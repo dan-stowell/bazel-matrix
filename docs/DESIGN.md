@@ -2,9 +2,9 @@
 
 Bazel Museum is a collection of reproducible Bazel builds of public open-source
 projects. There are three pieces. **Piece 1 (the data pipeline) and Piece 2
-(isolated builds with a fully-hermetic C/C++ toolchain) are built, and Piece 3
-has its first project (abseil-cpp). The optional containerized isolation tier is
-the next step.**
+(isolated, daemonless builds) are built, and Piece 3 has three projects spanning
+three toolchains — C++ (abseil-cpp), JVM (copybara), and Rust (cxx) — each built
+fully hermetically. The optional containerized isolation tier is the next step.**
 
 Everything is driven by Bazel: clone the repo onto a host that has only Bazel
 (via `bazelisk`) and you can build and run everything. No host Python, no host
@@ -205,9 +205,18 @@ the build (the runner has a hook for applying them; abseil needs none).
 
 ### Projects
 
-| Project | Target | Source pin | Toolchain |
-|---------|--------|-----------|-----------|
-| [abseil-cpp](../builds/abseil_cpp/BUILD.bazel) | `//builds/abseil_cpp:build` | release `20260526.0` | hermetic LLVM |
+| Project | Lang | Target | Source pin | Toolchain (all hermetic) |
+|---------|------|--------|-----------|--------------------------|
+| [abseil-cpp](../builds/abseil_cpp/BUILD.bazel) | C++ | `//builds/abseil_cpp:build` | release `20260526.0` | LLVM (`hermetic_cc`) |
+| [copybara](../builds/copybara/BUILD.bazel) | Java | `//builds/copybara:build` | tag `v20260622` | remote JDK (rules_java) |
+| [cxx](../builds/cxx/BUILD.bazel) | Rust | `//builds/cxx:build` | tag `1.0.194` | rustc (rules_rust) + LLVM |
+
+Each verified to compile with its hermetic toolchain and **zero host-compiler
+invocations**: abseil/cxx use `external/llvm++.../bin/clang`, copybara runs on a
+bundled OpenJDK (host `java` absent), cxx's rustc is rules_rust's downloaded
+toolchain. Go-style native deps, JVM, and Rust+C++ FFI exercise three different
+toolchain provisioning paths — and each fetches darwin toolchains too, so the
+collection is positioned for a macOS port.
 
 Adding a project:
 

@@ -12,8 +12,8 @@ run everything inside — no host Python, no host `gh`, no daemons assumed.
 | Piece | What | Status |
 |-------|------|--------|
 | 1 | **Data pipeline** — discover public projects that build with Bazel | ✅ built |
-| 2 | **Run Bazel builds in isolation** — daemonless inner build + fully-hermetic LLVM toolchain | ✅ built (container is an optional next tier) |
-| 3 | **The build collection** — first project: abseil-cpp | ✅ first build (abseil-cpp) |
+| 2 | **Run Bazel builds in isolation** — daemonless inner build + hermetic toolchains | ✅ built (container is an optional next tier) |
+| 3 | **The build collection** — 3 projects across 3 toolchains | ✅ abseil-cpp (C++), copybara (Java), cxx (Rust) |
 
 See [docs/DESIGN.md](docs/DESIGN.md) for the architecture and
 [docs/KICKOFF.md](docs/KICKOFF.md) for the project's intent.
@@ -50,6 +50,10 @@ bazel run //builds/abseil_cpp:build -- //absl/strings:strings
 
 # Pass flags through to the inner build:
 bazel run //builds/abseil_cpp:build -- --verbose_failures
+
+# Other projects / toolchains:
+bazel run //builds/copybara:build   # Java  — rules_java + hermetic remote JDK
+bazel run //builds/cxx:build        # Rust  — rules_rust + hermetic LLVM
 ```
 
 First run compiles from scratch (~5 min); reruns hit the inner action cache

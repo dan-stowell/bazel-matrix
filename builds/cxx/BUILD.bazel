@@ -1,0 +1,21 @@
+load("//builds:defs.bzl", "museum_build")
+
+# cxx (cxx.rs) — safe FFI between Rust and C++. Build #3 in the museum:
+# exercises the Rust toolchain (rules_rust 0.70 + hermetic rustc 1.96) and,
+# because cxx bridges to C++, the C/C++ toolchain too.
+#
+# Source pinned in //tools/fetch:extension.bzl (@cxx_archive, tag 1.0.194).
+# hermetic_cc = True so the C++ side also uses the fully-hermetic LLVM toolchain
+# (no host compiler) -- this also exercises rules_rust composing with it.
+#
+#   bazel run //builds/cxx:build
+museum_build(
+    name = "build",
+    source_archive = "@cxx_archive//file",
+    strip_prefix = "cxx-1.0.194",
+    targets = [
+        "//:cxx",   # rust_library (Rust side of the bridge)
+        "//:core",  # cc_library (C++ side)
+    ],
+    hermetic_cc = True,
+)
