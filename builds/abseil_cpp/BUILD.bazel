@@ -20,5 +20,21 @@ museum_project(
         # executor). Override targets for quick iteration, e.g.:
         #   bazel run //builds/abseil_cpp:build.remote -- //absl/base:base
         goal("build.remote", overlays = [BUILDBUDDY_RBE], targets = ["//absl/..."]),
+        # Same suite, executed on the remote executors. The cctz/time tests read
+        # the system timezone database (/usr/share/zoneinfo), which the executor
+        # image doesn't ship — it isn't a Bazel-tracked input — so they're
+        # excluded here (the local `test` goal still runs them). A hermetic
+        # tzdata input, or a tzdata-bearing executor image, would re-include them.
+        goal(
+            "test.remote",
+            command = "test",
+            overlays = [BUILDBUDDY_RBE],
+            targets = [
+                "//absl/...",
+                "-//absl/time:time_test",
+                "-//absl/time/internal/cctz:time_zone_format_test",
+                "-//absl/time/internal/cctz:time_zone_lookup_test",
+            ],
+        ),
     ],
 )

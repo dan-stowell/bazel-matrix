@@ -198,6 +198,44 @@ hermetic RBE work without a sysroot baked into the remote image.
 hermetic-llvm also cross-compiles (linux x86_64 ↔ aarch64, and more), the lever
 for cross-platform/RBE work.
 
+### Remote build execution (BuildBuddy RBE)
+
+The `BUILDBUDDY_RBE` overlay ([`builds/overlays.bzl`](../builds/overlays.bzl))
+runs builds *and* tests on BuildBuddy's cloud executors. Each project has
+`build.remote` and `test.remote` goals (the overlay composes onto any goal).
+
+We deliberately **do not use `toolchains_buildbuddy`**. Because `HERMETIC_LLVM`
+is zero-sysroot, the compiler and all inputs are content-addressed and uploaded
+to the CAS, so they run **image-agnostically** on the executor — hermetic-llvm
+even builds its own glibc 2.28 + compiler-rt from source *on the executor*. The
+only image requirement is a glibc new enough to launch the prebuilt `clang`
+(BuildBuddy's default Ubuntu 16.04 is too old), so the overlay pins a modern
+executor image via `--remote_default_exec_properties=container-image=…`. The API
+key is injected as a `--remote_header` by the runner (never committed).
+
+Verified on a linux/amd64 host: abseil 1327 remote actions, cxx 515 remote,
+copybara 292 remote — all green. Tests execute remotely too:
+
+| Project | `test.remote` | excluded on the executor (kept locally) |
+|---------|---------------|------------------------------------------|
+| abseil-cpp | 248/248 pass | 3 cctz/time tests — executor lacks system tzdata |
+| cxx | 1/1 pass | — |
+| copybara | 218/218 pass | Mercurial (no `hg`); 2 tests asserting permission-denied (executor runs as root) |
+
+The exclusions are all **executor-environment** differences (missing tzdata,
+root uid), not real failures — the local `test` goal still runs them. They're
+the RBE analogue of the local host-tooling notes below, and the natural fix is a
+hermetic data input (tzdata) / a non-root exec property rather than excluding.
+
+**macOS arm64 (next).** On a darwin host, Bazel's auto exec platform is darwin,
+but the executors are linux/x86_64. RBE from a Mac must therefore force a linux
+exec+target platform (a `platform()` with the executor `container-image`, set via
+`--host_platform`/`--platforms`/`--extra_execution_platforms`) so hermetic-llvm's
+linux toolchain runs on the executor and the Mac only orchestrates. Note for that
+work: `cxx` and `copybara` direct-depend on `platforms` (so `@platforms` is
+visible for the platform target), but `abseil-cpp` does **not** — its Mac-RBE
+overlay must also append `bazel_dep(name = "platforms", …)` to `MODULE.bazel`.
+
 ### Known boundaries (future work)
 
 - **Host tooling in tests.** Some projects' tests shell out to host binaries.
@@ -208,10 +246,6 @@ for cross-platform/RBE work.
 - **Network is open** during the inner build (to fetch BCR deps + the toolchain);
   the repository cache makes this a one-time cost. Vendoring for fully offline
   builds is possible later.
-- **Remote cache / RBE (next).** Modeled as overlays (`BUILDBUDDY_*`): BES +
-  `--remote_cache`/`--remote_executor` flags via a `.bazelrc` append, with the
-  API key injected through `remote_header_envs`. hermetic-llvm's zero-sysroot
-  toolchain is intended to make RBE hermetic without `toolchains_buildbuddy`.
 - **Optional container tier.** A minimal OCI image via
   [`rules_img`](https://github.com/bazel-contrib/rules_img) for kernel-level
   isolation. With toolchains hermetic, its marginal value is whole-process
@@ -229,9 +263,9 @@ Each project lives under `builds/<project>/` and is declared with
 
 | Project | Lang | Goals | Source pin | Toolchain (all hermetic) |
 |---------|------|-------|-----------|--------------------------|
-| [abseil-cpp](../builds/abseil_cpp/BUILD.bazel) | C++ | `build`, `test` | release `20260526.0` | LLVM (`HERMETIC_LLVM`) |
-| [copybara](../builds/copybara/BUILD.bazel) | Java | `build`, `test` | tag `v20260622` | remote JDK (rules_java) |
-| [cxx](../builds/cxx/BUILD.bazel) | Rust | `build`, `test` | tag `1.0.194` | rustc (rules_rust) + LLVM |
+| [abseil-cpp](../builds/abseil_cpp/BUILD.bazel) | C++ | `build`, `test`, `build.remote`, `test.remote` | release `20260526.0` | LLVM (`HERMETIC_LLVM`) |
+| [copybara](../builds/copybara/BUILD.bazel) | Java | `build`, `test`, `build.remote`, `test.remote` | tag `v20260622` | remote JDK (rules_java) |
+| [cxx](../builds/cxx/BUILD.bazel) | Rust | `build`, `test`, `build.remote`, `test.remote` | tag `1.0.194` | rustc (rules_rust) + LLVM |
 
 `bazel test` results, all hermetic (compiles use `external/llvm++.../bin/clang`
 with zero `/usr/bin` compiler calls; copybara runs on a bundled OpenJDK with

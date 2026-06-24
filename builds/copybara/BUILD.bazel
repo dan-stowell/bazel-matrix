@@ -34,5 +34,19 @@ museum_project(
             overlays = [BUILDBUDDY_RBE],
             targets = ["//java/com/google/copybara:copybara"],
         ),
+        goal(
+            "test.remote",
+            command = "test",
+            overlays = [BUILDBUDDY_RBE],
+            targets = [
+                "//javatests/...",
+                "-//javatests/com/google/copybara/hg/...",  # needs Mercurial
+                # The executor runs actions as root, so these tests don't observe
+                # the permission-denied / file-locked failures they assert (they
+                # pass in the local `test` goal under a normal uid).
+                "-//javatests/com/google/copybara/archive:ArchiveModuleTest_all_tests",
+                "-//javatests/com/google/copybara:folder/FolderDestinationTest_all_tests",
+            ],
+        ),
     ],
 )

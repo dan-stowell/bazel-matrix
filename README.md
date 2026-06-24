@@ -12,8 +12,8 @@ run everything inside — no host Python, no host `gh`, no daemons assumed.
 | Piece | What | Status |
 |-------|------|--------|
 | 1 | **Data pipeline** — discover public projects that build with Bazel | ✅ built |
-| 2 | **Run Bazel builds (and tests) in isolation** — daemonless, hermetic toolchains, composable overlays | ✅ built (remote cache/RBE + container are next tiers) |
-| 3 | **The build collection** — 3 projects across 3 toolchains, each with build + test | ✅ abseil-cpp (C++), copybara (Java), cxx (Rust) |
+| 2 | **Run Bazel builds + tests in isolation** — daemonless, hermetic toolchains, composable overlays, BuildBuddy RBE | ✅ built (RBE on linux; macOS RBE next) |
+| 3 | **The build collection** — 3 projects across 3 toolchains, each with build/test + remote build/test | ✅ abseil-cpp (C++), copybara (Java), cxx (Rust) |
 
 See [docs/DESIGN.md](docs/DESIGN.md) for the architecture and
 [docs/KICKOFF.md](docs/KICKOFF.md) for the project's intent.
@@ -59,6 +59,13 @@ bazel run //builds/cxx:build        # Rust  — rules_rust + hermetic LLVM
 bazel run //builds/abseil_cpp:test  # 251/251 pass
 bazel run //builds/cxx:test         # 1/1 pass
 bazel run //builds/copybara:test    # 220/220 pass (Mercurial tests excluded)
+
+# Build AND test on BuildBuddy remote execution (no toolchains_buildbuddy;
+# hermetic-llvm runs on the executors). Needs BUILDBUDDY_API_KEY in the env:
+bazel run //builds/abseil_cpp:build.remote
+bazel run //builds/abseil_cpp:test.remote   # 248/248 pass remotely
+bazel run //builds/cxx:test.remote
+bazel run //builds/copybara:test.remote
 ```
 
 First run compiles from scratch (~5 min); reruns hit the inner action cache

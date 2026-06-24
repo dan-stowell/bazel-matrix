@@ -17,5 +17,6 @@ museum_project(
         goal("test", command = "test", targets = ["//..."]),
         # Remote build execution (rustc + hermetic clang both run on the executor).
         goal("build.remote", overlays = [BUILDBUDDY_RBE], targets = ["//:cxx", "//:core"]),
+        goal("test.remote", command = "test", overlays = [BUILDBUDDY_RBE], targets = ["//..."]),
     ],
 )
