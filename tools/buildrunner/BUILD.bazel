@@ -1,0 +1,4 @@
+# The runner source is consumed by the `museum_build` macro (//builds:defs.bzl),
+# which creates a per-project py_binary around it (with that project's pinned
+# source archive + the inner bazel binary attached as data).
+exports_files(["runner.py"])

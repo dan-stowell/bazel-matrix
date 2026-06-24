@@ -1,8 +1,9 @@
 # Design
 
 Bazel Museum is a collection of reproducible Bazel builds of public open-source
-projects. There are three pieces. **Piece 1 (the data pipeline) is built; pieces
-2 and 3 are planned.**
+projects. There are three pieces. **Piece 1 (the data pipeline) and Piece 2
+(isolated builds, Tier 1) are built, and Piece 3 has its first project
+(abseil-cpp). The containerized isolation tier is the next step.**
 
 Everything is driven by Bazel: clone the repo onto a host that has only Bazel
 (via `bazelisk`) and you can build and run everything. No host Python, no host
@@ -90,7 +91,12 @@ pipeline/
   github.py        hermetic-gh wrapper + token resolution
   netfetch.py      stdlib-only HTTP helpers (no third-party deps)
   sources/         one module per source (nicolov, jin, bcr)
-tools/gh/          hermetic gh CLI module extension
+tools/gh/          hermetic gh CLI module extension (pipeline enrichment)
+tools/fetch/       module extensions: inner Bazel binary + project source pins
+tools/buildrunner/ runner.py — the isolated, daemonless inner-build engine
+builds/
+  defs.bzl         the museum_build macro
+  abseil_cpp/      first project: //builds/abseil_cpp:build
 data/projects.json generated snapshot (committed)
 ```
 
@@ -99,29 +105,89 @@ runfiles helper — no pip lockfile — which keeps it simple and hermetic.
 
 ---
 
-## Piece 2 — Running Bazel builds in isolation (planned)
+## Piece 2 — Running Bazel builds in isolation (built; Tier 1)
 
-Goal: `bazel run //builds/<project>:build` builds a chosen project inside a
-minimal, hermetic Linux container, with **no daemon assumed** (`bazel
---batch`-style, or a non-daemon runner).
+`bazel run //builds/<project>:build` builds a project with a **pinned, hermetic
+inner Bazel**, **daemonless**, in an **isolated build root** — using only Bazel
+on the host. Isolation here is at the level of *Bazel state + environment*
+(Tier 1); a kernel/container tier is the next step.
 
-Direction (open to change):
+### How it works
 
-- Define a minimal container image that can run Bazel, using
-  [`rules_img`](https://github.com/bazel-contrib/rules_img).
-- Provide per-project run targets:
-  `bazel run //:project_xyz_bazel_build -- <args>`.
-- Start with linux/amd64; linux/arm64 next (the hermetic `gh` setup already
-  pins both arches as a template for multi-arch).
+```
+bazel run //builds/abseil_cpp:build
+  │  (outer Bazel)
+  ▼
+tools/buildrunner/runner.py            # the engine, a py_binary per project
+  ├─ resolves (via runfiles):
+  │    @inner_bazel_linux_amd64//file  # pinned bazel 9.1.1 binary (hermetic)
+  │    @absl_archive//file             # pinned abseil source tarball (sha256)
+  ├─ extracts source fresh into  <build_root>/work/   (deterministic mtimes)
+  └─ exec:  bazel --batch --nohome_rc --nosystem_rc
+                  --output_user_root=<build_root>/output_root
+                  build --repository_cache=<build_root>/repo_cache
+                  -c opt //absl/...
+            (cwd = extracted workspace, scrubbed env)
+```
 
-## Piece 3 — The build collection (planned)
+The pinned inner Bazel binary and project source tarballs are fetched by
+[`tools/fetch/extension.bzl`](../tools/fetch/extension.bzl) (the same hermetic,
+sha256-pinned pattern as the `gh` CLI; linux amd64 + arm64). The `museum_build`
+macro ([`builds/defs.bzl`](../builds/defs.bzl)) wires a per-project `py_binary`
+around `runner.py` with that project's source + the inner Bazel as `data`.
 
-For each museum project:
+### What "isolation" guarantees (Tier 1)
 
-- Pull the project source as a dependency in `MODULE.bazel` (e.g.
-  `bazel_dep` / `git_override` / `archive_override`), not vendored.
-- Keep any necessary overlays/patches alongside it.
+- **Hermetic inner Bazel** — a pinned release binary, never the host's bazel/
+  bazelisk.
+- **Pinned source** — extracted fresh each run from a content-addressed
+  tarball, so the build always starts from a pristine, known tree.
+- **Dedicated state** — its own `--output_user_root` and `--repository_cache`
+  under a per-project build root (default `${TMPDIR}/bazel-museum/<project>`,
+  override with `MUSEUM_BUILD_ROOT`). The host's `~/.cache/bazel` is never
+  touched.
+- **Daemonless** — `--batch`: no Bazel server survives the run.
+- **No host config leakage** — `--nohome_rc --nosystem_rc`, and a scrubbed
+  environment (only an explicit allowlist — `PATH`, proxy/TLS vars, `CC`/`CXX`,
+  locale — is passed through).
 
-The data pipeline (piece 1) feeds the choice of first project: pick a
-well-known, self-contained project that already builds with Bazel from
-`data/projects.json`, then exercise pieces 2 and 3 against it.
+Reruns are fast: even though the source is re-extracted, the tarball's
+deterministic mtimes mean the inner action cache hits (~5 s vs ~5 min cold).
+
+### Known boundaries (future work)
+
+- **Host C/C++ toolchain.** abseil's `cc_configure` autodetects the host
+  compiler (`gcc`/`clang`), so the *toolchain* isn't hermetic yet. A hermetic
+  LLVM toolchain (e.g. `toolchains_llvm`) injected via overlay would close this.
+- **Network is open** during the inner build (to fetch BCR deps); the
+  repository cache makes this a one-time cost. Vendoring for fully offline
+  builds is possible later.
+- **Container tier (next).** Wrap the runner in a minimal OCI image built with
+  [`rules_img`](https://github.com/bazel-contrib/rules_img), run via a
+  container runtime — the kickoff's original idea — for kernel-level isolation
+  on top of the Tier 1 foundation. (`bwrap` is a lighter alternative where a
+  runtime isn't available.)
+
+## Piece 3 — The build collection
+
+Each project lives under `builds/<project>/` and is declared with the
+`museum_build` macro. Its source is pinned in
+[`tools/fetch/extension.bzl`](../tools/fetch/extension.bzl) (the kickoff's
+"source as a dep in `MODULE.bazel`"), and any overlays/patches live alongside
+the build (the runner has a hook for applying them; abseil needs none).
+
+### Projects
+
+| Project | Target | Source pin |
+|---------|--------|-----------|
+| [abseil-cpp](../builds/abseil_cpp/BUILD.bazel) | `//builds/abseil_cpp:build` | release `20260526.0` |
+
+Adding a project:
+
+1. Add its source tarball (url + sha256 + filename) to `_PROJECT_SOURCES` in
+   `tools/fetch/extension.bzl` and `use_repo(...)` it in `MODULE.bazel`.
+2. Create `builds/<project>/BUILD.bazel` with a `museum_build(...)` call.
+3. `bazel run //builds/<project>:build`.
+
+The data pipeline (piece 1) feeds the choice of projects: pick well-known,
+self-contained projects that already build with Bazel from `data/projects.json`.

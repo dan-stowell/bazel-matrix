@@ -1,0 +1,5 @@
+# The //builds package hosts the museum's collection of project builds.
+# Each project lives in a subpackage (e.g. //builds/abseil_cpp) and uses the
+# museum_build macro from :defs.bzl.
+
+exports_files(["defs.bzl"])

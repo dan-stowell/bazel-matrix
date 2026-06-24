@@ -1,0 +1,19 @@
+load("//builds:defs.bzl", "museum_build")
+
+# Abseil's C++ common libraries — the museum's first build.
+# Source is pinned in //tools/fetch:extension.bzl (@absl_archive, release
+# 20260526.0). Builds everything under //absl/... with the pinned inner Bazel,
+# isolated and daemonless:
+#
+#   bazel run //builds/abseil_cpp:build
+#   bazel run //builds/abseil_cpp:build -- //absl/strings/...   # subset
+museum_build(
+    name = "build",
+    source_archive = "@absl_archive//file",
+    strip_prefix = "abseil-cpp-20260526.0",
+    targets = ["//absl/..."],
+    build_flags = [
+        "-c",
+        "opt",
+    ],
+)

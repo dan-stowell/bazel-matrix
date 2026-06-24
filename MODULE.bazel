@@ -26,3 +26,11 @@ python.toolchain(
 # Used by the pipeline to enrich project metadata (stars, archived, etc.).
 gh = use_extension("//tools/gh:extension.bzl", "gh_extension")
 use_repo(gh, "gh_cli_linux_amd64", "gh_cli_linux_arm64")
+
+# Hermetic Bazel binary used to run the *inner* project builds in isolation,
+# and pinned source archives of the museum's projects (see //tools/fetch).
+inner_bazel = use_extension("//tools/fetch:extension.bzl", "inner_bazel")
+use_repo(inner_bazel, "inner_bazel_linux_amd64", "inner_bazel_linux_arm64")
+
+project_sources = use_extension("//tools/fetch:extension.bzl", "project_sources")
+use_repo(project_sources, "absl_archive")

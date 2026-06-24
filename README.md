@@ -12,8 +12,8 @@ run everything inside — no host Python, no host `gh`, no daemons assumed.
 | Piece | What | Status |
 |-------|------|--------|
 | 1 | **Data pipeline** — discover public projects that build with Bazel | ✅ built |
-| 2 | Run Bazel builds in isolation (minimal container, daemonless) | 🚧 planned |
-| 3 | The build collection (project sources as deps + overlays/patches) | 🚧 planned |
+| 2 | **Run Bazel builds in isolation** — hermetic, daemonless inner build | ✅ built (Tier 1; container next) |
+| 3 | **The build collection** — first project: abseil-cpp | ✅ first build (abseil-cpp) |
 
 See [docs/DESIGN.md](docs/DESIGN.md) for the architecture and
 [docs/KICKOFF.md](docs/KICKOFF.md) for the project's intent.
@@ -36,3 +36,21 @@ Enrichment authenticates GitHub via a hermetic, pinned `gh` (downloaded as a
 Bazel dependency). It uses `GH_TOKEN`/`GITHUB_TOKEN` if set, otherwise the
 host's `gh auth` credentials. Pass one explicitly with
 `GH_TOKEN=… bazel run //pipeline:gather`.
+
+### Build a project in isolation
+
+```sh
+# Build all of abseil-cpp with a pinned, hermetic inner Bazel, daemonless,
+# in an isolated build root (no host Bazel state touched):
+bazel run //builds/abseil_cpp:build
+
+# Build a subset (overrides the default targets):
+bazel run //builds/abseil_cpp:build -- //absl/strings:strings
+
+# Pass flags through to the inner build:
+bazel run //builds/abseil_cpp:build -- --verbose_failures
+```
+
+First run compiles from scratch (~5 min); reruns hit the inner action cache
+(~5 s). See [docs/DESIGN.md](docs/DESIGN.md#piece-2--running-bazel-builds-in-isolation-built)
+for how the isolation works.
