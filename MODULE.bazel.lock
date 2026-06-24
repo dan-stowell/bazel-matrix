@@ -190,7 +190,7 @@
   "moduleExtensions": {
     "//tools/fetch:extension.bzl%inner_bazel": {
       "general": {
-        "bzlTransitiveDigest": "yy6zLNpd2ey3bj7lD8/HnzWTPyB9H4rHInY4pZdvPJc=",
+        "bzlTransitiveDigest": "D+N0VjlTNH6xB4bLKgTAwGFpqzcenefaLtv2ehrH1XE=",
         "usagesDigest": "h14pbfoGF+xRhbdi2p4ZLtdO3iD9D6LSCzysqtpR8HE=",
         "recordedInputs": [
           "REPO_MAPPING:,bazel_tools bazel_tools"
@@ -223,7 +223,7 @@
     },
     "//tools/fetch:extension.bzl%project_sources": {
       "general": {
-        "bzlTransitiveDigest": "yy6zLNpd2ey3bj7lD8/HnzWTPyB9H4rHInY4pZdvPJc=",
+        "bzlTransitiveDigest": "D+N0VjlTNH6xB4bLKgTAwGFpqzcenefaLtv2ehrH1XE=",
         "usagesDigest": "4RQlvpJYAxX2PZxLc3Y4g/kgSEcAiqEkkFheY2guOrA=",
         "recordedInputs": [
           "REPO_MAPPING:,bazel_tools bazel_tools"
@@ -237,6 +237,26 @@
               ],
               "sha256": "6e1aee535473414164bf83e4ebc40240dec71a4701f8a642d906e95bea1aea0c",
               "downloaded_file_path": "abseil-cpp-20260526.0.tar.gz"
+            }
+          },
+          "copybara_archive": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_file",
+            "attributes": {
+              "urls": [
+                "https://github.com/google/copybara/archive/refs/tags/v20260622.tar.gz"
+              ],
+              "sha256": "62fd6f98f6414c0ed846f839f391e3c88bbbc7d2440cb353b4009a711b4d5ea0",
+              "downloaded_file_path": "copybara-v20260622.tar.gz"
+            }
+          },
+          "cxx_archive": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_file",
+            "attributes": {
+              "urls": [
+                "https://github.com/dtolnay/cxx/archive/refs/tags/1.0.194.tar.gz"
+              ],
+              "sha256": "2edf94915ab43778b02a13e522d050a76dea607d1a05f769911775676d27cb3c",
+              "downloaded_file_path": "cxx-1.0.194.tar.gz"
             }
           }
         }

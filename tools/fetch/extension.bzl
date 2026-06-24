@@ -53,6 +53,16 @@ _PROJECT_SOURCES = {
         "sha256": "6e1aee535473414164bf83e4ebc40240dec71a4701f8a642d906e95bea1aea0c",
         "filename": "abseil-cpp-20260526.0.tar.gz",
     },
+    "copybara_archive": {
+        "url": "https://github.com/google/copybara/archive/refs/tags/v20260622.tar.gz",
+        "sha256": "62fd6f98f6414c0ed846f839f391e3c88bbbc7d2440cb353b4009a711b4d5ea0",
+        "filename": "copybara-v20260622.tar.gz",
+    },
+    "cxx_archive": {
+        "url": "https://github.com/dtolnay/cxx/archive/refs/tags/1.0.194.tar.gz",
+        "sha256": "2edf94915ab43778b02a13e522d050a76dea607d1a05f769911775676d27cb3c",
+        "filename": "cxx-1.0.194.tar.gz",
+    },
 }
 
 

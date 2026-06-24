@@ -1,0 +1,17 @@
+load("//builds:defs.bzl", "museum_build")
+
+# Copybara — Google's tool for transforming and moving code between repositories.
+# A genuinely Bazel-native Java project. Build #2 in the museum: exercises the
+# JVM toolchain (rules_java + Bazel's hermetic remote JDK).
+#
+# Source pinned in //tools/fetch:extension.bzl (@copybara_archive, tag
+# v20260622). The Java toolchain is hermetic out of the box (downloaded remote
+# JDK), so no toolchain overlay is needed.
+#
+#   bazel run //builds/copybara:build
+museum_build(
+    name = "build",
+    source_archive = "@copybara_archive//file",
+    strip_prefix = "copybara-20260622",
+    targets = ["//java/com/google/copybara:copybara"],
+)

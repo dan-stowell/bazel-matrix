@@ -33,4 +33,4 @@ inner_bazel = use_extension("//tools/fetch:extension.bzl", "inner_bazel")
 use_repo(inner_bazel, "inner_bazel_linux_amd64", "inner_bazel_linux_arm64")
 
 project_sources = use_extension("//tools/fetch:extension.bzl", "project_sources")
-use_repo(project_sources, "absl_archive")
+use_repo(project_sources, "absl_archive", "copybara_archive", "cxx_archive")
