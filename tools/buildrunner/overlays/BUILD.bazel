@@ -1,3 +1,4 @@
-# Static overlay snippets appended onto a project's source by the build runner
-# (see //tools/buildrunner/runner.py --append and the museum_build macro).
-exports_files(glob(["*"]))
+# Static overlay snippets appended/written onto a project's source by the build
+# runner (see //tools/buildrunner/runner.py --append/--write and the museum_project
+# macro). Includes the dependency-module patches under patches/.
+exports_files(glob(["*", "patches/*"]))

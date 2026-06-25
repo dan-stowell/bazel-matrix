@@ -13,3 +13,17 @@
 bazel_dep(name = "llvm", version = "0.8.9")
 
 register_toolchains("@llvm//toolchain:all")
+
+# Patch the published `llvm` module without forking it. On macOS, cc_sysroot
+# emits only --sysroot, but clang resolves the system root as
+# -isysroot > $SDKROOT > --sysroot, so a stray SDKROOT in an action's
+# environment (apple_support injects one) silently overrides the hermetic SDK
+# and breaks hermeticity. This backports hermeticbuild/hermetic-llvm#642, which
+# also passes -isysroot. The patch file + this museum_patches/ package are
+# written into the source tree by the runner (see HERMETIC_LLVM in
+# //builds:overlays.bzl). Drop once #642 ships in a published BCR release.
+single_version_override(
+    module_name = "llvm",
+    patches = ["//museum_patches:llvm-isysroot.patch"],
+    patch_strip = 1,
+)

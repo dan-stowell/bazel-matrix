@@ -1,0 +1,8 @@
+# === bazel-museum: patches applied to dependency modules (injected by HERMETIC_LLVM) ===
+#
+# The runner writes this file (verbatim) to a fresh `museum_patches/` package in
+# the extracted source, alongside the patch files it references. The injected
+# MODULE.bazel uses single_version_override(module_name = "llvm", patches = [...])
+# to apply them, so we can ride the latest published `llvm` BCR module unforked
+# while carrying fixes that haven't shipped in a release yet.
+exports_files(glob(["*.patch"]))

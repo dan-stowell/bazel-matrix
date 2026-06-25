@@ -1,0 +1,27 @@
+Pass -isysroot on macOS so the hermetic SDK can't be overridden by SDKROOT.
+
+Backport of hermeticbuild/hermetic-llvm#642 onto the llvm 0.8.9 BCR release.
+clang resolves the system root as: -isysroot > $SDKROOT > --sysroot. cc_sysroot
+only emits --sysroot, so a stray SDKROOT in an action's environment (e.g. one
+injected by apple_support on macOS) silently overrides the hermetic SDK and
+breaks hermeticity. Adding -isysroot pins the hermetic sysroot at top priority.
+
+Applied via single_version_override(patches=...) so we keep the latest BCR
+module unforked. Drop once #642 lands in a published release.
+
+diff --git a/toolchain/args/macos/BUILD.bazel b/toolchain/args/macos/BUILD.bazel
+--- a/toolchain/args/macos/BUILD.bazel
++++ b/toolchain/args/macos/BUILD.bazel
+@@ -11,6 +11,12 @@ cc_sysroot(
+     allowlist_include_directories = [
+         "@macos_sdk//sysroot",
+     ],
++    # NOTE: cc_sysroot automatically passes --sysroot=, but clang has some
++    # defaulting logic if we don't also pass -isysroot.
++    args = [
++        "-isysroot",
++        "{sysroot}",
++    ],
+     data = [
+         "@macos_sdk//sysroot",
+     ],

@@ -119,6 +119,13 @@ def main(argv=None):
                    help="append the runfile RLOC onto DEST (relative to the workspace "
                         "root) before building -- e.g. inject a toolchain into MODULE.bazel "
                         "(repeatable)")
+    p.add_argument("--write", action="append", default=[], dest="writes",
+                   metavar="RLOC=DEST",
+                   help="copy the runfile RLOC verbatim to DEST (relative to the "
+                        "workspace root), creating parent dirs -- e.g. drop a patch "
+                        "file and a BUILD marker into a fresh museum_patches/ package "
+                        "(repeatable). Unlike --append, the destination is overwritten "
+                        "exactly, with no leading newline.")
     p.add_argument("--patch", action="append", default=[], dest="patches",
                    metavar="RLOC",
                    help="apply a unified-diff patch (patch -p1) to the source before "
@@ -151,6 +158,19 @@ def main(argv=None):
     if os.path.isdir(work):
         shutil.rmtree(work)
     workspace = _extract(archive, work, args.strip_prefix)
+
+    # Drop verbatim files into the source tree (e.g. a patch + its BUILD marker
+    # into a fresh museum_patches/ package). Unlike --append this overwrites the
+    # destination exactly, so a patch file isn't corrupted by a leading newline.
+    for spec in args.writes:
+        src_rloc, _, dest = spec.rpartition("=")
+        if not src_rloc or not dest:
+            sys.exit(f"runner: bad --write spec {spec!r} (want RLOC=DEST)")
+        src = _resolve(rf, src_rloc)
+        target = os.path.join(workspace, dest)
+        os.makedirs(os.path.dirname(target), exist_ok=True)
+        shutil.copyfile(src, target)
+        print(f"  overlay(write): {dest} <= {os.path.basename(src)}", file=sys.stderr)
 
     # Apply overlays: append snippets onto existing source files (e.g. inject a
     # hermetic toolchain into the project's MODULE.bazel). Deterministic because

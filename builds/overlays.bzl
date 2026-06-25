@@ -5,6 +5,9 @@ condition (a toolchain, an environment like remote cache / RBE, a project fix):
 
   * appends   — list of (file_label, dest): append file onto dest in the source
                 (e.g. inject a toolchain into MODULE.bazel, flags into .bazelrc)
+  * writes    — list of (file_label, dest): copy file verbatim to dest (creating
+                parent dirs), e.g. drop a patch + BUILD marker into a fresh
+                package. Unlike appends, no leading newline / no existing file.
   * patches   — list of unified-diff file labels applied with `patch -p1`
   * build_flags        — flags added to the inner `bazel <command>`
   * remote_header_envs — "ENVVAR:HEADER" pairs; the runner reads ENVVAR and adds
@@ -15,10 +18,11 @@ can add more (e.g. a remote-execution overlay). This is how we capture
 overlays/patches per (project x goal x environment).
 """
 
-def overlay(name, appends = [], patches = [], build_flags = [], remote_header_envs = []):
+def overlay(name, appends = [], writes = [], patches = [], build_flags = [], remote_header_envs = []):
     return struct(
         name = name,
         appends = appends,
+        writes = writes,
         patches = patches,
         build_flags = build_flags,
         remote_header_envs = remote_header_envs,
@@ -29,6 +33,14 @@ def overlay(name, appends = [], patches = [], build_flags = [], remote_header_en
 HERMETIC_LLVM = overlay(
     name = "hermetic_llvm",
     appends = [("//tools/buildrunner/overlays:hermetic_cc.MODULE.bazel", "MODULE.bazel")],
+    # Carry hermeticbuild/hermetic-llvm#642 (pass -isysroot on macOS) as a
+    # single_version_override patch so we ride the latest published `llvm` BCR
+    # module unforked. The appended MODULE.bazel references //museum_patches; we
+    # drop that package (the patch + a BUILD marker) into the source here.
+    writes = [
+        ("//tools/buildrunner/overlays:patches/llvm-isysroot.patch", "museum_patches/llvm-isysroot.patch"),
+        ("//tools/buildrunner/overlays:museum_patches.BUILD.bazel", "museum_patches/BUILD.bazel"),
+    ],
     build_flags = ["--extra_toolchains=@llvm//toolchain:all"],
 )
 

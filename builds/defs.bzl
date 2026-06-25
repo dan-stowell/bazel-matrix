@@ -106,11 +106,13 @@ def _emit_goal(project_id, source_archive, strip_prefix, toolchains, env, plat, 
 
     overlays = toolchains + env.overlays
     appends = []  # (label, dest)
+    writes = []  # (label, dest)
     patch_labels = []
     overlay_flags = []
     header_envs = []
     for ov in overlays:
         appends += ov.appends
+        writes += ov.writes
         patch_labels += ov.patches
         overlay_flags += ov.build_flags
         header_envs += ov.remote_header_envs
@@ -139,6 +141,8 @@ def _emit_goal(project_id, source_archive, strip_prefix, toolchains, env, plat, 
         args.append("--strip-prefix=" + strip_prefix)
     for label, dest in appends:
         args.append("--append=$(rlocationpath {})={}".format(label, dest))
+    for label, dest in writes:
+        args.append("--write=$(rlocationpath {})={}".format(label, dest))
     for label in patch_labels:
         args.append("--patch=$(rlocationpath {})".format(label))
     for env_spec in header_envs:
@@ -161,7 +165,11 @@ def _emit_goal(project_id, source_archive, strip_prefix, toolchains, env, plat, 
     for target in targets:
         args.append("--target=" + target)
 
-    overlay_files = _dedupe([label for label, _ in appends] + patch_labels)
+    overlay_files = _dedupe(
+        [label for label, _ in appends] +
+        [label for label, _ in writes] +
+        patch_labels,
+    )
     data = [source_archive] + overlay_files + _INNER_BAZEL_DATA
 
     # host_only environments (local) can only run when the host matches the
