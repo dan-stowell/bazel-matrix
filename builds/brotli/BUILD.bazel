@@ -1,0 +1,28 @@
+load("//builds:defs.bzl", "build_spec", "museum_project")
+load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:overlays.bzl", "HERMETIC_LLVM", "overlay")
+
+# Brotli — Google's compression library + CLI.
+# Source pinned in //tools/fetch:extension.bzl (@brotli_archive, v1.2.0). The
+# release tarball ships BUILD files but no MODULE.bazel (its in-tree build is
+# WORKSPACE-based), so we inject the canonical module() declaration. Built on
+# the Bazel 8.7 inner: brotli's BUILD calls cc_library unloaded, which Bazel 8.7
+# autoloads (Bazel 9 removed that) — and 8.7 carries hermetic-llvm.
+#
+# BROTLI_MODULE must precede HERMETIC_LLVM so module() is the first statement in
+# the synthesized MODULE.bazel (the toolchain block is appended after it).
+BROTLI_MODULE = overlay(
+    name = "brotli_module",
+    appends = [("//builds/brotli:module.MODULE.bazel", "MODULE.bazel")],
+)
+
+#   bazel run //builds/brotli:build_local_linux_amd64
+museum_project(
+    name = "brotli",
+    source_archive = "@brotli_archive//file",
+    strip_prefix = "brotli-1.2.0",
+    toolchains = [BROTLI_MODULE, HERMETIC_LLVM],
+    bazel_version = "8.7.0",
+    environments = [LOCAL, RBE],
+    build = build_spec(targets = ["//:brotli", "//:brotlienc", "//:brotlidec"], flags = ["-c", "opt"]),
+)

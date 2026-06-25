@@ -63,6 +63,8 @@ use_repo(
     "json_archive",
     "flatbuffers_archive",
     "catch2_archive",
+    "ortools_archive",
+    "brotli_archive",
 )
 
 # Hermetic `actiond` worker binary (see //tools/actiond:extension.bzl). actiond

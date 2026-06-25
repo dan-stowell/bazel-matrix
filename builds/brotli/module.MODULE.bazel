@@ -1,0 +1,9 @@
+# Synthesized MODULE.bazel for brotli: the brotli release tarball ships BUILD
+# files but no MODULE.bazel (its in-tree build is WORKSPACE-based). This is the
+# canonical module declaration the BCR uses for brotli. The hermetic-llvm
+# overlay is appended after this block (so module() stays first).
+module(
+    name = "brotli",
+    version = "1.2.0",
+    repo_name = "org_brotli",
+)

@@ -1,0 +1,25 @@
+load("//builds:defs.bzl", "build_spec", "museum_project")
+load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:overlays.bzl", "HERMETIC_LLVM")
+
+# OR-Tools — Google's operations-research / optimization suite.
+# Source pinned in //tools/fetch:extension.bzl (@ortools_archive, v9.15), built
+# with the fully-hermetic LLVM toolchain. We build CP-SAT (or-tools' flagship
+# constraint solver), which is self-contained — it doesn't pull the external LP
+# solvers (scip/highs/glpk).
+#
+# Built on the Bazel 8.7 inner: or-tools registers Go toolchains via rules_go
+# 0.53, whose cgo.bzl uses the global CcInfo symbol that Bazel 9 removed (this
+# bites even the C++ targets, since Bazel analyzes all registered toolchains).
+# Bazel 8.7 keeps CcInfo global and still carries hermetic-llvm.
+#
+#   bazel run //builds/ortools:build_local_linux_amd64
+museum_project(
+    name = "ortools",
+    source_archive = "@ortools_archive//file",
+    strip_prefix = "or-tools-9.15",
+    toolchains = [HERMETIC_LLVM],
+    bazel_version = "8.7.0",
+    environments = [LOCAL, RBE],
+    build = build_spec(targets = ["//ortools/sat:cp_model_solver"], flags = ["-c", "opt"]),
+)

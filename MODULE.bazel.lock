@@ -234,7 +234,7 @@
     },
     "//tools/fetch:extension.bzl%inner_bazel": {
       "general": {
-        "bzlTransitiveDigest": "BnjOg33ortsNkC8jbdbD9TXeCqUmjJMuCjprX/uvAwo=",
+        "bzlTransitiveDigest": "Jy0e1imlv0oLjejKtudP8RTjXhIc4jfCkpl87IRRKhc=",
         "usagesDigest": "h14pbfoGF+xRhbdi2p4ZLtdO3iD9D6LSCzysqtpR8HE=",
         "recordedInputs": [
           "REPO_MAPPING:,bazel_tools bazel_tools"
@@ -333,7 +333,7 @@
     },
     "//tools/fetch:extension.bzl%project_sources": {
       "general": {
-        "bzlTransitiveDigest": "BnjOg33ortsNkC8jbdbD9TXeCqUmjJMuCjprX/uvAwo=",
+        "bzlTransitiveDigest": "Jy0e1imlv0oLjejKtudP8RTjXhIc4jfCkpl87IRRKhc=",
         "usagesDigest": "4RQlvpJYAxX2PZxLc3Y4g/kgSEcAiqEkkFheY2guOrA=",
         "recordedInputs": [
           "REPO_MAPPING:,bazel_tools bazel_tools"
@@ -427,6 +427,26 @@
               ],
               "sha256": "be23a52b85cf04cd9587612147a10b023d59ed9757fa1843cc99e615d6c0893c",
               "downloaded_file_path": "Catch2-3.15.1.tar.gz"
+            }
+          },
+          "ortools_archive": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_file",
+            "attributes": {
+              "urls": [
+                "https://github.com/google/or-tools/archive/refs/tags/v9.15.tar.gz"
+              ],
+              "sha256": "6395a00a97ff30af878ee8d7fd5ad0ab1c7844f7219182c6d71acbee1b5f3026",
+              "downloaded_file_path": "or-tools-9.15.tar.gz"
+            }
+          },
+          "brotli_archive": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_file",
+            "attributes": {
+              "urls": [
+                "https://github.com/google/brotli/archive/refs/tags/v1.2.0.tar.gz"
+              ],
+              "sha256": "816c96e8e8f193b40151dad7e8ff37b1221d019dbcb9c35cd3fadbfe6477dfec",
+              "downloaded_file_path": "brotli-1.2.0.tar.gz"
             }
           }
         }

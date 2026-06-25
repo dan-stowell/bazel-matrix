@@ -132,6 +132,19 @@ _PROJECT_SOURCES = {
         "sha256": "be23a52b85cf04cd9587612147a10b023d59ed9757fa1843cc99e615d6c0893c",
         "filename": "Catch2-3.15.1.tar.gz",
     },
+    # OR-Tools — Google's optimization suite. First-party Bazel, modern deps.
+    "ortools_archive": {
+        "url": "https://github.com/google/or-tools/archive/refs/tags/v9.15.tar.gz",
+        "sha256": "6395a00a97ff30af878ee8d7fd5ad0ab1c7844f7219182c6d71acbee1b5f3026",
+        "filename": "or-tools-9.15.tar.gz",
+    },
+    # Brotli — compression library + CLI. Release ships BUILD files but no
+    # MODULE.bazel (see //builds/brotli, which synthesizes one).
+    "brotli_archive": {
+        "url": "https://github.com/google/brotli/archive/refs/tags/v1.2.0.tar.gz",
+        "sha256": "816c96e8e8f193b40151dad7e8ff37b1221d019dbcb9c35cd3fadbfe6477dfec",
+        "filename": "brotli-1.2.0.tar.gz",
+    },
 }
 
 
