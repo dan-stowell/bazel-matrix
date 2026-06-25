@@ -68,12 +68,29 @@ def _resolve(rf, rloc):
     return path
 
 
-def _build_root(name):
-    """Per-project build root holding persistent caches + a fresh workdir."""
+def _museum_base():
     base = os.environ.get("MUSEUM_BUILD_ROOT")
     if not base:
         base = os.path.join(tempfile.gettempdir(), "bazel-museum")
-    return os.path.join(base, name)
+    return base
+
+
+def _build_root(name):
+    """Per-project build root holding a per-goal output root + a fresh workdir."""
+    return os.path.join(_museum_base(), name)
+
+
+def _shared_repo_cache():
+    """Repository (download) cache shared across all goals.
+
+    Bazel's repository cache is content-addressed (keyed by sha256), so sharing
+    it between goals is safe and is what it's for: a toolchain or source archive
+    — most notably the rate-limited macOS SDK and the hermetic LLVM tarballs — is
+    fetched once and reused everywhere instead of re-downloaded per goal (which
+    otherwise trips upstream rate limits). The per-goal output_user_root,
+    fresh-extracted source, scrubbed env, and --batch isolation are unchanged.
+    """
+    return os.path.join(_museum_base(), "repo_cache")
 
 
 def _extract(archive, dest, strip_prefix):
@@ -148,7 +165,7 @@ def main(argv=None):
 
     root = _build_root(args.name)
     output_user_root = os.path.join(root, "output_root")
-    repo_cache = os.path.join(root, "repo_cache")
+    repo_cache = _shared_repo_cache()  # shared across goals; see _shared_repo_cache
     home = os.path.join(root, "home")
     tmp = os.path.join(root, "tmp")
     work = os.path.join(root, "work")

@@ -1,0 +1,40 @@
+Prefix ${pwd} onto -isysroot / --sysroot (space-separated) paths too.
+
+Backport of bazelbuild/rules_rust#4101 (and hermeticbuild/rules_rust#30) onto the
+rules_rust 0.68.1 BCR release. cargo_build_script's _pwd_flags_sysroot rewrites
+execroot-relative sysroot paths to absolute (${pwd}/...) so build scripts run
+correctly under remote execution. It only handled the `--sysroot=<path>` form,
+but the hermetic-llvm toolchain emits `-isysroot <path>` as two separate args
+(see hermeticbuild/hermetic-llvm#642), whose path was left execroot-relative and
+broke. Handle the space-separated `-isysroot` and `--sysroot` forms as well.
+
+Applied via single_version_override(patches=...) so we keep the latest BCR
+module unforked. Drop once the fix ships in a published rules_rust release.
+
+--- a/cargo/private/cargo_build_script.bzl
++++ b/cargo/private/cargo_build_script.bzl
+@@ -164,12 +164,20 @@
+         list: The modified argument list.
+     """
+     res = []
++    fix_next_arg = False
+     for arg in args:
+-        s, opt, path = arg.partition("--sysroot=")
+-        if s == "" and not paths.is_absolute(path):
+-            res.append("{}${{pwd}}/{}".format(opt, path))
++        if fix_next_arg and not paths.is_absolute(arg):
++            res.append("${{pwd}}/{}".format(arg))
+         else:
+-            res.append(arg)
++            s, opt, path = arg.partition("--sysroot=")
++            if s == "" and not paths.is_absolute(path):
++                res.append("{}${{pwd}}/{}".format(opt, path))
++            else:
++                res.append(arg)
++
++        # hermetic-llvm passes `-isysroot <path>` / `--sysroot <path>` as two
++        # separate args; prefix ${pwd} onto the following path too.
++        fix_next_arg = arg == "-isysroot" or arg == "--sysroot"
+     return res
+ 
+ def _pwd_flags_isystem(args):

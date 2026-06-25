@@ -1,0 +1,15 @@
+# === bazel-museum: rules_rust sysroot fix (injected by the RULES_RUST_SYSROOT_FIX overlay) ===
+#
+# Patch the published `rules_rust` module without forking it. cargo build scripts
+# rewrite execroot-relative sysroot paths to absolute (${pwd}/...) so they run
+# under remote execution, but 0.68.1 only handles `--sysroot=<path>` — not the
+# `-isysroot <path>` the hermetic-llvm toolchain emits on macOS (two separate
+# args). This backports bazelbuild/rules_rust#4101 (and hermeticbuild/rules_rust#30).
+# The patch + the museum_patches/ package are written into the source by the
+# runner (see RULES_RUST_SYSROOT_FIX in //builds:overlays.bzl). Drop once the fix
+# ships in a published BCR release.
+single_version_override(
+    module_name = "rules_rust",
+    patches = ["//museum_patches:rules_rust-isysroot.patch"],
+    patch_strip = 1,
+)

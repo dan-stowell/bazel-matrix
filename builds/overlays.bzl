@@ -44,6 +44,22 @@ HERMETIC_LLVM = overlay(
     build_flags = ["--extra_toolchains=@llvm//toolchain:all"],
 )
 
+# rules_rust sysroot fix. Patches the published `rules_rust` (unforked, via
+# single_version_override) so cargo build scripts prefix ${pwd} onto the
+# `-isysroot <path>` that hermetic-llvm now emits on macOS — otherwise Rust C/C++
+# build-script compiles get an execroot-relative sysroot and break. Backports
+# bazelbuild/rules_rust#4101 / hermeticbuild/rules_rust#30. Pair with HERMETIC_LLVM
+# on Rust projects. Self-contained like HERMETIC_LLVM's patch: writes the patch +
+# the museum_patches/ BUILD marker (idempotent if both overlays are present).
+RULES_RUST_SYSROOT_FIX = overlay(
+    name = "rules_rust_sysroot_fix",
+    appends = [("//tools/buildrunner/overlays:rules_rust_sysroot.MODULE.bazel", "MODULE.bazel")],
+    writes = [
+        ("//tools/buildrunner/overlays:patches/rules_rust-isysroot.patch", "museum_patches/rules_rust-isysroot.patch"),
+        ("//tools/buildrunner/overlays:museum_patches.BUILD.bazel", "museum_patches/BUILD.bazel"),
+    ],
+)
+
 # BuildBuddy cloud remote build execution (RBE). We deliberately do NOT use
 # toolchains_buildbuddy: hermetic-llvm is zero-sysroot, so the compiler and all
 # inputs are uploaded to the CAS and run image-agnostically on the executor.
