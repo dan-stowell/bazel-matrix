@@ -47,24 +47,21 @@ LOCAL = environment(
 )
 
 # BuildBuddy cloud RBE. Host-independent: runs the same from a linux or macOS
-# orchestrator. Today it serves linux/amd64.
+# orchestrator. Serves linux amd64/arm64 and darwin arm64.
 #
-# darwin_arm64 executors *exist* (verified) and are NOT the blocker. It's left
-# out of `platforms` because of a toolchain issue building hermetic-llvm's own
-# internal host tools on the executor (Layer 2 in docs/DESIGN.md) — those compile
-# via apple_support/host Xcode, whose absolute SDK path differs between the
-# orchestrator and the executor. The museum-side half (Layer 1) is ready below:
-# `source=bootstrapped` makes the toolchain's runtimes (compiler-rt etc.) compile
-# hermetically rather than via the host toolchain. Adding "darwin_arm64" to
-# `platforms` is the final flip once Layer 2 is fixed upstream.
+# darwin_arm64 uses the *prebuilt* hermetic-llvm toolchain (the default `source`)
+# like linux does — the compiler is downloaded and only the compiler-rt builtins
+# build from source (~600 actions for an abseil target). We deliberately do NOT
+# force `--@llvm//toolchain:source=bootstrapped`: that rebuilds clang/LLVM from
+# source on the executor (~13k actions, ~22x more) and was only needed before the
+# HERMETIC_LLVM `-isysroot` backport, when the toolchain's host-tool compiles fell
+# through to host Xcode. With that patch the prebuilt path is hermetic on the
+# executor (no Xcode-path errors), so no per-platform flag is required.
 RBE = environment(
     name = "rbe",
-    platforms = ["linux_amd64", "linux_arm64"],
+    platforms = ["linux_amd64", "linux_arm64", "darwin_arm64"],
     overlays = [BUILDBUDDY_RBE],
     pin_platform = True,
-    platform_flags = {
-        "darwin_arm64": ["--@llvm//toolchain:source=bootstrapped"],
-    },
 )
 
 # actiond: a local Linux RE worker (a VM on this host). Builds+tests the museum's
