@@ -81,6 +81,12 @@ bazel run //builds/cxx:build_local_linux_amd64         # Rust — rules_rust + h
 bazel run //builds/abseil_cpp:test  # 251/251 pass
 bazel run //builds/cxx:test         # 1/1 pass
 bazel run //builds/copybara:test    # 220/220 pass (Mercurial tests excluded)
+bazel run //builds/googletest:test_local_linux_amd64   # 41/41 pass
+bazel run //builds/flatbuffers:test_local_linux_amd64  # 1/1 pass (monolithic suite)
+bazel run //builds/catch2:test_local_linux_amd64       # 500 pass / 6 skipped (self-test)
+bazel run //builds/ortools:test_local_linux_amd64      # 89/89 pass (CP-SAT core)
+# Build-only — no faithful Bazel test goal: grpc (549 network/polling tests, a
+# separate effort), nlohmann/json & brotli (upstream tests are CMake/Go, not Bazel).
 
 # Build AND test on BuildBuddy remote execution (no toolchains_buildbuddy;
 # hermetic-llvm runs on the executors). Needs BUILDBUDDY_API_KEY in the env:

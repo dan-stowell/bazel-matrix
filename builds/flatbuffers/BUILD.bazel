@@ -1,4 +1,4 @@
-load("//builds:defs.bzl", "build_spec", "museum_project")
+load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
 load("//builds:environments.bzl", "LOCAL", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM")
 
@@ -17,4 +17,8 @@ museum_project(
     bazel_version = "8.7.0",
     environments = [LOCAL, RBE],
     build = build_spec(targets = ["//:flatc", "//:flatbuffers"], flags = ["-c", "opt"]),
+    # The C++ test suite is one monolithic cc_test that reads its schema/JSON
+    # fixtures from runfiles (the //tests:test_data filegroup). The Go/TS/Swift
+    # and the bazel-repository integration tests live in other toolchains.
+    test = test_spec(targets = ["//tests:flatbuffers_test"]),
 )

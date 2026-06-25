@@ -1,4 +1,4 @@
-load("//builds:defs.bzl", "build_spec", "museum_project")
+load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
 load("//builds:environments.bzl", "LOCAL", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM")
 
@@ -22,4 +22,28 @@ museum_project(
     bazel_version = "8.7.0",
     environments = [LOCAL, RBE],
     build = build_spec(targets = ["//ortools/sat:cp_model_solver"], flags = ["-c", "opt"]),
+    # CP-SAT's own test suite (the solver we build): the 87 cc_test in
+    # //ortools/sat plus the 2 //ortools/sat/python tests — 89 tests of the
+    # flagship constraint solver. Scoped to //ortools/sat/... so we don't pull
+    # the external LP backends (scip/highs/glpk) the rest of the suite needs.
+    #   * --build_tests_only: //ortools/sat also defines java_proto_library
+    #     (non-test) targets that need a JDK the hermetic build has no host
+    #     `java` for; build_tests_only keeps Bazel from building them (only test
+    #     targets + their deps are built).
+    #   * the java / go / samples subtrees are deselected. The java + go subtrees
+    #     are language-binding tests needing a JDK/Go toolchain. The samples
+    #     subtree's java_binary examples depend on //ortools/java:Loader →
+    #     @maven//:jna, and Bazel *analyzes* them even under --build_tests_only;
+    #     fetching @maven runs coursier, which needs a host `java` the hermetic
+    #     build lacks. Dropping samples keeps the analysis (and the test goal)
+    #     hermetic. The samples are usage examples, not core solver tests.
+    test = test_spec(
+        targets = [
+            "//ortools/sat/...",
+            "-//ortools/sat/java/...",
+            "-//ortools/sat/go/...",
+            "-//ortools/sat/samples/...",
+        ],
+        flags = ["-c", "opt", "--build_tests_only"],
+    ),
 )

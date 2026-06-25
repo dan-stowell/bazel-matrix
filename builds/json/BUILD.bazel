@@ -5,8 +5,9 @@ load("//builds:overlays.bzl", "HERMETIC_LLVM")
 # nlohmann/json — JSON for Modern C++ (header-only).
 # Source pinned in //tools/fetch:extension.bzl (@json_archive, v3.12.0), built
 # with the fully-hermetic LLVM toolchain. The Bazel build exposes the library
-# target only (the test suite isn't part of the bzlmod build), so this is a
-# build-only addition.
+# target only: upstream's test suite is CMake/CTest + doctest (under tests/,
+# no Bazel cc_test rules), so there is nothing to wire as a Bazel test goal —
+# this is a build-only project by construction.
 #
 #   bazel run //builds/json:build_local_linux_amd64
 museum_project(

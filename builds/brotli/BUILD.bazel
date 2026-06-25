@@ -9,6 +9,10 @@ load("//builds:overlays.bzl", "HERMETIC_LLVM", "overlay")
 # the Bazel 8.7 inner: brotli's BUILD calls cc_library unloaded, which Bazel 8.7
 # autoloads (Bazel 9 removed that) — and 8.7 carries hermetic-llvm.
 #
+# Build-only by construction: brotli's Bazel build defines the libraries + CLI
+# but no cc_test rules (upstream's tests are CMake/CTest roundtrips and Go
+# go_test under go/), so there's no Bazel test goal to wire.
+#
 # BROTLI_MODULE must precede HERMETIC_LLVM so module() is the first statement in
 # the synthesized MODULE.bazel (the toolchain block is appended after it).
 BROTLI_MODULE = overlay(

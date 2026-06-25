@@ -11,6 +11,14 @@ load("//builds:overlays.bzl", "HERMETIC_LLVM")
 # carry the zero-sysroot hermetic-llvm toolchain (which needs repo_metadata,
 # added in Bazel 8.3), yet still pre-Bazel-9 so grpc's deps resolve as authored.
 #
+# Build-only for now — deliberately, not by oversight. grpc's ~549 tests are
+# declared through its own grpc_cc_test macro, which fans each one out across
+# multiple "pollers" and defaults uses_polling=True; large swaths need real
+# sockets, the event engine, or TLS/cert fixtures, so a bare `bazel test
+# //test/...` is not a meaningful pass/fail. Faithful test parity here means
+# curating a hermetic subset (e.g. parts of //test/core/...) and is its own
+# focused effort rather than a one-line test_spec.
+#
 #   bazel run //builds/grpc:build_local_linux_amd64
 museum_project(
     name = "grpc",
