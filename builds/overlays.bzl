@@ -119,6 +119,11 @@ ACTIOND_WORKER = overlay(
         "--remote_local_fallback=false",
         "--remote_upload_local_results=false",
         "--noremote_cache_compression",
+        # NB: actiond's per-action chroot needs `requires-bash`/`libc` exec
+        # properties, but those go on the *platform* (museum_rbe/, see
+        # rbe_platforms.BUILD.bazel), not here — --remote_default_exec_properties
+        # is ignored once the execution platform sets any exec_properties (and
+        # ours sets OSFamily/Arch).
         # actiond is a *single* local VM, not a cloud pool. The museum's first
         # build compiles the whole hermetic LLVM toolchain (compiler-rt/libcxx/
         # libunwind) from source; at cloud concurrency (50) that many memory-heavy

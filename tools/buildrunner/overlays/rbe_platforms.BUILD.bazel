@@ -31,6 +31,16 @@ platform(
         # is amd64). Keep in sync with PLATFORMS in //builds:platforms.bzl.
         "Arch": "arm64",
         "container-image": "docker://gcr.io/flame-public/rbe-ubuntu20-04:latest",
+        # For the actiond environment (a local arm64 VM that runs each action in
+        # an empty chroot): mount the embedded bash for shell-script actions
+        # (rules_rust's bootstrap_process_wrapper.sh, the test wrappers) and a
+        # glibc for dynamically-linked tool binaries (prebuilt rustc). These must
+        # live on the platform — --remote_default_exec_properties is ignored once
+        # a platform sets exec_properties. BuildBuddy ignores keys it doesn't use,
+        # so they're harmless on the RBE side. glibc is backward-compatible, so
+        # the newest embedded one satisfies any tool needing an older version.
+        "requires-bash": "",
+        "libc": "glibc2.39",
     },
 )
 

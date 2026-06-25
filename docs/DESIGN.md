@@ -148,10 +148,14 @@ Bazel, and the goal's overlay files as `data`.
   bazelisk.
 - **Pinned source** — extracted fresh each run from a content-addressed
   tarball, so the build always starts from a pristine, known tree.
-- **Dedicated state** — its own `--output_user_root` and `--repository_cache`
-  under a per-project build root (default `${TMPDIR}/bazel-museum/<project>`,
-  override with `MUSEUM_BUILD_ROOT`). The host's `~/.cache/bazel` is never
-  touched.
+- **Dedicated state** — its own `--output_user_root` under a per-goal build root
+  (default `${TMPDIR}/bazel-museum/<goal>`, override with `MUSEUM_BUILD_ROOT`).
+  The host's `~/.cache/bazel` is never touched. The `--repository_cache` is the
+  one exception: it's *shared* across goals (`…/bazel-museum/repo_cache`) because
+  it's content-addressed (keyed by sha256), so a toolchain or source archive —
+  most importantly the rate-limited macOS SDK and the hermetic LLVM tarballs — is
+  fetched once and reused, instead of re-downloaded per goal (which trips
+  upstream CDN rate limits and intermittently breaks darwin builds).
 - **Daemonless** — `--batch`: no Bazel server survives the run.
 - **No host config leakage** — `--nohome_rc --nosystem_rc`, and a scrubbed
   environment (only an explicit allowlist — `PATH`, proxy/TLS vars, `CC`/`CXX`,
@@ -168,20 +172,40 @@ explicit, runnable targets named **`<command>_<env>_<os>_<arch>`** (e.g.
 
 - **command** — `build` or `test`.
 - **environment** ([`builds/environments.bzl`](../builds/environments.bzl)) —
-  *where* a goal runs. `LOCAL` (the host machine — serves one os/arch at a time,
-  so each goal is gated on the host matching it via `target_compatible_with`) and
-  `RBE` (BuildBuddy; host-independent). An environment declares the platforms it
-  can serve, the overlays it adds, whether it `pin_platform`s, and any
-  per-platform flags. Future environments (e.g. `actiond`) drop in here.
+  *where* a goal runs. Three exist: `LOCAL` (the host machine — serves one
+  os/arch at a time, so each goal is gated on the host matching it via
+  `target_compatible_with`), `RBE` (BuildBuddy cloud; host-independent), and
+  `ACTIOND` (a local Linux RE worker — [hermeticbuild/actiond][actiond] — that
+  runs actions in a VM on this host, serving linux/arm64 without leaving the
+  Mac). An environment declares the platforms it can serve, the overlays it adds,
+  whether it `pin_platform`s, and any per-platform flags; new ones drop in here.
+
+[actiond]: https://github.com/hermeticbuild/actiond
 - **platform** ([`builds/platforms.bzl`](../builds/platforms.bzl)) — a canonical
   `(os, arch)` with its constraints, `//builds` config_setting, and RBE
   `exec_properties`.
 
 An **overlay** ([`builds/overlays.bzl`](../builds/overlays.bzl)) is a reusable,
-named bundle of source `appends` (file → `MODULE.bazel` / `.bazelrc`), `patches`
-(unified diffs, `patch -p1`), `build_flags`, and `remote_header_envs`
+named bundle of source `appends` (file → `MODULE.bazel` / `.bazelrc`), `writes`
+(file copied verbatim to a path — e.g. dropping a patch + a `BUILD` marker into a
+fresh package, where `appends`' leading newline would corrupt the file),
+`patches` (unified diffs, `patch -p1`), `build_flags`, and `remote_header_envs`
 (`ENV:HEADER` pairs the runner turns into `--remote_header=HEADER=<value>`, to
 inject secrets like an API key without committing them).
+
+**Patching a dependency module without forking it.** Some fixes live in a
+project's *dependencies* (a BCR module), not the project. We ride the latest
+published module and carry the fix as a `single_version_override(patches=…)`: the
+overlay `appends` the override onto `MODULE.bazel` and `writes` the patch (plus a
+`BUILD` marker) into a `museum_patches/` package the override references. This is
+how `HERMETIC_LLVM` backports [hermetic-llvm#642][hl642] (pass `-isysroot` on
+macOS so a stray `SDKROOT` can't override the hermetic SDK) onto `llvm` 0.8.9, and
+how `RULES_RUST_SYSROOT_FIX` backports [rules_rust#4101][rr4101] (prefix `${pwd}`
+onto the `-isysroot <path>` that fix now emits) onto `rules_rust` 0.68.1 — so Rust
++ macOS builds work today, before either PR ships. Both drop out once released.
+
+[hl642]: https://github.com/hermeticbuild/hermetic-llvm/pull/642
+[rr4101]: https://github.com/bazelbuild/rules_rust/pull/4101
 
 A **project** (`museum_project`) pins a source tarball + `toolchains` (overlays
 applied to every goal, e.g. `HERMETIC_LLVM`), the `environments` it targets, and
@@ -243,7 +267,7 @@ the executor. Two flags matter for that:
   output tree name directories by the real target platform (not the legacy
   `--cpu`), so this class of bug is visible.
 
-Verified **from a macOS arm64 host** against linux/amd64 executors: abseil and
+Verified **from a macOS arm64 host** against linux/**amd64** executors: abseil and
 cxx `build`/`test` green; copybara `build` green. Tests execute remotely too:
 
 | Project | `test_rbe_linux_amd64` | excluded on the executor (kept locally) |
@@ -254,6 +278,19 @@ cxx `build`/`test` green; copybara `build` green. Tests execute remotely too:
 
 The linux exclusions are **executor-environment** differences (missing tzdata,
 root uid), not real failures — the local `test` goals still run them.
+
+**linux/arm64 on RBE — builds yes, execution no.** `linux_arm64` is in
+`RBE.platforms`, routed to BuildBuddy's arm64 executor pool via an `Arch=arm64`
+exec property. `build_rbe_linux_arm64` is **green** (abseil, 4160 actions, fully
+cross-compiling the hermetic LLVM toolchain to aarch64). But anything that has to
+*run* an arm64 binary on the executor fails: `test_rbe_linux_arm64`'s test
+binaries come back "No such file or directory" from the test wrapper (0/248,
+where amd64 with identical flags is 248/248), and cxx's Rust toolchain dies on
+`bootstrap_process_wrapper.sh: Exec format error`. So arm64 *target* compilation
+works on the cloud, but arm64 *execution* on the public arm64 pool does not (an
+executor-side wart we don't control). The reliable way to **build and test**
+linux/arm64 from this Mac is the `actiond` environment below — a real local arm64
+VM — not RBE.
 
 **macOS arm64 on RBE (in progress).** This is "build & test Darwin on RBE,"
 distinct from *orchestrating from* a Mac (which works above). Two findings from
@@ -283,6 +320,66 @@ probing it, each correcting an earlier assumption:
 Both copybara-from-macOS and the Layer 2 darwin issue are the same shape as the
 local host-tooling notes below: a host-configured tool that doesn't survive the
 trip to a differently-configured executor.
+
+### actiond — a local Linux arm64 worker (build & test linux from the Mac)
+
+[actiond][actiond] is a local Remote Execution worker + cache: it boots a small
+Linux VM and runs Bazel actions inside it, so the host acts as a local linux
+remote-execution worker. The museum models it as the `ACTIOND` environment
+([`builds/environments.bzl`](../builds/environments.bzl)) — a target
+`{env, os, arch}` exactly like `rbe`, emitting `{build,test}_actiond_linux_arm64`
+goals. It is the museum's answer to "build *and test* linux/arm64 from this Mac":
+the VM is real arm64 (Apple silicon), so unlike RBE's amd64 pool it can actually
+*run* arm64 binaries. Structurally it's RBE pointed at a local endpoint:
+`--remote_executor`/`--remote_cache=grpc://127.0.0.1:8980`, everything remote (no
+local fallback — the pinned platform is linux, unrunnable on macOS), the same
+zero-sysroot `HERMETIC_LLVM` cross-targeting linux so the whole compiler uploads
+to the worker's CAS and runs in its empty VM chroot.
+
+The worker is a persistent local *service* (like BuildBuddy, but on-box), so it
+lives outside the daemonless inner builds. Start it once:
+
+```
+bazel run //tools/actiond:serve      # boots the VM, serves grpc on :8980
+```
+
+The binary is pinned hermetically (sha256, same pattern as `gh`/inner-bazel;
+[`tools/actiond:extension.bzl`](../tools/actiond/extension.bzl)); the VM kernel,
+initramfs, and runtime image are embedded in it. Two things the worker needs that
+a cloud pool doesn't:
+
+- **Memory.** The first build compiles the entire hermetic LLVM toolchain
+  (compiler-rt/libcxx/libunwind) from source; at cloud concurrency the
+  memory-heavy clang/llvm-ar actions OOM-kill inside a small VM. The serve
+  wrapper gives the guest **14 GiB** (`--memory-mib`, override with
+  `MUSEUM_ACTIOND_MEMORY_MIB`) and the overlay keeps inner `--jobs` modest (8).
+- **Exec properties.** actiond runs each action in an *empty* chroot, so
+  non-hermetic actions request what they need via exec properties — and those
+  must live on the **execution platform** (`museum_rbe/`, see
+  [`rbe_platforms.BUILD.bazel`](../tools/buildrunner/overlays/rbe_platforms.BUILD.bazel)),
+  *not* `--remote_default_exec_properties`, which Bazel ignores once a platform
+  sets any `exec_properties` (ours sets `OSFamily`/`Arch`). The `linux_arm64`
+  platform carries `requires-bash=` (mounts the embedded bash for shell-script
+  actions — the test wrappers `test-setup.sh`/`generate-xml.sh`, and rules_rust's
+  `bootstrap_process_wrapper.sh`; without it they exit 127) and `libc=glibc2.39`
+  (mounts a glibc for dynamically-linked tool binaries; backward-compatible, so
+  the newest embedded one satisfies older needs). BuildBuddy ignores both keys,
+  so they're harmless on the RBE side of the shared platform.
+
+Verified on this macOS arm64 host: the worker's VM boots and serves, and
+`build_actiond_linux_arm64` for abseil is **green** — 2072 actions, the full
+hermetic LLVM toolchain compiled from source *inside the VM* and the library
+graph built for aarch64-linux, entirely on-box. (Each change to the platform's
+`exec_properties` re-keys every remote action, so the next build recompiles the
+toolchain from scratch — a one-time cost while tuning.)
+
+**cxx (Rust) on actiond is blocked one layer down**, not by our patches: the
+exec properties get rules_rust's prebuilt `rustc` to *start* (bash + glibc
+mounted), but it then dies on `libgcc_s.so.1: cannot open shared object file` —
+a GCC runtime lib the minimal VM image doesn't ship and that `libc=glibc…`
+doesn't include. So Rust on the local arm64 worker needs a runtime carrying
+`libgcc_s` (or a fully-static rustc); the C/C++ projects, which link the hermetic
+compiler-rt instead of libgcc, don't hit this.
 
 ### Known boundaries (future work)
 
