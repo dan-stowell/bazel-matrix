@@ -43,11 +43,12 @@ use_repo(
     "inner_bazel_9_1_1_linux_arm64",
     "inner_bazel_9_1_1_darwin_amd64",
     "inner_bazel_9_1_1_darwin_arm64",
-    # Bazel 8.0.1 (for projects that target Bazel 8, e.g. grpc).
-    "inner_bazel_8_0_1_linux_amd64",
-    "inner_bazel_8_0_1_linux_arm64",
-    "inner_bazel_8_0_1_darwin_amd64",
-    "inner_bazel_8_0_1_darwin_arm64",
+    # Bazel 8.7.0 (for projects that target Bazel 8, e.g. grpc; late enough to
+    # have repo_metadata so hermetic-llvm runs).
+    "inner_bazel_8_7_0_linux_amd64",
+    "inner_bazel_8_7_0_linux_arm64",
+    "inner_bazel_8_7_0_darwin_amd64",
+    "inner_bazel_8_7_0_darwin_arm64",
 )
 
 project_sources = use_extension("//tools/fetch:extension.bzl", "project_sources")

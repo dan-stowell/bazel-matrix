@@ -1,0 +1,23 @@
+load("//builds:defs.bzl", "build_spec", "museum_project")
+load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:overlays.bzl", "HERMETIC_LLVM")
+
+# gRPC — first-party Bazel, the natural companion to protobuf.
+# Source pinned in //tools/fetch:extension.bzl (@grpc_archive, v1.81.1).
+#
+# grpc 1.81.1 ships .bazelversion = 8.0.1: its transitive dep graph predates
+# Bazel 9 (opentelemetry-cpp / aspect_* / rules_go use rules/kwargs Bazel 9
+# removed). We build it with a late Bazel 8 inner (8.7.0) — recent enough to
+# carry the zero-sysroot hermetic-llvm toolchain (which needs repo_metadata,
+# added in Bazel 8.3), yet still pre-Bazel-9 so grpc's deps resolve as authored.
+#
+#   bazel run //builds/grpc:build_local_linux_amd64
+museum_project(
+    name = "grpc",
+    source_archive = "@grpc_archive//file",
+    strip_prefix = "grpc-1.81.1",
+    toolchains = [HERMETIC_LLVM],
+    bazel_version = "8.7.0",
+    environments = [LOCAL, RBE],
+    build = build_spec(targets = ["//:grpc++", "//:grpc"], flags = ["-c", "opt"]),
+)

@@ -234,7 +234,7 @@
     },
     "//tools/fetch:extension.bzl%inner_bazel": {
       "general": {
-        "bzlTransitiveDigest": "Tx41wdxH/vTTQyXY7JfDxndJr5tAMGroBQRCdGjZdng=",
+        "bzlTransitiveDigest": "BnjOg33ortsNkC8jbdbD9TXeCqUmjJMuCjprX/uvAwo=",
         "usagesDigest": "h14pbfoGF+xRhbdi2p4ZLtdO3iD9D6LSCzysqtpR8HE=",
         "recordedInputs": [
           "REPO_MAPPING:,bazel_tools bazel_tools"
@@ -284,46 +284,46 @@
               "downloaded_file_path": "bazel"
             }
           },
-          "inner_bazel_8_0_1_linux_amd64": {
+          "inner_bazel_8_7_0_linux_amd64": {
             "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_file",
             "attributes": {
               "urls": [
-                "https://github.com/bazelbuild/bazel/releases/download/8.0.1/bazel-8.0.1-linux-x86_64"
+                "https://github.com/bazelbuild/bazel/releases/download/8.7.0/bazel-8.7.0-linux-x86_64"
               ],
-              "sha256": "40f243b118f46d1c88842315e78ec5f9f6390980d67a90f7b64098613e60d65b",
+              "sha256": "d7606e679b78067c811096fb3d6cf135225b528835ca396e3a4dddf957859544",
               "executable": true,
               "downloaded_file_path": "bazel"
             }
           },
-          "inner_bazel_8_0_1_linux_arm64": {
+          "inner_bazel_8_7_0_linux_arm64": {
             "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_file",
             "attributes": {
               "urls": [
-                "https://github.com/bazelbuild/bazel/releases/download/8.0.1/bazel-8.0.1-linux-arm64"
+                "https://github.com/bazelbuild/bazel/releases/download/8.7.0/bazel-8.7.0-linux-arm64"
               ],
-              "sha256": "ebc269a83c64d52017681874d13fce399cc624ab42e8e83bf4dedfe29589eaa6",
+              "sha256": "bfe9558bd8a2ecfe4841ec46c0dbccb4b469fe22d81f2f859de0de222b3e7ce3",
               "executable": true,
               "downloaded_file_path": "bazel"
             }
           },
-          "inner_bazel_8_0_1_darwin_amd64": {
+          "inner_bazel_8_7_0_darwin_amd64": {
             "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_file",
             "attributes": {
               "urls": [
-                "https://github.com/bazelbuild/bazel/releases/download/8.0.1/bazel-8.0.1-darwin-x86_64"
+                "https://github.com/bazelbuild/bazel/releases/download/8.7.0/bazel-8.7.0-darwin-x86_64"
               ],
-              "sha256": "32ca8bbf866cb14190bfb019ce1ac4a7d61b8cbb3f0771137974e8d0e5cdf1eb",
+              "sha256": "76f3eb05782098e9f9ddd8247ec969b085195a3ae2978c81721a2235052ccf26",
               "executable": true,
               "downloaded_file_path": "bazel"
             }
           },
-          "inner_bazel_8_0_1_darwin_arm64": {
+          "inner_bazel_8_7_0_darwin_arm64": {
             "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_file",
             "attributes": {
               "urls": [
-                "https://github.com/bazelbuild/bazel/releases/download/8.0.1/bazel-8.0.1-darwin-arm64"
+                "https://github.com/bazelbuild/bazel/releases/download/8.7.0/bazel-8.7.0-darwin-arm64"
               ],
-              "sha256": "d10ac6488550c5211aed20084f40dfb77f6367e229b15a1cf287057941d9332b",
+              "sha256": "575f20fb23955e02f73519befd180df635b4ed0960c60f0e70fcc8d74014a713",
               "executable": true,
               "downloaded_file_path": "bazel"
             }
@@ -333,7 +333,7 @@
     },
     "//tools/fetch:extension.bzl%project_sources": {
       "general": {
-        "bzlTransitiveDigest": "Tx41wdxH/vTTQyXY7JfDxndJr5tAMGroBQRCdGjZdng=",
+        "bzlTransitiveDigest": "BnjOg33ortsNkC8jbdbD9TXeCqUmjJMuCjprX/uvAwo=",
         "usagesDigest": "4RQlvpJYAxX2PZxLc3Y4g/kgSEcAiqEkkFheY2guOrA=",
         "recordedInputs": [
           "REPO_MAPPING:,bazel_tools bazel_tools"

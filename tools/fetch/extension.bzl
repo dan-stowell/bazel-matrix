@@ -34,13 +34,17 @@ _INNER_BAZELS = {
         "darwin_amd64": ("darwin-x86_64", "6fd490084bdccf044d7a6d8360a26f8770fa09f4e624328efea292f493204930"),
         "darwin_arm64": ("darwin-arm64", "2db883718453f0437a7bcb408e889dbf8539cdc4d61c8ebc3807a1a88d02ff08"),
     },
-    # gRPC 1.81.1 (and other mature projects) target Bazel 8; building them with
-    # the Bazel 9 inner fights their pre-Bazel-9 transitive dep graph.
-    "8.0.1": {
-        "linux_amd64": ("linux-x86_64", "40f243b118f46d1c88842315e78ec5f9f6390980d67a90f7b64098613e60d65b"),
-        "linux_arm64": ("linux-arm64", "ebc269a83c64d52017681874d13fce399cc624ab42e8e83bf4dedfe29589eaa6"),
-        "darwin_amd64": ("darwin-x86_64", "32ca8bbf866cb14190bfb019ce1ac4a7d61b8cbb3f0771137974e8d0e5cdf1eb"),
-        "darwin_arm64": ("darwin-arm64", "d10ac6488550c5211aed20084f40dfb77f6367e229b15a1cf287057941d9332b"),
+    # Mature projects (grpc, flatbuffers, ...) target Bazel 8; building them with
+    # the Bazel 9 inner fights their pre-Bazel-9 transitive dep graph. We pin a
+    # late Bazel 8: it predates Bazel 9's rule removals BUT has repo_metadata
+    # (added in 8.3), which the hermetic-llvm toolchain requires — so the same
+    # zero-sysroot toolchain works here. (8.0.1, grpc's own .bazelversion, lacks
+    # repo_metadata and can't carry hermetic-llvm.)
+    "8.7.0": {
+        "linux_amd64": ("linux-x86_64", "d7606e679b78067c811096fb3d6cf135225b528835ca396e3a4dddf957859544"),
+        "linux_arm64": ("linux-arm64", "bfe9558bd8a2ecfe4841ec46c0dbccb4b469fe22d81f2f859de0de222b3e7ce3"),
+        "darwin_amd64": ("darwin-x86_64", "76f3eb05782098e9f9ddd8247ec969b085195a3ae2978c81721a2235052ccf26"),
+        "darwin_arm64": ("darwin-arm64", "575f20fb23955e02f73519befd180df635b4ed0960c60f0e70fcc8d74014a713"),
     },
 }
 

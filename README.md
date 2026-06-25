@@ -13,7 +13,7 @@ run everything inside — no host Python, no host `gh`, no daemons assumed.
 |-------|------|--------|
 | 1 | **Data pipeline** — discover *and rank* public projects that build with Bazel | ✅ built |
 | 2 | **Run Bazel builds + tests in isolation** — daemonless, hermetic toolchains, composable overlays, BuildBuddy RBE | ✅ built (RBE on linux; macOS RBE next) |
-| 3 | **The build collection** — projects across toolchains, each with build/test + remote build/test | ✅ abseil-cpp, protobuf, googletest, nlohmann/json, Catch2 (C++), copybara (Java), cxx (Rust) |
+| 3 | **The build collection** — projects across toolchains, each with build/test + remote build/test | ✅ abseil-cpp, protobuf, grpc, googletest, nlohmann/json, Catch2 (C++), copybara (Java), cxx (Rust) |
 
 See [docs/DESIGN.md](docs/DESIGN.md) for the architecture and
 [docs/KICKOFF.md](docs/KICKOFF.md) for the project's intent.
@@ -67,6 +67,7 @@ bazel run //builds/abseil_cpp:build -- --verbose_failures
 
 # Other projects / toolchains (goals are <command>_<env>_<os>_<arch>):
 bazel run //builds/protobuf:build_local_linux_amd64    # C++ — protoc + runtime
+bazel run //builds/grpc:build_local_linux_amd64        # C++ — grpc + grpc++ (Bazel 8.7 inner)
 bazel run //builds/googletest:build_local_linux_amd64  # C++ — gtest (+gmock)
 bazel run //builds/json:build_local_linux_amd64        # C++ — nlohmann/json (header-only)
 bazel run //builds/catch2:build_local_linux_amd64      # C++ — Catch2 framework
