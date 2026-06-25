@@ -39,3 +39,11 @@ py_binary(
     }),
     deps = [":lib"],
 )
+
+# Offline ranker: order museum candidates from an existing snapshot. No gh, no
+# network — pure function of data/projects.json.
+py_binary(
+    name = "rank",
+    srcs = ["rank.py"],
+    deps = [":lib"],
+)

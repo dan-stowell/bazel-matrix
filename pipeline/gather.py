@@ -69,8 +69,14 @@ def _collect():
     return by_key, reports
 
 
-def _enrich(projects, gh, workers=8):
-    """Fill in stars/archived/etc. via gh, concurrently. Mutates in place."""
+def _enrich(projects, gh, workers=8, detect_bazel_min_stars=None):
+    """Fill in stars/archived/etc. via gh, concurrently. Mutates in place.
+
+    If detect_bazel_min_stars is not None, additionally probe each project that
+    clears that star threshold for first-party Bazel build files (one extra API
+    call per probed repo). Gating by stars keeps the probe cheap: we only care
+    about first-party status for plausible candidates.
+    """
     def one(proj):
         try:
             info = gh.repo_info(proj.owner, proj.repo_name)
@@ -89,12 +95,19 @@ def _enrich(projects, gh, workers=8):
             proj.description = info.get("description") or ""
         proj.enriched = True
 
+        if (detect_bazel_min_stars is not None
+                and not proj.archived
+                and proj.stars >= detect_bazel_min_stars):
+            try:
+                markers = gh.repo_bazel_markers(
+                    proj.owner, proj.repo_name, model.BAZEL_MARKERS)
+                proj.bazel_markers = markers
+                proj.first_party_bazel = bool(markers)
+            except ghmod.GhError:
+                pass  # leave first_party_bazel = None (unknown)
+
     with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as pool:
         list(pool.map(one, projects))
-
-
-def _sort_key(proj):
-    return (_CATEGORY_ORDER.get(proj.category, 9), -proj.stars, proj.key)
 
 
 def main(argv=None):
@@ -103,6 +116,10 @@ def main(argv=None):
                         help="runfiles path to the hermetic gh binary")
     parser.add_argument("--enrich", choices=["projects", "all", "none"], default="projects",
                         help="which entries to enrich via the GitHub API (default: projects)")
+    parser.add_argument("--detect-bazel-min-stars", type=int, default=1000,
+                        help="probe projects with >= this many stars for first-party "
+                             "Bazel build files (one extra API call each); set to -1 "
+                             "to skip the probe (default: 1000)")
     parser.add_argument("--output", default=None,
                         help="output path (default: $BUILD_WORKSPACE_DIRECTORY/data/projects.json)")
     args = parser.parse_args(argv)
@@ -134,7 +151,8 @@ def main(argv=None):
                 p for p in projects if p.category == model.CATEGORY_PROJECT
             ]
             print(f"  enriching {len(targets)} repos via gh...", file=sys.stderr)
-            _enrich(targets, gh)
+            detect_min = None if args.detect_bazel_min_stars < 0 else args.detect_bazel_min_stars
+            _enrich(targets, gh, detect_bazel_min_stars=detect_min)
             # Canonicalization may have collapsed aliases onto the same repo;
             # re-dedupe by (now canonical) key.
             merged = {}
@@ -147,20 +165,47 @@ def main(argv=None):
             projects = list(merged.values())
             print(f"  {len(projects)} unique repos after canonicalization", file=sys.stderr)
 
-    projects.sort(key=_sort_key)
+    # Calibrate freshness against the most recent activity in the snapshot, so
+    # candidate scores are deterministic (no wall-clock dependence).
+    reference = max((p.pushed_at for p in projects if p.pushed_at), default="")
+
+    # Order projects by candidate score (best first) within the project
+    # category; other categories keep the stars ordering.
+    projects.sort(key=lambda p: (
+        _CATEGORY_ORDER.get(p.category, 9),
+        -model.candidate_score(p, reference),
+        -p.stars,
+        p.key,
+    ))
 
     counts = {"total": len(projects)}
     for cat in (model.CATEGORY_PROJECT, model.CATEGORY_RULESET,
                 model.CATEGORY_TOOLING, model.CATEGORY_UNKNOWN):
         counts[cat] = sum(1 for p in projects if p.category == cat)
     counts["enriched"] = sum(1 for p in projects if p.enriched)
+    counts["first_party_bazel"] = sum(1 for p in projects if p.first_party_bazel)
+
+    # A quick-glance leaderboard of the strongest candidates.
+    top = [p for p in projects
+           if p.category == model.CATEGORY_PROJECT and not p.archived][:30]
+    top_candidates = [{
+        "name": p.name or p.repo_name,
+        "repo": p.repo_url,
+        "language": p.language,
+        "stars": p.stars,
+        "in_bcr": p.in_bcr,
+        "first_party_bazel": p.first_party_bazel,
+        "candidate_score": model.candidate_score(p, reference),
+    } for p in top]
 
     doc = {
-        "schema_version": 1,
+        "schema_version": 2,
         "generator": "bazel run //pipeline:gather",
+        "reference_pushed_at": reference,
         "sources": reports,
         "counts": counts,
-        "projects": [p.to_dict() for p in projects],
+        "top_candidates": top_candidates,
+        "projects": [p.to_dict(reference) for p in projects],
     }
 
     os.makedirs(os.path.dirname(output), exist_ok=True)

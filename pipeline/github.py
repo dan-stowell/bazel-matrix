@@ -72,3 +72,14 @@ class Gh:
         """Return a dict of repo metadata, following renames/redirects."""
         out = self.api(f"repos/{owner}/{repo}", jq=self._REPO_JQ)
         return json.loads(out)
+
+    def repo_bazel_markers(self, owner, repo, markers):
+        """Return which of `markers` exist at the repo's default-branch root.
+
+        One API call (the root tree listing). A non-empty result means the repo
+        itself ships Bazel build files — i.e. it's a first-party Bazel project,
+        not merely something packaged for Bazel elsewhere (e.g. in the BCR).
+        """
+        out = self.api(f"repos/{owner}/{repo}/contents", jq=".[].name")
+        names = set(out.split("\n"))
+        return [m for m in markers if m in names]
