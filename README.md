@@ -1,6 +1,6 @@
 # bazel-museum
 
-**Clone onto any machine that has only Bazel, and build & test 20 real
+**Clone onto any machine that has only Bazel, and build & test 21 real
 open-source projects — including Bazel itself — across 3 execution backends, 2
 operating systems, and 2 CPU architectures.** No host compiler, no host Python,
 no `gh`, no daemons — every toolchain is hermetic and pinned, and the inner
@@ -37,6 +37,7 @@ projects also run their upstream test suite hermetically (numbers below).
 | [jsoncpp](builds/jsoncpp/BUILD.bazel) | C++ | hermetic LLVM | ✅ | ✅ | — |
 | [magic_enum](builds/magic_enum/BUILD.bazel) | C++ | hermetic LLVM | ✅ | ✅ | — |
 | [FTXUI](builds/ftxui/BUILD.bazel) | C++ | hermetic LLVM | ✅ | ✅ | — |
+| [jsonnet](builds/jsonnet/BUILD.bazel) | C++ | hermetic LLVM | ✅ | ✅ | — |
 | [copybara](builds/copybara/BUILD.bazel) | Java | rules_java + hermetic JDK | ✅ | ✅ | — |
 | [cxx](builds/cxx/BUILD.bazel) | Rust | rules_rust + hermetic LLVM | ✅ | ✅ | ✅ |
 | [bazel](builds/bazel/BUILD.bazel) | Java / C++ | hermetic LLVM + bundled JDK | ✅¹ | ✅¹ | —² |

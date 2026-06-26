@@ -218,6 +218,14 @@ _PROJECT_SOURCES = {
         "sha256": "14bef1f8caff548c49af8eeadfca21910d66e93e68237f0c3d20236b60c01e7e",
         "filename": "FTXUI-7.0.0.tar.gz",
     },
+    # jsonnet — Google's data-templating language (C++ implementation). First-
+    # party Bazel; its BUILDs load rules_cc but its core tests use googletest
+    # (cc_* unloaded), so it runs on the Bazel 8.7 inner.
+    "jsonnet_archive": {
+        "url": "https://github.com/google/jsonnet/archive/refs/tags/v0.22.0.tar.gz",
+        "sha256": "5914b9904d97efa662d919519cef1a14e4132bfddddaeed8b061b4a8af628f8d",
+        "filename": "jsonnet-0.22.0.tar.gz",
+    },
 }
 
 
