@@ -21,3 +21,4 @@ gperftools	8.7.0	ok	ok	no-host-cc
 grpc	8.7.0	fail	fail	-	
 highway	8.7.0	ok	ok	no-host-cc	
 json	9.1.1	ok	ok	no-host-cc	
+jsoncpp	9.1.1	ok	ok	no-host-cc	
