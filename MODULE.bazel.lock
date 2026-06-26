@@ -258,7 +258,7 @@
     },
     "//tools/fetch:extension.bzl%inner_bazel": {
       "general": {
-        "bzlTransitiveDigest": "3REPl10Ydd5HD4KWdgCbje2FUpGBjVfZ/avqFeovGdA=",
+        "bzlTransitiveDigest": "DREUgLfc+MNYquzI2FfacoIgUpbOz44uJRM0f32mw5Q=",
         "usagesDigest": "h14pbfoGF+xRhbdi2p4ZLtdO3iD9D6LSCzysqtpR8HE=",
         "recordedInputs": [
           "REPO_MAPPING:,bazel_tools bazel_tools"
@@ -357,7 +357,7 @@
     },
     "//tools/fetch:extension.bzl%project_sources": {
       "general": {
-        "bzlTransitiveDigest": "3REPl10Ydd5HD4KWdgCbje2FUpGBjVfZ/avqFeovGdA=",
+        "bzlTransitiveDigest": "DREUgLfc+MNYquzI2FfacoIgUpbOz44uJRM0f32mw5Q=",
         "usagesDigest": "4RQlvpJYAxX2PZxLc3Y4g/kgSEcAiqEkkFheY2guOrA=",
         "recordedInputs": [
           "REPO_MAPPING:,bazel_tools bazel_tools"
@@ -661,6 +661,16 @@
               ],
               "sha256": "dd950e165d81b330c03701aee6cdfc1402f3b8794c6aeeb780eedfd76bbaca41",
               "downloaded_file_path": "cctz-f353c12.tar.gz"
+            }
+          },
+          "buildtools_archive": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_file",
+            "attributes": {
+              "urls": [
+                "https://github.com/bazelbuild/buildtools/archive/refs/tags/v7.3.1.tar.gz"
+              ],
+              "sha256": "051951c10ff8addeb4f10be3b0cf474b304b2ccd675f2cc7683cdd9010320ca9",
+              "downloaded_file_path": "buildtools-7.3.1.tar.gz"
             }
           }
         }

@@ -295,6 +295,14 @@ _PROJECT_SOURCES = {
         "sha256": "dd950e165d81b330c03701aee6cdfc1402f3b8794c6aeeb780eedfd76bbaca41",
         "filename": "cctz-f353c12.tar.gz",
     },
+    # buildtools — Bazel's BUILD/Starlark tooling (buildifier, buildozer), in Go.
+    # Built with rules_go; its older aspect_rules_js / rules_nodejs deps use
+    # Bazel-9-removed APIs, so it runs on the Bazel 8.7 inner.
+    "buildtools_archive": {
+        "url": "https://github.com/bazelbuild/buildtools/archive/refs/tags/v7.3.1.tar.gz",
+        "sha256": "051951c10ff8addeb4f10be3b0cf474b304b2ccd675f2cc7683cdd9010320ca9",
+        "filename": "buildtools-7.3.1.tar.gz",
+    },
 }
 
 
