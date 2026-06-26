@@ -187,6 +187,14 @@ _PROJECT_SOURCES = {
         "sha256": "b99a0b86c0ba9360ec7e78c4f1e43b1cbdf1e6936c8fa0f6835c0cd694a495a1",
         "filename": "zlib-1.3.2.tar.gz",
     },
+    # highway — Google's portable SIMD/vector library (C++). First-party Bazel;
+    # the library loads rules_cc but its tests use googletest (cc_* unloaded), so
+    # it runs on the Bazel 8.7 inner.
+    "highway_archive": {
+        "url": "https://github.com/google/highway/archive/refs/tags/1.4.0.tar.gz",
+        "sha256": "e72241ac9524bb653ae52ced768b508045d4438726a303f10181a38f764a453c",
+        "filename": "highway-1.4.0.tar.gz",
+    },
 }
 
 
