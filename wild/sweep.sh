@@ -30,9 +30,11 @@ classify() {  # <logfile> <rc>
 
 run_cfg() {  # <image> <version|-> <key> <logfile> -- <targets...>
   local image="$1" ver="$2" key="$3" log="$4"; shift 4; [[ "$1" == "--" ]] && shift
-  local env=(); [[ "$ver" != "-" ]] && env=(USE_BAZEL_VERSION="$ver")
-  WILD_IMAGE="$image" "${env[@]}" timeout "$TIMEOUT" \
-    wild/build.sh "$key" --output_user_root=/home/wild/ob/"$key" build "$@" >"$log" 2>&1
+  (   # export in a subshell so a variable-expanded "VAR=val" isn't run as a command
+    export WILD_IMAGE="$image"
+    [[ "$ver" != "-" ]] && export USE_BAZEL_VERSION="$ver"
+    timeout "$TIMEOUT" wild/build.sh "$key" --output_user_root=/home/wild/ob/"$key" build "$@"
+  ) >"$log" 2>&1
   local rc=$?
   classify "$log" "$rc"
 }
