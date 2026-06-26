@@ -7,9 +7,10 @@ Columns:
 - **+right-bazel** — baseline image, pinned to the project's known-good Bazel (isolates Bazel-version drift from everything else).
 - **hermetic** — *strict* image (nothing but bazelisk), known-good Bazel. ✅ here means the project builds with no host toolchain at all — hermetic in nature. Only attempted when **+right-bazel** builds.
 
-**0/0** build as-is · **0/0** with the right Bazel · **0/0** are hermetic in nature.
+**1/1** build as-is · **1/1** with the right Bazel · **1/1** are hermetic in nature.
 
 _✅ builds · 🕒 Bazel-version drift (cc_*/sh_test autoload removed in Bazel 9) · 🔧 needs a host C/C++ toolchain · 📦 build/consumption-shape issue (e.g. `includes=["."]`, built-as-dep) · ⏱️ timed out · ❌ other failure · · n/a_
 
 | project | declared Bazel | as-is | +right-bazel | hermetic | note |
 |---------|:--------------:|:-----:|:------------:|:--------:|------|
+| absl | 9.1.1 | ✅ ok | ✅ ok | ✅ ok |  |
