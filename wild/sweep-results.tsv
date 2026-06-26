@@ -6,3 +6,4 @@ boringssl	9.1.1	ok	ok	no-host-cc
 brotli	8.7.0	fail	fail	-	The 'build' command is only supported from within a workspace (below a directory having a 
 buildtools	8.7.0	drift	ok	no-host-cc	
 catch2	9.1.1	ok	ok	no-host-cc	
+cctz	8.7.0	dep-shape	ok	no-host-cc	
