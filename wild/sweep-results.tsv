@@ -8,3 +8,4 @@ buildtools	8.7.0	drift	ok	no-host-cc
 catch2	9.1.1	ok	ok	no-host-cc	
 cctz	8.7.0	dep-shape	ok	no-host-cc	
 cli11	8.7.0	drift	ok	no-host-cc	
+copybara	9.1.1	ok	ok	no-host-cc	
