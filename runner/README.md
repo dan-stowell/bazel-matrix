@@ -38,6 +38,8 @@ enumerating.
   ```sh
   bazel run //projects/re2:build
   bazel run //projects/re2:test
+  bazel run //projects/re2:local_build
+  bazel run //projects/re2:local_test
   ```
 
 - **[`//projects:run.sh`](../projects/run.sh)** — the shared runner. Reads a
@@ -49,6 +51,8 @@ enumerating.
   (`USE_BAZEL_VERSION`). Each project gets its own Bazel output base; a shared
   content-addressed `--repository_cache` keeps the BCR + toolchain downloads warm
   across projects. `RUNNER_RUNTIME` selects `crun` (default) or `docker`.
+  `:local_build` / `:local_test` bypass the image and run the same pinned source,
+  Bazel version, targets, and caches directly on the host.
 
 - **[`verify.sh`](verify.sh)** — the build+test sweep. Runs every project's
   upstream build, then (if green) its upstream test, and records the result to

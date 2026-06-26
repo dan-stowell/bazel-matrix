@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Runner behind the //projects/<project>:build and :test targets.
 #
-#   run.sh <key> <bazel-version|-> <build|test> [targets/flags...]
+#   run.sh <key> <bazel-version|-> <build|test|local_build|local_test> [targets/flags...]
 #
 # Builds/tests a project "as upstream ships it": its pinned source (no museum
 # overlays, no injected toolchain) run by bazelisk inside the //runner/image
@@ -11,14 +11,15 @@
 # container rootfs, and bazelisk runs the upstream MODULE/BUILD as found.
 #
 # Runtime (RUNNER_RUNTIME):
+#   local  host-local bazelisk, host tools, isolated output/cache roots.
 #   crun   (default) daemonless + rootless via the pinned //tools/crun plus the
 #          //runner/image:image OCI layout in runfiles. The rootfs is extracted
 #          into RUNNER_CACHE on demand, keyed by manifest digest. No dockerd, no
 #          host runtime, no manual pre-staging step.
 #   docker the image loaded by `bazel run //runner/image:load` (needs a daemon).
 # Env: RUNNER_CACHE (default ~/.cache/runner), RUNNER_IMAGE (docker tag),
-#      RUNNER_OCI_LAYOUT/RUNNER_ROOTFS/RUNNER_CRUN (debug overrides for crun
-#      mode). The old WILD_* names are accepted as fallbacks.
+#      RUNNER_BAZELISK/RUNNER_OCI_LAYOUT/RUNNER_ROOTFS/RUNNER_CRUN (debug
+#      overrides). The old WILD_* names are accepted as fallbacks.
 set -euo pipefail
 
 # Under `bazel run`, the repo root is $BUILD_WORKSPACE_DIRECTORY; fall back to
@@ -90,12 +91,19 @@ PY
   printf '%s\n' "$rootfs"
 }
 
-key="${1:?usage: run.sh <key> <version|-> <build|test> [targets...]}"
+key="${1:?usage: run.sh <key> <version|-> <build|test|local_build|local_test> [targets...]}"
 ver="${2:-}"; cmd="${3:-build}"; shift 3 || true
 targets=("$@")
 
+case "$cmd" in
+  local_build) RUNTIME="local"; cmd="build" ;;
+  local_test) RUNTIME="local"; cmd="test" ;;
+esac
+
 # Runtime present?
-if [[ "$RUNTIME" == crun ]]; then
+if [[ "$RUNTIME" == local ]]; then
+  :
+elif [[ "$RUNTIME" == crun ]]; then
   OCI_LAYOUT="${RUNNER_OCI_LAYOUT:-${WILD_OCI_LAYOUT:-$(runfile runner/image/image_oci_layout || runfile runner/image/oci_layout || true)}}"
   CRUN="${RUNNER_CRUN:-${WILD_CRUN:-$(runfile runner/image/crun.bin || true)}}"
   if [[ -n "${RUNNER_ROOTFS:-${WILD_ROOTFS:-}}" ]]; then
@@ -118,7 +126,7 @@ elif [[ "$RUNTIME" == docker ]]; then
     exit 1
   fi
 else
-  echo "error: unknown RUNNER_RUNTIME='$RUNTIME' (use crun or docker)" >&2; exit 2
+  echo "error: unknown RUNNER_RUNTIME='$RUNTIME' (use local, crun, or docker)" >&2; exit 2
 fi
 
 # Pull url/sha256/filename for "<key>_archive" out of extension.bzl.
@@ -144,34 +152,51 @@ workdir="$SRC_CACHE/$strip"
 
 # Pin the project's known-good Bazel (the version column). "-" leaves bazelisk
 # to honor the repo's .bazelversion (or its default).
-env_args=()
-[[ -n "$ver" && "$ver" != "-" ]] && env_args+=(-e "USE_BAZEL_VERSION=$ver")
-
-# Every project mounts its source at /work, so give each its own Bazel output
-# base (keyed by project) — otherwise they'd collide in one shared base and
-# re-fetch each other's deps. Lives under the mounted $HOME so reruns stay warm.
-startup=("--output_user_root=/home/runner/ob/$key")
+docker_env_args=()
+local_env_args=()
+if [[ -n "$ver" && "$ver" != "-" ]]; then
+  docker_env_args+=(-e "USE_BAZEL_VERSION=$ver")
+  local_env_args+=("USE_BAZEL_VERSION=$ver")
+fi
 
 # Extra bazel flags (e.g. --verbose_failures) go before the `--` marker; the
 # targets go after it so negative patterns like `-//:exhaustive_test` parse as
-# target patterns rather than options. A shared, content-addressed repository
-# cache (under the mounted $HOME) means the BCR + toolchains download once
-# across all projects rather than once per project's output base.
-flags=("--repository_cache=/home/runner/repocache")
+# target patterns rather than options.
+if [[ "$RUNTIME" == local ]]; then
+  # Host-local runs get isolated Bazel state but intentionally use host tools.
+  startup=("--output_user_root=$CACHE/local_ob/$key")
+  flags=("--repository_cache=$CACHE/home/repocache")
+else
+  # Every project mounts its source at /work, so give each its own Bazel output
+  # base (keyed by project) — otherwise they'd collide in one shared base and
+  # re-fetch each other's deps. Lives under the mounted $HOME so reruns stay warm.
+  startup=("--output_user_root=/home/runner/ob/$key")
+  flags=("--repository_cache=/home/runner/repocache")
+fi
 if [[ -n "${RUNNER_BAZEL_FLAGS:-${WILD_BAZEL_FLAGS:-}}" ]]; then
   read -ra _extra <<<"${RUNNER_BAZEL_FLAGS:-$WILD_BAZEL_FLAGS}"; flags+=("${_extra[@]}")
 fi
 
 echo ">> [$RUNTIME] bazelisk $cmd ${targets[*]}   (project=$key, bazel=${ver:--})"
 
-# The full bazelisk argv, identical for both runtimes.
+# The full bazelisk argv, identical after runtime-specific startup/cache paths.
 bazelisk=(/usr/local/bin/bazelisk "${startup[@]}" "$cmd" "${flags[@]}" -- "${targets[@]}")
+
+if [[ "$RUNTIME" == local ]]; then
+  local_bazelisk="${RUNNER_BAZELISK:-${WILD_BAZELISK:-}}"
+  if [[ -z "$local_bazelisk" ]]; then
+    local_bazelisk="$(command -v bazelisk || command -v bazel || true)"
+  fi
+  [[ -n "$local_bazelisk" ]] || { echo "error: no bazelisk or bazel on PATH for local run" >&2; exit 1; }
+  cd "$workdir"
+  exec env "${local_env_args[@]}" "$local_bazelisk" "${startup[@]}" "$cmd" "${flags[@]}" -- "${targets[@]}"
+fi
 
 if [[ "$RUNTIME" == docker ]]; then
   exec docker run --rm \
     -v "$workdir":/work \
     -v "$CACHE/home":/home/runner \
-    "${env_args[@]}" \
+    "${docker_env_args[@]}" \
     "$IMAGE" "${startup[@]}" "$cmd" "${flags[@]}" -- "${targets[@]}"
 fi
 

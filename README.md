@@ -14,6 +14,10 @@ bazel build //runner/image:oci_layout
 # 3. Build and test a project; this also builds the image artifact if needed:
 bazel run //projects/re2:build      # fetches re2's pinned source, runs its own BUILD
 bazel run //projects/re2:test       # runs re2's upstream test suite in the image
+
+# Optional: run the same upstream build/test directly on the local host:
+bazel run //projects/re2:local_build
+bazel run //projects/re2:local_test
 ```
 
 Each `//projects/<project>:build` / `:test` target fetches the project's pinned
@@ -23,6 +27,10 @@ against the upstream `MODULE`/`BUILD` inside it (via
 [crun](https://github.com/containers/crun) in a rootless OCI bundle) with the
 project's known-good Bazel pinned. The first build compiles from scratch; reruns
 hit a warm cache.
+
+The `:local_build` / `:local_test` variants use the same pinned source, Bazel
+version, targets, and cache layout, but run directly on the host with the host's
+toolchain and installed tools.
 
 ## Projects that build as they are
 

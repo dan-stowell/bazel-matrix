@@ -7,8 +7,8 @@ container via //projects:run.sh. The pinned crun binary and image OCI layout are
 ordinary runfiles/data dependencies of each runner:
 
     bazel build //runner/image:oci_layout   # optional prebuild
-    bazel run //projects/cpu_features:build
-    bazel run //projects/cpu_features:test
+    bazel run //projects/cpu_features:build        # runner image
+    bazel run //projects/cpu_features:local_build  # host-local tools
 
 `version` is the project's known-good Bazel (bazelisk pins it via
 USE_BAZEL_VERSION); "-" lets bazelisk honor the repo's own .bazelversion.
@@ -37,6 +37,16 @@ def runner_project(name, version = "-", build = None, test = None):
                 ],
                 # docker run reaches the network and isn't sandboxable; keep
                 # these out of `bazel build //...` wildcards.
+                tags = ["manual", "no-sandbox", "requires-network"],
+                visibility = ["//visibility:public"],
+            )
+
+            sh_binary(
+                name = "local_" + goal,
+                srcs = ["//projects:run.sh"],
+                args = [name, version, "local_" + goal] + targets,
+                # Host-local runs reach the network and intentionally use host
+                # tools, so keep them out of wildcard builds as well.
                 tags = ["manual", "no-sandbox", "requires-network"],
                 visibility = ["//visibility:public"],
             )
