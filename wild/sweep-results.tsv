@@ -16,3 +16,4 @@ fast_float	8.7.0	ok	ok	no-host-cc
 flatbuffers	8.7.0	dep-shape	ok	no-host-cc	
 ftxui	8.7.0	ok	ok	no-host-cc	
 glog	8.7.0	drift	ok	no-host-cc	
+googletest	8.7.0	drift	ok	no-host-cc	
