@@ -1,0 +1,7 @@
+# Appended to jsoncpp's MODULE.bazel. jsoncpp doesn't declare a direct dependency
+# on `platforms`, so @platforms isn't visible to its root module — but the
+# museum's injected RBE platform package (museum_rbe, whose platform() uses
+# @platforms//os + @platforms//cpu constraints) needs it. A direct bazel_dep
+# makes @platforms resolve. Local builds don't inject museum_rbe, so this only
+# matters for the RBE/actiond goals.
+bazel_dep(name = "platforms", version = "1.0.0")

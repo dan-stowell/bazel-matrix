@@ -195,6 +195,14 @@ _PROJECT_SOURCES = {
         "sha256": "e72241ac9524bb653ae52ced768b508045d4438726a303f10181a38f764a453c",
         "filename": "highway-1.4.0.tar.gz",
     },
+    # jsoncpp — the classic C++ JSON library. First-party Bazel (loads rules_cc;
+    # its unit test uses its own harness, not googletest), so it builds on the
+    # default 9.1.1 inner.
+    "jsoncpp_archive": {
+        "url": "https://github.com/open-source-parsers/jsoncpp/archive/refs/tags/1.9.8.tar.gz",
+        "sha256": "51828cf3574281d2b79ec2a1c56a9e4c20cc1103711321ea96384cffb8d2d904",
+        "filename": "jsoncpp-1.9.8.tar.gz",
+    },
 }
 
 

@@ -258,7 +258,7 @@
     },
     "//tools/fetch:extension.bzl%inner_bazel": {
       "general": {
-        "bzlTransitiveDigest": "O8qyGQmP9Dq/+MYdKJQWDM0gptehcJ2qCNDpGpfOi1I=",
+        "bzlTransitiveDigest": "t+wicLPSBpgh6A+XELvvKFP8Y3k7g7TbfJlfHdXqll0=",
         "usagesDigest": "h14pbfoGF+xRhbdi2p4ZLtdO3iD9D6LSCzysqtpR8HE=",
         "recordedInputs": [
           "REPO_MAPPING:,bazel_tools bazel_tools"
@@ -357,7 +357,7 @@
     },
     "//tools/fetch:extension.bzl%project_sources": {
       "general": {
-        "bzlTransitiveDigest": "O8qyGQmP9Dq/+MYdKJQWDM0gptehcJ2qCNDpGpfOi1I=",
+        "bzlTransitiveDigest": "t+wicLPSBpgh6A+XELvvKFP8Y3k7g7TbfJlfHdXqll0=",
         "usagesDigest": "4RQlvpJYAxX2PZxLc3Y4g/kgSEcAiqEkkFheY2guOrA=",
         "recordedInputs": [
           "REPO_MAPPING:,bazel_tools bazel_tools"
@@ -531,6 +531,16 @@
               ],
               "sha256": "e72241ac9524bb653ae52ced768b508045d4438726a303f10181a38f764a453c",
               "downloaded_file_path": "highway-1.4.0.tar.gz"
+            }
+          },
+          "jsoncpp_archive": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_file",
+            "attributes": {
+              "urls": [
+                "https://github.com/open-source-parsers/jsoncpp/archive/refs/tags/1.9.8.tar.gz"
+              ],
+              "sha256": "51828cf3574281d2b79ec2a1c56a9e4c20cc1103711321ea96384cffb8d2d904",
+              "downloaded_file_path": "jsoncpp-1.9.8.tar.gz"
             }
           }
         }
