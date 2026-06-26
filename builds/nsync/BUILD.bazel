@@ -1,0 +1,39 @@
+load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
+load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:overlays.bzl", "HERMETIC_LLVM")
+
+# nsync — Google's small C library of synchronization primitives (mutexes,
+# condition variables, notes, once), with a C++ wrapper. Source pinned in
+# //tools/fetch:extension.bzl (@nsync_archive, release 1.30.0), built with the
+# fully-hermetic LLVM toolchain. Its BUILD uses the unloaded cc_* rules, so it
+# runs on the Bazel 8.7 inner. (nsync declares the platforms dep directly, so no
+# PLATFORMS_DEP.)
+#
+#   bazel run //builds/nsync:build_local_linux_amd64
+#   bazel run //builds/nsync:test_local_linux_amd64
+museum_project(
+    name = "nsync",
+    source_archive = "@nsync_archive//file",
+    strip_prefix = "nsync-1.30.0",
+    toolchains = [HERMETIC_LLVM],
+    bazel_version = "8.7.0",
+    environments = [LOCAL, RBE],
+    # The C library plus its C++ wrapper.
+    build = build_spec(targets = ["//:nsync", "//:nsync_cpp"], flags = ["-c", "opt"]),
+    # The functional unit tests for the core primitives — counter, mutex,
+    # condition variable, note, once and waiter. The timing-sensitive
+    # stress/starvation/pingpong tests are left out to keep the suite fast and
+    # deterministic on both local and RBE.
+    test = test_spec(
+        targets = [
+            "//:counter_test",
+            "//:mu_test",
+            "//:cv_test",
+            "//:note_test",
+            "//:once_test",
+            "//:wait_test",
+            "//:dll_test",
+        ],
+        flags = ["-c", "opt"],
+    ),
+)

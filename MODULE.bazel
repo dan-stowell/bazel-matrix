@@ -98,6 +98,7 @@ use_repo(
     "cctz_archive",
     "buildtools_archive",
     "boringssl_archive",
+    "nsync_archive",
 )
 
 # Hermetic `actiond` worker binary (see //tools/actiond:extension.bzl). actiond

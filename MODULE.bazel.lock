@@ -258,7 +258,7 @@
     },
     "//tools/fetch:extension.bzl%inner_bazel": {
       "general": {
-        "bzlTransitiveDigest": "bX3Jlv0Qj9nKVIMdvEvXhjQCBMFx4j2T3uDkarKaS+M=",
+        "bzlTransitiveDigest": "+H5lIFTpnu6zv9WEKkM7Ig6tLeC0JslXn+St9D3ff5o=",
         "usagesDigest": "h14pbfoGF+xRhbdi2p4ZLtdO3iD9D6LSCzysqtpR8HE=",
         "recordedInputs": [
           "REPO_MAPPING:,bazel_tools bazel_tools"
@@ -357,7 +357,7 @@
     },
     "//tools/fetch:extension.bzl%project_sources": {
       "general": {
-        "bzlTransitiveDigest": "bX3Jlv0Qj9nKVIMdvEvXhjQCBMFx4j2T3uDkarKaS+M=",
+        "bzlTransitiveDigest": "+H5lIFTpnu6zv9WEKkM7Ig6tLeC0JslXn+St9D3ff5o=",
         "usagesDigest": "4RQlvpJYAxX2PZxLc3Y4g/kgSEcAiqEkkFheY2guOrA=",
         "recordedInputs": [
           "REPO_MAPPING:,bazel_tools bazel_tools"
@@ -681,6 +681,16 @@
               ],
               "sha256": "d1c599485fd1919d75ea2925af5fff81c1d5b21ab2f0d41fee1f788b1d917159",
               "downloaded_file_path": "boringssl-0.20260616.0.tar.gz"
+            }
+          },
+          "nsync_archive": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_file",
+            "attributes": {
+              "urls": [
+                "https://github.com/google/nsync/archive/refs/tags/1.30.0.tar.gz"
+              ],
+              "sha256": "883a0b3f8ffc1950670425df3453c127c1a3f6ed997719ca1bbe7f474235b6cc",
+              "downloaded_file_path": "nsync-1.30.0.tar.gz"
             }
           }
         }

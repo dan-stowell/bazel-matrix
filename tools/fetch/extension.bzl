@@ -311,6 +311,13 @@ _PROJECT_SOURCES = {
         "sha256": "d1c599485fd1919d75ea2925af5fff81c1d5b21ab2f0d41fee1f788b1d917159",
         "filename": "boringssl-0.20260616.0.tar.gz",
     },
+    # nsync — Google's C synchronization primitives (+ C++ wrapper). Its BUILD
+    # uses the unloaded cc_* rules, so it runs on the Bazel 8.7 inner.
+    "nsync_archive": {
+        "url": "https://github.com/google/nsync/archive/refs/tags/1.30.0.tar.gz",
+        "sha256": "883a0b3f8ffc1950670425df3453c127c1a3f6ed997719ca1bbe7f474235b6cc",
+        "filename": "nsync-1.30.0.tar.gz",
+    },
 }
 
 
