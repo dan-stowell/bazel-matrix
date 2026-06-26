@@ -15,3 +15,4 @@ doctest	9.1.1	includes-dot	includes-dot	-	BUILD.bazel:3:11: in cc_library rule /
 fast_float	8.7.0	ok	ok	no-host-cc	
 flatbuffers	8.7.0	dep-shape	ok	no-host-cc	
 ftxui	8.7.0	ok	ok	no-host-cc	
+glog	8.7.0	drift	ok	no-host-cc	
