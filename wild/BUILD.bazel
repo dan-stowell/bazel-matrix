@@ -1,0 +1,2 @@
+# Shared runner behind every //wild/<project>:build and :test target.
+exports_files(["run.sh"])
