@@ -60,9 +60,20 @@ workdir="$SRC_CACHE/$strip"
 env_args=()
 [[ -n "$ver" && "$ver" != "-" ]] && env_args+=(-e "USE_BAZEL_VERSION=$ver")
 
+# Every project mounts its source at /work, so give each its own Bazel output
+# base (keyed by project) — otherwise they'd collide in one shared base and
+# re-fetch each other's deps. Lives under the mounted $HOME so reruns stay warm.
+startup=("--output_user_root=/home/wild/ob/$key")
+
+# Extra bazel flags (e.g. --verbose_failures) go before the `--` marker; the
+# targets go after it so negative patterns like `-//:exhaustive_test` parse as
+# target patterns rather than options.
+flags=()
+[[ -n "${WILD_BAZEL_FLAGS:-}" ]] && read -ra flags <<<"$WILD_BAZEL_FLAGS"
+
 echo ">> [$IMAGE] bazelisk $cmd ${targets[*]}   (project=$key, bazel=${ver:--})"
 exec docker run --rm \
   -v "$workdir":/work \
   -v "$CACHE/home":/home/wild \
   "${env_args[@]}" \
-  "$IMAGE" "$cmd" "${targets[@]}"
+  "$IMAGE" "${startup[@]}" "$cmd" "${flags[@]}" -- "${targets[@]}"

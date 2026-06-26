@@ -47,6 +47,13 @@ tar(
     mtree = [
         "./work type=dir mode=0777",
         "./home/wild type=dir mode=0777",
+        # The debian-slim base is merged-/usr (/bin -> /usr/bin), but the apt
+        # .deb layer ships a real /bin directory, which clobbers that symlink
+        # and hides the shells (they live in /usr/bin). Bazel's default genrule
+        # shell and rules_cc's cc_wrapper.sh both hard-code /bin/bash, so
+        # recreate the two that builds reach for.
+        "./bin/sh type=link link=/usr/bin/dash",
+        "./bin/bash type=link link=/usr/bin/bash",
         # default-jdk-headless installs the JVM under /usr/lib/jvm; expose `java`.
         "./usr/bin/cc type=link link=/usr/bin/gcc",
         "./usr/bin/c++ type=link link=/usr/bin/g++",
