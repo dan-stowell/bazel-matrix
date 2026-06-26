@@ -20,3 +20,4 @@ googletest	8.7.0	drift	ok	no-host-cc
 gperftools	8.7.0	ok	ok	no-host-cc	
 grpc	8.7.0	fail	fail	-	
 highway	8.7.0	ok	ok	no-host-cc	
+json	9.1.1	ok	ok	no-host-cc	
