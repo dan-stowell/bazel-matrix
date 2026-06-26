@@ -91,6 +91,7 @@ use_repo(
     "opencc_archive",
     "cpu_features_archive",
     "fast_float_archive",
+    "cli11_archive",
 )
 
 # Hermetic `actiond` worker binary (see //tools/actiond:extension.bzl). actiond

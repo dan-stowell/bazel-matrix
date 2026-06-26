@@ -258,6 +258,13 @@ _PROJECT_SOURCES = {
         "sha256": "76f958dd97b1cf4d8862d1f0986a47d4bdfa8845252bae15ef0f40de3b95961f",
         "filename": "fast_float-8.2.10.tar.gz",
     },
+    # CLI11 — command-line parser for C++11. Catch2-based tests use the unloaded
+    # cc_* rules, so it runs on the Bazel 8.7 inner.
+    "cli11_archive": {
+        "url": "https://github.com/CLIUtils/CLI11/archive/refs/tags/v2.4.2.tar.gz",
+        "sha256": "f2d893a65c3b1324c50d4e682c0cdc021dd0477ae2c048544f39eed6654b699a",
+        "filename": "CLI11-2.4.2.tar.gz",
+    },
 }
 
 

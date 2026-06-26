@@ -258,7 +258,7 @@
     },
     "//tools/fetch:extension.bzl%inner_bazel": {
       "general": {
-        "bzlTransitiveDigest": "Qi0XV8EYf24CCucJ26l1zmmwqCdaiC4ywK1DWgl8NhQ=",
+        "bzlTransitiveDigest": "yOAUtVjSRILwxapB4OoGVoQbR4N1vadfSUl7hQhyhzA=",
         "usagesDigest": "h14pbfoGF+xRhbdi2p4ZLtdO3iD9D6LSCzysqtpR8HE=",
         "recordedInputs": [
           "REPO_MAPPING:,bazel_tools bazel_tools"
@@ -357,7 +357,7 @@
     },
     "//tools/fetch:extension.bzl%project_sources": {
       "general": {
-        "bzlTransitiveDigest": "Qi0XV8EYf24CCucJ26l1zmmwqCdaiC4ywK1DWgl8NhQ=",
+        "bzlTransitiveDigest": "yOAUtVjSRILwxapB4OoGVoQbR4N1vadfSUl7hQhyhzA=",
         "usagesDigest": "4RQlvpJYAxX2PZxLc3Y4g/kgSEcAiqEkkFheY2guOrA=",
         "recordedInputs": [
           "REPO_MAPPING:,bazel_tools bazel_tools"
@@ -611,6 +611,16 @@
               ],
               "sha256": "76f958dd97b1cf4d8862d1f0986a47d4bdfa8845252bae15ef0f40de3b95961f",
               "downloaded_file_path": "fast_float-8.2.10.tar.gz"
+            }
+          },
+          "cli11_archive": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_file",
+            "attributes": {
+              "urls": [
+                "https://github.com/CLIUtils/CLI11/archive/refs/tags/v2.4.2.tar.gz"
+              ],
+              "sha256": "f2d893a65c3b1324c50d4e682c0cdc021dd0477ae2c048544f39eed6654b699a",
+              "downloaded_file_path": "CLI11-2.4.2.tar.gz"
             }
           }
         }
