@@ -31,3 +31,4 @@ ortools	8.7.0	fail	ok	fail
 protobuf	9.1.1	ok	ok	dep-shape	
 re2	8.7.0	ok	ok	no-host-cc	
 snappy	8.7.0	drift	ok	no-host-cc	
+zlib	9.1.1	ok	ok	no-host-cc	
