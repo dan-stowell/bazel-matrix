@@ -1,0 +1,14 @@
+
+# === bazel-museum: platforms dependency (for the injected RBE platform) ===
+#
+# The museum's remote environments inject a museum_rbe/ package whose platform()
+# rules use @platforms//os + @platforms//cpu constraints (see
+# rbe_platforms.BUILD.bazel). @platforms is only visible in a module's repo
+# mapping if that module depends on `platforms` — most projects do transitively,
+# but some (e.g. jsoncpp, magic_enum) never declare it as a direct dep, so
+# @platforms is unresolvable and the RBE/actiond goals fail at analysis.
+#
+# Appending this bazel_dep makes @platforms visible. The version is a lower
+# bound; MVS picks the highest in the resolved graph. Local goals don't inject
+# museum_rbe, so this is a no-op there beyond a satisfied direct dep.
+bazel_dep(name = "platforms", version = "1.0.0")

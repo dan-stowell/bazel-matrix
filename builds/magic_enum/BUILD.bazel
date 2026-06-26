@@ -1,0 +1,32 @@
+load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
+load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:overlays.bzl", "HERMETIC_LLVM", "PLATFORMS_DEP")
+
+# magic_enum — static reflection (to-string, iteration, …) for C++ enums.
+# Source pinned in //tools/fetch:extension.bzl (@magic_enum_archive, v0.9.8),
+# built with the fully-hermetic LLVM toolchain.
+#
+# magic_enum is header-only, so its parity is the test suite. Those tests live in
+# a *nested* Bazel module at magic_enum-0.9.8/test (test/MODULE.bazel, module
+# "magic_enum_tests") that consumes the library as an external dep:
+#     bazel_dep(name = "magic_enum"); local_path_override(... path = "..")
+# i.e. it builds magic_enum from the parent dir (whose MODULE.bazel the tarball
+# ships). So we root the build at test/ (strip_prefix) and let the override pull
+# the parent — the same shape as //builds/brotli_go. The tests vendor a Catch2
+# single-header (in 3rdparty/), so no BCR Catch2 is needed. HERMETIC_LLVM +
+# PLATFORMS_DEP are appended to the test module (it declares neither llvm nor
+# platforms, the latter required by the injected RBE platform package).
+#
+#   bazel run //builds/magic_enum:test_local_linux_amd64
+museum_project(
+    name = "magic_enum",
+    source_archive = "@magic_enum_archive//file",
+    strip_prefix = "magic_enum-0.9.8/test",
+    toolchains = [HERMETIC_LLVM, PLATFORMS_DEP],
+    environments = [LOCAL, RBE],
+    # The two wired cc_tests (test, test_flags) — building them compiles real
+    # magic_enum usage through the vendored Catch2 (the library itself is
+    # header-only, so this is where the toolchain actually exercises it).
+    build = build_spec(targets = ["//..."], flags = ["-c", "opt"]),
+    test = test_spec(targets = ["//..."], flags = ["-c", "opt"]),
+)

@@ -87,6 +87,17 @@ RULES_CC_DEP = overlay(
     appends = [("//tools/buildrunner/overlays:rules_cc_dep.MODULE.bazel", "MODULE.bazel")],
 )
 
+# Makes @platforms visible by appending a direct bazel_dep. The museum's injected
+# RBE platform package (museum_rbe) uses @platforms//os + @platforms//cpu
+# constraints; a project that never declares `platforms` as a direct dep can't
+# resolve them and its RBE/actiond goals fail at analysis. Apply to such projects
+# (e.g. magic_enum). A no-op for local goals beyond a satisfied direct dep; don't
+# apply to projects that already depend on platforms (a duplicate bazel_dep errors).
+PLATFORMS_DEP = overlay(
+    name = "platforms_dep",
+    appends = [("//tools/buildrunner/overlays:platforms_dep.MODULE.bazel", "MODULE.bazel")],
+)
+
 # NOTE: projects whose *transitive deps* use Bazel-9-removed APIs (old
 # aspect_bazel_lib, rules_foreign_cc, rules_go, ...) are handled by building them
 # on a late Bazel 8 inner — museum_project(bazel_version = "8.7.0") — rather than

@@ -258,7 +258,7 @@
     },
     "//tools/fetch:extension.bzl%inner_bazel": {
       "general": {
-        "bzlTransitiveDigest": "t+wicLPSBpgh6A+XELvvKFP8Y3k7g7TbfJlfHdXqll0=",
+        "bzlTransitiveDigest": "fhv/gKXIh2TsQsjIbtz43BQ1v/gi11nCvvmb5skYfFs=",
         "usagesDigest": "h14pbfoGF+xRhbdi2p4ZLtdO3iD9D6LSCzysqtpR8HE=",
         "recordedInputs": [
           "REPO_MAPPING:,bazel_tools bazel_tools"
@@ -357,7 +357,7 @@
     },
     "//tools/fetch:extension.bzl%project_sources": {
       "general": {
-        "bzlTransitiveDigest": "t+wicLPSBpgh6A+XELvvKFP8Y3k7g7TbfJlfHdXqll0=",
+        "bzlTransitiveDigest": "fhv/gKXIh2TsQsjIbtz43BQ1v/gi11nCvvmb5skYfFs=",
         "usagesDigest": "4RQlvpJYAxX2PZxLc3Y4g/kgSEcAiqEkkFheY2guOrA=",
         "recordedInputs": [
           "REPO_MAPPING:,bazel_tools bazel_tools"
@@ -541,6 +541,16 @@
               ],
               "sha256": "51828cf3574281d2b79ec2a1c56a9e4c20cc1103711321ea96384cffb8d2d904",
               "downloaded_file_path": "jsoncpp-1.9.8.tar.gz"
+            }
+          },
+          "magic_enum_archive": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_file",
+            "attributes": {
+              "urls": [
+                "https://github.com/Neargye/magic_enum/archive/refs/tags/v0.9.8.tar.gz"
+              ],
+              "sha256": "1e54959a3f3cb675938d858603ad69d0f3f7c82439fc2bf86d7232daec2bd10e",
+              "downloaded_file_path": "magic_enum-0.9.8.tar.gz"
             }
           }
         }

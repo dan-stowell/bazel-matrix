@@ -203,6 +203,14 @@ _PROJECT_SOURCES = {
         "sha256": "51828cf3574281d2b79ec2a1c56a9e4c20cc1103711321ea96384cffb8d2d904",
         "filename": "jsoncpp-1.9.8.tar.gz",
     },
+    # magic_enum — static reflection for C++ enums (header-only). First-party
+    # Bazel (loads rules_cc; its tests vendor a Catch2 single-header), so it
+    # builds on the default 9.1.1 inner.
+    "magic_enum_archive": {
+        "url": "https://github.com/Neargye/magic_enum/archive/refs/tags/v0.9.8.tar.gz",
+        "sha256": "1e54959a3f3cb675938d858603ad69d0f3f7c82439fc2bf86d7232daec2bd10e",
+        "filename": "magic_enum-0.9.8.tar.gz",
+    },
 }
 
 
