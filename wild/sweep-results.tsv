@@ -12,3 +12,4 @@ copybara	9.1.1	ok	ok	no-host-cc
 cpu_features	8.7.0	ok	ok	no-host-cc	
 cxx	9.1.1	ok	ok	no-host-cc	
 doctest	9.1.1	includes-dot	includes-dot	-	BUILD.bazel:3:11: in cc_library rule //:doctest: 
+fast_float	8.7.0	ok	ok	no-host-cc	
