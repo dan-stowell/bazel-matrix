@@ -27,3 +27,4 @@ magic_enum	9.1.1	ok	ok	no-host-cc
 nsync	8.7.0	drift	ok	no-host-cc	
 onetbb	8.7.0	ok	ok	no-host-cc	
 opencc	8.7.0	ok	ok	no-host-cc	
+ortools	8.7.0	fail	ok	fail	

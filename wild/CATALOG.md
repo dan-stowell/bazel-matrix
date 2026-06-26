@@ -7,7 +7,7 @@ Columns:
 - **+right-bazel** — baseline image, pinned to the project's known-good Bazel (isolates Bazel-version drift from everything else).
 - **hermetic** — *strict* image (nothing but bazelisk), known-good Bazel. ✅ here means the project builds with no host toolchain at all — hermetic in nature. Only attempted when **+right-bazel** builds.
 
-**17/28** build as-is · **24/28** with the right Bazel · **0/28** are hermetic in nature.
+**17/29** build as-is · **25/29** with the right Bazel · **0/29** are hermetic in nature.
 
 _✅ builds · 🕒 Bazel-version drift (cc_*/sh_test autoload removed in Bazel 9) · 🔧 needs a host C/C++ toolchain · 📦 build/consumption-shape issue (e.g. `includes=["."]`, built-as-dep) · ⏱️ timed out · ❌ other failure · · n/a_
 
@@ -37,6 +37,7 @@ _✅ builds · 🕒 Bazel-version drift (cc_*/sh_test autoload removed in Bazel 
 | glog | 8.7.0 | 🕒 drift | ✅ ok | 🔧 no-host-cc |  |
 | googletest | 8.7.0 | 🕒 drift | ✅ ok | 🔧 no-host-cc |  |
 | nsync | 8.7.0 | 🕒 drift | ✅ ok | 🔧 no-host-cc |  |
+| ortools | 8.7.0 | ❌ fail | ✅ ok | ❌ fail |  |
 | bazel | 9.1.1 | ⏱️ timeout | ⏱️ timeout | · - |  |
 | brotli | 8.7.0 | ❌ fail | ❌ fail | · - | The 'build' command is only supported from within a workspace (below a directory having a  |
 | doctest | 9.1.1 | 📦 includes-dot | 📦 includes-dot | · - | BUILD.bazel:3:11: in cc_library rule //:doctest:  |
