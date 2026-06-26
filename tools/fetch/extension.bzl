@@ -272,6 +272,13 @@ _PROJECT_SOURCES = {
         "sha256": "00e4a87e87b7e7612f519a41e491f16623b12423620006f59f5688bfd8d13b08",
         "filename": "glog-0.7.1.tar.gz",
     },
+    # oneTBB — Intel's oneAPI Threading Building Blocks. Its Bazel BUILD uses the
+    # unloaded cc_* rules, so it runs on the Bazel 8.7 inner.
+    "onetbb_archive": {
+        "url": "https://github.com/uxlfoundation/oneTBB/archive/refs/tags/v2022.0.0.tar.gz",
+        "sha256": "e8e89c9c345415b17b30a2db3095ba9d47647611662073f7fbf54ad48b7f3c2a",
+        "filename": "oneTBB-2022.0.0.tar.gz",
+    },
 }
 
 

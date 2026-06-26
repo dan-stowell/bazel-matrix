@@ -258,7 +258,7 @@
     },
     "//tools/fetch:extension.bzl%inner_bazel": {
       "general": {
-        "bzlTransitiveDigest": "gnwewMMsRtOGB84p8nGXgIUdAA10Ka9pnIhfRS1c/Ds=",
+        "bzlTransitiveDigest": "k8vOemWpkdH2xxYS6GTsOolAPFMn+7q5g+0Cm0UJ3DA=",
         "usagesDigest": "h14pbfoGF+xRhbdi2p4ZLtdO3iD9D6LSCzysqtpR8HE=",
         "recordedInputs": [
           "REPO_MAPPING:,bazel_tools bazel_tools"
@@ -357,7 +357,7 @@
     },
     "//tools/fetch:extension.bzl%project_sources": {
       "general": {
-        "bzlTransitiveDigest": "gnwewMMsRtOGB84p8nGXgIUdAA10Ka9pnIhfRS1c/Ds=",
+        "bzlTransitiveDigest": "k8vOemWpkdH2xxYS6GTsOolAPFMn+7q5g+0Cm0UJ3DA=",
         "usagesDigest": "4RQlvpJYAxX2PZxLc3Y4g/kgSEcAiqEkkFheY2guOrA=",
         "recordedInputs": [
           "REPO_MAPPING:,bazel_tools bazel_tools"
@@ -631,6 +631,16 @@
               ],
               "sha256": "00e4a87e87b7e7612f519a41e491f16623b12423620006f59f5688bfd8d13b08",
               "downloaded_file_path": "glog-0.7.1.tar.gz"
+            }
+          },
+          "onetbb_archive": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_file",
+            "attributes": {
+              "urls": [
+                "https://github.com/uxlfoundation/oneTBB/archive/refs/tags/v2022.0.0.tar.gz"
+              ],
+              "sha256": "e8e89c9c345415b17b30a2db3095ba9d47647611662073f7fbf54ad48b7f3c2a",
+              "downloaded_file_path": "oneTBB-2022.0.0.tar.gz"
             }
           }
         }
