@@ -1,2 +1,3 @@
 key	version	as_is	right_bazel	hermetic	note
 absl	9.1.1	ok	ok	no-host-cc	
+bazel	9.1.1	timeout	timeout	-	
