@@ -75,9 +75,9 @@ def main():
     for r in works:
         proj = r["proj"]
         name, repo, desc = META.get(proj, (proj, "", ""))
-        build_cmd = "`bazel run //wild/%s:build`" % proj
+        build_cmd = "`bazel run //projects/%s:build`" % proj
         if r["test"] == "ok":
-            test_cmd = "`bazel run //wild/%s:test`" % proj
+            test_cmd = "`bazel run //projects/%s:test`" % proj
             p, f = pass_fail(r.get("test_summary", ""))
             if f:  # a few environment-sensitive tests fail locally
                 test_cmd += " (%d/%d pass)" % (p, p + f)

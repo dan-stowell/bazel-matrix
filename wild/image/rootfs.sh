@@ -7,7 +7,7 @@
 #   rootfs/   the //wild/image filesystem, extracted from the OCI layout that
 #             rules_img builds *without a daemon* (bazel --output_groups=oci_layout).
 #   crun      the pinned static OCI runtime (//tools/crun), copied out of Bazel's
-#             cache so wild/run.sh can exec it.
+#             cache so projects/run.sh can exec it.
 #
 # After this, `bazel run //wild/<project>:build` runs rootless via crun. Re-run
 # this whenever the image changes (idempotent: keyed on the manifest digest).

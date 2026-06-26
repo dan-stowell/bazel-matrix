@@ -1,0 +1,3 @@
+# The shared runner behind every //projects/<project>:build and :test target.
+# The wild_project macro lives in defs.bzl.
+exports_files(["run.sh"])

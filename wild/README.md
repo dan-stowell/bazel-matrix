@@ -27,18 +27,20 @@ enumerating.
   daemon) and stages it alongside a pinned static `crun` ([`//tools/crun`](../../tools/crun)).
   No dockerd, no host runtime, no root — just a single-id user namespace.
 
-- **[`<project>/`](.)** — one package per project with `:build` and `:test`
-  targets (e.g. [`re2`](re2), [`cpu_features`](cpu_features)). Generated from the
-  museum project list by [`gen_targets.py`](gen_targets.py); each target is a thin
-  wrapper over `run.sh`.
+- **[`//projects/<project>`](../projects)** — one package per project with
+  `:build` and `:test` targets (e.g. [`re2`](../projects/re2),
+  [`cpu_features`](../projects/cpu_features)). Generated from the museum project
+  list by [`gen_targets.py`](gen_targets.py); each target is a thin wrapper over
+  [`//projects:run.sh`](../projects/run.sh).
 
   ```sh
-  bazel run //wild/re2:build
-  bazel run //wild/re2:test
+  bazel run //projects/re2:build
+  bazel run //projects/re2:test
   ```
 
-- **[`run.sh`](run.sh)** — the shared runner. Reads a project's pinned
-  `url+sha256` straight from [`//tools/fetch`](../tools/fetch), fetches + verifies
+- **[`//projects:run.sh`](../projects/run.sh)** — the shared runner. Reads a
+  project's pinned `url+sha256` straight from [`//tools/fetch`](../tools/fetch),
+  fetches + verifies
   the source on the host, mounts it into the image, and runs `bazelisk` against
   the upstream `MODULE`/`BUILD` with the project's known-good Bazel pinned
   (`USE_BAZEL_VERSION`). Each project gets its own Bazel output base; a shared

@@ -149,7 +149,7 @@ apt.install(
 use_repo(apt, "toolchain_apt")
 
 # Hermetic `crun` (static OCI runtime) for running the image daemonlessly and
-# rootlessly — no dockerd. See //tools/crun:extension.bzl and wild/run.sh.
+# rootlessly — no dockerd. See //tools/crun:extension.bzl and projects/run.sh.
 crun = use_extension("//tools/crun:extension.bzl", "crun")
 use_repo(crun, "crun_linux_amd64", "crun_linux_arm64")
 

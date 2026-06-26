@@ -59,7 +59,7 @@ while IFS=$'\t' read -r proj key version build test; do
   bstat="n/a"
   if [[ -n "$build" ]]; then
     read -ra BT <<<"$build"
-    timeout "$BUILD_TIMEOUT" wild/run.sh "$key" "$version" build "${BT[@]}" \
+    timeout "$BUILD_TIMEOUT" projects/run.sh "$key" "$version" build "${BT[@]}" \
       >"$LOGS/$proj.build.log" 2>&1
     bstat=$(classify_build "$LOGS/$proj.build.log" $?)
   fi
@@ -71,7 +71,7 @@ while IFS=$'\t' read -r proj key version build test; do
       tstat="skip-build"
     else
       read -ra TT <<<"$test"
-      timeout "$TEST_TIMEOUT" wild/run.sh "$key" "$version" test "${TT[@]}" \
+      timeout "$TEST_TIMEOUT" projects/run.sh "$key" "$version" test "${TT[@]}" \
         >"$LOGS/$proj.test.log" 2>&1
       rc=$?
       tstat=$(classify_test "$LOGS/$proj.test.log" $rc)
