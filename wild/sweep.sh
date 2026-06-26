@@ -28,20 +28,22 @@ classify() {  # <logfile> <rc>
   echo fail
 }
 
-run_cfg() {  # <image> <version|-> <key> <logfile> -- <targets...>
-  local image="$1" ver="$2" key="$3" log="$4"; shift 4; [[ "$1" == "--" ]] && shift
-  (   # export in a subshell so a variable-expanded "VAR=val" isn't run as a command
+run_cfg() {  # <image> <version|-> <key> <cfg> <logfile> -- <targets...>
+  local image="$1" ver="$2" key="$3" cfg="$4" log="$5"; shift 5; [[ "$1" == "--" ]] && shift
+  (   # export in a subshell so a variable-expanded "VAR=val" isn't run as a command.
+      # Distinct output base per config so the strict (C) build recompiles from
+      # scratch instead of reusing the baseline (B) build's cached outputs.
     export WILD_IMAGE="$image"
     [[ "$ver" != "-" ]] && export USE_BAZEL_VERSION="$ver"
-    timeout "$TIMEOUT" wild/build.sh "$key" --output_user_root=/home/wild/ob/"$key" build "$@"
+    timeout "$TIMEOUT" wild/build.sh "$key" --output_user_root=/home/wild/ob/"$key-$cfg" build "$@"
   ) >"$log" 2>&1
   local rc=$?
   classify "$log" "$rc"
 }
 
-clean_ob() {  # drop a project's output base (root-owned, so via a container)
-  docker run --rm --entrypoint rm -v "$CACHE/home":/home/wild bazel-wild-baseline \
-    -rf /home/wild/ob/"$1" >/dev/null 2>&1 || true
+clean_ob() {  # drop a project's output bases (root-owned, so via a container)
+  docker run --rm --entrypoint sh -v "$CACHE/home":/home/wild bazel-wild-baseline \
+    -c "rm -rf /home/wild/ob/$1-*" >/dev/null 2>&1 || true
 }
 
 regen() { python3 wild/_catalog.py "$TSV" > wild/CATALOG.md; }
@@ -51,18 +53,18 @@ while IFS=$'\t' read -r key ver targets; do
   echo "==== $key (declared bazel $ver; targets: $targets) ===="
   read -ra T <<<"$targets"
 
-  A=$(run_cfg bazel-wild-baseline - "$key" "$LOGS/$key.A.log" -- "${T[@]}")
+  A=$(run_cfg bazel-wild-baseline - "$key" A "$LOGS/$key.A.log" -- "${T[@]}")
   echo "  A as-is        : $A"
 
   if [[ "$ver" == "$DEFAULT_BAZEL" ]]; then
     B="$A"; cp "$LOGS/$key.A.log" "$LOGS/$key.B.log"
   else
-    B=$(run_cfg bazel-wild-baseline "$ver" "$key" "$LOGS/$key.B.log" -- "${T[@]}")
+    B=$(run_cfg bazel-wild-baseline "$ver" "$key" B "$LOGS/$key.B.log" -- "${T[@]}")
   fi
   echo "  B +right-bazel : $B"
 
   if [[ "$B" == "ok" ]]; then
-    C=$(run_cfg bazel-wild "$ver" "$key" "$LOGS/$key.C.log" -- "${T[@]}")
+    C=$(run_cfg bazel-wild "$ver" "$key" C "$LOGS/$key.C.log" -- "${T[@]}")
   else
     C="-"
   fi
