@@ -63,22 +63,54 @@ cgo C toolchain at analysis time. So even "no native code" projects lean on a
 host compiler in nature — exactly the dependency the museum's `HERMETIC_LLVM`
 overlay removes by injection.
 
-### Takeaway
+## The baseline image: build it as it is
 
-Almost nothing builds with *literally* nothing but bazelisk, because "in nature"
-a Bazel project assumes the host is a developer machine with a C compiler on
-`$PATH`. That points at two honest framings for this track, which is the open
-question:
+Almost nothing builds with *literally* nothing but bazelisk, because in nature a
+Bazel project assumes the host is a developer machine. So the working image is
+[`Dockerfile.baseline`](Dockerfile.baseline) — bazelisk + a **normal CI machine**
+(C/C++ toolchain, JDK, python, git, zip; ~1.1 GB). The goal is to *build things
+as they are*; the pinned image is the "nature" they run in. Hermeticity then
+becomes **its own dimension** we measure, not a precondition:
 
-- **(a) Strictly bazelisk-only** → the interesting set is the small minority of
-  projects that bring their *own* hermetic toolchain (e.g. declare
-  `toolchains_llvm` / `hermetic_cc_toolchain` and `register_toolchains` in their
-  own `MODULE.bazel`). Cataloging those = "who is hermetic in nature."
-- **(b) bazelisk + a baseline** → bake a system compiler (gcc, a JDK, …) into the
-  image to model a *normal* CI machine, and let the container be the
-  reproducibility boundary. More projects build; the image is the pinned "nature."
+- **hermetic from the start** — builds in the strict, compiler-free image.
+- **hermetic with a nudge** — would, with a small declared change (e.g. register
+  a `toolchains_llvm` toolchain in its own MODULE).
+- **leans on the host** — builds only with the baseline image's toolchain.
 
-| project | lang | result (in the wild) |
+## First catalog (baseline image, `build //...` unless noted)
+
+| project | bazelisk picked | result | wall / note |
+|---------|:--------------:|:------:|-------------|
+| cpu_features | 9.1.1 | ✅ | builds clean as-is (98 actions) |
+| fast_float | 9.1.1→**7.4.1** | ✅¹ | builds at 7.4.1; `//...` on 9 fails (drift) |
+| json | 9.1.1 | ❌ | `//...`: `docs/mkdocs/...` pkg won't load (drift) |
+| googletest | 9.1.1 | ❌ | `//...`: `googlemock/test` pkg won't load (drift) |
+| buildtools | 9.1.1 | ❌ | `sh_test` removed in Bazel 9 (pins no version) |
+| doctest | **8.5.0** | ❌ | root `//:doctest` uses `includes=["."]`, rejected as the main module (fine as a *dep*) |
+
+¹ with `USE_BAZEL_VERSION=7.4.1`.
+
+The dimensions that fell out, each roughly independent:
+
+1. **Bazel version.** Does the repo pin a `.bazelversion`? buildtools/json/fast_float
+   pin none → bazelisk grabs Bazel 9, which removed the `cc_*`/`sh_test` autoloads,
+   so any package still using them fails to *load*. doctest *does* pin (8.5.0) and
+   bazelisk honors it — version-pinning works in nature when the repo bothers.
+2. **Host toolchain.** Cleared by the baseline image (gcc/JDK/python); the strict
+   image is the probe for who doesn't need it.
+3. **Build surface.** `build //...` is the honest "build it all," but one stray
+   docs/test/example package (often the version-drift casualty) fails the whole
+   pattern even when the core lib is fine. Per-target builds tell a different story.
+4. **Consumption shape.** Some libraries (doctest) are meant to be *consumed*, not
+   built as the root module — `includes=["."]` is legal for an external dep, not
+   for the main workspace.
+
+## Status / strict-image findings
+
+The strict (bazelisk-only) image established the two walls below; the baseline
+image clears the host-toolchain one, leaving version drift as the dominant blocker.
+
+| project | lang | result (strict, bazelisk-only) |
 |---------|------|----------------------|
 | buildtools | Go | ❌ no `.bazelversion` → Bazel 9 `sh_test` removed; @7.4.1 → no host gcc (rules_go cgo) |
 | fast_float | C++ | ❌ @7.4.1 → no host gcc (rules_cc autoconfig) |

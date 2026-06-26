@@ -1,0 +1,36 @@
+# "In the wild" image, baseline variant: bazelisk + a normal CI machine.
+#
+# The strict image (./Dockerfile) carries nothing but bazelisk and proved that
+# almost nothing builds that way — in nature a Bazel project assumes the host has
+# a C compiler (and often a JDK / python) on $PATH. This variant models that: a
+# pinned, ordinary CI machine. The *image* is the reproducibility boundary, and
+# we still run each project's build exactly as upstream ships it (no overlays).
+#
+# Baseline = what a generic Linux CI runner has: a C/C++ toolchain, a JDK, python,
+# git and the archive tools Bazel genrules commonly shell out to. Deliberately
+# NOT a hermetic toolchain — the point is to let projects use the host the way
+# they do in the wild.
+#
+# Build:  docker build -t bazel-wild-baseline -f wild/Dockerfile.baseline wild/
+
+FROM debian:bookworm-slim AS fetch
+ARG BAZELISK_VERSION=v1.25.0
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl \
+    && curl -fsSL -o /bazelisk \
+        "https://github.com/bazelbuild/bazelisk/releases/download/${BAZELISK_VERSION}/bazelisk-linux-amd64" \
+    && chmod +x /bazelisk
+
+FROM debian:bookworm-slim
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        build-essential \
+        default-jdk-headless \
+        python3 python-is-python3 \
+        git \
+        zip unzip \
+    && rm -rf /var/lib/apt/lists/*
+COPY --from=fetch /bazelisk /usr/local/bin/bazelisk
+ENV HOME=/home/wild
+RUN mkdir -p /home/wild /work
+WORKDIR /work
+ENTRYPOINT ["/usr/local/bin/bazelisk"]
