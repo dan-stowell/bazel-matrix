@@ -242,6 +242,14 @@ _PROJECT_SOURCES = {
         "sha256": "1cc663704ff15728d6ea41ced8cd9dcc086f7bd9a80e8531b2f8054d2f3b8733",
         "filename": "OpenCC-1.3.1.tar.gz",
     },
+    # cpu_features — Google's runtime CPU feature detection library (C). First-
+    # party Bazel; its tests use googletest (cc_* unloaded), so it runs on the
+    # Bazel 8.7 inner.
+    "cpu_features_archive": {
+        "url": "https://github.com/google/cpu_features/archive/refs/tags/v0.11.0.tar.gz",
+        "sha256": "ab2463f2d38fcaff1ce806be8e4c91333449931f5e02009d543b2569a3fa471a",
+        "filename": "cpu_features-0.11.0.tar.gz",
+    },
 }
 
 

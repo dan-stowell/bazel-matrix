@@ -89,6 +89,7 @@ use_repo(
     "jsonnet_archive",
     "gperftools_archive",
     "opencc_archive",
+    "cpu_features_archive",
 )
 
 # Hermetic `actiond` worker binary (see //tools/actiond:extension.bzl). actiond
