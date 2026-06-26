@@ -258,7 +258,7 @@
     },
     "//tools/fetch:extension.bzl%inner_bazel": {
       "general": {
-        "bzlTransitiveDigest": "zYNSixTSplaGfINn8Ul7m6dACp0vymGdrIhlJpZLSlM=",
+        "bzlTransitiveDigest": "Qi0XV8EYf24CCucJ26l1zmmwqCdaiC4ywK1DWgl8NhQ=",
         "usagesDigest": "h14pbfoGF+xRhbdi2p4ZLtdO3iD9D6LSCzysqtpR8HE=",
         "recordedInputs": [
           "REPO_MAPPING:,bazel_tools bazel_tools"
@@ -357,7 +357,7 @@
     },
     "//tools/fetch:extension.bzl%project_sources": {
       "general": {
-        "bzlTransitiveDigest": "zYNSixTSplaGfINn8Ul7m6dACp0vymGdrIhlJpZLSlM=",
+        "bzlTransitiveDigest": "Qi0XV8EYf24CCucJ26l1zmmwqCdaiC4ywK1DWgl8NhQ=",
         "usagesDigest": "4RQlvpJYAxX2PZxLc3Y4g/kgSEcAiqEkkFheY2guOrA=",
         "recordedInputs": [
           "REPO_MAPPING:,bazel_tools bazel_tools"
@@ -601,6 +601,16 @@
               ],
               "sha256": "ab2463f2d38fcaff1ce806be8e4c91333449931f5e02009d543b2569a3fa471a",
               "downloaded_file_path": "cpu_features-0.11.0.tar.gz"
+            }
+          },
+          "fast_float_archive": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_file",
+            "attributes": {
+              "urls": [
+                "https://github.com/fastfloat/fast_float/archive/refs/tags/v8.2.10.tar.gz"
+              ],
+              "sha256": "76f958dd97b1cf4d8862d1f0986a47d4bdfa8845252bae15ef0f40de3b95961f",
+              "downloaded_file_path": "fast_float-8.2.10.tar.gz"
             }
           }
         }

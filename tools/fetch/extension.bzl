@@ -250,6 +250,14 @@ _PROJECT_SOURCES = {
         "sha256": "ab2463f2d38fcaff1ce806be8e4c91333449931f5e02009d543b2569a3fa471a",
         "filename": "cpu_features-0.11.0.tar.gz",
     },
+    # fast_float — fast, exact float/integer parsing for C++ (header-only). Its
+    # doctest-based tests use the unloaded cc_* rules, so it runs on the Bazel
+    # 8.7 inner.
+    "fast_float_archive": {
+        "url": "https://github.com/fastfloat/fast_float/archive/refs/tags/v8.2.10.tar.gz",
+        "sha256": "76f958dd97b1cf4d8862d1f0986a47d4bdfa8845252bae15ef0f40de3b95961f",
+        "filename": "fast_float-8.2.10.tar.gz",
+    },
 }
 
 
