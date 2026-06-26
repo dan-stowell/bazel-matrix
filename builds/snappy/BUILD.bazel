@@ -1,0 +1,24 @@
+load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
+load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:overlays.bzl", "HERMETIC_LLVM")
+
+# snappy — Google's fast compression/decompression library (C++).
+# Source pinned in //tools/fetch:extension.bzl (@snappy_archive, release 1.2.2),
+# built with the fully-hermetic LLVM toolchain. snappy's BUILD calls cc_*
+# unloaded (and its unit test pulls in googletest), so it runs on the Bazel 8.7
+# inner — recent enough for hermetic-llvm, old enough to autoload the cc_* rules.
+#
+#   bazel run //builds/snappy:build_local_linux_amd64
+#   bazel run //builds/snappy:test_local_linux_amd64
+museum_project(
+    name = "snappy",
+    source_archive = "@snappy_archive//file",
+    strip_prefix = "snappy-1.2.2",
+    toolchains = [HERMETIC_LLVM],
+    bazel_version = "8.7.0",
+    environments = [LOCAL, RBE],
+    build = build_spec(targets = ["//:snappy"], flags = ["-c", "opt"]),
+    # snappy's correctness unit test (reads the bundled testdata corpus). The
+    # sibling snappy_benchmark target is a benchmark, not parity — left out.
+    test = test_spec(targets = ["//:snappy_unittest"], flags = ["-c", "opt"]),
+)

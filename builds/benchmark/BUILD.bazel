@@ -1,0 +1,30 @@
+load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
+load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:overlays.bzl", "HERMETIC_LLVM")
+
+# google/benchmark — the C++ microbenchmark library.
+# Source pinned in //tools/fetch:extension.bzl (@benchmark_archive, release
+# v1.9.5), built with the fully-hermetic LLVM toolchain. The library loads
+# rules_cc, but its test suite depends on googletest (cc_* unloaded), so it runs
+# on the Bazel 8.7 inner like the other googletest-consuming C++ projects.
+#
+#   bazel run //builds/benchmark:build_local_linux_amd64
+#   bazel run //builds/benchmark:test_local_linux_amd64
+museum_project(
+    name = "benchmark",
+    source_archive = "@benchmark_archive//file",
+    strip_prefix = "benchmark-1.9.5",
+    toolchains = [HERMETIC_LLVM],
+    bazel_version = "8.7.0",
+    environments = [LOCAL, RBE],
+    build = build_spec(targets = ["//:benchmark"], flags = ["-c", "opt"]),
+    # benchmark's own self-test suite (//test) — it exercises the library against
+    # googletest plus output-format assertions. locale_impermeability_test is
+    # excluded everywhere: it switches to the en_US.UTF-8 locale to prove output
+    # is locale-independent, but that locale isn't a Bazel-tracked input in the
+    # hermetic environment (only C.UTF-8 exists), so it can't construct it.
+    test = test_spec(
+        targets = ["//test/...", "-//test:locale_impermeability_test"],
+        flags = ["-c", "opt"],
+    ),
+)

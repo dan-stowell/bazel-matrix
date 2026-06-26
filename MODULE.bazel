@@ -78,6 +78,9 @@ use_repo(
     "ortools_archive",
     "brotli_archive",
     "bazel_archive",
+    "re2_archive",
+    "snappy_archive",
+    "benchmark_archive",
 )
 
 # Hermetic `actiond` worker binary (see //tools/actiond:extension.bzl). actiond

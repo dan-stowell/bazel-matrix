@@ -155,6 +155,30 @@ _PROJECT_SOURCES = {
         "sha256": "bdc0f7fb282eaa31df2e97d1bb1fc22965ec6d9ec95a8e8f126c7a2a7636552c",
         "filename": "bazel-9.1.1.tar.gz",
     },
+    # RE2 — Google's regular-expression library (C++). First-party Bazel
+    # (modern MODULE.bazel + rules_cc loads), depends on abseil-cpp. Release
+    # tarball; built with hermetic LLVM like the other C++ projects.
+    "re2_archive": {
+        "url": "https://github.com/google/re2/releases/download/2025-11-05/re2-2025-11-05.tar.gz",
+        "sha256": "87f6029d2f6de8aa023654240a03ada90e876ce9a4676e258dd01ea4c26ffd67",
+        "filename": "re2-2025-11-05.tar.gz",
+    },
+    # snappy — Google's fast compression/decompression library (C++). First-party
+    # Bazel; its BUILD calls cc_* unloaded and its tests pull in googletest, so it
+    # runs on the Bazel 8.7 inner like the other pre-Bazel-9 C++ projects.
+    "snappy_archive": {
+        "url": "https://github.com/google/snappy/archive/refs/tags/1.2.2.tar.gz",
+        "sha256": "90f74bc1fbf78a6c56b3c4a082a05103b3a56bb17bca1a27e052ea11723292dc",
+        "filename": "snappy-1.2.2.tar.gz",
+    },
+    # google/benchmark — the C++ microbenchmark library. First-party Bazel; the
+    # library loads rules_cc, but its tests use googletest (cc_* unloaded), so it
+    # runs on the Bazel 8.7 inner.
+    "benchmark_archive": {
+        "url": "https://github.com/google/benchmark/archive/refs/tags/v1.9.5.tar.gz",
+        "sha256": "9631341c82bac4a288bef951f8b26b41f69021794184ece969f8473977eaa340",
+        "filename": "benchmark-1.9.5.tar.gz",
+    },
 }
 
 

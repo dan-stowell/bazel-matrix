@@ -1,0 +1,41 @@
+load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
+load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:overlays.bzl", "HERMETIC_LLVM")
+
+# RE2 — Google's regular-expression library (C++).
+# Source pinned in //tools/fetch:extension.bzl (@re2_archive, release
+# 2025-11-05), built with the fully-hermetic LLVM toolchain.
+#
+# The core `//:re2` library loads its cc rules, but re2's test targets pull in
+# the googletest BCR module (and re2's own app/ + python/ packages) whose BUILD
+# files still call cc_library/cc_binary unloaded — removed from Bazel 9. So we
+# run the Bazel 8.7 inner (recent enough for the zero-sysroot hermetic-llvm
+# toolchain, old enough to still autoload the cc_* rules), as for googletest et al.
+#
+#   bazel run //builds/re2:build_local_linux_amd64
+#   bazel run //builds/re2:test_local_linux_amd64
+museum_project(
+    name = "re2",
+    source_archive = "@re2_archive//file",
+    strip_prefix = "re2-2025-11-05",
+    toolchains = [HERMETIC_LLVM],
+    bazel_version = "8.7.0",
+    environments = [LOCAL, RBE],
+    build = build_spec(targets = ["//:re2"], flags = ["-c", "opt"]),
+    # re2's own C++ test suite (parse/search/regexp/dfa/set/...), built -c opt.
+    # `//:all` scopes to the root package's tests — skipping the app/ CLI and the
+    # python/ pybind bindings, which aren't part of the library's test parity.
+    # The exhaustive_test family is brute-force (each enumerates all regexps up to
+    # a length: 150–200s apiece) — excluded to keep the goal tractable and within
+    # RBE action timeouts; the remaining 16 tests cover the functional surface.
+    test = test_spec(
+        targets = [
+            "//:all",
+            "-//:exhaustive_test",
+            "-//:exhaustive1_test",
+            "-//:exhaustive2_test",
+            "-//:exhaustive3_test",
+        ],
+        flags = ["-c", "opt"],
+    ),
+)
