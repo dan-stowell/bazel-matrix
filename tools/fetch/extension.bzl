@@ -286,6 +286,15 @@ _PROJECT_SOURCES = {
         "sha256": "9189960c2bbbc4f3382ce0773b2bb5f13e3afd8fed47f55f193e11e85a4f9854",
         "filename": "doctest-2.5.2.tar.gz",
     },
+    # cctz — Google's civil-time / time-zone library (basis of absl::time). No
+    # recent release tag carries Bazel support, so pinned to a master commit. Its
+    # BUILD explicitly loads cc_* from @rules_cc, so it runs on the default 9.1.1
+    # inner.
+    "cctz_archive": {
+        "url": "https://github.com/google/cctz/archive/f353c121a9e4fb55a9c623899e87197eaee0392d.tar.gz",
+        "sha256": "dd950e165d81b330c03701aee6cdfc1402f3b8794c6aeeb780eedfd76bbaca41",
+        "filename": "cctz-f353c12.tar.gz",
+    },
 }
 
 

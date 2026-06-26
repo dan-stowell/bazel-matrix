@@ -258,7 +258,7 @@
     },
     "//tools/fetch:extension.bzl%inner_bazel": {
       "general": {
-        "bzlTransitiveDigest": "ZWanwg2DVLF1iseZknC2RDiJU9yQ945rxSxDC/3xJVA=",
+        "bzlTransitiveDigest": "3REPl10Ydd5HD4KWdgCbje2FUpGBjVfZ/avqFeovGdA=",
         "usagesDigest": "h14pbfoGF+xRhbdi2p4ZLtdO3iD9D6LSCzysqtpR8HE=",
         "recordedInputs": [
           "REPO_MAPPING:,bazel_tools bazel_tools"
@@ -357,7 +357,7 @@
     },
     "//tools/fetch:extension.bzl%project_sources": {
       "general": {
-        "bzlTransitiveDigest": "ZWanwg2DVLF1iseZknC2RDiJU9yQ945rxSxDC/3xJVA=",
+        "bzlTransitiveDigest": "3REPl10Ydd5HD4KWdgCbje2FUpGBjVfZ/avqFeovGdA=",
         "usagesDigest": "4RQlvpJYAxX2PZxLc3Y4g/kgSEcAiqEkkFheY2guOrA=",
         "recordedInputs": [
           "REPO_MAPPING:,bazel_tools bazel_tools"
@@ -651,6 +651,16 @@
               ],
               "sha256": "9189960c2bbbc4f3382ce0773b2bb5f13e3afd8fed47f55f193e11e85a4f9854",
               "downloaded_file_path": "doctest-2.5.2.tar.gz"
+            }
+          },
+          "cctz_archive": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_file",
+            "attributes": {
+              "urls": [
+                "https://github.com/google/cctz/archive/f353c121a9e4fb55a9c623899e87197eaee0392d.tar.gz"
+              ],
+              "sha256": "dd950e165d81b330c03701aee6cdfc1402f3b8794c6aeeb780eedfd76bbaca41",
+              "downloaded_file_path": "cctz-f353c12.tar.gz"
             }
           }
         }

@@ -95,6 +95,7 @@ use_repo(
     "glog_archive",
     "onetbb_archive",
     "doctest_archive",
+    "cctz_archive",
 )
 
 # Hermetic `actiond` worker binary (see //tools/actiond:extension.bzl). actiond
