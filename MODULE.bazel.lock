@@ -292,6 +292,39 @@
         }
       }
     },
+    "//tools/crun:extension.bzl%crun": {
+      "general": {
+        "bzlTransitiveDigest": "YaUVnLIvZZffpCWWD9MlFt7LnA+jTLB+zEKzs0uhBAM=",
+        "usagesDigest": "q4vJwO4RUrbJ89rdv4BJP71jth8Ko3vpvKoaiSJSbHs=",
+        "recordedInputs": [
+          "REPO_MAPPING:,bazel_tools bazel_tools"
+        ],
+        "generatedRepoSpecs": {
+          "crun_linux_amd64": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_file",
+            "attributes": {
+              "urls": [
+                "https://github.com/containers/crun/releases/download/1.28/crun-1.28-linux-amd64"
+              ],
+              "sha256": "2aa6b7024a9c9f153895c0d11ae233d3758f54844011c3a039e3e89048d01d42",
+              "executable": true,
+              "downloaded_file_path": "crun"
+            }
+          },
+          "crun_linux_arm64": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_file",
+            "attributes": {
+              "urls": [
+                "https://github.com/containers/crun/releases/download/1.28/crun-1.28-linux-arm64"
+              ],
+              "sha256": "cc1e8ec89aef1422e0741be196f9ed099e2e09d2f48f30f27cd44a22ef1f0342",
+              "executable": true,
+              "downloaded_file_path": "crun"
+            }
+          }
+        }
+      }
+    },
     "//tools/fetch:extension.bzl%inner_bazel": {
       "general": {
         "bzlTransitiveDigest": "+H5lIFTpnu6zv9WEKkM7Ig6tLeC0JslXn+St9D3ff5o=",

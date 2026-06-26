@@ -16,9 +16,20 @@ load("@rules_img//img:image.bzl", "image_manifest")
 load("@rules_img//img:layer.bzl", "file_metadata", "image_layer")
 load("@rules_img//img:load.bzl", "image_load")
 load("@rules_distroless//distroless:defs.bzl", "cacerts")
+load("@rules_shell//shell:sh_binary.bzl", "sh_binary")
 load("@tar.bzl", "tar")
 
-exports_files(["toolchain.yaml", "toolchain.lock.json"])
+exports_files(["toolchain.yaml", "toolchain.lock.json", "rootfs.sh"])
+
+# Stage the daemonless run path (rootless crun + the extracted rootfs) into the
+# cache, materialised entirely from Bazel — no docker. See wild/image/rootfs.sh.
+#   bazel run //wild/image:rootfs
+sh_binary(
+    name = "rootfs",
+    srcs = ["rootfs.sh"],
+    tags = ["manual"],
+    visibility = ["//visibility:public"],
+)
 
 # The ca-certificates .deb ships the individual certs but the bundle at
 # /etc/ssl/certs/ca-certificates.crt (what SSL_CERT_FILE points at) is generated

@@ -1,0 +1,4 @@
+# This package exists so //tools/crun:extension.bzl can be loaded from
+# MODULE.bazel. The actual crun binary is provided by the @crun_* repos the
+# extension creates (e.g. @crun_linux_amd64//file).
+exports_files(["extension.bzl"])

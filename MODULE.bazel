@@ -148,6 +148,11 @@ apt.install(
 )
 use_repo(apt, "toolchain_apt")
 
+# Hermetic `crun` (static OCI runtime) for running the image daemonlessly and
+# rootlessly — no dockerd. See //tools/crun:extension.bzl and wild/run.sh.
+crun = use_extension("//tools/crun:extension.bzl", "crun")
+use_repo(crun, "crun_linux_amd64", "crun_linux_arm64")
+
 # bazelisk binary, baked into the image so the only entrypoint is "run bazel".
 http_file = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
 http_file(

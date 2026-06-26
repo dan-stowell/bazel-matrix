@@ -17,9 +17,15 @@ enumerating.
   build time, no Dockerfile.
 
   ```sh
-  bazel run //wild/image:load              # build + load bazel-wild-baseline:latest
+  bazel run //wild/image:rootfs            # daemonless: stage rootfs + crun into ~/.cache/wild
+  bazel run //wild/image:load              # docker: build + load bazel-wild-baseline:latest
   bazel run @toolchain_apt//:lock          # regenerate the apt lock after editing toolchain.yaml
   ```
+
+  The default run path is **daemonless and rootless**: [`rootfs.sh`](image/rootfs.sh)
+  extracts the image's filesystem from the OCI layout rules_img builds (no
+  daemon) and stages it alongside a pinned static `crun` ([`//tools/crun`](../../tools/crun)).
+  No dockerd, no host runtime, no root — just a single-id user namespace.
 
 - **[`<project>/`](.)** — one package per project with `:build` and `:test`
   targets (e.g. [`re2`](re2), [`cpu_features`](cpu_features)). Generated from the
@@ -37,7 +43,8 @@ enumerating.
   the upstream `MODULE`/`BUILD` with the project's known-good Bazel pinned
   (`USE_BAZEL_VERSION`). Each project gets its own Bazel output base; a shared
   content-addressed `--repository_cache` keeps the BCR + toolchain downloads warm
-  across projects.
+  across projects. `WILD_RUNTIME` selects `crun` (default, rootless OCI bundle
+  over the staged rootfs) or `docker`.
 
 - **[`verify.sh`](verify.sh)** — the build+test sweep. Runs every project's
   upstream build, then (if green) its upstream test, and records the result to
