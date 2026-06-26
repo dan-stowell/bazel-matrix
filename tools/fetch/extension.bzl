@@ -279,6 +279,13 @@ _PROJECT_SOURCES = {
         "sha256": "e8e89c9c345415b17b30a2db3095ba9d47647611662073f7fbf54ad48b7f3c2a",
         "filename": "oneTBB-2022.0.0.tar.gz",
     },
+    # doctest — fast, header-only C++ unit-testing framework. Its BUILD files
+    # explicitly load cc_* from @rules_cc, so it runs on the default 9.1.1 inner.
+    "doctest_archive": {
+        "url": "https://github.com/doctest/doctest/archive/refs/tags/v2.5.2.tar.gz",
+        "sha256": "9189960c2bbbc4f3382ce0773b2bb5f13e3afd8fed47f55f193e11e85a4f9854",
+        "filename": "doctest-2.5.2.tar.gz",
+    },
 }
 
 

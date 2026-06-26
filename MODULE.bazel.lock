@@ -258,7 +258,7 @@
     },
     "//tools/fetch:extension.bzl%inner_bazel": {
       "general": {
-        "bzlTransitiveDigest": "k8vOemWpkdH2xxYS6GTsOolAPFMn+7q5g+0Cm0UJ3DA=",
+        "bzlTransitiveDigest": "ZWanwg2DVLF1iseZknC2RDiJU9yQ945rxSxDC/3xJVA=",
         "usagesDigest": "h14pbfoGF+xRhbdi2p4ZLtdO3iD9D6LSCzysqtpR8HE=",
         "recordedInputs": [
           "REPO_MAPPING:,bazel_tools bazel_tools"
@@ -357,7 +357,7 @@
     },
     "//tools/fetch:extension.bzl%project_sources": {
       "general": {
-        "bzlTransitiveDigest": "k8vOemWpkdH2xxYS6GTsOolAPFMn+7q5g+0Cm0UJ3DA=",
+        "bzlTransitiveDigest": "ZWanwg2DVLF1iseZknC2RDiJU9yQ945rxSxDC/3xJVA=",
         "usagesDigest": "4RQlvpJYAxX2PZxLc3Y4g/kgSEcAiqEkkFheY2guOrA=",
         "recordedInputs": [
           "REPO_MAPPING:,bazel_tools bazel_tools"
@@ -641,6 +641,16 @@
               ],
               "sha256": "e8e89c9c345415b17b30a2db3095ba9d47647611662073f7fbf54ad48b7f3c2a",
               "downloaded_file_path": "oneTBB-2022.0.0.tar.gz"
+            }
+          },
+          "doctest_archive": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_file",
+            "attributes": {
+              "urls": [
+                "https://github.com/doctest/doctest/archive/refs/tags/v2.5.2.tar.gz"
+              ],
+              "sha256": "9189960c2bbbc4f3382ce0773b2bb5f13e3afd8fed47f55f193e11e85a4f9854",
+              "downloaded_file_path": "doctest-2.5.2.tar.gz"
             }
           }
         }
