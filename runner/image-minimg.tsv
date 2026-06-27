@@ -15,7 +15,7 @@ goal	result	missing	note
 //builds/highs:build_minimg_linux_amd64	ok	-	
 //builds/buildtools:build_minimg_linux_amd64	ok	-	
 //builds/jsoncpp:build_minimg_linux_amd64	ok	-	
-//builds/nsync:build_minimg_linux_amd64	fail	other	ERROR: Build did NOT complete successfully
+//builds/nsync:build_minimg_linux_amd64	ok	-	pure-C //:nsync (nsync_cpp excluded on minimg: .c-as-c++ lacks libc++)
 //builds/opentelemetry_cpp:build_minimg_linux_amd64	ok	-	
 //builds/abseil_cpp:build_minimg_linux_amd64	ok	-	
 //builds/boringssl:build_minimg_linux_amd64	ok	-	
@@ -33,7 +33,7 @@ goal	result	missing	note
 //builds/protobuf:build_minimg_linux_amd64	ok	-	
 //builds/z3:build_minimg_linux_amd64	fail	other	ERROR: Build did NOT complete successfully
 //builds/go_jsonnet:build_minimg_linux_amd64	ok	-	
-//builds/grpc_gateway:build_minimg_linux_amd64	fail	other	ERROR: Build did NOT complete successfully
+//builds/grpc_gateway:build_minimg_linux_amd64	ok	-	pure-Go mode (avoids cgo/lld text-reloc)
 //builds/json:build_minimg_linux_amd64	ok	-	
 //builds/grpc:build_minimg_linux_amd64	timeout	-	
 //builds/magic_enum:build_minimg_linux_amd64	ok	-	

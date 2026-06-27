@@ -21,12 +21,16 @@ museum_project(
     bazel_version = "9.1.1",
     environments = [LOCAL, RBE, MINIMG],
     # The two protoc plugins grpc-gateway ships, both pure-Go binaries.
+    # Force pure-Go linking: a transitive dep otherwise pulls cgo, whose external
+    # link goes through clang++ → ld.lld and hits a text-relocation error
+    # (R_X86_64_64 against a Go type symbol) in the minimal container. These
+    # binaries don't need cgo, so pure mode is both correct and more hermetic.
     build = build_spec(
         targets = [
             "//protoc-gen-grpc-gateway:protoc-gen-grpc-gateway",
             "//protoc-gen-openapiv2:protoc-gen-openapiv2",
         ],
-        flags = ["-c", "opt"],
+        flags = ["-c", "opt", "--@io_bazel_rules_go//go/config:pure"],
     ),
     # Pure-Go unit tests for the proxy runtime, the protobuf-path/casing helpers,
     # the descriptor model and the two code generators. //examples/... integration
@@ -38,6 +42,6 @@ museum_project(
             "//protoc-gen-grpc-gateway/...",
             "//protoc-gen-openapiv2/...",
         ],
-        flags = ["-c", "opt"],
+        flags = ["-c", "opt", "--@io_bazel_rules_go//go/config:pure"],
     ),
 )

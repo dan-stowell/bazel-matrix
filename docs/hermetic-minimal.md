@@ -67,6 +67,33 @@ The pattern matches the build sweep: the hermetic toolchain itself is never the
 problem. What remains are specific tool needs (objcopy, patch/quilt), a couple of
 test targets, and the pre-existing edges — each a small, local fix.
 
+## Fixes applied — getting the suite working in MINIMG
+
+Two classes of fix: **environment tools** (added to the image — auxiliary tools a
+build graph invokes, never a compiler) and **source-level** (per-project, the
+"transformation" axis).
+
+**Image (`minimal.Dockerfile`) — fixed bazel + copybara, build 44/49, test 36/42:**
+
+| Added | Unblocked |
+|-------|-----------|
+| `binutils` (objcopy) | **bazel** now builds (green, ~28 min) — its install-base genrule shells to `objcopy` |
+| `patch`, `quilt` | **copybara** now passes all **220/220** tests (the patch/quilt-transformation tests) |
+| `libtinfo5` | the clang cpptrace's *own* `toolchains_llvm` downloads now loads (see below) |
+
+The image stays compiler-free: `gcc`/`g++`/`cc` are still absent.
+
+**Remaining — source-level, per-project (candidates for a `variants` transform):**
+
+| Project | Diagnosis | Fix shape |
+|---------|-----------|-----------|
+| nsync | pure-C `//:nsync` **builds**; only `//:nsync_cpp` fails — it compiles `.c` as `-x c++`, which Bazel treats as a C action, so the hermetic toolchain (`--sysroot=/dev/null -nostdlibinc`) adds glibc/kernel/compiler-rt headers but **not libc++** → `<mutex>` not found | narrow the MINIMG build to `//:nsync`, or a copt adding libc++'s isystem |
+| grpc_gateway | Go **cgo** external-link: `ld.lld: relocation R_X86_64_64 cannot be used against symbol` (known rules_go/lld interaction) | pass `-extldflags` / linkmode to rules_go |
+| cpptrace | gets past libtinfo now, but its *self-registered* `toolchains_llvm` (not the museum's hermetic `llvm`) can't link in the foreign_cc libunwind configure (`C compiler cannot create executables`) — that toolchain isn't self-contained | patch cpptrace to use the museum `llvm`, or drop its `toolchains_llvm` |
+| z3 | foreign_cc `bazel-bin/**` glob / FindPython3 (pre-existing, image-independent) | upstream-edge patch |
+| protobuf / opentelemetry_cpp | one arch test / a few benchmark smoketests; **builds + bulk of tests pass** | per-env test exclusion |
+| bazel / grpc | only the 25-min sweep cap (bazel *builds* in ~28 min) | raise the goal timeout |
+
 ## Status: tiers 1 & 2 proven
 
 | Tier | Goal | Result |

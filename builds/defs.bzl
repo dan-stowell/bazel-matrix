@@ -83,9 +83,17 @@ _COMMAND_DEFAULT_FLAGS = {
     ],
 }
 
-def build_spec(targets, flags = []):
-    """The `build` command for a project: what to build, plus extra flags."""
-    return struct(command = "build", targets = targets, flags = flags, exclude_on = {})
+def build_spec(targets, flags = [], exclude_on = {}):
+    """The `build` command for a project: what to build, plus extra flags.
+
+    Args:
+      targets: default build target patterns.
+      flags: extra flags for the inner `bazel build`.
+      exclude_on: dict env-name -> target patterns to *additionally* exclude in
+        that environment (e.g. a target that only builds with a host toolchain a
+        given environment lacks).
+    """
+    return struct(command = "build", targets = targets, flags = flags, exclude_on = exclude_on)
 
 def test_spec(targets, flags = [], exclude_on = {}):
     """The `test` command for a project.
