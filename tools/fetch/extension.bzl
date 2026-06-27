@@ -123,6 +123,15 @@ _PROJECT_SOURCES = {
         "sha256": "f619a51371f41c0ad6837b2a98af9d4643b3371015d873887f7e8d3237320b2f",
         "filename": "gflags-2.3.0.tar.gz",
     },
+    # go-jsonnet — the pure-Go implementation of the Jsonnet data-templating
+    # language (sibling to the C++ //projects/jsonnet). First-party Bazel: builds
+    # its CLIs via rules_go and runs its Go unit tests. Pulls the C++ jsonnet
+    # stdlib via an http_archive. .bazelversion 8.5.1, so the 8.7 inner.
+    "go_jsonnet_archive": {
+        "url": "https://github.com/google/go-jsonnet/archive/refs/tags/v0.22.0.tar.gz",
+        "sha256": "9c463043a05c1e833c57136521e808ee8df192131f00c636235a2b54823d8c4c",
+        "filename": "go-jsonnet-0.22.0.tar.gz",
+    },
     # GoogleTest — the C++ test framework. First-party Bazel, builds + tests
     # itself with the hermetic LLVM toolchain.
     "googletest_archive": {

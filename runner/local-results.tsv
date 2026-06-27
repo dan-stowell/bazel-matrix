@@ -35,3 +35,4 @@ brotli	8.7.0	failure	missing
 brotli_go	8.7.0	missing	failure	
 grpc_gateway	9.1.1	success	success	Executed 8 out of 8 tests: 8 tests pass.
 gflags	8.7.0	success	missing	
+go_jsonnet	8.7.0	success	success	Executed 8 out of 8 tests: 8 tests pass.

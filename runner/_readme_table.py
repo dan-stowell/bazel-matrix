@@ -33,6 +33,7 @@ META = {
     "json":         ("nlohmann/json", "https://github.com/nlohmann/json", "JSON for Modern C++"),
     "jsoncpp":      ("jsoncpp", "https://github.com/open-source-parsers/jsoncpp", "C++ library for reading/writing JSON"),
     "jsonnet":      ("jsonnet", "https://github.com/google/jsonnet", "Data-templating language"),
+    "go_jsonnet":   ("go-jsonnet", "https://github.com/google/go-jsonnet", "Pure-Go implementation of Jsonnet"),
     "magic_enum":   ("magic_enum", "https://github.com/Neargye/magic_enum", "Static reflection for C++ enums"),
     "nsync":        ("nsync", "https://github.com/google/nsync", "C library of synchronization primitives"),
     "onetbb":       ("oneTBB", "https://github.com/uxlfoundation/oneTBB", "Intel's Threading Building Blocks"),
