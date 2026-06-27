@@ -83,6 +83,7 @@ use_repo(
     "grpc_archive",
     "grpc_gateway_archive",
     "gflags_archive",
+    "abseil_py_archive",
     "go_jsonnet_archive",
     "googletest_archive",
     "json_archive",

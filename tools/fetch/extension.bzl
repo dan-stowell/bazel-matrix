@@ -123,6 +123,14 @@ _PROJECT_SOURCES = {
         "sha256": "f619a51371f41c0ad6837b2a98af9d4643b3371015d873887f7e8d3237320b2f",
         "filename": "gflags-2.3.0.tar.gz",
     },
+    # abseil-py — Google's Python common libraries (app, flags, logging, testing).
+    # First-party Bazel (bzlmod) built with rules_python; runs its py_test suite
+    # on a hermetic interpreter. Pure Python, no C code.
+    "abseil_py_archive": {
+        "url": "https://github.com/abseil/abseil-py/archive/refs/tags/v2.4.0.tar.gz",
+        "sha256": "190418ea571aa09a0d91b08e3f71a2598337821dcec3f24872f44a140e8499ee",
+        "filename": "abseil-py-2.4.0.tar.gz",
+    },
     # go-jsonnet — the pure-Go implementation of the Jsonnet data-templating
     # language (sibling to the C++ //projects/jsonnet). First-party Bazel: builds
     # its CLIs via rules_go and runs its Go unit tests. Pulls the C++ jsonnet

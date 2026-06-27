@@ -14,6 +14,7 @@ import sys
 # proj-dir -> (display name, source repo, one-line description)
 META = {
     "abseil_cpp":   ("abseil-cpp", "https://github.com/abseil/abseil-cpp", "Google's C++ standard-library extensions"),
+    "abseil_py":    ("abseil-py", "https://github.com/abseil/abseil-py", "Google's Python common libraries (app/flags/logging)"),
     "benchmark":    ("google/benchmark", "https://github.com/google/benchmark", "Microbenchmark support library"),
     "boringssl":    ("BoringSSL", "https://github.com/google/boringssl", "Google's fork of OpenSSL"),
     "catch2":       ("Catch2", "https://github.com/catchorg/Catch2", "C++ unit-testing framework"),

@@ -81,6 +81,7 @@ and rendered by [`runner/_local_table.py`](runner/_local_table.py).
 | Project | Bazel | `:local_build` | `:local_test` |
 |---------|:-----:|:--------------:|:-------------:|
 | [abseil-cpp](https://github.com/abseil/abseil-cpp) | 9.1.1 | ✅ | ✅ |
+| [abseil-py](https://github.com/abseil/abseil-py) | 8.7.0 | ✅ | ✅ |
 | [bazel](https://github.com/bazelbuild/bazel) | 9.1.1 | ❌ | ❌ (1/15) |
 | [BoringSSL](https://github.com/google/boringssl) | 9.1.1 | ✅ | ✅ |
 | [brotli](https://github.com/google/brotli) | 8.7.0 | ❌ | — |
@@ -118,5 +119,5 @@ and rendered by [`runner/_local_table.py`](runner/_local_table.py).
 | [snappy](https://github.com/google/snappy) | 8.7.0 | ✅ | ✅ |
 | [zlib](https://github.com/madler/zlib) | 9.1.1 | ✅ | — |
 
-_Host-local sweep of 37 projects: 32 build and 24 run their test suite directly on the host toolchain (✅ success · ❌ failure · ⏱️ timeout · — no such target)._
+_Host-local sweep of 38 projects: 33 build and 25 run their test suite directly on the host toolchain (✅ success · ❌ failure · ⏱️ timeout · — no such target)._
 <!-- END GENERATED LOCAL TABLE -->
