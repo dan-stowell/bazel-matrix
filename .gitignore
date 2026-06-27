@@ -4,3 +4,4 @@
 # Python bytecode (in case anything is run outside Bazel)
 __pycache__/
 *.pyc
+runner/image-minimg.tsv.lock
