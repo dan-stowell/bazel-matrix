@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM", "HERMETIC_ZIP")
 
 # file_test exercises real POSIX filesystem semantics that invert when the test
@@ -42,7 +42,7 @@ museum_project(
     source_archive = "@bazel_archive//file",
     strip_prefix = "bazel-9.1.1",
     toolchains = [HERMETIC_LLVM, HERMETIC_ZIP],
-    environments = [LOCAL, RBE],
+    environments = [LOCAL, RBE, MINIMG],
     # HERMETIC_LLVM appends the `llvm` module, which resolves newer transitive
     # versions of platforms/bazel_features/rules_cc than Bazel's own MODULE pins
     # as direct deps. Bazel-the-tool builds with strict direct-dependency

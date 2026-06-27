@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project")
-load("//builds:environments.bzl", "ACTIOND", "LOCAL", "RBE")
+load("//builds:environments.bzl", "ACTIOND", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM", "overlay")
 
 # Brotli — Google's compression library + CLI.
@@ -28,6 +28,6 @@ museum_project(
     strip_prefix = "brotli-1.2.0",
     toolchains = [BROTLI_MODULE, HERMETIC_LLVM],
     bazel_version = "8.7.0",
-    environments = [LOCAL, RBE, ACTIOND],
+    environments = [LOCAL, RBE, ACTIOND, MINIMG],
     build = build_spec(targets = ["//:brotli", "//:brotlienc", "//:brotlidec"], flags = ["-c", "opt"]),
 )

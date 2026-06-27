@@ -1,0 +1,50 @@
+goal	result	missing	note
+//builds/abseil_py:build_minimg_linux_amd64	ok	-	
+//builds/benchmark:build_minimg_linux_amd64	ok	-	
+//builds/bazel:build_minimg_linux_amd64	fail	other	ERROR: Build did NOT complete successfully
+//builds/brotli:build_minimg_linux_amd64	ok	-	
+//builds/catch2:build_minimg_linux_amd64	ok	-	
+//builds/cli11:build_minimg_linux_amd64	ok	-	
+//builds/cpptrace:build_minimg_linux_amd64	fail	other	ERROR: Build did NOT complete successfully
+//builds/doctest:build_minimg_linux_amd64	ok	-	
+//builds/crow:build_minimg_linux_amd64	ok	-	
+//builds/fast_float:build_minimg_linux_amd64	ok	-	
+//builds/glog:build_minimg_linux_amd64	ok	-	
+//builds/ftxui:build_minimg_linux_amd64	ok	-	
+//builds/googletest:build_minimg_linux_amd64	ok	-	
+//builds/highs:build_minimg_linux_amd64	ok	-	
+//builds/buildtools:build_minimg_linux_amd64	ok	-	
+//builds/jsoncpp:build_minimg_linux_amd64	ok	-	
+//builds/nsync:build_minimg_linux_amd64	fail	other	ERROR: Build did NOT complete successfully
+//builds/opentelemetry_cpp:build_minimg_linux_amd64	ok	-	
+//builds/abseil_cpp:build_minimg_linux_amd64	ok	-	
+//builds/boringssl:build_minimg_linux_amd64	ok	-	
+//builds/cctz:build_minimg_linux_amd64	ok	-	
+//builds/cpu_features:build_minimg_linux_amd64	ok	-	
+//builds/copybara:build_minimg_linux_amd64	ok	-	
+//builds/double_conversion:build_minimg_linux_amd64	ok	-	
+//builds/gflags:build_minimg_linux_amd64	ok	-	
+//builds/gperftools:build_minimg_linux_amd64	ok	-	
+//builds/cxx:build_minimg_linux_amd64	ok	-	
+//builds/highway:build_minimg_linux_amd64	ok	-	
+//builds/jsonnet:build_minimg_linux_amd64	ok	-	
+//builds/flatbuffers:build_minimg_linux_amd64	ok	-	
+//builds/onetbb:build_minimg_linux_amd64	ok	-	
+//builds/protobuf:build_minimg_linux_amd64	ok	-	
+//builds/z3:build_minimg_linux_amd64	fail	other	ERROR: Build did NOT complete successfully
+//builds/go_jsonnet:build_minimg_linux_amd64	ok	-	
+//builds/grpc_gateway:build_minimg_linux_amd64	fail	other	ERROR: Build did NOT complete successfully
+//builds/json:build_minimg_linux_amd64	ok	-	
+//builds/grpc:build_minimg_linux_amd64	timeout	-	
+//builds/magic_enum:build_minimg_linux_amd64	ok	-	
+//builds/openexr:build_minimg_linux_amd64	ok	-	
+//builds/prometheus_cpp:build_minimg_linux_amd64	ok	-	
+//builds/snappy:build_minimg_linux_amd64	ok	-	
+//builds/iceoryx2:build_minimg_linux_amd64	ok	-	
+//builds/ortools:build_minimg_linux_amd64	ok	-	
+//builds/lcm:build_minimg_linux_amd64	ok	-	
+//builds/quill:build_minimg_linux_amd64	ok	-	
+//builds/opencc:build_minimg_linux_amd64	ok	-	
+//builds/zlib:build_minimg_linux_amd64	ok	-	
+//builds/pcre2:build_minimg_linux_amd64	ok	-	
+//builds/re2:build_minimg_linux_amd64	ok	-	

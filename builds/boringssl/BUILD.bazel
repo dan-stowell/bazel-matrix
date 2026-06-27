@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM")
 
 # BoringSSL — Google's fork of OpenSSL (the crypto/TLS library behind Chrome,
@@ -18,7 +18,7 @@ museum_project(
     source_archive = "@boringssl_archive//file",
     strip_prefix = "boringssl-0.20260616.0",
     toolchains = [HERMETIC_LLVM],
-    environments = [LOCAL, RBE],
+    environments = [LOCAL, RBE, MINIMG],
     # The two libraries that are the point of BoringSSL: libcrypto and libssl.
     build = build_spec(targets = ["//:crypto", "//:ssl"], flags = ["-c", "opt"]),
     # ssl_test exercises the TLS stack against libcrypto; urandom_test covers the

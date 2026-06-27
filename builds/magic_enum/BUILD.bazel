@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM", "PLATFORMS_DEP")
 
 # magic_enum — static reflection (to-string, iteration, …) for C++ enums.
@@ -23,7 +23,7 @@ museum_project(
     source_archive = "@magic_enum_archive//file",
     strip_prefix = "magic_enum-0.9.8/test",
     toolchains = [HERMETIC_LLVM, PLATFORMS_DEP],
-    environments = [LOCAL, RBE],
+    environments = [LOCAL, RBE, MINIMG],
     # The two wired cc_tests (test, test_flags) — building them compiles real
     # magic_enum usage through the vendored Catch2 (the library itself is
     # header-only, so this is where the toolchain actually exercises it).

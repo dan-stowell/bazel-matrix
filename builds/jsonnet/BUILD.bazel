@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM", "PLATFORMS_DEP")
 
 # jsonnet — Google's data-templating language (the C++ implementation).
@@ -18,7 +18,7 @@ museum_project(
     strip_prefix = "jsonnet-0.22.0",
     toolchains = [HERMETIC_LLVM, PLATFORMS_DEP],
     bazel_version = "8.7.0",
-    environments = [LOCAL, RBE],
+    environments = [LOCAL, RBE, MINIMG],
     # The jsonnet CLI (//cmd:jsonnet) — the headline artifact (interpreter built
     # on libjsonnet).
     build = build_spec(targets = ["//cmd:jsonnet"], flags = ["-c", "opt"]),

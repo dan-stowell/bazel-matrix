@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM")
 
 # RE2 — Google's regular-expression library (C++).
@@ -20,7 +20,7 @@ museum_project(
     strip_prefix = "re2-2025-11-05",
     toolchains = [HERMETIC_LLVM],
     bazel_version = "8.7.0",
-    environments = [LOCAL, RBE],
+    environments = [LOCAL, RBE, MINIMG],
     build = build_spec(targets = ["//:re2"], flags = ["-c", "opt"]),
     # re2's own C++ test suite (parse/search/regexp/dfa/set/...), built -c opt.
     # `//:all` scopes to the root package's tests — skipping the app/ CLI and the

@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM")
 
 # nsync — Google's small C library of synchronization primitives (mutexes,
@@ -17,7 +17,7 @@ museum_project(
     strip_prefix = "nsync-1.30.0",
     toolchains = [HERMETIC_LLVM],
     bazel_version = "8.7.0",
-    environments = [LOCAL, RBE],
+    environments = [LOCAL, RBE, MINIMG],
     # The C library plus its C++ wrapper.
     build = build_spec(targets = ["//:nsync", "//:nsync_cpp"], flags = ["-c", "opt"]),
     # The functional unit tests for the core primitives — counter, mutex,

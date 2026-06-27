@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project")
-load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM")
 
 # PCRE2 — Perl Compatible Regular Expressions (version 2), the C regex engine used
@@ -17,6 +17,6 @@ museum_project(
     strip_prefix = "pcre2-pcre2-10.47",
     toolchains = [HERMETIC_LLVM],
     bazel_version = "9.1.1",
-    environments = [LOCAL, RBE],
+    environments = [LOCAL, RBE, MINIMG],
     build = build_spec(targets = ["//:pcre2"], flags = ["-c", "opt"]),
 )

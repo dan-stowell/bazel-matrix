@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM")
 
 # snappy — Google's fast compression/decompression library (C++).
@@ -16,7 +16,7 @@ museum_project(
     strip_prefix = "snappy-1.2.2",
     toolchains = [HERMETIC_LLVM],
     bazel_version = "8.7.0",
-    environments = [LOCAL, RBE],
+    environments = [LOCAL, RBE, MINIMG],
     build = build_spec(targets = ["//:snappy"], flags = ["-c", "opt"]),
     # snappy's correctness unit test (reads the bundled testdata corpus). The
     # sibling snappy_benchmark target is a benchmark, not parity — left out.

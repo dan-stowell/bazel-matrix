@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM", "PLATFORMS_DEP")
 
 # CLI11 — a command-line parser for C++11 (header-only, optionally compiled).
@@ -18,7 +18,7 @@ museum_project(
     strip_prefix = "CLI11-2.4.2",
     toolchains = [HERMETIC_LLVM, PLATFORMS_DEP],
     bazel_version = "8.7.0",
-    environments = [LOCAL, RBE],
+    environments = [LOCAL, RBE, MINIMG],
     build = build_spec(targets = ["//:cli11"], flags = ["-c", "opt"]),
     # A core subset of the Catch2 suite covering parsing, options, subcommands,
     # help, formatting and the app integration tests (which exercise the

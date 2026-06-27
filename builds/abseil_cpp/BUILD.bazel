@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "ACTIOND", "LOCAL", "RBE")
+load("//builds:environments.bzl", "ACTIOND", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM")
 
 # cctz/time tests read the host tzdata, absent off-host (RBE/actiond); see below.
@@ -21,7 +21,7 @@ museum_project(
     source_archive = "@absl_archive//file",
     strip_prefix = "abseil-cpp-20260526.0",
     toolchains = [HERMETIC_LLVM],
-    environments = [LOCAL, RBE, ACTIOND],
+    environments = [LOCAL, RBE, ACTIOND, MINIMG],
     build = build_spec(targets = ["//absl/..."], flags = ["-c", "opt"]),
     test = test_spec(
         targets = ["//absl/..."],

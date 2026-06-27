@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM")
 
 # cpu_features — Google's library for runtime CPU feature detection (C).
@@ -16,7 +16,7 @@ museum_project(
     strip_prefix = "cpu_features-0.11.0",
     toolchains = [HERMETIC_LLVM],
     bazel_version = "8.7.0",
-    environments = [LOCAL, RBE],
+    environments = [LOCAL, RBE, MINIMG],
     build = build_spec(targets = ["//:cpuinfo"], flags = ["-c", "opt"]),
     # The portable unit tests (bit_utils/string_view/stack_line_reader) plus
     # cpuinfo_test, which exercises the x86 detection path on this host.

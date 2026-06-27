@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM")
 
 # OpenTelemetry C++ — the observability API and SDK (distributed tracing, metrics
@@ -17,7 +17,7 @@ museum_project(
     strip_prefix = "opentelemetry-cpp-1.24.0",
     toolchains = [HERMETIC_LLVM],
     bazel_version = "8.7.0",
-    environments = [LOCAL, RBE],
+    environments = [LOCAL, RBE, MINIMG],
     build = build_spec(targets = ["//api:api"], flags = ["-c", "opt"]),
     test = test_spec(targets = ["//api/test/..."], flags = ["-c", "opt"]),
 )

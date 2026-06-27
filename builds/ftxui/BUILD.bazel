@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM")
 
 # FTXUI — a functional C++ terminal-UI library (screen / dom / component).
@@ -17,7 +17,7 @@ museum_project(
     strip_prefix = "FTXUI-7.0.0",
     toolchains = [HERMETIC_LLVM],
     bazel_version = "8.7.0",
-    environments = [LOCAL, RBE],
+    environments = [LOCAL, RBE, MINIMG],
     build = build_spec(targets = ["//:ftxui"], flags = ["-c", "opt"]),
     # FTXUI's monolithic self-test (//:tests) — the screen/dom/component unit
     # tests, which render to in-memory buffers (no real TTY needed).

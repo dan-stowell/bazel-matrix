@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "ACTIOND", "LOCAL", "RBE")
+load("//builds:environments.bzl", "ACTIOND", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM")
 
 # GoogleTest — the C++ test framework.
@@ -21,7 +21,7 @@ museum_project(
     strip_prefix = "googletest-1.17.0",
     toolchains = [HERMETIC_LLVM],
     bazel_version = "8.7.0",
-    environments = [LOCAL, RBE, ACTIOND],
+    environments = [LOCAL, RBE, ACTIOND, MINIMG],
     build = build_spec(targets = ["//:gtest", "//:gtest_main"], flags = ["-c", "opt"]),
     # googletest's own self-test suite: the C++ unit tests plus the Python-driven
     # tests that exercise the compiled binaries' output (rules_python supplies a

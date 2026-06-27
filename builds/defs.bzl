@@ -148,6 +148,12 @@ def _emit_goal(project_id, source_archive, strip_prefix, toolchains, env, plat, 
     ]
     if strip_prefix:
         args.append("--strip-prefix=" + strip_prefix)
+
+    # Container environments (MINIMG) run the inner bazel inside a minimal image
+    # instead of on the host; the runner bind-mounts the build root + inner bazel.
+    if getattr(env, "container_image", None):
+        args.append("--container-image=" + env.container_image)
+
     for label, dest in appends:
         args.append("--append=$(rlocationpath {})={}".format(label, dest))
     for label, dest in writes:

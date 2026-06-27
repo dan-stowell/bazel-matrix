@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "ACTIOND", "LOCAL", "RBE")
+load("//builds:environments.bzl", "ACTIOND", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM")
 
 # OR-Tools — Google's operations-research / optimization suite.
@@ -20,7 +20,7 @@ museum_project(
     strip_prefix = "or-tools-9.15",
     toolchains = [HERMETIC_LLVM],
     bazel_version = "8.7.0",
-    environments = [LOCAL, RBE, ACTIOND],
+    environments = [LOCAL, RBE, ACTIOND, MINIMG],
     build = build_spec(targets = ["//ortools/sat:cp_model_solver"], flags = ["-c", "opt"]),
     # CP-SAT's own test suite (the solver we build): the 87 cc_test in
     # //ortools/sat plus the 2 //ortools/sat/python tests — 89 tests of the

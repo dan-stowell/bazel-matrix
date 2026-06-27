@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL")
+load("//builds:environments.bzl", "LOCAL", "MINIMG")
 load("//builds:overlays.bzl", "HERMETIC_LLVM", "PLATFORMS_DEP")
 
 # cpptrace — a C++ stacktrace / backtrace library. Source pinned in
@@ -16,7 +16,7 @@ museum_project(
     strip_prefix = "cpptrace-1.0.4",
     toolchains = [HERMETIC_LLVM, PLATFORMS_DEP],
     bazel_version = "8.7.0",
-    environments = [LOCAL],
+    environments = [LOCAL, MINIMG],
     build = build_spec(targets = ["//:cpptrace"], flags = ["-c", "opt"]),
     test = test_spec(targets = ["//test:unittest"], flags = ["-c", "opt"]),
 )

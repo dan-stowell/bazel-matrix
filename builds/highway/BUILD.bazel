@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM")
 
 # highway — Google's portable SIMD/vector library (C++).
@@ -16,7 +16,7 @@ museum_project(
     strip_prefix = "highway-1.4.0",
     toolchains = [HERMETIC_LLVM],
     bazel_version = "8.7.0",
-    environments = [LOCAL, RBE],
+    environments = [LOCAL, RBE, MINIMG],
     build = build_spec(targets = ["//:hwy"], flags = ["-c", "opt"]),
     # highway's full suite is ~130 tests, each compiled across every SIMD target
     # the toolchain enables (SSE4/AVX2/AVX3/...) — 40–50s per test to compile, so

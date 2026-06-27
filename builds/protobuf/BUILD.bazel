@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "ACTIOND", "LOCAL", "RBE")
+load("//builds:environments.bzl", "ACTIOND", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM")
 
 # Protocol Buffers — the museum's marquee first-party Bazel C++ project.
@@ -15,7 +15,7 @@ museum_project(
     source_archive = "@protobuf_archive//file",
     strip_prefix = "protobuf-35.1",
     toolchains = [HERMETIC_LLVM],
-    environments = [LOCAL, RBE, ACTIOND],
+    environments = [LOCAL, RBE, ACTIOND, MINIMG],
     # The iconic artifacts: the protoc compiler and the C++ runtime library.
     build = build_spec(targets = ["//:protoc", "//:protobuf"], flags = ["-c", "opt"]),
     # The C++ runtime test tree. Other language bindings (Java/Python/Ruby/

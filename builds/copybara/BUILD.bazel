@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM")
 
 # Copybara — Google's tool for transforming and moving code between repositories.
@@ -23,7 +23,7 @@ museum_project(
     source_archive = "@copybara_archive//file",
     strip_prefix = "copybara-20260622",
     toolchains = [HERMETIC_LLVM],
-    environments = [LOCAL, RBE],
+    environments = [LOCAL, RBE, MINIMG],
     build = build_spec(targets = ["//java/com/google/copybara:copybara"]),
     test = test_spec(
         targets = [

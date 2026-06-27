@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL")
+load("//builds:environments.bzl", "LOCAL", "MINIMG")
 load("//builds:overlays.bzl", "HERMETIC_LLVM", "overlay")
 
 # brotli's Bazel tests — its go bindings. The C library (built by //builds/brotli)
@@ -35,7 +35,7 @@ museum_project(
     strip_prefix = "brotli-1.2.0/go",
     toolchains = [HERMETIC_LLVM, BROTLI_GO_PARENT],
     bazel_version = "8.7.0",
-    environments = [LOCAL],
+    environments = [LOCAL, MINIMG],
     test = test_spec(
         targets = ["//..."],
         flags = ["-c", "opt", "--linkopt=-Wl,-z,notext"],

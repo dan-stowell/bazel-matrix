@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM", "PLATFORMS_DEP")
 
 # fast_float — fast, exact float/integer parsing for C++ (header-only).
@@ -17,7 +17,7 @@ museum_project(
     strip_prefix = "fast_float-8.2.10",
     toolchains = [HERMETIC_LLVM, PLATFORMS_DEP],
     bazel_version = "8.7.0",
-    environments = [LOCAL, RBE],
+    environments = [LOCAL, RBE, MINIMG],
     # The header lib (compiles nothing on its own) plus the core doctest-driven
     # parsing tests, which actually exercise it.
     build = build_spec(targets = ["//:fast_float"], flags = ["-c", "opt"]),

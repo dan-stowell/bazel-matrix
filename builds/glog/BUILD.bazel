@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM", "PLATFORMS_DEP")
 
 # glog — Google's C++ application-level logging library.
@@ -23,7 +23,7 @@ museum_project(
     strip_prefix = "glog-0.7.1",
     toolchains = [HERMETIC_LLVM, PLATFORMS_DEP],
     bazel_version = "8.7.0",
-    environments = [LOCAL, RBE],
+    environments = [LOCAL, RBE, MINIMG],
     build = build_spec(targets = ["//:glog"], flags = ["-c", "opt"]),
     test = test_spec(targets = ["//bazel/example:main"], flags = ["-c", "opt"]),
 )

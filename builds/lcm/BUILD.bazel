@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM")
 
 # LCM (Lightweight Communications and Marshalling) — a low-latency message-passing
@@ -17,7 +17,7 @@ museum_project(
     strip_prefix = "lcm-1.5.2",
     toolchains = [HERMETIC_LLVM],
     bazel_version = "8.7.0",
-    environments = [LOCAL, RBE],
+    environments = [LOCAL, RBE, MINIMG],
     build = build_spec(targets = ["//lcm:lcm-static"], flags = ["-c", "opt"]),
     test = test_spec(targets = ["//test/cpp:memq_test"], flags = ["-c", "opt"]),
 )

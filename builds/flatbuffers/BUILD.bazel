@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "ACTIOND", "LOCAL", "RBE")
+load("//builds:environments.bzl", "ACTIOND", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM")
 
 # FlatBuffers — serialization library + the flatc schema compiler.
@@ -15,7 +15,7 @@ museum_project(
     strip_prefix = "flatbuffers-25.12.19-2026-02-06-03fffb2",
     toolchains = [HERMETIC_LLVM],
     bazel_version = "8.7.0",
-    environments = [LOCAL, RBE, ACTIOND],
+    environments = [LOCAL, RBE, ACTIOND, MINIMG],
     build = build_spec(targets = ["//:flatc", "//:flatbuffers"], flags = ["-c", "opt"]),
     # The C++ test suite is one monolithic cc_test that reads its schema/JSON
     # fixtures from runfiles (the //tests:test_data filegroup). The Go/TS/Swift

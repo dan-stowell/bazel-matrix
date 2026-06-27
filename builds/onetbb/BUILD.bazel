@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM")
 
 # oneTBB — Intel's oneAPI Threading Building Blocks, a C++ parallelism library.
@@ -16,7 +16,7 @@ museum_project(
     strip_prefix = "oneTBB-2022.0.0",
     toolchains = [HERMETIC_LLVM],
     bazel_version = "8.7.0",
-    environments = [LOCAL, RBE],
+    environments = [LOCAL, RBE, MINIMG],
     build = build_spec(targets = ["//:tbb"], flags = ["-c", "opt"]),
     # The four upstream Bazel tests, exercising the mutex, parallel_for,
     # parallel_reduce and task scheduling paths against the built library.

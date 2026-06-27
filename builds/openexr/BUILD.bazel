@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM")
 
 # OpenEXR — the Academy Software Foundation's high-dynamic-range image format and
@@ -16,7 +16,7 @@ museum_project(
     strip_prefix = "openexr-3.4.13-rc3",
     toolchains = [HERMETIC_LLVM],
     bazel_version = "9.1.1",
-    environments = [LOCAL, RBE],
+    environments = [LOCAL, RBE, MINIMG],
     build = build_spec(targets = ["//:OpenEXR"], flags = ["-c", "opt"]),
     test = test_spec(targets = ["//:IexTest"], flags = ["-c", "opt"]),
 )

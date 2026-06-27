@@ -148,6 +148,42 @@ def _stage_tools(rf, specs, toolbin):
     return toolbin
 
 
+# PATH inside the container: a stock Debian PATH, plus the per-goal toolbin so
+# pinned tools (HERMETIC_ZIP etc.) still take precedence. Deliberately no host
+# dirs — the container provides its own (toolchain-free) userland.
+_CONTAINER_PATH = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+
+def _containerize(cmd, image, runtime, base, bazel, workspace, env, toolbin):
+    """Wrap `cmd` so the inner bazel runs inside `image`.
+
+    The museum build root (`base`: per-goal output roots, fresh source, home,
+    tmp, toolbin) and the shared repo cache live under `base`; the inner bazel
+    binary lives in runfiles. Both are bind-mounted at *identical* paths, so the
+    absolute-path flags (--output_user_root, --repository_cache, cwd) and the
+    bazel argv work unchanged inside. We run as the host uid so cache/output
+    files stay host-owned (no root-owned droppings to sudo away later), use the
+    host network so dependency downloads (BCR, hermetic LLVM) just work, and pass
+    only the scrubbed env — with a container PATH, never the host's.
+    """
+    path = os.pathsep.join([toolbin, _CONTAINER_PATH]) if toolbin else _CONTAINER_PATH
+    docker = [
+        runtime, "run", "--rm", "--init",
+        "--network", "host",
+        "--user", "%d:%d" % (os.getuid(), os.getgid()),
+        "-v", "%s:%s" % (base, base),
+        "-v", "%s:%s:ro" % (bazel, bazel),
+        "-w", workspace,
+        "-e", "PATH=" + path,
+    ]
+    for k, v in env.items():
+        if k == "PATH":
+            continue  # replaced with the container PATH above
+        docker += ["-e", "%s=%s" % (k, v)]
+    docker.append(image)
+    return docker + cmd
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--name", required=True, help="short project name (for the build root)")
@@ -187,6 +223,13 @@ def main(argv=None):
                         "and prepend that dir to the inner build's PATH -- so a project whose "
                         "build shells out to a host tool (e.g. Bazel's genrules call `zip`) "
                         "gets a hermetic, pinned one instead of the host's (repeatable)")
+    p.add_argument("--container-image", default=None,
+                   help="if set, run the inner bazel inside this container image "
+                        "(e.g. a minimal image with no host C/C++ toolchain) instead "
+                        "of on the host. The museum build root and the inner bazel "
+                        "binary are bind-mounted at identical paths.")
+    p.add_argument("--container-runtime", default="docker",
+                   help="container runtime for --container-image (default: docker)")
     p.add_argument("extra", nargs="*", help="extra args/targets forwarded to the inner build")
     # parse_known_args so that any flag we don't define (e.g. --subcommands,
     # --verbose_failures passed after `bazel run ... --`) is forwarded verbatim
@@ -322,6 +365,12 @@ def main(argv=None):
     tool_path = _stage_tools(rf, args.tools, toolbin)
     env = _clean_env(home, tmp, path_prepend=tool_path)
 
+    # MINIMG-style environments run the inner bazel inside a minimal container
+    # image (no host C/C++ toolchain — the hermetic LLVM overlay supplies it).
+    if args.container_image:
+        cmd = _containerize(cmd, args.container_image, args.container_runtime,
+                            _museum_base(), bazel, workspace, env, tool_path)
+
     # Redact secret-bearing header flags when echoing the command.
     shown = [a if not a.startswith("--remote_header=") else
              a.split("=")[0] + "=" + a.split("=")[1] + "=<redacted>" for a in cmd[1:]]
@@ -334,7 +383,10 @@ def main(argv=None):
     print(f"  command:          bazel {' '.join(shown)}", file=sys.stderr)
     print("=" * 72, file=sys.stderr)
 
-    proc = subprocess.run(cmd, cwd=workspace, env=env)
+    # On the host path, run with the scrubbed env. When containerizing, `cmd` is
+    # the docker CLI — give it the host env (it needs the real PATH/DOCKER_* to
+    # run); the scrubbed env was already handed to the container via -e.
+    proc = subprocess.run(cmd, cwd=workspace, env=None if args.container_image else env)
     return proc.returncode
 
 

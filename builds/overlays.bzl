@@ -49,6 +49,17 @@ HERMETIC_LLVM = overlay(
     build_flags = ["--extra_toolchains=@llvm//toolchain:all"],
 )
 
+# Suppress Bazel's unconditional host C/C++ toolchain autodetection. rules_cc's
+# cc_configure probes for a host `cc` at fetch time for almost every module and
+# hard-errors ("Cannot find gcc or CC") when none exists — even though a hermetic
+# toolchain is registered and actually selected. In a minimal, toolchain-free
+# container that probe has nothing to find, so suppress it. Pair with
+# HERMETIC_LLVM in container environments (MINIMG). See docs/hermetic-minimal.md.
+CC_NODETECT = overlay(
+    name = "cc_nodetect",
+    build_flags = ["--repo_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1"],
+)
+
 # Hermetic `zip` on PATH. Some projects' builds shell out to `zip` (Bazel
 # itself: its genrules call `zip` ~72x to pack the embedded install base), which
 # the scrubbed inner environment doesn't provide. Instead of requiring a host

@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM", "PLATFORMS_DEP")
 
 # doctest — the fast, header-only C++ unit-testing framework.
@@ -23,7 +23,7 @@ museum_project(
     source_archive = "@doctest_archive//file",
     strip_prefix = "doctest-2.5.2/examples",
     toolchains = [HERMETIC_LLVM, PLATFORMS_DEP],
-    environments = [LOCAL, RBE],
+    environments = [LOCAL, RBE, MINIMG],
     # Build the doctest library itself (consumed as @doctest from the examples
     # module), then run the example test that links static libs against it.
     build = build_spec(targets = ["@doctest//:doctest"], flags = ["-c", "opt"]),

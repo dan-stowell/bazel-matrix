@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM", "PLATFORMS_DEP")
 
 # abseil-py — Google's Python common libraries (application/flags/logging/testing),
@@ -18,7 +18,7 @@ museum_project(
     strip_prefix = "abseil-py-2.4.0",
     toolchains = [HERMETIC_LLVM, PLATFORMS_DEP],
     bazel_version = "8.7.0",
-    environments = [LOCAL, RBE],
+    environments = [LOCAL, RBE, MINIMG],
     # The whole absl Python package tree (app, flags, logging, testing helpers).
     build = build_spec(targets = ["//absl/..."]),
     # abseil-py's py_test suite across flags, logging, testing and the top-level

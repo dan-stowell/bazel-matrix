@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "ACTIOND", "LOCAL", "RBE")
+load("//builds:environments.bzl", "ACTIOND", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM")
 
 # gRPC — first-party Bazel, the natural companion to protobuf.
@@ -27,7 +27,7 @@ museum_project(
     strip_prefix = "grpc-1.81.1",
     toolchains = [HERMETIC_LLVM],
     bazel_version = "8.7.0",
-    environments = [LOCAL, RBE, ACTIOND],
+    environments = [LOCAL, RBE, ACTIOND, MINIMG],
     build = build_spec(targets = ["//:grpc++", "//:grpc"], flags = ["-c", "opt"]),
     test = test_spec(targets = ["//test/core/promise/..."], flags = ["-c", "opt"]),
 )

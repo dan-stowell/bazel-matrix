@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM")
 
 # cctz — Google's C++ library for civil-time and time-zone calculations (the
@@ -19,7 +19,7 @@ museum_project(
     strip_prefix = "cctz-f353c121a9e4fb55a9c623899e87197eaee0392d",
     toolchains = [HERMETIC_LLVM],
     bazel_version = "8.7.0",
-    environments = [LOCAL, RBE],
+    environments = [LOCAL, RBE, MINIMG],
     build = build_spec(targets = ["//:time_zone"], flags = ["-c", "opt"]),
     # civil_time_test is pure date arithmetic and fully hermetic. The two
     # time-zone tests read tz data from the system /usr/share/zoneinfo (cctz

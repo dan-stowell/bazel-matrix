@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM", "PLATFORMS_DEP")
 
 # buildtools — Bazel's own BUILD/Starlark file tooling (buildifier, buildozer),
@@ -19,7 +19,7 @@ museum_project(
     strip_prefix = "buildtools-7.3.1",
     toolchains = [HERMETIC_LLVM, PLATFORMS_DEP],
     bazel_version = "8.7.0",
-    environments = [LOCAL, RBE],
+    environments = [LOCAL, RBE, MINIMG],
     # buildifier itself (the canonical Bazel file formatter), a pure-Go binary.
     build = build_spec(targets = ["//buildifier:buildifier"], flags = ["-c", "opt"]),
     # The pure-Go unit tests for the build-file parser/printer, the buildozer

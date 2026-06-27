@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM", "overlay")
 
 # jsoncpp — the classic C++ JSON parser/serializer.
@@ -24,7 +24,7 @@ museum_project(
     source_archive = "@jsoncpp_archive//file",
     strip_prefix = "jsoncpp-1.9.8",
     toolchains = [JSONCPP_PLATFORMS, HERMETIC_LLVM],
-    environments = [LOCAL, RBE],
+    environments = [LOCAL, RBE, MINIMG],
     build = build_spec(targets = ["//:jsoncpp"], flags = ["-c", "opt"]),
     # jsoncpp's own unit test (its self-contained test harness over //:jsoncpp).
     test = test_spec(targets = ["//src/test_lib_json:jsoncpp_test"], flags = ["-c", "opt"]),

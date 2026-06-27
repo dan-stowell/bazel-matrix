@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project")
-load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM", "PLATFORMS_DEP")
 
 # gflags — Google's C++ command-line flags library. Source pinned in
@@ -21,7 +21,7 @@ museum_project(
     strip_prefix = "gflags-2.3.0",
     toolchains = [HERMETIC_LLVM, PLATFORMS_DEP],
     bazel_version = "8.7.0",
-    environments = [LOCAL, RBE],
+    environments = [LOCAL, RBE, MINIMG],
     # The canonical multithreaded gflags library (//:gflags); the sibling
     # //:gflags_nothreads is the same sources built single-threaded.
     build = build_spec(targets = ["//:gflags"], flags = ["-c", "opt"]),

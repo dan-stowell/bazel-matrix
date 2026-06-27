@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM")
 
 # iceoryx2 — the Rust rewrite of Eclipse iceoryx: zero-copy, lock-free shared-
@@ -17,7 +17,7 @@ museum_project(
     strip_prefix = "iceoryx2-0.9.2",
     toolchains = [HERMETIC_LLVM],
     bazel_version = "8.7.0",
-    environments = [LOCAL, RBE],
+    environments = [LOCAL, RBE, MINIMG],
     build = build_spec(targets = ["//iceoryx2:iceoryx2"], flags = ["-c", "opt"]),
     test = test_spec(targets = ["//iceoryx2:iceoryx2-tests"], flags = ["-c", "opt"]),
 )

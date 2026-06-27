@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM")
 
 # gperftools — Google performance tools: the tcmalloc allocator + profilers (C++).
@@ -16,7 +16,7 @@ museum_project(
     strip_prefix = "gperftools-gperftools-2.18.1",
     toolchains = [HERMETIC_LLVM],
     bazel_version = "8.7.0",
-    environments = [LOCAL, RBE],
+    environments = [LOCAL, RBE, MINIMG],
     build = build_spec(targets = ["//:tcmalloc_minimal"], flags = ["-c", "opt"]),
     # The core minimal-tcmalloc allocator test — a self-contained allocation
     # correctness exercise of the library. (gperftools' heap-checker/profiler

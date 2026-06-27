@@ -26,9 +26,9 @@ To add an environment (e.g. a future `actiond`), define it here with the
 platforms it supports and add it to a project's `environments = [...]`.
 """
 
-load(":overlays.bzl", "ACTIOND_WORKER", "BUILDBUDDY_RBE")
+load(":overlays.bzl", "ACTIOND_WORKER", "BUILDBUDDY_RBE", "CC_NODETECT")
 
-def environment(name, platforms, overlays = [], pin_platform = False, host_only = False, host_cpu_only = False, platform_flags = {}):
+def environment(name, platforms, overlays = [], pin_platform = False, host_only = False, host_cpu_only = False, platform_flags = {}, container_image = None):
     return struct(
         name = name,
         platforms = platforms,
@@ -37,6 +37,7 @@ def environment(name, platforms, overlays = [], pin_platform = False, host_only 
         host_only = host_only,
         host_cpu_only = host_cpu_only,
         platform_flags = platform_flags,
+        container_image = container_image,
     )
 
 # The host machine itself. Supports exactly one platform at a time — whichever
@@ -82,4 +83,23 @@ ACTIOND = environment(
     overlays = [ACTIOND_WORKER],
     pin_platform = True,
     host_cpu_only = True,
+)
+
+# MINIMG: run the inner build inside a *minimal* container image — debian-slim
+# with the generic build tools (python/git/curl/zip) but NO host C/C++ toolchain.
+# The HERMETIC_LLVM overlay (carried on the project's `toolchains`) supplies clang
+# over the BCR, so the image needs no compiler; CC_NODETECT suppresses Bazel's
+# host-cc probe that would otherwise hard-error in a toolchain-free image. This is
+# the containerised, image-agnostic build that actiond will execute remotely —
+# proven for re2/abseil in docs/hermetic-minimal.md.
+#
+# Like actiond it runs a linux build of the host's CPU arch (the image is linux),
+# so host_cpu_only gates each goal on the host CPU. The image is a docker tag
+# built+loaded by `bazel run //runner/image:minimal_load`.
+MINIMG = environment(
+    name = "minimg",
+    platforms = ["linux_amd64", "linux_arm64"],
+    overlays = [CC_NODETECT],
+    host_cpu_only = True,
+    container_image = "museum-minimg:latest",
 )

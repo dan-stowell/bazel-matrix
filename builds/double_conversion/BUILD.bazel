@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM", "PLATFORMS_DEP")
 
 # double-conversion — Google's library for binary-decimal conversion of IEEE-754
@@ -17,7 +17,7 @@ museum_project(
     strip_prefix = "double-conversion-3.4.0",
     toolchains = [HERMETIC_LLVM, PLATFORMS_DEP],
     bazel_version = "8.7.0",
-    environments = [LOCAL, RBE],
+    environments = [LOCAL, RBE, MINIMG],
     build = build_spec(targets = ["//:double-conversion"], flags = ["-c", "opt"]),
     test = test_spec(targets = ["//:cctest"], flags = ["-c", "opt"]),
 )

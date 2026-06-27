@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM", "PLATFORMS_DEP")
 
 # grpc-gateway — a gRPC-to-JSON reverse proxy and the protoc plugins that
@@ -19,7 +19,7 @@ museum_project(
     strip_prefix = "grpc-gateway-2.29.0",
     toolchains = [HERMETIC_LLVM, PLATFORMS_DEP],
     bazel_version = "9.1.1",
-    environments = [LOCAL, RBE],
+    environments = [LOCAL, RBE, MINIMG],
     # The two protoc plugins grpc-gateway ships, both pure-Go binaries.
     build = build_spec(
         targets = [

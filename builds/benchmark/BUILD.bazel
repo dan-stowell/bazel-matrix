@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM")
 
 # google/benchmark — the C++ microbenchmark library.
@@ -16,7 +16,7 @@ museum_project(
     strip_prefix = "benchmark-1.9.5",
     toolchains = [HERMETIC_LLVM],
     bazel_version = "8.7.0",
-    environments = [LOCAL, RBE],
+    environments = [LOCAL, RBE, MINIMG],
     build = build_spec(targets = ["//:benchmark"], flags = ["-c", "opt"]),
     # benchmark's own self-test suite (//test) — it exercises the library against
     # googletest plus output-format assertions. locale_impermeability_test is

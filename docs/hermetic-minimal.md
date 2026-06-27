@@ -6,6 +6,49 @@ the project builds (and tests) in a **minimal container image** — eventually
 under **actiond**. This is the bridge from the current "ordinary CI machine"
 image (`docs/minimal-image.md`) to a fully hermetic, image-agnostic build._
 
+## Productized: the MINIMG environment
+
+This is now a first-class museum **environment** (`//builds:environments.bzl`,
+`MINIMG`) alongside LOCAL/RBE/ACTIOND — not a manual probe. Every project carries
+it (`environments = [..., MINIMG]`), emitting `build_minimg_linux_amd64` /
+`test_minimg_linux_amd64` goals:
+
+```
+bazel run //builds/re2:build_minimg_linux_amd64
+bazel run //builds/re2:test_minimg_linux_amd64
+```
+
+How it works:
+- `tools/buildrunner/runner.py` gained `--container-image`: it bind-mounts the
+  museum build root + the inner bazel binary at identical paths into the image
+  and runs the inner build there (host uid, host network), instead of on the host.
+- `MINIMG` sets that image to `museum-minimg:latest`
+  (`runner/image/minimal.Dockerfile` — debian-slim + python/git/curl/zip, **no
+  C/C++ toolchain**) and adds the `CC_NODETECT` overlay
+  (`--repo_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1`). The HERMETIC_LLVM overlay
+  (already on each project's `toolchains`) supplies the compiler — so the source
+  transformation is reused unchanged; MINIMG only swaps the environment.
+
+### Sweep — build, all 49 projects (`runner/image-minimg.tsv`)
+
+**43/49 build** in the toolchain-free container (44 counting grpc, which timed
+out at 98%). The six exceptions are specific, not the toolchain:
+
+| Project | Cause |
+|---------|-------|
+| bazel | genrule shells to `objcopy` (binutils) — absent from the image |
+| cpptrace | its *self-registered* `toolchains_llvm` clang needs `libtinfo.so.5` (not the museum's hermetic `llvm`) |
+| nsync | `<mutex>` not found — its futex-platform compile relies on host libstdc++ headers, not libc++ |
+| grpc_gateway | Go **cgo** external-link via `clang++` fails (pure-Go buildtools builds fine) |
+| z3 | foreign_cc `bazel-bin/**` glob / FindPython3 edge (pre-existing) |
+| grpc | timeout at 98% (4036/4132) — builds, just slow |
+
+So the hermetic-LLVM transformation carries the large majority of the suite into
+a toolchain-free image. The residual failures are tool needs (objcopy), a
+competing self-registered toolchain (cpptrace), host-stdlib assumptions (nsync),
+cgo linking (grpc_gateway), and pre-existing edges (z3) — each a candidate for a
+small per-project transformation/patch.
+
 ## Status: tiers 1 & 2 proven
 
 | Tier | Goal | Result |

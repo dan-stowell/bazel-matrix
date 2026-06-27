@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project")
-load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM")
 
 # z3 — Microsoft Research's Z3 SMT theorem prover (C++). Source pinned in
@@ -16,6 +16,6 @@ museum_project(
     strip_prefix = "z3-z3-4.16.0",
     toolchains = [HERMETIC_LLVM],
     bazel_version = "9.1.1",
-    environments = [LOCAL, RBE],
+    environments = [LOCAL, RBE, MINIMG],
     build = build_spec(targets = ["//:z3"], flags = ["-c", "opt"]),
 )

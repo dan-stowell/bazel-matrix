@@ -1,5 +1,5 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM", "PLATFORMS_DEP")
 
 # go-jsonnet — the pure-Go implementation of the Jsonnet data-templating
@@ -19,7 +19,7 @@ museum_project(
     strip_prefix = "go-jsonnet-0.22.0",
     toolchains = [HERMETIC_LLVM, PLATFORMS_DEP],
     bazel_version = "8.7.0",
-    environments = [LOCAL, RBE],
+    environments = [LOCAL, RBE, MINIMG],
     # The Jsonnet command-line tools go-jsonnet ships, all pure-Go binaries: the
     # evaluator, the linter and the formatter. (c-bindings/wasm targets need cgo /
     # a wasm platform, so they're left out.)
