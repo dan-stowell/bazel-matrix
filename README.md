@@ -91,6 +91,7 @@ and rendered by [`runner/_local_table.py`](runner/_local_table.py).
 | [cctz](https://github.com/google/cctz) | 8.7.0 | ✅ | ✅ |
 | [CLI11](https://github.com/CLIUtils/CLI11) | 8.7.0 | ✅ | ✅ |
 | [copybara](https://github.com/google/copybara) | 9.1.1 | ✅ | ❌ (219/220) |
+| [cpptrace](https://github.com/jeremy-rifkin/cpptrace) | v1.0.4 | ✅ | ✅ |
 | [cpu_features](https://github.com/google/cpu_features) | 8.7.0 | ✅ | ✅ |
 | [Crow](https://github.com/CrowCpp/Crow) | 8.7.0 | ✅ | — |
 | [cxx](https://github.com/dtolnay/cxx) | 9.1.1 | ✅ | ❌ |
@@ -130,5 +131,5 @@ and rendered by [`runner/_local_table.py`](runner/_local_table.py).
 | [z3](https://github.com/Z3Prover/z3) | 9.1.1 | ✅ | — |
 | [zlib](https://github.com/madler/zlib) | 9.1.1 | ✅ | — |
 
-_Host-local sweep of 49 projects: 44 build and 32 run their test suite directly on the host toolchain (✅ success · ❌ failure · ⏱️ timeout · — no such target)._
+_Host-local sweep of 50 projects: 45 build and 33 run their test suite directly on the host toolchain (✅ success · ❌ failure · ⏱️ timeout · — no such target)._
 <!-- END GENERATED LOCAL TABLE -->

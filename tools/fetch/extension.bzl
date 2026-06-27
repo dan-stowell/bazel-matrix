@@ -224,6 +224,13 @@ _PROJECT_SOURCES = {
         "sha256": "f7f938ca50cbc63245e07e6d0e8b9f540c00c69eaf57848710aac4297c4af2b3",
         "filename": "iceoryx2-0.9.2.tar.gz",
     },
+    # cpptrace — C++ stacktrace library. First-party Bazel; self-registers
+    # toolchains_llvm (hermetic clang) and uses rules_foreign_cc for zstd/xz.
+    "cpptrace_archive": {
+        "url": "https://github.com/jeremy-rifkin/cpptrace/archive/refs/tags/v1.0.4.tar.gz",
+        "sha256": "5c9f5b301e903714a4d01f1057b9543fa540f7bfcc5e3f8bd1748e652e24f9ea",
+        "filename": "cpptrace-1.0.4.tar.gz",
+    },
     # GoogleTest — the C++ test framework. First-party Bazel, builds + tests
     # itself with the hermetic LLVM toolchain.
     "googletest_archive": {

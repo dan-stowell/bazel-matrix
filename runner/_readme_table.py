@@ -62,6 +62,7 @@ META = {
     "lcm":          ("LCM", "https://github.com/lcm-proj/lcm", "Lightweight Communications and Marshalling (robotics)"),
     "pcre2":        ("PCRE2", "https://github.com/PCRE2Project/pcre2", "Perl-compatible regular expressions (C)"),
     "iceoryx2":     ("iceoryx2", "https://github.com/eclipse-iceoryx/iceoryx2", "Zero-copy lock-free IPC middleware (Rust)"),
+    "cpptrace":     ("cpptrace", "https://github.com/jeremy-rifkin/cpptrace", "C++ stacktrace/backtrace library (foreign_cc libunwind/zstd/xz)"),
 }
 
 # Human-readable reason for the projects that don't build as they are.
