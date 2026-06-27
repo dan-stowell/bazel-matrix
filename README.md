@@ -101,6 +101,7 @@ and rendered by [`runner/_local_table.py`](runner/_local_table.py).
 | [GoogleTest](https://github.com/google/googletest) | 8.7.0 | ✅ | ✅ |
 | [gperftools](https://github.com/gperftools/gperftools) | 8.7.0 | ✅ | ✅ |
 | [gRPC](https://github.com/grpc/grpc) | 8.7.0 | ❌ | ❌ |
+| [grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway) | 9.1.1 | ✅ | ✅ |
 | [highway](https://github.com/google/highway) | 8.7.0 | ✅ | ✅ |
 | [jsoncpp](https://github.com/open-source-parsers/jsoncpp) | 9.1.1 | ✅ | ✅ |
 | [jsonnet](https://github.com/google/jsonnet) | 8.7.0 | ✅ | ✅ |
@@ -115,5 +116,5 @@ and rendered by [`runner/_local_table.py`](runner/_local_table.py).
 | [snappy](https://github.com/google/snappy) | 8.7.0 | ✅ | ✅ |
 | [zlib](https://github.com/madler/zlib) | 9.1.1 | ✅ | — |
 
-_Host-local sweep of 34 projects: 29 build and 22 run their test suite directly on the host toolchain (✅ success · ❌ failure · ⏱️ timeout · — no such target)._
+_Host-local sweep of 35 projects: 30 build and 23 run their test suite directly on the host toolchain (✅ success · ❌ failure · ⏱️ timeout · — no such target)._
 <!-- END GENERATED LOCAL TABLE -->

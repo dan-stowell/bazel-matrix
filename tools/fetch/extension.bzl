@@ -107,6 +107,14 @@ _PROJECT_SOURCES = {
         "sha256": "48ae0d05f87206112d9e9144a923191ee1e482141a70686ec58dc86d0b40fddc",
         "filename": "grpc-1.81.1.tar.gz",
     },
+    # grpc-gateway — gRPC-to-JSON reverse proxy + protoc plugins, written in Go.
+    # First-party Bazel (bzlmod): builds its protoc-gen-* plugins via rules_go and
+    # runs its pure-Go unit tests. Modern MODULE.bazel (.bazelversion 9.0.2).
+    "grpc_gateway_archive": {
+        "url": "https://github.com/grpc-ecosystem/grpc-gateway/archive/refs/tags/v2.29.0.tar.gz",
+        "sha256": "c067650666440981109965953c4636cb08a556d0986ad4861167fec4553d8d74",
+        "filename": "grpc-gateway-2.29.0.tar.gz",
+    },
     # GoogleTest — the C++ test framework. First-party Bazel, builds + tests
     # itself with the hermetic LLVM toolchain.
     "googletest_archive": {

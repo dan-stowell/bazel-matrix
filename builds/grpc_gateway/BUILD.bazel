@@ -1,0 +1,43 @@
+load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
+load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:overlays.bzl", "HERMETIC_LLVM", "PLATFORMS_DEP")
+
+# grpc-gateway — a gRPC-to-JSON reverse proxy and the protoc plugins that
+# generate it, written in Go. Source pinned in //tools/fetch:extension.bzl
+# (@grpc_gateway_archive, release v2.29.0). First-party Bazel (modern bzlmod):
+# built with rules_go (hermetic Go SDK) and a C toolchain (HERMETIC_LLVM) for the
+# rules_go stdlib even though the plugins are pure Go. grpc-gateway pins Bazel
+# 9.0.2 and its deps are all Bazel-9-clean, so it runs on the 9.x inner.
+# PLATFORMS_DEP supplies @platforms visibility for the injected RBE platform
+# package (grpc-gateway's MODULE declares no direct platforms dep).
+#
+#   bazel run //builds/grpc_gateway:build_local_linux_amd64
+#   bazel run //builds/grpc_gateway:test_local_linux_amd64
+museum_project(
+    name = "grpc_gateway",
+    source_archive = "@grpc_gateway_archive//file",
+    strip_prefix = "grpc-gateway-2.29.0",
+    toolchains = [HERMETIC_LLVM, PLATFORMS_DEP],
+    bazel_version = "9.1.1",
+    environments = [LOCAL, RBE],
+    # The two protoc plugins grpc-gateway ships, both pure-Go binaries.
+    build = build_spec(
+        targets = [
+            "//protoc-gen-grpc-gateway:protoc-gen-grpc-gateway",
+            "//protoc-gen-openapiv2:protoc-gen-openapiv2",
+        ],
+        flags = ["-c", "opt"],
+    ),
+    # Pure-Go unit tests for the proxy runtime, the protobuf-path/casing helpers,
+    # the descriptor model and the two code generators. //examples/... integration
+    # tests spin up live gateway servers, so they're left out.
+    test = test_spec(
+        targets = [
+            "//internal/...",
+            "//runtime/...",
+            "//protoc-gen-grpc-gateway/...",
+            "//protoc-gen-openapiv2/...",
+        ],
+        flags = ["-c", "opt"],
+    ),
+)

@@ -81,6 +81,7 @@ use_repo(
     "cxx_archive",
     "protobuf_archive",
     "grpc_archive",
+    "grpc_gateway_archive",
     "googletest_archive",
     "json_archive",
     "flatbuffers_archive",

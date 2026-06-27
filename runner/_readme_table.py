@@ -46,6 +46,7 @@ META = {
     "brotli":       ("brotli", "https://github.com/google/brotli", "Brotli compression"),
     "brotli_go":    ("brotli (Go)", "https://github.com/google/brotli", "Go bindings for brotli"),
     "grpc":         ("gRPC", "https://github.com/grpc/grpc", "High-performance RPC framework"),
+    "grpc_gateway": ("grpc-gateway", "https://github.com/grpc-ecosystem/grpc-gateway", "gRPC-to-JSON reverse proxy + protoc plugins (Go)"),
     "bazel":        ("bazel", "https://github.com/bazelbuild/bazel", "The Bazel build system itself (Java/C++)"),
 }
 
