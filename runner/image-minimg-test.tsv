@@ -33,7 +33,7 @@ goal	result	missing	note
 //builds/ortools:test_minimg_linux_amd64	ok	-	
 //builds/snappy:test_minimg_linux_amd64	ok	-	
 //builds/protobuf:test_minimg_linux_amd64	fail	python3	//src/google/protobuf/compiler:protoc_x86_64_test                        FAILED in 0.
-//builds/copybara:test_minimg_linux_amd64	fail	other	//javatests/com/google/copybara/transform/patch:QuiltTransformationTest_patch_tests F
+//builds/copybara:test_minimg_linux_amd64	ok	-	220/220 tests pass (patch/quilt now in image)
 //builds/doctest:test_minimg_linux_amd64	ok	-	
 //builds/ftxui:test_minimg_linux_amd64	ok	-	
 //builds/gperftools:test_minimg_linux_amd64	ok	-	

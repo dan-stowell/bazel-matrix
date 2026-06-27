@@ -15,7 +15,14 @@
 FROM debian:bookworm-slim
 RUN apt-get update && apt-get install -y --no-install-recommends \
       ca-certificates python3 python-is-python3 git curl zip unzip xz-utils \
+      binutils patch quilt libtinfo5 \
  && rm -rf /var/lib/apt/lists/* \
  && mkdir -p /work /home/runner && chmod 0777 /work /home/runner
 # Deliberately NO build-essential: the hermetic LLVM toolchain provides the
-# compiler. Verify with `command -v gcc` returning nothing.
+# compiler (gcc/g++ stay absent — verify with `command -v gcc` returning
+# nothing). The extras above are auxiliary tools specific projects' build graphs
+# invoke, NOT a compiler:
+#   binutils  → `objcopy` (bazel's install-base genrule)
+#   patch,quilt → copybara's patch/quilt-transformation tests
+#   libtinfo5 → the clang that cpptrace's *own* toolchains_llvm downloads needs
+#               libtinfo.so.5 at runtime (Debian bookworm otherwise ships .so.6)

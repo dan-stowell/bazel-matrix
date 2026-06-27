@@ -1,7 +1,7 @@
 goal	result	missing	note
 //builds/abseil_py:build_minimg_linux_amd64	ok	-	
 //builds/benchmark:build_minimg_linux_amd64	ok	-	
-//builds/bazel:build_minimg_linux_amd64	fail	other	ERROR: Build did NOT complete successfully
+//builds/bazel:build_minimg_linux_amd64	ok	-	builds in ~28min (objcopy now in image)
 //builds/brotli:build_minimg_linux_amd64	ok	-	
 //builds/catch2:build_minimg_linux_amd64	ok	-	
 //builds/cli11:build_minimg_linux_amd64	ok	-	
