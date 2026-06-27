@@ -39,3 +39,4 @@ go_jsonnet	8.7.0	success	success	Executed 8 out of 8 tests: 8 tests pass.
 abseil_py	8.7.0	success	success	Executed 27 out of 27 tests: 27 tests pass.
 crow	8.7.0	success	missing	
 quill	8.7.0	success	missing	
+z3	9.1.1	success	missing	

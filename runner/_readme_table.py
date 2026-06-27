@@ -53,6 +53,7 @@ META = {
     "grpc_gateway": ("grpc-gateway", "https://github.com/grpc-ecosystem/grpc-gateway", "gRPC-to-JSON reverse proxy + protoc plugins (Go)"),
     "bazel":        ("bazel", "https://github.com/bazelbuild/bazel", "The Bazel build system itself (Java/C++)"),
     "quill":        ("quill", "https://github.com/odygrd/quill", "Asynchronous low-latency C++ logging library"),
+    "z3":           ("z3", "https://github.com/Z3Prover/z3", "Microsoft's Z3 SMT theorem prover"),
 }
 
 # Human-readable reason for the projects that don't build as they are.
