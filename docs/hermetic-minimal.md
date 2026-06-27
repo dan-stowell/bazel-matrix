@@ -73,7 +73,11 @@ Two classes of fix: **environment tools** (added to the image — auxiliary tool
 build graph invokes, never a compiler) and **source-level** (per-project, the
 "transformation" axis).
 
-**Image (`minimal.Dockerfile`) — fixed bazel + copybara, build 44/49, test 36/42:**
+After both rounds of fixes below, the MINIMG build sweep is **46/49** (the
+remaining three: grpc just times out but builds; cpptrace's self-registered
+toolchain and z3's foreign_cc glob are deeper edges).
+
+**Image (`minimal.Dockerfile`) — fixed bazel + copybara:**
 
 | Added | Unblocked |
 |-------|-----------|
