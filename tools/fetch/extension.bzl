@@ -216,6 +216,14 @@ _PROJECT_SOURCES = {
         "sha256": "409c443549b13b216da40049850a32f3e6c57d4224ab11553ab5a786878a158e",
         "filename": "pcre2-pcre2-10.47.tar.gz",
     },
+    # iceoryx2 — Eclipse's zero-copy lock-free inter-process communication
+    # middleware, rewritten in Rust. First-party Bazel (rules_rust + crate_universe
+    # with a pinned Cargo.Bazel.lock). The 8.7 inner.
+    "iceoryx2_archive": {
+        "url": "https://github.com/eclipse-iceoryx/iceoryx2/archive/refs/tags/v0.9.2.tar.gz",
+        "sha256": "f7f938ca50cbc63245e07e6d0e8b9f540c00c69eaf57848710aac4297c4af2b3",
+        "filename": "iceoryx2-0.9.2.tar.gz",
+    },
     # GoogleTest — the C++ test framework. First-party Bazel, builds + tests
     # itself with the hermetic LLVM toolchain.
     "googletest_archive": {

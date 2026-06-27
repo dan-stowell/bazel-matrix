@@ -82,6 +82,7 @@ use_repo(
     "protobuf_archive",
     "grpc_archive",
     "grpc_gateway_archive",
+    "iceoryx2_archive",
     "pcre2_archive",
     "lcm_archive",
     "opentelemetry_cpp_archive",

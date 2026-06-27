@@ -1,0 +1,23 @@
+load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
+load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:overlays.bzl", "HERMETIC_LLVM")
+
+# iceoryx2 — the Rust rewrite of Eclipse iceoryx: zero-copy, lock-free shared-
+# memory inter-process communication. Source pinned in //tools/fetch:extension.bzl
+# (@iceoryx2_archive, v0.9.2). First-party Bazel: rules_rust with crate_universe
+# (a checked-in Cargo.Bazel.lock pins the crate graph, fetched from crates.io).
+# Run on the 8.7 inner; rules_rust downloads its own Rust toolchain. First Rust-
+# native project built and tested in the museum.
+#
+#   bazel run //builds/iceoryx2:build_local_linux_amd64
+#   bazel run //builds/iceoryx2:test_local_linux_amd64
+museum_project(
+    name = "iceoryx2",
+    source_archive = "@iceoryx2_archive//file",
+    strip_prefix = "iceoryx2-0.9.2",
+    toolchains = [HERMETIC_LLVM],
+    bazel_version = "8.7.0",
+    environments = [LOCAL, RBE],
+    build = build_spec(targets = ["//iceoryx2:iceoryx2"], flags = ["-c", "opt"]),
+    test = test_spec(targets = ["//iceoryx2:iceoryx2-tests"], flags = ["-c", "opt"]),
+)
