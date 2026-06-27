@@ -1,0 +1,21 @@
+load("//builds:defs.bzl", "build_spec", "museum_project")
+load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//builds:overlays.bzl", "HERMETIC_LLVM")
+
+# quill — an asynchronous, low-latency C++ logging library. Source pinned in
+# //tools/fetch:extension.bzl (@quill_archive, release v12.0.0). First-party
+# Bazel (bzlmod): its root BUILD calls cc_library unloaded, so it runs on the
+# Bazel 8.7 inner with the hermetic LLVM toolchain. No upstream Bazel test
+# target, so this is a build-only project. quill's MODULE declares a direct
+# platforms dep, so no PLATFORMS_DEP overlay.
+#
+#   bazel run //builds/quill:build_local_linux_amd64
+museum_project(
+    name = "quill",
+    source_archive = "@quill_archive//file",
+    strip_prefix = "quill-12.0.0",
+    toolchains = [HERMETIC_LLVM],
+    bazel_version = "8.7.0",
+    environments = [LOCAL, RBE],
+    build = build_spec(targets = ["//:quill"], flags = ["-c", "opt"]),
+)

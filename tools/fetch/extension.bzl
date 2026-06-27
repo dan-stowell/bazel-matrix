@@ -149,6 +149,21 @@ _PROJECT_SOURCES = {
         "sha256": "82926bba66a48fa8dd0165cbc1f1b96b6dc9c3e56d08d318d901196e13eccf1a",
         "filename": "Crow-1.3.2.tar.gz",
     },
+    # z3 — Microsoft's SMT theorem prover (C++). First-party Bazel: builds via
+    # rules_foreign_cc cmake() using the host cmake/make/gcc. Build-only (no Bazel
+    # test targets).
+    "z3_archive": {
+        "url": "https://github.com/Z3Prover/z3/archive/refs/tags/z3-4.16.0.tar.gz",
+        "sha256": "c68c3e5e4810b16126b8cb4c47eee85c1ac3e24a81914c8e371b40de9dd33ac7",
+        "filename": "z3-z3-4.16.0.tar.gz",
+    },
+    # quill — an asynchronous low-latency C++ logging library. First-party Bazel
+    # (bzlmod); its root BUILD calls cc_library unloaded, so the 8.7 inner. Build-only.
+    "quill_archive": {
+        "url": "https://github.com/odygrd/quill/archive/refs/tags/v12.0.0.tar.gz",
+        "sha256": "86974f76a2ca229460b027aed656ee9d3c5c1c5df70507448cb434d5e477d868",
+        "filename": "quill-12.0.0.tar.gz",
+    },
     # GoogleTest — the C++ test framework. First-party Bazel, builds + tests
     # itself with the hermetic LLVM toolchain.
     "googletest_archive": {

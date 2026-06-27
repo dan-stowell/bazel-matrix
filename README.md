@@ -116,9 +116,10 @@ and rendered by [`runner/_local_table.py`](runner/_local_table.py).
 | [OpenCC](https://github.com/BYVoid/OpenCC) | 8.7.0 | ✅ | ✅ |
 | [OR-Tools](https://github.com/google/or-tools) | 8.7.0 | ✅ | ❌ |
 | [protobuf](https://github.com/protocolbuffers/protobuf) | 9.1.1 | ✅ | ✅ |
+| [quill](https://github.com/odygrd/quill) | 8.7.0 | ✅ | — |
 | [re2](https://github.com/google/re2) | 8.7.0 | ✅ | ✅ |
 | [snappy](https://github.com/google/snappy) | 8.7.0 | ✅ | ✅ |
 | [zlib](https://github.com/madler/zlib) | 9.1.1 | ✅ | — |
 
-_Host-local sweep of 39 projects: 34 build and 25 run their test suite directly on the host toolchain (✅ success · ❌ failure · ⏱️ timeout · — no such target)._
+_Host-local sweep of 40 projects: 35 build and 25 run their test suite directly on the host toolchain (✅ success · ❌ failure · ⏱️ timeout · — no such target)._
 <!-- END GENERATED LOCAL TABLE -->
