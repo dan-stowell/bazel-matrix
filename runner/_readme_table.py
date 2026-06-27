@@ -56,6 +56,7 @@ META = {
     "z3":           ("z3", "https://github.com/Z3Prover/z3", "Microsoft's Z3 SMT theorem prover"),
     "double_conversion": ("double-conversion", "https://github.com/google/double-conversion", "IEEE-754 double/string conversion (C++)"),
     "prometheus_cpp": ("prometheus-cpp", "https://github.com/jupp0r/prometheus-cpp", "Prometheus metrics client library for C++"),
+    "openexr":      ("OpenEXR", "https://github.com/AcademySoftwareFoundation/openexr", "High-dynamic-range image format (C++, ASWF)"),
 }
 
 # Human-readable reason for the projects that don't build as they are.

@@ -115,6 +115,7 @@ and rendered by [`runner/_local_table.py`](runner/_local_table.py).
 | [nsync](https://github.com/google/nsync) | 8.7.0 | ✅ | ✅ |
 | [oneTBB](https://github.com/uxlfoundation/oneTBB) | 8.7.0 | ✅ | ✅ |
 | [OpenCC](https://github.com/BYVoid/OpenCC) | 8.7.0 | ✅ | ✅ |
+| [OpenEXR](https://github.com/AcademySoftwareFoundation/openexr) | 9.1.1 | ✅ | ✅ |
 | [OR-Tools](https://github.com/google/or-tools) | 8.7.0 | ✅ | ❌ |
 | [prometheus-cpp](https://github.com/jupp0r/prometheus-cpp) | 8.7.0 | ✅ | ✅ |
 | [protobuf](https://github.com/protocolbuffers/protobuf) | 9.1.1 | ✅ | ✅ |
@@ -124,5 +125,5 @@ and rendered by [`runner/_local_table.py`](runner/_local_table.py).
 | [z3](https://github.com/Z3Prover/z3) | 9.1.1 | ✅ | — |
 | [zlib](https://github.com/madler/zlib) | 9.1.1 | ✅ | — |
 
-_Host-local sweep of 43 projects: 38 build and 27 run their test suite directly on the host toolchain (✅ success · ❌ failure · ⏱️ timeout · — no such target)._
+_Host-local sweep of 44 projects: 39 build and 28 run their test suite directly on the host toolchain (✅ success · ❌ failure · ⏱️ timeout · — no such target)._
 <!-- END GENERATED LOCAL TABLE -->
