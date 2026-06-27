@@ -207,7 +207,6 @@ trap 'rm -rf "$bundle"' EXIT
 
 ENV_JSON="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 HOME=/home/runner
-JAVA_HOME=/usr/lib/jvm/default-java
 SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt"
 [[ -n "$ver" && "$ver" != "-" ]] && ENV_JSON+=$'\n'"USE_BAZEL_VERSION=$ver"
 

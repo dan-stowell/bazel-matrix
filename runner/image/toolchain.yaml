@@ -2,7 +2,7 @@
 #
 # rules_distroless resolves this package set (and its full dependency closure)
 # into hermetic .deb layers that rules_img stacks onto a debian:bookworm-slim
-# base. The result is a pinned, ordinary CI machine: a C/C++ toolchain, a JDK,
+# base. The result is a pinned, ordinary CI machine: a C/C++ toolchain,
 # python, git, and the archive tools Bazel genrules commonly shell out to —
 # exactly what a real-world Bazel project assumes is on $PATH "in nature".
 #
@@ -30,8 +30,10 @@ packages:
   # C/C++ toolchain (gcc, g++, make, libc headers) — what Bazel's cc
   # auto-configuration probes the host for.
   - build-essential
-  # JDK — for the Java projects (copybara) and any genrule that shells to java.
-  - default-jdk-headless
+  # NOTE: no JDK. The Java projects (copybara) and even bazel-the-project build
+  # with no host Java — javac uses the hermetic remotejdk (rules_java downloads
+  # it) and Bazel's launcher uses its own embedded JDK. Probed in
+  # docs/minimal-image.md; add a JDK back only if a genrule shells to `java`.
   # Python — many C++ Bazel builds run python at build time (protobuf, grpc, …).
   - python3
   - python-is-python3

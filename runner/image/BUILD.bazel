@@ -68,9 +68,9 @@ tar(
         # Bazel's cc auto-configuration probes for `cc`/`gcc`/`c++`.
         "./usr/bin/cc type=link link=/usr/bin/gcc",
         "./usr/bin/c++ type=link link=/usr/bin/g++",
-        # default-jdk-headless installs the JVM under /usr/lib/jvm; expose it.
-        "./usr/bin/java type=link link=/usr/lib/jvm/default-java/bin/java",
-        "./usr/bin/javac type=link link=/usr/lib/jvm/default-java/bin/javac",
+        # No java/javac links: the image ships no JDK (Java builds use the
+        # hermetic remotejdk; bazel's launcher its embedded JDK). See
+        # docs/minimal-image.md and toolchain.yaml.
     ],
 )
 
@@ -81,7 +81,6 @@ image_manifest(
     env = {
         "HOME": "/home/runner",
         "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
-        "JAVA_HOME": "/usr/lib/jvm/default-java",
         "SSL_CERT_FILE": "/etc/ssl/certs/ca-certificates.crt",
         # bazelisk needs a Bazel version to fetch when a repo pins none.
         "USE_BAZEL_VERSION": "9.1.1",
