@@ -82,6 +82,7 @@ use_repo(
     "protobuf_archive",
     "grpc_archive",
     "grpc_gateway_archive",
+    "opentelemetry_cpp_archive",
     "highs_archive",
     "openexr_archive",
     "prometheus_cpp_archive",

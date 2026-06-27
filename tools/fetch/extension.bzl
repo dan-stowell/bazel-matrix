@@ -192,6 +192,14 @@ _PROJECT_SOURCES = {
         "sha256": "05931e8dd8c8cac514da8297003c31a206a0004d542b7da500810b85c87c20b9",
         "filename": "HiGHS-1.14.0.tar.gz",
     },
+    # OpenTelemetry C++ — observability API/SDK (traces, metrics, logs). First-party
+    # Bazel (.bazelversion 8.5.0), so the 8.7 inner. We build+test the header-only API
+    # layer (the SDK exporters pull grpc/protobuf).
+    "opentelemetry_cpp_archive": {
+        "url": "https://github.com/open-telemetry/opentelemetry-cpp/archive/refs/tags/v1.24.0.tar.gz",
+        "sha256": "7b8e966affca1daf1906272f4d983631cad85fb6ea60fb6f55dcd1811a730604",
+        "filename": "opentelemetry-cpp-1.24.0.tar.gz",
+    },
     # GoogleTest — the C++ test framework. First-party Bazel, builds + tests
     # itself with the hermetic LLVM toolchain.
     "googletest_archive": {
