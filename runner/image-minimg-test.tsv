@@ -1,0 +1,43 @@
+goal	result	missing	note
+//builds/abseil_py:test_minimg_linux_amd64	ok	-	
+//builds/benchmark:test_minimg_linux_amd64	ok	-	
+//builds/brotli_go:test_minimg_linux_amd64	ok	-	
+//builds/catch2:test_minimg_linux_amd64	ok	-	
+//builds/cli11:test_minimg_linux_amd64	ok	-	
+//builds/cpptrace:test_minimg_linux_amd64	fail	other	//test:unittest                                                 FAILED TO BUILD
+//builds/double_conversion:test_minimg_linux_amd64	ok	-	
+//builds/glog:test_minimg_linux_amd64	ok	-	
+//builds/cxx:test_minimg_linux_amd64	ok	-	
+//builds/abseil_cpp:test_minimg_linux_amd64	ok	-	
+//builds/flatbuffers:test_minimg_linux_amd64	ok	-	
+//builds/boringssl:test_minimg_linux_amd64	ok	-	
+//builds/googletest:test_minimg_linux_amd64	ok	-	
+//builds/cctz:test_minimg_linux_amd64	ok	-	
+//builds/cpu_features:test_minimg_linux_amd64	ok	-	
+//builds/highs:test_minimg_linux_amd64	ok	-	
+//builds/fast_float:test_minimg_linux_amd64	ok	-	
+//builds/bazel:test_minimg_linux_amd64	timeout	-	
+//builds/jsonnet:test_minimg_linux_amd64	ok	-	
+//builds/go_jsonnet:test_minimg_linux_amd64	ok	-	
+//builds/onetbb:test_minimg_linux_amd64	ok	-	
+//builds/grpc_gateway:test_minimg_linux_amd64	fail	other	//runtime:runtime_test                                          FAILED TO BUILD
+//builds/jsoncpp:test_minimg_linux_amd64	ok	-	
+//builds/nsync:test_minimg_linux_amd64	ok	-	
+//builds/buildtools:test_minimg_linux_amd64	ok	-	
+//builds/grpc:test_minimg_linux_amd64	timeout	-	
+//builds/opentelemetry_cpp:test_minimg_linux_amd64	fail	other	//api/test/trace:span_id_benchmark_smoketest                    FAILED TO BUILD
+//builds/re2:test_minimg_linux_amd64	ok	-	
+//builds/iceoryx2:test_minimg_linux_amd64	ok	-	
+//builds/magic_enum:test_minimg_linux_amd64	ok	-	
+//builds/openexr:test_minimg_linux_amd64	ok	-	
+//builds/ortools:test_minimg_linux_amd64	ok	-	
+//builds/snappy:test_minimg_linux_amd64	ok	-	
+//builds/protobuf:test_minimg_linux_amd64	fail	python3	//src/google/protobuf/compiler:protoc_x86_64_test                        FAILED in 0.
+//builds/copybara:test_minimg_linux_amd64	fail	other	//javatests/com/google/copybara/transform/patch:QuiltTransformationTest_patch_tests F
+//builds/doctest:test_minimg_linux_amd64	ok	-	
+//builds/ftxui:test_minimg_linux_amd64	ok	-	
+//builds/gperftools:test_minimg_linux_amd64	ok	-	
+//builds/highway:test_minimg_linux_amd64	ok	-	
+//builds/lcm:test_minimg_linux_amd64	ok	-	
+//builds/opencc:test_minimg_linux_amd64	ok	-	
+//builds/prometheus_cpp:test_minimg_linux_amd64	ok	-	

@@ -49,6 +49,24 @@ competing self-registered toolchain (cpptrace), host-stdlib assumptions (nsync),
 cgo linking (grpc_gateway), and pre-existing edges (z3) — each a candidate for a
 small per-project transformation/patch.
 
+### Sweep — test, all 42 test goals (`runner/image-minimg-test.tsv`)
+
+**35/42 build *and test*** in the toolchain-free container (37 counting bazel +
+grpc, which only timed out at ~25 min on their large test graphs). The seven
+non-passing break down as:
+
+| Project | Test result |
+|---------|-------------|
+| bazel / grpc | timeout (huge test graphs; build/test both just slow) |
+| cpptrace / grpc_gateway | same as build (libtinfo / cgo link) |
+| copybara | **build + most tests pass**; only the `patch`/`quilt`-transformation tests fail — those host tools aren't in the image (a tool need, like git/zip) |
+| protobuf | **build + most tests pass**; one arch-check test (`protoc_x86_64_test`) fails |
+| opentelemetry_cpp | benchmark *smoketests* fail to build (a few targets); the rest pass |
+
+The pattern matches the build sweep: the hermetic toolchain itself is never the
+problem. What remains are specific tool needs (objcopy, patch/quilt), a couple of
+test targets, and the pre-existing edges — each a small, local fix.
+
 ## Status: tiers 1 & 2 proven
 
 | Tier | Goal | Result |
