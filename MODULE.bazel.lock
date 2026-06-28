@@ -327,7 +327,7 @@
     },
     "//tools/fetch:extension.bzl%inner_bazel": {
       "general": {
-        "bzlTransitiveDigest": "GAeFMVeNMqGWCEGS4alFg30F3AzJyPFMmJAm2tG833o=",
+        "bzlTransitiveDigest": "KWXdudFnzkOngeQFeY29H0i45vIZx9zPXMuwCcKIcAo=",
         "usagesDigest": "h14pbfoGF+xRhbdi2p4ZLtdO3iD9D6LSCzysqtpR8HE=",
         "recordedInputs": [
           "REPO_MAPPING:,bazel_tools bazel_tools"
@@ -426,7 +426,7 @@
     },
     "//tools/fetch:extension.bzl%project_sources": {
       "general": {
-        "bzlTransitiveDigest": "GAeFMVeNMqGWCEGS4alFg30F3AzJyPFMmJAm2tG833o=",
+        "bzlTransitiveDigest": "KWXdudFnzkOngeQFeY29H0i45vIZx9zPXMuwCcKIcAo=",
         "usagesDigest": "4RQlvpJYAxX2PZxLc3Y4g/kgSEcAiqEkkFheY2guOrA=",
         "recordedInputs": [
           "REPO_MAPPING:,bazel_tools bazel_tools"
@@ -830,6 +830,16 @@
               ],
               "sha256": "2d8052ce2b3fac00b5164303cb2479f1fb4d0819f14f2434023cf4a56d3eeacf",
               "downloaded_file_path": "verible-a0a8d8eb.tar.gz"
+            }
+          },
+          "fuzztest_archive": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_file",
+            "attributes": {
+              "urls": [
+                "https://github.com/google/fuzztest/archive/1a18c86d947c25ff2b73562a90d41a2207e8cba9.tar.gz"
+              ],
+              "sha256": "f13e0d92b1e7a7b11953654ebc96c4e301fe5390cb9c687d5bdbc77c9fb1bc9d",
+              "downloaded_file_path": "fuzztest-1a18c86d.tar.gz"
             }
           },
           "opencc_archive": {

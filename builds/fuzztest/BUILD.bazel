@@ -1,0 +1,47 @@
+load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
+load("//builds:overlays.bzl", "HERMETIC_LLVM")
+
+# fuzztest — Google's C++ testing/fuzzing framework (the FUZZ_TEST macro,
+# property-based "domains", and the Centipede engine). Source pinned in
+# //tools/fetch:extension.bzl (@fuzztest_archive, a commit archive), built with
+# the fully-hermetic LLVM toolchain. First-party Bazel (MODULE.bazel + loaded cc_*
+# rules; it names its own repo @com_google_fuzztest, which resolves when fuzztest
+# is the root module). Its MODULE declares all deps (abseil, re2, googletest, ... +
+# platforms/skylib), so only the hermetic-LLVM overlay is needed — no dep overlay.
+# Pinned to the Bazel 8.7 inner: a transitive dep registers a rules_go version
+# whose toolchain code uses the native CcInfo symbol that Bazel 9 removed, so the
+# Bazel 9 inner fails toolchain resolution even for the C++ targets; the late
+# Bazel 8 inner keeps those legacy APIs and resolves cleanly.
+#
+#   bazel run //builds/fuzztest:build_local_linux_amd64
+#   bazel run //builds/fuzztest:test_local_linux_amd64
+museum_project(
+    name = "fuzztest",
+    source_archive = "@fuzztest_archive//file",
+    strip_prefix = "fuzztest-1a18c86d947c25ff2b73562a90d41a2207e8cba9",
+    toolchains = [HERMETIC_LLVM],
+    bazel_version = "8.7.0",
+    environments = [LOCAL, RBE, MINIMG],
+    build = build_spec(targets = ["//fuzztest:domain_core"], flags = ["-c", "opt"]),
+    # A deterministic core of the property-based "domain" library tests — the
+    # combinators and value/numeric/container/pointer/string domains. These build
+    # on //fuzztest:domain_core (abseil + googletest), deliberately avoiding the
+    # protobuf, flatbuffers, regexp/grammar (antlr4) domain tests, which pull the
+    # heavy codegen deps. Keeps the goal fast and hermetic on local, container, RBE.
+    test = test_spec(
+        targets = [
+            "//domain_tests:aggregate_combinators_test",
+            "//domain_tests:container_combinators_test",
+            "//domain_tests:container_test",
+            "//domain_tests:map_filter_combinator_test",
+            "//domain_tests:misc_domains_test",
+            "//domain_tests:numeric_domains_test",
+            "//domain_tests:pointer_domains_test",
+            "//domain_tests:recursive_domains_test",
+            "//domain_tests:specific_value_domains_test",
+            "//domain_tests:string_domains_test",
+        ],
+        flags = ["-c", "opt"],
+    ),
+)

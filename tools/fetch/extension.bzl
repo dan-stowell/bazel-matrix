@@ -379,6 +379,18 @@ _PROJECT_SOURCES = {
         "sha256": "2d8052ce2b3fac00b5164303cb2479f1fb4d0819f14f2434023cf4a56d3eeacf",
         "filename": "verible-a0a8d8eb.tar.gz",
     },
+    # fuzztest — Google's C++ testing/fuzzing framework (the FUZZ_TEST macro,
+    # property-based "domains", and the Centipede engine). First-party Bazel
+    # (MODULE.bazel + loaded cc_* rules, self-named repo @com_google_fuzztest), so
+    # it runs on the default Bazel 9 inner. Deps (abseil, re2, googletest, protobuf,
+    # flatbuffers, riegeli, antlr4, ...) all come from the BCR, with a couple of
+    # in-module single_version_overrides it carries itself. Pinned to a commit
+    # archive (no tagged release on the branch we want).
+    "fuzztest_archive": {
+        "url": "https://github.com/google/fuzztest/archive/1a18c86d947c25ff2b73562a90d41a2207e8cba9.tar.gz",
+        "sha256": "f13e0d92b1e7a7b11953654ebc96c4e301fe5390cb9c687d5bdbc77c9fb1bc9d",
+        "filename": "fuzztest-1a18c86d.tar.gz",
+    },
     # OpenCC — Open Chinese Convert (C++). First-party Bazel; the library pulls
     # several BCR deps (marisa-trie, darts-clone, rapidjson, tclap), some of
     # which call cc_* unloaded, so it runs on the Bazel 8.7 inner.
