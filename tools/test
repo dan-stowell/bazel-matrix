@@ -1,0 +1,125 @@
+#!/usr/bin/env python3
+"""museum test dispatcher — run a project's test suite in an environment, under
+a build client.
+
+    tools/test <project> <env> [client] [platform]
+    tools/test --list
+
+Axes (see //builds:environments.bzl and //builds:clients.bzl):
+  project   a museum project that has a real test suite (tools/test --list)
+  env       where actions execute: local | rbe | minimg | ...
+  client    what drives the build (a Bazel version today): bazel9 | bazel8
+            (optional — defaults to the project's primary client)
+  platform  os_arch the test runs as (optional — defaults to this host)
+
+Examples:
+  tools/test re2 local                 # host platform, project's default client
+  tools/test re2 local bazel8          # pin the client
+  tools/test abseil_cpp rbe bazel9 linux_amd64
+  tools/test --list                    # every (project, env, client, platform)
+
+This is a thin wrapper: it resolves the goal name and runs
+`bazelisk run //builds/<project>:test_<env>[_<client>]_<platform>`. Run it
+directly (not via `bazel run`) so it doesn't contend for the outer Bazel server.
+"""
+
+import os
+import platform as _platform
+import subprocess
+import sys
+
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+def host_platform():
+    sysname = {"Linux": "linux", "Darwin": "darwin"}.get(_platform.system())
+    arch = {"x86_64": "amd64", "amd64": "amd64",
+            "aarch64": "arm64", "arm64": "arm64"}.get(_platform.machine().lower())
+    if not sysname or not arch:
+        sys.exit("tools/test: cannot map host %s/%s to a museum platform"
+                 % (_platform.system(), _platform.machine()))
+    return "%s_%s" % (sysname, arch)
+
+
+def query_test_goals():
+    """Return the canonical (client-qualified) test py_binary goals as a list of
+    (project, env, client, platform)."""
+    out = subprocess.run(
+        ["bazelisk", "query", 'kind("py_binary", //builds/...:*)'],
+        cwd=REPO, capture_output=True, text=True)
+    if out.returncode != 0:
+        sys.exit("tools/test: bazel query failed:\n" + out.stderr)
+    rows = []
+    for line in out.stdout.splitlines():
+        line = line.strip()
+        if "//builds/" not in line or ":test_" not in line:
+            continue
+        pkg, _, name = line.partition(":")
+        project = pkg.split("/")[-1]
+        parts = name.split("_")  # test_<env>_<client>_<os>_<arch>
+        if len(parts) != 5 or parts[0] != "test":
+            continue
+        _, env, client, os_, arch = parts
+        rows.append((project, env, client, "%s_%s" % (os_, arch)))
+    return rows
+
+
+def cmd_list():
+    rows = query_test_goals()
+    by_project = {}
+    for project, env, client, plat in rows:
+        by_project.setdefault(project, set()).add((env, client, plat))
+    print("# %d projects with real test suites\n" % len(by_project))
+    print("%-20s %-8s %-8s %s" % ("PROJECT", "ENV", "CLIENT", "PLATFORM"))
+    for project in sorted(by_project):
+        for env, client, plat in sorted(by_project[project]):
+            print("%-20s %-8s %-8s %s" % (project, env, client, plat))
+
+
+def usage(msg=None):
+    if msg:
+        sys.stderr.write("tools/test: %s\n\n" % msg)
+    sys.stderr.write(__doc__)
+    sys.exit(2)
+
+
+def main(argv):
+    if not argv or argv[0] in ("-h", "--help"):
+        usage()
+    if argv[0] == "--list":
+        return cmd_list()
+
+    if len(argv) < 2:
+        usage("need at least <project> <env>")
+    project, env = argv[0], argv[1]
+    client = argv[2] if len(argv) > 2 else None
+    plat = argv[3] if len(argv) > 3 else host_platform()
+
+    if client:
+        goal = "test_%s_%s_%s" % (env, client, plat)
+    else:
+        goal = "test_%s_%s" % (env, plat)  # back-compat alias = default client
+    target = "//builds/%s:%s" % (project, goal)
+
+    # Validate against what actually exists, with a helpful listing on miss.
+    rows = [r for r in query_test_goals() if r[0] == project]
+    if not rows:
+        avail = sorted({r[0] for r in query_test_goals()})
+        usage("'%s' has no test suite in the museum.\nProjects with tests: %s"
+              % (project, ", ".join(avail)))
+    envs = sorted({r[1] for r in rows})
+    clients = sorted({r[2] for r in rows})
+    plats = sorted({r[3] for r in rows})
+    if env not in envs:
+        usage("'%s' has no env '%s'. Available: %s" % (project, env, ", ".join(envs)))
+    if client and client not in clients:
+        usage("'%s' has no client '%s'. Available: %s" % (project, client, ", ".join(clients)))
+    if plat not in plats:
+        usage("'%s' has no platform '%s'. Available: %s" % (project, plat, ", ".join(plats)))
+
+    print("museum: %s" % target, file=sys.stderr)
+    os.execvp("bazelisk", ["bazelisk", "run", target])
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])

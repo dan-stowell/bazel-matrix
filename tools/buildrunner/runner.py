@@ -25,6 +25,8 @@ Usage (constructed by the macro, but documented for clarity):
 """
 
 import argparse
+import hashlib
+import json
 import os
 import shutil
 import subprocess
@@ -184,6 +186,130 @@ def _containerize(cmd, image, runtime, base, bazel, workspace, env, toolbin):
     return docker + cmd
 
 
+def _sha256(path):
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _resolve_bep_file(fobj, execroots):
+    """Resolve a BEP file object to a local path, or None if not on disk.
+
+    Local builds report `file://` URIs. Remote (RBE) builds report
+    `bytestream://.../blobs/<digest>/<size>` — the bytes live in the remote CAS —
+    but with `--remote_download_toplevel` the requested targets' outputs are
+    materialised locally too, under the execroot at the path the file's
+    `pathPrefix` (+ name) describes (e.g. bazel-out/<config>/bin/libre2.a). So for
+    a non-file URI we reconstruct that local path and use it if it exists.
+    """
+    uri = fobj.get("uri", "")
+    if uri.startswith("file://"):
+        p = uri[len("file://"):]
+        return p if os.path.isfile(p) else None
+    name = fobj.get("name")
+    if not name:
+        return None
+    prefix = fobj.get("pathPrefix") or []
+    for er in execroots:
+        cand = os.path.join(er, *prefix, name)
+        if os.path.isfile(cand):
+            return cand
+    return None
+
+
+def _emit_artifacts(bep_path, dest_dir, output_user_root):
+    """Copy a finished build's outputs into dest_dir + write an artifacts.json
+    manifest (target -> files, each with sha256 + size).
+
+    We read the build's *Build Event Protocol* stream (--build_event_json_file):
+    one JSON object per line. Each `targetCompleted` event names its output
+    groups, which reference `namedSet` events by id; a named set holds file URIs
+    and can nest further sets — so we resolve them transitively. The files are
+    ones Bazel *already produced* (freshly built, a cache hit, or downloaded from
+    RBE), so emitting is a pure post-build copy: it never changes an action key
+    and never forces a rebuild. The bytes are the same ones the build cached, so
+    the manifest's sha256s are stable across cached reruns and across local/RBE.
+    """
+    if not os.path.exists(bep_path):
+        print("  artifacts: no build-event file at %s; nothing to emit" % bep_path,
+              file=sys.stderr)
+        return
+    events = []
+    with open(bep_path, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                events.append(json.loads(line))
+            except json.JSONDecodeError:
+                continue
+
+    # Execroots under the output root, for reconstructing RBE-downloaded paths.
+    import glob as _glob
+    execroots = [p for p in _glob.glob(os.path.join(output_user_root, "*", "execroot", "*"))
+                 if os.path.isdir(p)]
+
+    # id -> namedSetOfFiles payload (its files + nested fileSets).
+    named = {}
+    for ev in events:
+        nid = ev.get("id", {}).get("namedSet", {}).get("id")
+        if nid is not None:
+            named[nid] = ev.get("namedSetOfFiles", {})
+
+    def files_of(set_id, seen):
+        if set_id is None or set_id in seen:
+            return []
+        seen.add(set_id)
+        payload = named.get(set_id, {})
+        out = list(payload.get("files", []))
+        for child in payload.get("fileSets", []):
+            out += files_of(child.get("id"), seen)
+        return out
+
+    os.makedirs(dest_dir, exist_ok=True)
+    manifest = []
+    for ev in events:
+        tid = ev.get("id", {}).get("targetCompleted")
+        comp = ev.get("completed")
+        if not tid or not comp or not comp.get("success"):
+            continue
+        label = tid.get("label", "")
+        safe = label.lstrip("@/").replace("/", "_").replace(":", "_") or "_root"
+        seen_sets, seen_uri, outs = set(), set(), []
+        for og in comp.get("outputGroup", []):
+            for fs in og.get("fileSets", []):
+                for fobj in files_of(fs.get("id"), seen_sets):
+                    uri = fobj.get("uri", "")
+                    if uri in seen_uri:
+                        continue
+                    seen_uri.add(uri)
+                    src = _resolve_bep_file(fobj, execroots)
+                    if not src:
+                        continue
+                    tgt_dir = os.path.join(dest_dir, safe)
+                    os.makedirs(tgt_dir, exist_ok=True)
+                    dst = os.path.join(tgt_dir, os.path.basename(src))
+                    shutil.copyfile(src, dst)
+                    outs.append({
+                        "name": fobj.get("name", os.path.basename(src)),
+                        "path": os.path.relpath(dst, dest_dir),
+                        "sha256": _sha256(src),
+                        "size": os.path.getsize(src),
+                    })
+        if outs:
+            manifest.append({"target": label, "outputs": outs})
+    manifest.sort(key=lambda m: m["target"])
+    with open(os.path.join(dest_dir, "artifacts.json"), "w", encoding="utf-8") as mf:
+        json.dump({"artifacts": manifest}, mf, indent=2, sort_keys=True)
+        mf.write("\n")
+    n = sum(len(m["outputs"]) for m in manifest)
+    print("  artifacts: %d file(s) from %d target(s) -> %s" % (n, len(manifest), dest_dir),
+          file=sys.stderr)
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--name", required=True, help="short project name (for the build root)")
@@ -230,6 +356,13 @@ def main(argv=None):
                         "binary are bind-mounted at identical paths.")
     p.add_argument("--container-runtime", default="docker",
                    help="container runtime for --container-image (default: docker)")
+    p.add_argument("--emit-artifacts", nargs="?", const="", default=None,
+                   metavar="DIR",
+                   help="after a successful build, copy each target's outputs into "
+                        "DIR (default <build_root>/artifacts) and write an "
+                        "artifacts.json manifest (target -> files with sha256). Reads "
+                        "the build's outputs via the Build Event Protocol, so it never "
+                        "triggers a rebuild. Also honoured via MUSEUM_EMIT_ARTIFACTS.")
     p.add_argument("extra", nargs="*", help="extra args/targets forwarded to the inner build")
     # parse_known_args so that any flag we don't define (e.g. --subcommands,
     # --verbose_failures passed after `bazel run ... --`) is forwarded verbatim
@@ -250,6 +383,32 @@ def main(argv=None):
     toolbin = os.path.join(root, "toolbin")
     for d in (output_user_root, repo_cache, home, tmp):
         os.makedirs(d, exist_ok=True)
+
+    # Artifact emission (opt-in): resolve the destination dir and a BEP sink the
+    # inner build writes its event stream to. Lives under `root`, which is inside
+    # the bind-mounted build base, so it resolves identically for container envs.
+    emit_dir = None
+    if args.emit_artifacts is not None:
+        emit_dir = args.emit_artifacts or os.path.join(root, "artifacts")
+    else:
+        ev = os.environ.get("MUSEUM_EMIT_ARTIFACTS")
+        if ev:
+            emit_dir = os.path.join(root, "artifacts") if ev.lower() in ("1", "true", "yes", "on") else ev
+    bep_path = os.path.join(root, "bep.json") if emit_dir else None
+    if bep_path and os.path.exists(bep_path):
+        os.remove(bep_path)  # stale stream from a prior run would mislead the copy
+
+    # Optional shared action cache (content-addressed) across goals — opt-in via
+    # MUSEUM_DISK_CACHE (a path, or "1" => <base>/disk_cache). Off by default so
+    # each goal stays isolated. Turning it on lets the expensive hermetic LLVM
+    # toolchain compile once and be reused by every other goal/project/env — what
+    # makes a full local/minimg sweep tractable. Placed under the build base so it
+    # is bind-mounted into container envs. Safe to share: keyed by action inputs.
+    disk_cache = os.environ.get("MUSEUM_DISK_CACHE")
+    if disk_cache:
+        if disk_cache.lower() in ("1", "true", "yes", "on"):
+            disk_cache = os.path.join(_museum_base(), "disk_cache")
+        os.makedirs(disk_cache, exist_ok=True)
     # Fresh source tree each run for reproducibility; caches persist for speed.
     if os.path.isdir(work):
         shutil.rmtree(work)
@@ -344,6 +503,11 @@ def main(argv=None):
         ]
 
     flags = list(args.build_flags) + header_flags + tool_flags + extra_flags
+    if disk_cache:
+        flags.append("--disk_cache=" + disk_cache)
+    if bep_path:
+        # Ride the build's event stream to learn its outputs — no extra analysis.
+        flags.append("--build_event_json_file=" + bep_path)
     # Targets passed via `-- <targets>` override the configured defaults.
     targets = extra_targets if extra_targets else list(args.targets)
     if not targets:
@@ -387,6 +551,11 @@ def main(argv=None):
     # the docker CLI — give it the host env (it needs the real PATH/DOCKER_* to
     # run); the scrubbed env was already handed to the container via -e.
     proc = subprocess.run(cmd, cwd=workspace, env=None if args.container_image else env)
+
+    # On success, copy the build's outputs out + record a manifest. Reads files
+    # the build already produced (cached or fresh), so it can't perturb caching.
+    if emit_dir and proc.returncode == 0:
+        _emit_artifacts(bep_path, emit_dir, output_user_root)
     return proc.returncode
 
 

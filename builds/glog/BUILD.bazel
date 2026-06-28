@@ -1,4 +1,4 @@
-load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
+load("//builds:defs.bzl", "build_spec", "museum_project")
 load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM", "PLATFORMS_DEP")
 
@@ -25,5 +25,7 @@ museum_project(
     bazel_version = "8.7.0",
     environments = [LOCAL, RBE, MINIMG],
     build = build_spec(targets = ["//:glog"], flags = ["-c", "opt"]),
-    test = test_spec(targets = ["//bazel/example:main"], flags = ["-c", "opt"]),
+    # No test goal: glog's only Bazel "test" was //bazel/example:main, a
+    # build+link+run smoke test, not a real suite (its unit tests are
+    # CMake-only). Build-only in the museum; excluded from the test surface.
 )

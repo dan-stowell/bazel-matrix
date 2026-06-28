@@ -161,29 +161,81 @@ Bazel, and the goal's overlay files as `data`.
   environment (only an explicit allowlist — `PATH`, proxy/TLS vars, `CC`/`CXX`,
   locale — is passed through).
 
-Reruns are fast: even though the source is re-extracted, the tarball's
-deterministic mtimes mean the inner action cache hits (~5 s vs ~5 min cold).
+Reruns are fast, and behave like ordinary Bazel: the per-goal `output_user_root`
+persists, so its on-disk **action cache and test-result cache survive** between
+runs even under `--batch`. The source is re-extracted from the same
+content-addressed tarball, so Bazel re-digests identical bytes, sees unchanged
+inputs, and gets cache hits — including test caching. A second `tools/test re2
+local` reports `Executed 0 out of 16 tests` (all `(cached) PASSED`), with only
+the analysis phase re-running (~8 s, because `--batch` discards the in-memory
+graph). Nothing that already succeeded against the same inputs runs again. (Each
+goal's cache is private; a shared `--disk_cache` or remote cache would extend the
+"don't redo it" guarantee across goals and machines.)
+
+### Build outputs and artifact emission
+
+A `build` goal's outputs are ordinary Bazel outputs in the per-goal
+`bazel-out/.../bin` (e.g. re2's `libre2.a`); the museum doesn't ship them — the
+deliverable is the green build itself. Opting a `build_spec` into
+`emit_artifacts = True` additionally **copies a target's outputs into
+`<build_root>/artifacts/` and writes an `artifacts.json` manifest** (target →
+files, each with `sha256` + `size`). The runner learns the outputs from the
+build's **Build Event Protocol** stream (`--build_event_json_file`), resolving
+each `targetCompleted` event's output groups through the `namedSet` events it
+references. Because it only *reads* files the build already produced, emission
+never changes an action key and never forces a rebuild — a fully cached build
+still emits, and the manifest's `sha256`s are byte-identical to a cold build's.
+(Honoured per-run via `MUSEUM_EMIT_ARTIFACTS=1` too; default-on per `build_spec`.)
+
+This works across **local, MINIMG, and RBE**. Remote builds report outputs as
+`bytestream://` CAS references rather than `file://`, but `--remote_download_
+toplevel` materialises the requested targets locally, so the emitter reconstructs
+each output's local path from its BEP `pathPrefix`. Verified: re2's `libre2.a`
+emits with the **same sha256 in all three environments** — a byte-identical
+artifact from host, container, and remote execution.
+
+**Sharing the cache across goals.** Each goal's `output_user_root` is private, so
+a cold goal recompiles the (expensive) hermetic toolchain. Set
+`MUSEUM_DISK_CACHE=1` (or a path) to add a content-addressed `--disk_cache` under
+the build base — shared by every goal, so the toolchain compiles once and all
+later goals/projects/environments reuse it. It's bind-mounted into container envs
+and safe to share (keyed by action inputs); off by default to keep goals isolated.
 
 ### Environments, platforms, and the goal matrix
 
-The build layer models three independent dimensions and crosses them into
-explicit, runnable targets named **`<command>_<env>_<os>_<arch>`** (e.g.
-`build_rbe_linux_amd64`, `test_local_darwin_arm64`):
+The build layer models four independent dimensions and crosses them into
+explicit, runnable targets named **`<command>_<env>_<client>_<os>_<arch>`** (e.g.
+`build_rbe_bazel9_linux_amd64`, `test_local_bazel8_darwin_arm64`):
 
 - **command** — `build` or `test`.
 - **environment** ([`builds/environments.bzl`](../builds/environments.bzl)) —
-  *where* a goal runs. Three exist: `LOCAL` (the host machine — serves one
-  os/arch at a time, so each goal is gated on the host matching it via
-  `target_compatible_with`), `RBE` (BuildBuddy cloud; host-independent), and
-  `ACTIOND` (a local Linux RE worker — [hermeticbuild/actiond][actiond] — that
-  runs actions in a VM on this host, serving linux/arm64 without leaving the
-  Mac). An environment declares the platforms it can serve, the overlays it adds,
+  *where* a goal runs. `LOCAL` (the host machine — serves one os/arch at a time,
+  so each goal is gated on the host matching it via `target_compatible_with`),
+  `RBE` (BuildBuddy cloud; host-independent), `MINIMG` (a minimal,
+  toolchain-free container), and `ACTIOND` (a local Linux RE worker —
+  [hermeticbuild/actiond][actiond] — that runs actions in a VM on this host).
+  An environment declares the platforms it can serve, the overlays it adds,
   whether it `pin_platform`s, and any per-platform flags; new ones drop in here.
 
 [actiond]: https://github.com/hermeticbuild/actiond
+- **client** ([`builds/clients.bzl`](../builds/clients.bzl)) — *what* drives the
+  build. Today every client is a pinned Bazel release (`bazel9` = 9.1.1, `bazel8`
+  = 8.7.0), so a client is effectively a Bazel version — but the axis is named,
+  not a bare version, so non-Bazel clients can join later. A project declares the
+  clients it supports (`clients = [...]`, first = default); the legacy
+  `bazel_version=` shorthand still works and maps to a single client. Each goal
+  also gets a back-compat `alias` without the client segment, pointing at the
+  default client (so `test_local_linux_amd64` still resolves).
 - **platform** ([`builds/platforms.bzl`](../builds/platforms.bzl)) — a canonical
   `(os, arch)` with its constraints, `//builds` config_setting, and RBE
   `exec_properties`.
+
+**Running a suite.** [`tools/test`](../tools/test) is the dispatcher over the
+test surface: `tools/test <project> <env> [client] [platform]` (client defaults
+to the project's primary; platform to this host) resolves the goal and runs it.
+`tools/test --list` enumerates every `(project, env, client, platform)` cell.
+Only projects with a **real test suite** carry test goals — build-only projects
+and example/smoke "tests" (glog, doctest) are excluded from the test surface.
 
 An **overlay** ([`builds/overlays.bzl`](../builds/overlays.bzl)) is a reusable,
 named bundle of source `appends` (file → `MODULE.bazel` / `.bazelrc`), `writes`
@@ -211,11 +263,12 @@ onto the `-isysroot <path>` that fix now emits) onto `rules_rust` 0.68.1 — so 
 [rr4101]: https://github.com/bazelbuild/rules_rust/pull/4101
 
 A **project** (`museum_project`) pins a source tarball + `toolchains` (overlays
-applied to every goal, e.g. `HERMETIC_LLVM`), the `environments` it targets, and
-a `build`/`test` spec. It emits one goal per **runnable** cell of
-environments × platforms × commands; `test_spec.exclude_on` drops target patterns
-per-environment. Only runnable cells appear: `RBE` lists the platforms it has
-executors for, and `LOCAL` goals are inert off their host.
+applied to every goal, e.g. `HERMETIC_LLVM`), the `environments` it targets, the
+`clients` it supports, and a `build`/`test` spec. It emits one goal per
+**runnable** cell of environments × platforms × clients × commands;
+`build_spec`/`test_spec.exclude_on` drops target patterns per-environment. Only
+runnable cells appear: `RBE` lists the platforms it has executors for, and
+`LOCAL` goals are inert off their host.
 
 ### Hermetic C/C++ toolchain (the `HERMETIC_LLVM` overlay)
 

@@ -1,6 +1,6 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
 load("//builds:environments.bzl", "ACTIOND", "LOCAL", "MINIMG", "RBE")
-load("//builds:overlays.bzl", "HERMETIC_LLVM")
+load("//builds:overlays.bzl", "HERMETIC_LLVM", "PLATFORMS_DEP")
 
 # Catch2 — C++ test framework.
 # Source pinned in //tools/fetch:extension.bzl (@catch2_archive, v3.15.1), built
@@ -31,7 +31,10 @@ museum_project(
     name = "catch2",
     source_archive = "@catch2_archive//file",
     strip_prefix = "Catch2-3.15.1",
-    toolchains = [HERMETIC_LLVM],
+    # PLATFORMS_DEP gives the injected RBE platform package @platforms visibility
+    # (Catch2's MODULE declares no direct platforms dep), needed by the
+    # pin_platform envs (RBE/actiond).
+    toolchains = [HERMETIC_LLVM, PLATFORMS_DEP],
     environments = [LOCAL, RBE, ACTIOND, MINIMG],
     build = build_spec(targets = ["//:catch2_main"], flags = ["-c", "opt"]),
     test = test_spec(

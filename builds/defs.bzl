@@ -34,6 +34,7 @@ executors for, and `local` goals are gated on the host matching their platform
 
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//tools/fetch:extension.bzl", "DEFAULT_INNER_BAZEL_VERSION")
+load(":clients.bzl", "clients_for")
 load(":platforms.bzl", "PLATFORMS")
 
 # Per-OS+CPU selection of the pinned inner Bazel binary (data dep + runfiles
@@ -83,7 +84,7 @@ _COMMAND_DEFAULT_FLAGS = {
     ],
 }
 
-def build_spec(targets, flags = [], exclude_on = {}):
+def build_spec(targets, flags = [], exclude_on = {}, emit_artifacts = True):
     """The `build` command for a project: what to build, plus extra flags.
 
     Args:
@@ -92,8 +93,18 @@ def build_spec(targets, flags = [], exclude_on = {}):
       exclude_on: dict env-name -> target patterns to *additionally* exclude in
         that environment (e.g. a target that only builds with a host toolchain a
         given environment lacks).
+      emit_artifacts: default True — after a successful build, copy each target's
+        outputs into `<build_root>/artifacts/` and write an `artifacts.json`
+        manifest (target -> files with sha256). Read from the build's event
+        stream, so it never forces a rebuild. Set False to opt a project out.
     """
-    return struct(command = "build", targets = targets, flags = flags, exclude_on = exclude_on)
+    return struct(
+        command = "build",
+        targets = targets,
+        flags = flags,
+        exclude_on = exclude_on,
+        emit_artifacts = emit_artifacts,
+    )
 
 def test_spec(targets, flags = [], exclude_on = {}):
     """The `test` command for a project.
@@ -116,8 +127,9 @@ def _dedupe(items):
             out.append(it)
     return out
 
-def _emit_goal(project_id, source_archive, strip_prefix, toolchains, env, plat, spec, bazel_version, visibility):
-    goal_name = "{}_{}_{}".format(spec.command, env.name, plat.name)
+def _emit_goal(project_id, source_archive, strip_prefix, toolchains, env, plat, spec, client, visibility):
+    goal_name = "{}_{}_{}_{}".format(spec.command, env.name, client.name, plat.name)
+    bazel_version = client.bazel_version
 
     overlays = toolchains + env.overlays
     appends = []  # (label, dest)
@@ -161,6 +173,10 @@ def _emit_goal(project_id, source_archive, strip_prefix, toolchains, env, plat, 
     # instead of on the host; the runner bind-mounts the build root + inner bazel.
     if getattr(env, "container_image", None):
         args.append("--container-image=" + env.container_image)
+
+    # Opt-in: copy this build's outputs out + write an artifacts.json manifest.
+    if getattr(spec, "emit_artifacts", False):
+        args.append("--emit-artifacts")
 
     for label, dest in appends:
         args.append("--append=$(rlocationpath {})={}".format(label, dest))
@@ -219,6 +235,7 @@ def _emit_goal(project_id, source_archive, strip_prefix, toolchains, env, plat, 
         target_compatible_with = compatible,
         visibility = visibility,
     )
+    return goal_name
 
 def museum_project(
         name,
@@ -229,6 +246,7 @@ def museum_project(
         strip_prefix = "",
         toolchains = [],
         bazel_version = DEFAULT_INNER_BAZEL_VERSION,
+        clients = None,
         visibility = ["//visibility:public"]):
     """Declare a museum project and emit its environment x platform x command grid.
 
@@ -240,9 +258,13 @@ def museum_project(
       test: a test_spec(...) (or None to emit no test goals).
       strip_prefix: top-level directory inside the tarball = workspace root.
       toolchains: overlays applied to every goal (e.g. [HERMETIC_LLVM]).
-      bazel_version: which pinned inner Bazel to run the build with. Defaults to
-        the museum default; set it to match a project's .bazelversion when the
-        project targets an older Bazel (must be a version in //tools/fetch).
+      bazel_version: legacy single-client shorthand — which pinned inner Bazel to
+        run the build with. Defaults to the museum default; set it to match a
+        project's .bazelversion when the project targets an older Bazel (must be
+        a version in //tools/fetch). Ignored when `clients` is set.
+      clients: the client axis (see //builds:clients.bzl): a list of client
+        names (e.g. ["bazel8", "bazel9"]) this project supports. The first is the
+        default. When omitted, a single client is derived from `bazel_version`.
       visibility: visibility for the generated goal targets.
     """
 
@@ -250,19 +272,33 @@ def museum_project(
     # goals (e.g. both `build_local_darwin_arm64`) don't collide on the build root.
     project_id = (native.package_name().replace("/", "_") or name)
     specs = [s for s in (build, test) if s]
+    client_structs = clients_for(bazel_version, clients)
+    default_client = client_structs[0]
 
     for env in environments:
         for plat_name in env.platforms:
             plat = PLATFORMS[plat_name]
             for spec in specs:
-                _emit_goal(
-                    project_id,
-                    source_archive,
-                    strip_prefix,
-                    toolchains,
-                    env,
-                    plat,
-                    spec,
-                    bazel_version,
-                    visibility,
-                )
+                for client in client_structs:
+                    goal_name = _emit_goal(
+                        project_id,
+                        source_archive,
+                        strip_prefix,
+                        toolchains,
+                        env,
+                        plat,
+                        spec,
+                        client,
+                        visibility,
+                    )
+
+                    # Back-compat alias without the client segment, pointing at
+                    # the project's default (first) client. Keeps the historical
+                    # `<cmd>_<env>_<platform>` goal names working and gives the
+                    # test dispatcher a stable name when `client` is omitted.
+                    if client == default_client:
+                        native.alias(
+                            name = "{}_{}_{}".format(spec.command, env.name, plat.name),
+                            actual = ":" + goal_name,
+                            visibility = visibility,
+                        )

@@ -18,17 +18,15 @@ museum_project(
     toolchains = [HERMETIC_LLVM],
     bazel_version = "8.7.0",
     environments = [LOCAL, RBE, MINIMG],
-    # The C library plus its C++ wrapper.
+    # The pure-C library. (nsync also ships //:nsync_cpp, a C++ wrapper that
+    # compiles nsync's .c sources as `-x c++` for C++11 atomics. Bazel treats a
+    # .c source as a C action, so the zero-sysroot hermetic toolchain
+    # (--sysroot=/dev/null -nostdlibinc) adds glibc/kernel headers but not libc++,
+    # and the file then includes <mutex> → not found. That fails under the
+    # hermetic toolchain in every environment, so we don't build it here.)
     build = build_spec(
-        targets = ["//:nsync", "//:nsync_cpp"],
+        targets = ["//:nsync"],
         flags = ["-c", "opt"],
-        # //:nsync_cpp compiles nsync's .c sources as `-x c++` (for C++11 atomics).
-        # Bazel treats a .c source as a C action, so the zero-sysroot hermetic
-        # toolchain (--sysroot=/dev/null -nostdlibinc) adds glibc/kernel headers
-        # but not libc++ — and the file then includes <mutex>. Host toolchains keep
-        # libc++ on the default include path so it builds there; the minimal
-        # container has no such fallback, so build only the pure-C library there.
-        exclude_on = {"minimg": ["//:nsync_cpp"]},
     ),
     # The functional unit tests for the core primitives — counter, mutex,
     # condition variable, note, once and waiter. The timing-sensitive

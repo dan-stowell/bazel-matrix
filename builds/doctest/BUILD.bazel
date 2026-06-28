@@ -1,4 +1,4 @@
-load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
+load("//builds:defs.bzl", "build_spec", "museum_project")
 load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM", "PLATFORMS_DEP")
 
@@ -25,10 +25,8 @@ museum_project(
     toolchains = [HERMETIC_LLVM, PLATFORMS_DEP],
     environments = [LOCAL, RBE, MINIMG],
     # Build the doctest library itself (consumed as @doctest from the examples
-    # module), then run the example test that links static libs against it.
+    # module). No test goal: the only Bazel "test" was the //exe_with_static_libs
+    # example binary, not doctest's own test/ suite (which isn't Bazel-wired).
+    # Build-only in the museum; excluded from the test surface.
     build = build_spec(targets = ["@doctest//:doctest"], flags = ["-c", "opt"]),
-    test = test_spec(
-        targets = ["//exe_with_static_libs:exe_with_static_libs"],
-        flags = ["-c", "opt"],
-    ),
 )
