@@ -368,6 +368,17 @@ _PROJECT_SOURCES = {
         "sha256": "9d06c3c6b83873b889ad8a0d766325f58b758d1cef804f2b08aee6612eee09fb",
         "filename": "s2geometry-3f5bd2d9.tar.gz",
     },
+    # verible — CHIPS Alliance's SystemVerilog parser/style-linter/formatter
+    # suite (C++). First-party Bazel (MODULE.bazel + loaded cc_* rules), so it
+    # runs on the default Bazel 9 inner. Deps (abseil, skylib, nlohmann_json,
+    # protobuf, re2, rules_bison/flex/m4, rules_cc, ...) all come from the BCR;
+    # the bison/flex toolchains are only pulled by the parser, not the common/
+    # util tests the museum builds. Pinned to the v0.0-4080-ga0a8d8eb commit.
+    "verible_archive": {
+        "url": "https://github.com/chipsalliance/verible/archive/a0a8d8eb8cfa9fd8969c9d646454d363b48aa449.tar.gz",
+        "sha256": "2d8052ce2b3fac00b5164303cb2479f1fb4d0819f14f2434023cf4a56d3eeacf",
+        "filename": "verible-a0a8d8eb.tar.gz",
+    },
     # OpenCC — Open Chinese Convert (C++). First-party Bazel; the library pulls
     # several BCR deps (marisa-trie, darts-clone, rapidjson, tclap), some of
     # which call cc_* unloaded, so it runs on the Bazel 8.7 inner.

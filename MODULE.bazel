@@ -126,6 +126,7 @@ use_repo(
     "boringssl_archive",
     "nsync_archive",
     "s2geometry_archive",
+    "verible_archive",
 )
 
 # Hermetic `actiond` worker binary (see //tools/actiond:extension.bzl). actiond
