@@ -108,6 +108,17 @@ def _sha256(path):
     return h.hexdigest()
 
 
+def _dedupe(items):
+    seen = set()
+    result = []
+    for item in items:
+        if not item or item in seen:
+            continue
+        seen.add(item)
+        result.append(item)
+    return result
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("--mode", choices = ["build", "test"], required=True)
@@ -130,6 +141,12 @@ def main(argv=None):
     print("kiss: bazel  =", bazel, file=sys.stderr)
 
     env = os.environ.copy()
+    env["PATH"] = os.pathsep.join(_dedupe([
+        env.get("PATH", ""),
+        "/usr/local/bin",
+        "/usr/bin",
+        "/bin",
+    ]))
     startup_flags = []
     if args.mode == "build":
         output_user_root = os.path.abspath(".kiss-output-user-root")

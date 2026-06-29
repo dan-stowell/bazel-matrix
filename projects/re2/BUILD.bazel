@@ -1,7 +1,6 @@
 load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
 load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
 load("//builds:overlays.bzl", "HERMETIC_LLVM")
-load("//tools/kiss:defs.bzl", "extract_source", "kiss_build", "kiss_test")
 
 _RE2_TEST = test_spec(
     targets = [
@@ -23,30 +22,4 @@ museum_project(
     environments = [LOCAL, RBE, MINIMG],
     build = build_spec(targets = ["//:re2"], flags = ["-c", "opt"]),
     test = _RE2_TEST,
-)
-
-extract_source(
-    name = "kiss_source",
-    archive = "@re2_archive//file",
-    strip_prefix = "re2-2025-11-05",
-)
-
-kiss_test(
-    name = "kiss_test",
-    source = ":kiss_source",
-    bazel = "@inner_bazel_8_7_0_linux_amd64//file",
-    targets = [
-        "//:all",
-        "-//:exhaustive_test",
-        "-//:exhaustive1_test",
-        "-//:exhaustive2_test",
-        "-//:exhaustive3_test",
-    ],
-)
-
-kiss_build(
-    name = "kiss_build",
-    source = ":kiss_source",
-    bazel = "@inner_bazel_8_7_0_linux_amd64//file",
-    targets = ["//:re2"],
 )

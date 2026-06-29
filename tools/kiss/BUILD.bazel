@@ -1,2 +1,9 @@
+load("@rules_python//python:defs.bzl", "py_binary")
+
 exports_files(["kiss_runner.py"])
 
+py_binary(
+    name = "kiss_runner",
+    srcs = ["kiss_runner.py"],
+    main = "kiss_runner.py",
+)

@@ -33,6 +33,7 @@ executors for, and `local` goals are gated on the host matching their platform
 
 load("@rules_python//python:defs.bzl", "py_binary", "py_test")
 load("//tools/fetch:extension.bzl", "DEFAULT_INNER_BAZEL_VERSION")
+load("//tools/kiss:defs.bzl", "extract_source", "inner_bazel", "inner_bazel_arg", "inner_bazel_data", "kiss_build", "kiss_test")
 load(":clients.bzl", "clients_for")
 load(":overlays.bzl", "HERMETIC_LLVM")
 load(":platforms.bzl", "PLATFORMS")
@@ -285,6 +286,32 @@ def _emit_test_suites(name, environments, specs, emitted, default_client, visibi
                     visibility = visibility,
                 )
 
+def _emit_kiss_targets(source_archive, strip_prefix, build, test, default_client, visibility):
+    extract_source(
+        name = "kiss_source",
+        archive = source_archive,
+        strip_prefix = strip_prefix,
+    )
+
+    bazel = inner_bazel(default_client.bazel_version)
+    if build:
+        kiss_build(
+            name = "kiss_build",
+            source = ":kiss_source",
+            bazel = bazel,
+            targets = build.targets,
+            visibility = visibility,
+        )
+    if test:
+        kiss_test(
+            name = "kiss_test",
+            source = ":kiss_source",
+            targets = test.targets,
+            bazel_data = inner_bazel_data(default_client.bazel_version),
+            bazel_arg = inner_bazel_arg(default_client.bazel_version),
+            visibility = visibility,
+        )
+
 def project_test(
         name,
         source_archive,
@@ -421,6 +448,7 @@ def museum_project(
                     emitted[(env.name, client.name, plat.name, spec.command)] = goal_name
 
     _emit_test_suites(name, environments, specs, emitted, default_client, visibility)
+    _emit_kiss_targets(source_archive, strip_prefix, build, test, default_client, visibility)
 
 def bcr_project(
         name,
