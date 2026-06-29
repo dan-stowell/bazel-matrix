@@ -1,0 +1,15 @@
+load("//builds:defs.bzl", "bcr_project", "test_spec")
+load("//builds:environments.bzl", "CIIMG", "LOCAL")
+
+# cpp-httplib — a single-header C++ HTTP/HTTPS client/server library
+# (yhirose/cpp-httplib). A "BCR module" project: the runner bazel_dep()s it from
+# the Bazel Central Registry and runs its own @cpp-httplib//... tests (which the
+# BCR presubmit builds but does not run). Host tier on LOCAL + the full CI image
+# (CIIMG) with the ambient toolchain — no hermetic LLVM.
+bcr_project(
+    name = "cpp-httplib",
+    module = "cpp-httplib",
+    version = "0.46.0",
+    environments = [LOCAL, CIIMG],
+    test = test_spec(targets = ["@cpp-httplib//..."], flags = ["-c", "opt"]),
+)
