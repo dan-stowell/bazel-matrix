@@ -196,6 +196,11 @@ def _containerize(cmd, image, runtime, base, bazel, workspace, env, toolbin):
         runtime, "run", "--rm", "--init",
         "--network", "host",
         "--user", "%d:%d" % (os.getuid(), os.getgid()),
+        # We always pass an explicit inner-bazel argv as `cmd`, so clear any image
+        # ENTRYPOINT (e.g. the CI image's bazelisk) — otherwise it would swallow
+        # the inner-bazel path as its own argument. No-op for entrypoint-less
+        # images (museum-minimg).
+        "--entrypoint", "",
         "-v", "%s:%s" % (base, base),
         "-v", "%s:%s:ro" % (bazel, bazel),
         "-w", workspace,

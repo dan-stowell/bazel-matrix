@@ -103,3 +103,18 @@ MINIMG = environment(
     host_cpu_only = True,
     container_image = "museum-minimg:latest",
 )
+
+# CIIMG: run the inner build inside the *full* CI image — debian + the ordinary
+# build toolchain (build-essential/gcc, JDK, python, git, curl, zip), the same
+# "ordinary CI machine" the //projects wild builds use. No CC_NODETECT and no
+# injected hermetic toolchain: the build uses the image's own gcc, autodetected.
+# This is the non-hermetic container tier — "builds with the toolchain a real CI
+# box has" — as opposed to MINIMG's toolchain-free + hermetic-LLVM design. The
+# image is the docker tag built+loaded by `bazel run //runner/image:load`.
+CIIMG = environment(
+    name = "ciimg",
+    platforms = ["linux_amd64", "linux_arm64"],
+    overlays = [],
+    host_cpu_only = True,
+    container_image = "bazel-runner-baseline:latest",
+)

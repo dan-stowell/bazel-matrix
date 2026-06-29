@@ -1,23 +1,26 @@
 load("//builds:defs.bzl", "bcr_project", "build_spec", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
-load("//builds:overlays.bzl", "HERMETIC_LLVM")
+load("//builds:environments.bzl", "CIIMG", "LOCAL", "RBE")
 
 # simdutf — fast SIMD Unicode validation & transcoding (UTF-8/16/32, base64), C++.
 # This is a "BCR module" project: rather than pinning the upstream source and
 # running its in-repo BUILD, the runner synthesizes a root module that
 # bazel_dep()s simdutf from the Bazel Central Registry and builds/tests its own
 # @simdutf//... targets — the build_targets/test_targets the BCR's presubmit.yml
-# runs. The registry resolves simdutf's source, patches, and MODULE.bazel; the
-# fully-hermetic LLVM toolchain is injected as usual. Pinned to BCR 7.7.0.
+# runs. The registry resolves simdutf's source, patches, and MODULE.bazel.
+# Pinned to BCR 7.7.0.
 #
-#   bazel run //builds/simdutf:build_local_linux_amd64
+# Toolchain by env (bcr_project default): LOCAL + CIIMG build with the ambient
+# host / CI-image gcc (no hermetic overlay); RBE uses hermetic LLVM (the host
+# toolchain can't match the remote executor's compiler).
+#
 #   bazel run //builds/simdutf:test_local_linux_amd64
+#   bazel run //builds/simdutf:test_ciimg_linux_amd64
+#   bazel run //builds/simdutf:test_rbe_linux_amd64
 bcr_project(
     name = "simdutf",
     module = "simdutf",
     version = "7.7.0",
-    toolchains = [HERMETIC_LLVM],
-    environments = [LOCAL, RBE, MINIMG],
+    environments = [LOCAL, CIIMG, RBE],
     build = build_spec(targets = ["@simdutf"], flags = ["-c", "opt"]),
     test = test_spec(targets = ["@simdutf//:test"], flags = ["-c", "opt"]),
 )

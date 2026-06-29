@@ -35,6 +35,7 @@ executors for, and `local` goals are gated on the host matching their platform
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//tools/fetch:extension.bzl", "DEFAULT_INNER_BAZEL_VERSION")
 load(":clients.bzl", "clients_for")
+load(":overlays.bzl", "HERMETIC_LLVM")
 load(":platforms.bzl", "PLATFORMS")
 
 # Per-OS+CPU selection of the pinned inner Bazel binary (data dep + runfiles
@@ -316,7 +317,8 @@ def bcr_project(
         environments,
         build = None,
         test = None,
-        toolchains = [],
+        toolchains = None,
+        rbe_toolchains = None,
         bazel_version = DEFAULT_INNER_BAZEL_VERSION,
         clients = None,
         visibility = ["//visibility:public"]):
@@ -329,21 +331,34 @@ def bcr_project(
     MODULE.bazel; the goal then builds/tests the module's own `@<module>//...`
     targets (e.g. the `test_targets` the BCR's presubmit.yml runs). This captures
     projects whose Bazel build lives in the BCR (community-"ported" modules) and
-    whose upstream repo ships no/partial in-repo Bazel. Toolchain overlays still
-    apply; emits the same `<cmd>_<env>_<client>_<platform>` goal grid.
+    whose upstream repo ships no/partial in-repo Bazel. Emits the same
+    `<cmd>_<env>_<client>_<platform>` goal grid.
+
+    Toolchain by environment: by default this reaches for hermetic LLVM only
+    where it's actually needed. Autodetect-capable environments (LOCAL, CIIMG —
+    the host or a CI image that ships a compiler) build with the *ambient* host
+    toolchain, no overlay. The pin-platform RBE environment, where a host-
+    autodetected toolchain can't match the remote executor's compiler, gets
+    HERMETIC_LLVM. (MINIMG — the toolchain-free minimal image — has no compiler to
+    autodetect, so if you target it, pass it via `toolchains` with HERMETIC_LLVM.)
 
     Args:
       name: project name (informational; the package path also identifies it).
       module: the BCR module name (e.g. "simdutf").
       version: the BCR module version to pin (e.g. "7.7.0").
-      environments: environments to target (e.g. [LOCAL, MINIMG, RBE]).
+      environments: environments to target (e.g. [LOCAL, CIIMG, RBE]).
       build: a build_spec(...) over @<module>//... targets, or None.
       test: a test_spec(...) over @<module>//... targets, or None.
-      toolchains: overlays applied to every goal (e.g. [HERMETIC_LLVM]).
+      toolchains: overlays for the autodetect-capable (non-pin_platform)
+        environments. Defaults to [] (the ambient host/CI-image toolchain).
+      rbe_toolchains: overlays for pin_platform environments (RBE). Defaults to
+        [HERMETIC_LLVM] — the reproducible cross-machine toolchain.
       bazel_version: legacy single-client shorthand; ignored when `clients` set.
       clients: the client axis (see //builds:clients.bzl).
       visibility: visibility for the generated goal targets.
     """
+    host_toolchains = toolchains if toolchains != None else []
+    pin_toolchains = rbe_toolchains if rbe_toolchains != None else [HERMETIC_LLVM]
     project_id = (native.package_name().replace("/", "_") or name)
     specs = [s for s in (build, test) if s]
     client_structs = clients_for(bazel_version, clients)
@@ -351,6 +366,7 @@ def bcr_project(
     bcr_module = "{}={}".format(module, version)
 
     for env in environments:
+        env_toolchains = pin_toolchains if env.pin_platform else host_toolchains
         for plat_name in env.platforms:
             plat = PLATFORMS[plat_name]
             for spec in specs:
@@ -359,7 +375,7 @@ def bcr_project(
                         project_id,
                         None,  # no source archive
                         "",
-                        toolchains,
+                        env_toolchains,
                         env,
                         plat,
                         spec,
