@@ -1,0 +1,16 @@
+load("//builds:defs.bzl", "bcr_project", "test_spec")
+load("//builds:environments.bzl", "CIIMG", "LOCAL")
+
+# libxkbcommon — keyboard keymap handling in C (xkbcommon/libxkbcommon).
+# A "BCR module" project: the runner bazel_dep()s the module from the Bazel
+# Central Registry and runs its own presubmit test target. Host tier: builds and
+# tests with the ambient toolchain on LOCAL and in the full CI image (CIIMG) — no
+# hermetic LLVM. (RBE/hermetic reached for only when needed.)
+bcr_project(
+    name = "xkbcommon",
+    module = "xkbcommon",
+    version = "1.9.2.bcr.beta.1",
+
+    environments = [LOCAL, CIIMG],
+    test = test_spec(targets = ["@xkbcommon//:xkbcommon_headers_consumer_compile_test"], flags = ["-c", "opt"]),
+)
