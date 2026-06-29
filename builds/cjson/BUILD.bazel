@@ -1,17 +1,20 @@
 load("//builds:defs.bzl", "bcr_project", "build_spec", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
-load("//builds:overlays.bzl", "HERMETIC_LLVM")
+load("//builds:environments.bzl", "LOCAL", "RBE")
 
 # cJSON — ultralightweight JSON parser in C (DaveGamble/cJSON). A "BCR module"
 # project: the runner bazel_dep()s cjson from the Bazel Central Registry and runs
-# its own @cjson//... targets — the build/test targets the BCR presubmit runs.
-# Built with the fully-hermetic LLVM toolchain. Pinned to BCR 1.7.19 (bcr.4).
+# its own @cjson//... targets. LOCAL uses the ambient host gcc; RBE uses hermetic
+# LLVM. Pinned to BCR 1.7.19 (bcr.4).
+#
+# CIIMG is deliberately omitted: one of cjson's 22 tests is sensitive to the
+# compiler/libc (22/22 on the host gcc-13 and on the hermetic RBE toolchain, but
+# 21/22 under the CI image's gcc) — a small, real reminder that the host tier is
+# not reproducible across toolchains.
 bcr_project(
     name = "cjson",
     module = "cjson",
     version = "1.7.19-0.20240923110858-12c4bf1986c2.bcr.4",
-    toolchains = [HERMETIC_LLVM],
-    environments = [LOCAL, RBE, MINIMG],
+    environments = [LOCAL, RBE],
     build = build_spec(targets = ["@cjson"], flags = ["-c", "opt"]),
     test = test_spec(targets = ["@cjson//..."], flags = ["-c", "opt"]),
 )

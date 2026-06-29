@@ -1,17 +1,14 @@
 load("//builds:defs.bzl", "bcr_project", "build_spec", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
-load("//builds:overlays.bzl", "HERMETIC_LLVM")
+load("//builds:environments.bzl", "CIIMG", "LOCAL", "RBE")
 
-# GLM — OpenGL Mathematics, a header-only C++ math library for graphics (g-truc).
-# A "BCR module" project: the runner bazel_dep()s glm from the Bazel Central
-# Registry and runs its own @glm//... targets (the BCR presubmit's build/test
-# targets). Built with the fully-hermetic LLVM toolchain. Pinned to BCR 1.0.3.
+# GLM — OpenGL Mathematics, header-only C++ math library for graphics (g-truc).
+# A "BCR module" project running its own @glm//... targets. LOCAL + CIIMG use the
+# ambient host/CI-image gcc; RBE uses hermetic LLVM. Pinned to BCR 1.0.3.
 bcr_project(
     name = "glm",
     module = "glm",
     version = "1.0.3",
-    toolchains = [HERMETIC_LLVM],
-    environments = [LOCAL, RBE, MINIMG],
+    environments = [LOCAL, CIIMG, RBE],
     build = build_spec(targets = ["@glm//:glm"], flags = ["-c", "opt"]),
     test = test_spec(targets = ["@glm//..."], flags = ["-c", "opt"]),
 )

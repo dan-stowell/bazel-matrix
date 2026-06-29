@@ -1,19 +1,16 @@
 load("//builds:defs.bzl", "bcr_project", "build_spec", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
-load("//builds:overlays.bzl", "HERMETIC_LLVM")
+load("//builds:environments.bzl", "CIIMG", "LOCAL", "RBE")
 
-# lexy — C++ parser combinator library (foonathan/lexy). A "BCR module" project:
-# the runner bazel_dep()s lexy from the Bazel Central Registry and runs its own
-# @lexy//:lexy_test target (the BCR presubmit's test target). Pinned to the Bazel
-# 8.7 inner (its test target isn't visible to the Bazel 9 inner). Fully-hermetic
-# LLVM toolchain. BCR 2025.05.0.
+# lexy — C++ parser combinator library (foonathan/lexy). A "BCR module" project
+# running its own @lexy//:lexy_test target. Pinned to the Bazel 8.7 inner (its
+# test target isn't visible to the Bazel 9 inner). LOCAL + CIIMG use the ambient
+# host/CI-image gcc; RBE uses hermetic LLVM. BCR 2025.05.0.
 bcr_project(
     name = "lexy",
     module = "lexy",
     version = "2025.05.0",
     bazel_version = "8.7.0",
-    toolchains = [HERMETIC_LLVM],
-    environments = [LOCAL, RBE, MINIMG],
+    environments = [LOCAL, CIIMG, RBE],
     build = build_spec(targets = ["@lexy//:lexy"], flags = ["-c", "opt"]),
     test = test_spec(targets = ["@lexy//:lexy_test"], flags = ["-c", "opt"]),
 )
