@@ -1,5 +1,5 @@
-load("//builds:defs.bzl", "bcr_project", "build_spec", "test_spec")
-load("//builds:environments.bzl", "CIIMG", "LOCAL", "RBE")
+load("//kiss:defs.bzl", "bcr_project", "build_spec", "test_spec")
+load("//kiss:defs.bzl", "CIIMG", "LOCAL", "RBE")
 
 # toml++ — header-only TOML parser/serializer for C++ (marzer/tomlplusplus). A
 # "BCR module" project running its own @tomlplusplus//... targets. LOCAL + CIIMG

@@ -1,6 +1,6 @@
-load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "ACTIOND", "LOCAL", "MINIMG", "RBE")
-load("//builds:overlays.bzl", "HERMETIC_LLVM", "PLATFORMS_DEP")
+load("//kiss:defs.bzl", "build_spec", "museum_project", "test_spec")
+load("//kiss:defs.bzl", "ACTIOND", "LOCAL", "MINIMG", "RBE")
+load("//kiss:defs.bzl", "HERMETIC_LLVM", "PLATFORMS_DEP")
 
 # Catch2 — C++ test framework.
 # Source pinned in //kiss:extension.bzl (@catch2_archive, v3.15.1), built

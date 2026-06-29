@@ -1,5 +1,5 @@
-load("//builds:defs.bzl", "bcr_project", "test_spec")
-load("//builds:environments.bzl", "CIIMG", "LOCAL")
+load("//kiss:defs.bzl", "bcr_project", "test_spec")
+load("//kiss:defs.bzl", "CIIMG", "LOCAL")
 
 # lexbor — fast HTML/CSS rendering engine in C (lexbor/lexbor).
 # A "BCR module" project: the runner bazel_dep()s the module from the Bazel

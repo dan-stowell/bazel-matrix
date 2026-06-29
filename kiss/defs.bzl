@@ -1,4 +1,51 @@
 load("@rules_python//python:defs.bzl", "py_test")
+load("//kiss:extension.bzl", "DEFAULT_INNER_BAZEL_VERSION")
+
+def build_spec(targets, flags = [], exclude_on = {}, emit_artifacts = True):
+    return struct(
+        command = "build",
+        targets = targets,
+        flags = flags,
+        exclude_on = exclude_on,
+        emit_artifacts = emit_artifacts,
+    )
+
+def test_spec(targets, flags = [], exclude_on = {}):
+    return struct(
+        command = "test",
+        targets = targets,
+        flags = flags,
+        exclude_on = exclude_on,
+    )
+
+def _compat_env(name):
+    return struct(name = name)
+
+LOCAL = _compat_env("local")
+RBE = _compat_env("rbe")
+ACTIOND = _compat_env("actiond")
+MINIMG = _compat_env("minimg")
+CIIMG = _compat_env("ciimg")
+
+def overlay(name, appends = [], writes = [], patches = [], build_flags = [], remote_header_envs = [], tools = []):
+    return struct(
+        name = name,
+        appends = appends,
+        writes = writes,
+        patches = patches,
+        build_flags = build_flags,
+        remote_header_envs = remote_header_envs,
+        tools = tools,
+    )
+
+HERMETIC_LLVM = overlay(name = "hermetic_llvm")
+CC_NODETECT = overlay(name = "cc_nodetect")
+HERMETIC_ZIP = overlay(name = "hermetic_zip")
+RULES_RUST_SYSROOT_FIX = overlay(name = "rules_rust_sysroot_fix")
+RULES_CC_DEP = overlay(name = "rules_cc_dep")
+PLATFORMS_DEP = overlay(name = "platforms_dep")
+BUILDBUDDY_RBE = overlay(name = "buildbuddy_rbe")
+ACTIOND_WORKER = overlay(name = "actiond_worker")
 
 def inner_bazel(version):
     vtag = version.replace(".", "_")
@@ -141,3 +188,71 @@ def kiss_test(name, source, targets, bazel = None, bazel_data = None, bazel_arg 
         timeout = "eternal",
         visibility = visibility,
     )
+
+def _emit_kiss_targets(source_archive, strip_prefix, build, test, bazel_version, visibility):
+    extract_source(
+        name = "kiss_source",
+        archive = source_archive,
+        strip_prefix = strip_prefix,
+    )
+
+    bazel = inner_bazel(bazel_version)
+    if build:
+        kiss_build(
+            name = "kiss_build",
+            source = ":kiss_source",
+            bazel = bazel,
+            targets = build.targets,
+            visibility = visibility,
+        )
+    if test:
+        kiss_test(
+            name = "kiss_test",
+            source = ":kiss_source",
+            targets = test.targets,
+            bazel_data = inner_bazel_data(bazel_version),
+            bazel_arg = inner_bazel_arg(bazel_version),
+            visibility = visibility,
+        )
+
+def museum_project(
+        name,
+        source_archive,
+        environments,
+        build = None,
+        test = None,
+        strip_prefix = "",
+        toolchains = [],
+        bazel_version = DEFAULT_INNER_BAZEL_VERSION,
+        clients = None,
+        visibility = ["//visibility:public"]):
+    if clients:
+        fail("KISS-only museum_project does not support clients=; use bazel_version=")
+    _emit_kiss_targets(source_archive, strip_prefix, build, test, bazel_version, visibility)
+
+def project_test(
+        name,
+        source_archive,
+        test,
+        strip_prefix = "",
+        toolchains = [],
+        bazel_version = DEFAULT_INNER_BAZEL_VERSION,
+        clients = None,
+        visibility = ["//visibility:public"]):
+    _emit_kiss_targets(source_archive, strip_prefix, None, test, bazel_version, visibility)
+
+def bcr_project(
+        name,
+        module,
+        version,
+        environments,
+        build = None,
+        test = None,
+        toolchains = None,
+        rbe_toolchains = None,
+        bazel_version = DEFAULT_INNER_BAZEL_VERSION,
+        clients = None,
+        visibility = ["//visibility:public"]):
+    # BCR projects do not have pinned source archives in this repo, so there is
+    # no KISS source/build/test target to emit for them.
+    pass

@@ -1,2 +1,0 @@
-# Compatibility package for existing project BUILD files.
-exports_files(["defs.bzl"])

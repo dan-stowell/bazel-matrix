@@ -1,6 +1,6 @@
-load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
-load("//builds:overlays.bzl", "HERMETIC_LLVM", "PLATFORMS_DEP")
+load("//kiss:defs.bzl", "build_spec", "museum_project", "test_spec")
+load("//kiss:defs.bzl", "LOCAL", "MINIMG", "RBE")
+load("//kiss:defs.bzl", "HERMETIC_LLVM", "PLATFORMS_DEP")
 
 # buildtools — Bazel's own BUILD/Starlark file tooling (buildifier, buildozer),
 # written in Go. Source pinned in //kiss:extension.bzl (@buildtools_archive,

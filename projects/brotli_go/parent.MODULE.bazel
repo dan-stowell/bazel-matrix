@@ -8,7 +8,7 @@
 # i.e. it expects the parent directory (the C sources we already build) to be a
 # Bazel module. The release tarball ships no MODULE.bazel there, so the
 # brotli_go test goal writes this file to ../MODULE.bazel (see BROTLI_GO_PARENT
-# in //builds/brotli:BUILD.bazel). The hermetic LLVM toolchain is registered by
+# in //projects/brotli:BUILD.bazel). The hermetic LLVM toolchain is registered by
 # the root (go) module, so this parent only needs the module declaration.
 module(
     name = "brotli",

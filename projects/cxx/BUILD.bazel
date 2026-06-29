@@ -1,6 +1,6 @@
-load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "ACTIOND", "LOCAL", "MINIMG", "RBE")
-load("//builds:overlays.bzl", "HERMETIC_LLVM", "RULES_RUST_SYSROOT_FIX")
+load("//kiss:defs.bzl", "build_spec", "museum_project", "test_spec")
+load("//kiss:defs.bzl", "ACTIOND", "LOCAL", "MINIMG", "RBE")
+load("//kiss:defs.bzl", "HERMETIC_LLVM", "RULES_RUST_SYSROOT_FIX")
 
 # cxx (cxx.rs) — safe FFI between Rust and C++. Build #3: exercises the Rust
 # toolchain (rules_rust + hermetic rustc) plus, via the C++ bridge, the

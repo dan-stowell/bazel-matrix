@@ -1,5 +1,5 @@
-load("//builds:defs.bzl", "bcr_project", "test_spec")
-load("//builds:environments.bzl", "CIIMG", "LOCAL")
+load("//kiss:defs.bzl", "bcr_project", "test_spec")
+load("//kiss:defs.bzl", "CIIMG", "LOCAL")
 
 # libde265 — H.265/HEVC video decoder in C++ (strukturag/libde265).
 # A "BCR module" project: the runner bazel_dep()s the module from the Bazel

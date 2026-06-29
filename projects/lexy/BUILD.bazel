@@ -1,5 +1,5 @@
-load("//builds:defs.bzl", "bcr_project", "build_spec", "test_spec")
-load("//builds:environments.bzl", "CIIMG", "LOCAL", "RBE")
+load("//kiss:defs.bzl", "bcr_project", "build_spec", "test_spec")
+load("//kiss:defs.bzl", "CIIMG", "LOCAL", "RBE")
 
 # lexy — C++ parser combinator library (foonathan/lexy). A "BCR module" project
 # running its own @lexy//:lexy_test target. Pinned to the Bazel 8.7 inner (its

@@ -193,7 +193,7 @@
   "moduleExtensions": {
     "//kiss:extension.bzl%inner_bazel": {
       "general": {
-        "bzlTransitiveDigest": "KWXdudFnzkOngeQFeY29H0i45vIZx9zPXMuwCcKIcAo=",
+        "bzlTransitiveDigest": "MCZ2YUIC7CCpYiZiRgm1wUD1XtmuL49Y1eCYWo6vPFc=",
         "usagesDigest": "eb1Hw1CZPLV2WiayGlCDdNU50nsvlZjghjvpiT0r5d4=",
         "recordedInputs": [
           "REPO_MAPPING:,bazel_tools bazel_tools"
@@ -292,7 +292,7 @@
     },
     "//kiss:extension.bzl%project_sources": {
       "general": {
-        "bzlTransitiveDigest": "KWXdudFnzkOngeQFeY29H0i45vIZx9zPXMuwCcKIcAo=",
+        "bzlTransitiveDigest": "MCZ2YUIC7CCpYiZiRgm1wUD1XtmuL49Y1eCYWo6vPFc=",
         "usagesDigest": "eTzZC0ExKm3Krp9AN3ZY51HIMrNO1pN0/SEdfqfwSNk=",
         "recordedInputs": [
           "REPO_MAPPING:,bazel_tools bazel_tools"

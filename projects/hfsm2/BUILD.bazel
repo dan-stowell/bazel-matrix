@@ -1,5 +1,5 @@
-load("//builds:defs.bzl", "bcr_project", "test_spec")
-load("//builds:environments.bzl", "CIIMG", "LOCAL")
+load("//kiss:defs.bzl", "bcr_project", "test_spec")
+load("//kiss:defs.bzl", "CIIMG", "LOCAL")
 
 # HFSM2 — header-only C++ hierarchical finite-state-machine library (andrew-gresyk/HFSM2).
 # A "BCR module" project: the runner bazel_dep()s the module from the Bazel

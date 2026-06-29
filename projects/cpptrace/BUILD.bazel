@@ -1,6 +1,6 @@
-load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "MINIMG")
-load("//builds:overlays.bzl", "HERMETIC_LLVM", "PLATFORMS_DEP")
+load("//kiss:defs.bzl", "build_spec", "museum_project", "test_spec")
+load("//kiss:defs.bzl", "LOCAL", "MINIMG")
+load("//kiss:defs.bzl", "HERMETIC_LLVM", "PLATFORMS_DEP")
 
 # cpptrace — a C++ stacktrace / backtrace library. Source pinned in
 # //kiss:extension.bzl (@cpptrace_archive, release v1.0.4). First-party

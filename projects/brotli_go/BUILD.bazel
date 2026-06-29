@@ -1,6 +1,6 @@
-load("//builds:defs.bzl", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "MINIMG")
-load("//builds:overlays.bzl", "HERMETIC_LLVM", "overlay")
+load("//kiss:defs.bzl", "museum_project", "test_spec")
+load("//kiss:defs.bzl", "LOCAL", "MINIMG")
+load("//kiss:defs.bzl", "HERMETIC_LLVM", "overlay")
 
 # brotli's Bazel tests — its go bindings. The C library (built by //projects/brotli)
 # ships no cc_test rules; brotli's only Bazel test targets are the go_test rules

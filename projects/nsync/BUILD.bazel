@@ -1,6 +1,6 @@
-load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
-load("//builds:overlays.bzl", "HERMETIC_LLVM")
+load("//kiss:defs.bzl", "build_spec", "museum_project", "test_spec")
+load("//kiss:defs.bzl", "LOCAL", "MINIMG", "RBE")
+load("//kiss:defs.bzl", "HERMETIC_LLVM")
 
 # nsync — Google's small C library of synchronization primitives (mutexes,
 # condition variables, notes, once), with a C++ wrapper. Source pinned in

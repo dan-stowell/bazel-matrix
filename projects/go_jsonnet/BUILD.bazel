@@ -1,6 +1,6 @@
-load("//builds:defs.bzl", "build_spec", "museum_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
-load("//builds:overlays.bzl", "HERMETIC_LLVM", "PLATFORMS_DEP")
+load("//kiss:defs.bzl", "build_spec", "museum_project", "test_spec")
+load("//kiss:defs.bzl", "LOCAL", "MINIMG", "RBE")
+load("//kiss:defs.bzl", "HERMETIC_LLVM", "PLATFORMS_DEP")
 
 # go-jsonnet — the pure-Go implementation of the Jsonnet data-templating
 # language, the Go sibling of the C++ //projects/jsonnet. Source pinned in

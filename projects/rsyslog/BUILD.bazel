@@ -1,5 +1,5 @@
-load("//builds:defs.bzl", "bcr_project", "test_spec")
-load("//builds:environments.bzl", "LOCAL")
+load("//kiss:defs.bzl", "bcr_project", "test_spec")
+load("//kiss:defs.bzl", "LOCAL")
 
 # rsyslog — high-performance system log processing in C (rsyslog/rsyslog).
 # A "BCR module" project running its own @rsyslog//... presubmit test target on

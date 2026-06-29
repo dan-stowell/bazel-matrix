@@ -1,5 +1,5 @@
-load("//builds:defs.bzl", "bcr_project", "build_spec", "test_spec")
-load("//builds:environments.bzl", "LOCAL", "RBE")
+load("//kiss:defs.bzl", "bcr_project", "build_spec", "test_spec")
+load("//kiss:defs.bzl", "LOCAL", "RBE")
 
 # cJSON — ultralightweight JSON parser in C (DaveGamble/cJSON). A "BCR module"
 # project: the runner bazel_dep()s cjson from the Bazel Central Registry and runs

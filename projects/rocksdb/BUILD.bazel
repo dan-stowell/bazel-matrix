@@ -1,5 +1,5 @@
-load("//builds:defs.bzl", "bcr_project", "build_spec", "test_spec")
-load("//builds:environments.bzl", "CIIMG", "LOCAL")
+load("//kiss:defs.bzl", "bcr_project", "build_spec", "test_spec")
+load("//kiss:defs.bzl", "CIIMG", "LOCAL")
 
 # RocksDB — Facebook's embedded persistent key-value store / LSM-tree engine, C++
 # (facebook/rocksdb). A "BCR module" project: the runner bazel_dep()s rocksdb from

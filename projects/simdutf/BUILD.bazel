@@ -1,5 +1,5 @@
-load("//builds:defs.bzl", "bcr_project", "build_spec", "test_spec")
-load("//builds:environments.bzl", "CIIMG", "LOCAL", "RBE")
+load("//kiss:defs.bzl", "bcr_project", "build_spec", "test_spec")
+load("//kiss:defs.bzl", "CIIMG", "LOCAL", "RBE")
 
 # simdutf — fast SIMD Unicode validation & transcoding (UTF-8/16/32, base64), C++.
 # This is a "BCR module" project: rather than pinning the upstream source and

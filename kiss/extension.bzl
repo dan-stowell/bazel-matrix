@@ -263,7 +263,7 @@ _PROJECT_SOURCES = {
         "filename": "or-tools-9.15.tar.gz",
     },
     # Brotli — compression library + CLI. Release ships BUILD files but no
-    # MODULE.bazel (see //builds/brotli, which synthesizes one).
+    # MODULE.bazel (see //projects/brotli, which synthesizes one).
     "brotli_archive": {
         "url": "https://github.com/google/brotli/archive/refs/tags/v1.2.0.tar.gz",
         "sha256": "816c96e8e8f193b40151dad7e8ff37b1221d019dbcb9c35cd3fadbfe6477dfec",
