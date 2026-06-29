@@ -130,27 +130,30 @@ def main(argv=None):
     print("kiss: bazel  =", bazel, file=sys.stderr)
 
     env = os.environ.copy()
+    startup_flags = []
     if args.mode == "build":
-        home = os.path.abspath(".kiss-home")
-        os.makedirs(home, exist_ok=True)
-        env["HOME"] = home
+        output_user_root = os.path.abspath(".kiss-output-user-root")
+        os.makedirs(output_user_root, exist_ok=True)
+        startup_flags.append("--output_user_root=" + output_user_root)
 
     bep = os.path.join(os.environ.get("TEST_TMPDIR", os.getcwd()), "kiss.bep.json")
+    command_flags = list(args.flag)
+    if args.mode == "test":
+        command_flags = [
+            "--test_output=errors",
+            "--keep_going",
+        ] + command_flags
+    elif args.bundle:
+        command_flags = ["--build_event_json_file=" + bep] + command_flags
+
     cmd = [
         bazel,
         "--batch",
         "--nohome_rc",
         "--nosystem_rc",
+    ] + startup_flags + [
         args.mode,
-    ] + args.flag + ["--"] + args.target
-
-    if args.mode == "test":
-        cmd[5:5] = [
-            "--test_output=errors",
-            "--keep_going",
-        ]
-    elif args.bundle:
-        cmd[5:5] = ["--build_event_json_file=" + bep]
+    ] + command_flags + ["--"] + args.target
 
     print("kiss: command =", " ".join(cmd), file=sys.stderr)
     proc = subprocess.run(cmd, cwd=source, env=env)
