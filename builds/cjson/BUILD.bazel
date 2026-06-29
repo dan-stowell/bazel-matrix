@@ -1,0 +1,17 @@
+load("//builds:defs.bzl", "bcr_project", "build_spec", "test_spec")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
+load("//builds:overlays.bzl", "HERMETIC_LLVM")
+
+# cJSON — ultralightweight JSON parser in C (DaveGamble/cJSON). A "BCR module"
+# project: the runner bazel_dep()s cjson from the Bazel Central Registry and runs
+# its own @cjson//... targets — the build/test targets the BCR presubmit runs.
+# Built with the fully-hermetic LLVM toolchain. Pinned to BCR 1.7.19 (bcr.4).
+bcr_project(
+    name = "cjson",
+    module = "cjson",
+    version = "1.7.19-0.20240923110858-12c4bf1986c2.bcr.4",
+    toolchains = [HERMETIC_LLVM],
+    environments = [LOCAL, RBE, MINIMG],
+    build = build_spec(targets = ["@cjson"], flags = ["-c", "opt"]),
+    test = test_spec(targets = ["@cjson//..."], flags = ["-c", "opt"]),
+)

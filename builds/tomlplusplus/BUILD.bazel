@@ -1,0 +1,17 @@
+load("//builds:defs.bzl", "bcr_project", "build_spec", "test_spec")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
+load("//builds:overlays.bzl", "HERMETIC_LLVM")
+
+# toml++ — header-only TOML parser/serializer for C++ (marzer/tomlplusplus). A
+# "BCR module" project: the runner bazel_dep()s tomlplusplus from the Bazel
+# Central Registry and runs its own @tomlplusplus//... targets (the BCR
+# presubmit's build/test targets). Fully-hermetic LLVM toolchain. BCR 3.4.0.
+bcr_project(
+    name = "tomlplusplus",
+    module = "tomlplusplus",
+    version = "3.4.0",
+    toolchains = [HERMETIC_LLVM],
+    environments = [LOCAL, RBE, MINIMG],
+    build = build_spec(targets = ["@tomlplusplus"], flags = ["-c", "opt"]),
+    test = test_spec(targets = ["@tomlplusplus//..."], flags = ["-c", "opt"]),
+)

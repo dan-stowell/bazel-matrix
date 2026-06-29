@@ -1,0 +1,17 @@
+load("//builds:defs.bzl", "bcr_project", "build_spec", "test_spec")
+load("//builds:environments.bzl", "LOCAL", "MINIMG", "RBE")
+load("//builds:overlays.bzl", "HERMETIC_LLVM")
+
+# TinyXML-2 — small, efficient C++ XML parser (leethomason/tinyxml2). A "BCR
+# module" project: the runner bazel_dep()s tinyxml2 from the Bazel Central
+# Registry and runs its own @tinyxml2 targets (the BCR presubmit's build/test
+# targets, incl. the xmltest suite). Fully-hermetic LLVM toolchain. BCR 11.0.0.
+bcr_project(
+    name = "tinyxml2",
+    module = "tinyxml2",
+    version = "11.0.0",
+    toolchains = [HERMETIC_LLVM],
+    environments = [LOCAL, RBE, MINIMG],
+    build = build_spec(targets = ["@tinyxml2"], flags = ["-c", "opt"]),
+    test = test_spec(targets = ["@tinyxml2//:xmltest"], flags = ["-c", "opt"]),
+)
