@@ -1,0 +1,16 @@
+load("//builds:defs.bzl", "bcr_project", "test_spec")
+load("//builds:environments.bzl", "CIIMG", "LOCAL")
+
+# libheif — HEIF/AVIF image codec in C++ (strukturag/libheif).
+# A "BCR module" project: the runner bazel_dep()s the module from the Bazel
+# Central Registry and runs its own presubmit test target. Host tier: builds and
+# tests with the ambient toolchain on LOCAL and in the full CI image (CIIMG) — no
+# hermetic LLVM. (RBE/hermetic reached for only when needed.)
+bcr_project(
+    name = "libheif",
+    module = "libheif",
+    version = "1.21.2",
+
+    environments = [LOCAL, CIIMG],
+    test = test_spec(targets = ["@libheif//..."], flags = ["-c", "opt"]),
+)
