@@ -1,14 +1,13 @@
-load("//kiss:defs.bzl", "build_spec", "museum_project", "test_spec")
+load("//kiss:defs.bzl", "build_spec", "hermetic_llvm_project_modification", "test_spec")
 load("//kiss:defs.bzl", "LOCAL", "RBE")
 
 # highway — Google's portable SIMD/vector library (C++).
 # Source pinned in //kiss:extension.bzl (@highway_archive, release
-# 1.4.0), built from the upstream source/module as-is. The hermetic LLVM
-# modification lives in //projects/highway/hermetic_llvm. The library loads
+# 1.4.0), built with the fully-hermetic LLVM toolchain. The library loads
 # rules_cc, but its test suite depends on googletest (cc_* unloaded), so it runs
 # on the Bazel 8.7 inner like the other googletest-consuming C++ projects.
 #
-museum_project(
+hermetic_llvm_project_modification(
     name = "highway",
     source_archive = "@highway_archive//file",
     strip_prefix = "highway-1.4.0",
