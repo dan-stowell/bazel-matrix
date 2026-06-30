@@ -114,10 +114,10 @@ Legend: `✅` = KISS target exists and the latest local build sweep passed where
 | `lexy` | 💤 | ✅ | ✅ |
 | `libavif` | ✅ | ✅ | ❌ |
 | `libcreate` | ✅ | ✅ | ✅ |
-| `libde265` | ✅ | ✅ | 💤 |
-| `libdwarf` | ✅ | ✅ | 💤 |
-| `libevent` | ✅ | ✅ | 💤 |
-| `libfastjson` | ✅ | ✅ | 💤 |
+| `libde265` | ✅ | ✅ | ❌ |
+| `libdwarf` | ✅ | ✅ | ✅ |
+| `libevent` | ✅ | ✅ | ❌ |
+| `libfastjson` | ✅ | ✅ | ✅ |
 | `libgd` | ✅ | ✅ | 💤 |
 | `libgit2` | ✅ | ✅ | 💤 |
 | `libheif` | ✅ | ✅ | 💤 |
