@@ -128,10 +128,10 @@ Legend: `✅` = KISS target exists and the latest local build sweep passed where
 | `marisa-trie` | ✅ | ✅ | ✅ |
 | `nsync` | ✅ | ✅ | ✅ |
 | `ogg` | ✅ | ✅ | ✅ |
-| `onetbb` | ✅ | ✅ | 💤 |
-| `opencc` | ✅ | ✅ | 💤 |
-| `opencl-sdk` | ✅ | ✅ | 💤 |
-| `openexr` | ✅ | ✅ | 💤 |
+| `onetbb` | ✅ | ✅ | ✅ |
+| `opencc` | ✅ | ✅ | ✅ |
+| `opencl-sdk` | ✅ | ✅ | ❌ |
+| `openexr` | ✅ | ✅ | ✅ |
 | `openssl` | ✅ | ✅ | 💤 |
 | `opentelemetry_cpp` | ✅ | ✅ | 💤 |
 | `ortools` | ✅ | ✅ | 💤 |
