@@ -50,7 +50,13 @@ museum_project(
     # are backward-compatible and only the overlay introduces them.
     build = build_spec(
         targets = ["//src:bazel-bin"],
-        flags = ["--check_direct_dependencies=off"],
+        flags = [
+            "--check_direct_dependencies=off",
+            "--java_language_version=21",
+            "--tool_java_language_version=21",
+            "--java_runtime_version=remotejdk_21",
+            "--tool_java_runtime_version=remotejdk_21",
+        ],
     ),
     # Test parity is the C++ client unit tests (//src/test/cpp/...): pure
     # gtest+abseil unit tests that exercise Bazel's own C++ (startup options, rc

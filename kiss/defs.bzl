@@ -40,7 +40,11 @@ def overlay(name, appends = [], writes = [], patches = [], build_flags = [], rem
 
 HERMETIC_LLVM = overlay(name = "hermetic_llvm")
 CC_NODETECT = overlay(name = "cc_nodetect")
-HERMETIC_ZIP = overlay(name = "hermetic_zip")
+HERMETIC_ZIP = overlay(
+    name = "hermetic_zip",
+    writes = [("//kiss:zip.py", ".kiss-tools/zip")],
+    build_flags = ["--strategy=Genrule=local"],
+)
 RULES_RUST_SYSROOT_FIX = overlay(name = "rules_rust_sysroot_fix")
 RULES_CC_DEP = overlay(name = "rules_cc_dep")
 PLATFORMS_DEP = overlay(name = "platforms_dep")
@@ -80,8 +84,16 @@ def _extract_source_impl(ctx):
     args.add(ctx.file.archive)
     args.add(out.path)
     args.add(ctx.attr.strip_prefix)
+    for src, dest in ctx.attr.appends.items():
+        args.add("--append")
+        args.add(_single_file(src[DefaultInfo].files, "appends"))
+        args.add(dest)
+    for src, dest in ctx.attr.writes.items():
+        args.add("--write")
+        args.add(_single_file(src[DefaultInfo].files, "writes"))
+        args.add(dest)
     ctx.actions.run_shell(
-        inputs = [ctx.file.archive],
+        inputs = [ctx.file.archive] + ctx.files.appends + ctx.files.writes,
         outputs = [out],
         arguments = [args],
         command = """
@@ -89,12 +101,34 @@ set -euo pipefail
 archive="$1"
 out="$2"
 strip_prefix="$3"
+shift 3
 mkdir -p "$out"
 if [[ -n "$strip_prefix" ]]; then
-  tar -xzf "$archive" -C "$out" --strip-components=1 "$strip_prefix"
+  strip_components=$(awk -F/ '{print NF}' <<< "$strip_prefix")
+  tar -xzf "$archive" -C "$out" --strip-components="$strip_components" "$strip_prefix"
 else
   tar -xzf "$archive" -C "$out"
 fi
+while (($#)); do
+  op="$1"
+  src="$2"
+  dest="$3"
+  shift 3
+  mkdir -p "$(dirname "$out/$dest")"
+  case "$op" in
+    --append)
+      cat "$src" >> "$out/$dest"
+      ;;
+    --write)
+      cp "$src" "$out/$dest"
+      chmod +x "$out/$dest"
+      ;;
+    *)
+      echo "unknown overlay op: $op" >&2
+      exit 2
+      ;;
+  esac
+done
 """,
     )
     return [DefaultInfo(files = depset([out]))]
@@ -102,8 +136,10 @@ fi
 extract_source = rule(
     implementation = _extract_source_impl,
     attrs = {
+        "appends": attr.label_keyed_string_dict(allow_files = True),
         "archive": attr.label(allow_single_file = True, mandatory = True),
         "strip_prefix": attr.string(),
+        "writes": attr.label_keyed_string_dict(allow_files = True),
     },
 )
 
@@ -120,10 +156,12 @@ def _kiss_build_impl(ctx):
     args = ctx.actions.args()
     args.add("--mode=build")
     args.add("--source", source.path)
+    if ctx.attr.source_subdir:
+        args.add("--source_subdir", ctx.attr.source_subdir)
     args.add("--bazel", ctx.file.bazel.path)
     args.add("--bundle", out.path)
-    args.add_all(ctx.attr.flags, before_each = "--flag")
-    args.add_all(ctx.attr.targets, before_each = "--target")
+    args.add_all(ctx.attr.flags, format_each = "--flag=%s")
+    args.add_all(ctx.attr.targets, format_each = "--target=%s")
 
     ctx.actions.run(
         executable = ctx.executable._runner,
@@ -141,6 +179,7 @@ _kiss_build = rule(
         "bazel": attr.label(allow_single_file = True, mandatory = True),
         "flags": attr.string_list(),
         "source": attr.label(mandatory = True),
+        "source_subdir": attr.string(),
         "targets": attr.string_list(mandatory = True),
         "_runner": attr.label(
             default = Label("//kiss:kiss_runner"),
@@ -150,17 +189,18 @@ _kiss_build = rule(
     },
 )
 
-def kiss_build(name, source, bazel, targets, flags = [], visibility = None):
+def kiss_build(name, source, bazel, targets, flags = [], source_subdir = "", visibility = None):
     _kiss_build(
         name = name,
         source = source,
+        source_subdir = source_subdir,
         bazel = bazel,
         targets = targets,
         flags = flags,
         visibility = visibility,
     )
 
-def kiss_test(name, source, targets, bazel = None, bazel_data = None, bazel_arg = None, flags = [], visibility = None):
+def kiss_test(name, source, targets, bazel = None, bazel_data = None, bazel_arg = None, flags = [], source_subdir = "", visibility = None):
     if bazel_data == None:
         bazel_data = [bazel]
     if bazel_arg == None:
@@ -173,7 +213,9 @@ def kiss_test(name, source, targets, bazel = None, bazel_data = None, bazel_arg 
         args = [
             "--mode=test",
             "--source=$(rlocationpath %s)" % source,
-        ] + bazel_arg + [
+        ] + ([
+            "--source_subdir=%s" % source_subdir,
+        ] if source_subdir else []) + bazel_arg + [
             "--flag=%s" % flag
             for flag in flags
         ] + [
@@ -189,20 +231,38 @@ def kiss_test(name, source, targets, bazel = None, bazel_data = None, bazel_arg 
         visibility = visibility,
     )
 
-def _emit_kiss_targets(source_archive, strip_prefix, build, test, bazel_version, visibility):
+def _overlay_files(toolchains, field):
+    result = {}
+    for toolchain in toolchains:
+        for label, dest in getattr(toolchain, field):
+            result[Label(label)] = dest
+    return result
+
+def _overlay_build_flags(toolchains):
+    result = []
+    for toolchain in toolchains:
+        result.extend(toolchain.build_flags)
+    return result
+
+def _emit_kiss_targets(source_archive, strip_prefix, source_subdir, toolchains, build, test, bazel_version, visibility):
     extract_source(
         name = "kiss_source",
         archive = source_archive,
         strip_prefix = strip_prefix,
+        appends = _overlay_files(toolchains, "appends"),
+        writes = _overlay_files(toolchains, "writes"),
     )
 
     bazel = inner_bazel(bazel_version)
+    build_flags = _overlay_build_flags(toolchains)
     if build:
         kiss_build(
             name = "kiss_build",
             source = ":kiss_source",
             bazel = bazel,
             targets = build.targets,
+            flags = build_flags + build.flags,
+            source_subdir = source_subdir,
             visibility = visibility,
         )
     if test:
@@ -212,6 +272,8 @@ def _emit_kiss_targets(source_archive, strip_prefix, build, test, bazel_version,
             targets = test.targets,
             bazel_data = inner_bazel_data(bazel_version),
             bazel_arg = inner_bazel_arg(bazel_version),
+            flags = build_flags + test.flags,
+            source_subdir = source_subdir,
             visibility = visibility,
         )
 
@@ -222,24 +284,26 @@ def museum_project(
         build = None,
         test = None,
         strip_prefix = "",
+        source_subdir = "",
         toolchains = [],
         bazel_version = DEFAULT_INNER_BAZEL_VERSION,
         clients = None,
         visibility = ["//visibility:public"]):
     if clients:
         fail("KISS-only museum_project does not support clients=; use bazel_version=")
-    _emit_kiss_targets(source_archive, strip_prefix, build, test, bazel_version, visibility)
+    _emit_kiss_targets(source_archive, strip_prefix, source_subdir, toolchains, build, test, bazel_version, visibility)
 
 def project_test(
         name,
         source_archive,
         test,
         strip_prefix = "",
+        source_subdir = "",
         toolchains = [],
         bazel_version = DEFAULT_INNER_BAZEL_VERSION,
         clients = None,
         visibility = ["//visibility:public"]):
-    _emit_kiss_targets(source_archive, strip_prefix, None, test, bazel_version, visibility)
+    _emit_kiss_targets(source_archive, strip_prefix, source_subdir, toolchains, None, test, bazel_version, visibility)
 
 def bcr_project(
         name,

@@ -54,12 +54,12 @@ Legend: `✅` = KISS target exists and the latest local build sweep passed where
 | `aravis` | 💤 | 💤 |
 | `avro-cpp` | 💤 | 💤 |
 | `basis_universal` | 💤 | 💤 |
-| `bazel` | ❌ | ✅ |
+| `bazel` | ✅ | ✅ |
 | `behaviortree_cpp` | 💤 | 💤 |
 | `benchmark` | ✅ | ✅ |
 | `boringssl` | ✅ | ✅ |
 | `briansmith_ring` | 💤 | 💤 |
-| `brotli` | ❌ | 💤 |
+| `brotli` | ✅ | 💤 |
 | `brotli_go` | 💤 | ✅ |
 | `buildtools` | ✅ | ✅ |
 | `c-blosc2` | 💤 | 💤 |
@@ -79,7 +79,7 @@ Legend: `✅` = KISS target exists and the latest local build sweep passed where
 | `cxx` | ✅ | ✅ |
 | `cxxurl` | 💤 | 💤 |
 | `directxmath` | 💤 | 💤 |
-| `doctest` | ❌ | 💤 |
+| `doctest` | ✅ | 💤 |
 | `double_conversion` | ✅ | ✅ |
 | `effcee` | 💤 | 💤 |
 | `exprtk` | 💤 | 💤 |
@@ -102,7 +102,7 @@ Legend: `✅` = KISS target exists and the latest local build sweep passed where
 | `hfsm2` | 💤 | 💤 |
 | `highs` | ✅ | ✅ |
 | `highway` | ✅ | ✅ |
-| `iceoryx2` | ❌ | ✅ |
+| `iceoryx2` | ✅ | ✅ |
 | `icu` | 💤 | 💤 |
 | `iperf` | 💤 | 💤 |
 | `iverilog` | 💤 | 💤 |
@@ -124,7 +124,7 @@ Legend: `✅` = KISS target exists and the latest local build sweep passed where
 | `libpcap` | 💤 | 💤 |
 | `libwebsockets` | 💤 | 💤 |
 | `llvm-project` | 💤 | 💤 |
-| `magic_enum` | ❌ | ✅ |
+| `magic_enum` | ✅ | ✅ |
 | `marisa-trie` | 💤 | 💤 |
 | `nsync` | ✅ | ✅ |
 | `ogg` | 💤 | 💤 |
@@ -144,7 +144,7 @@ Legend: `✅` = KISS target exists and the latest local build sweep passed where
 | `rocksdb` | 💤 | 💤 |
 | `rsyslog` | 💤 | 💤 |
 | `rules_multirun` | 💤 | 💤 |
-| `s2geometry` | ❌ | ✅ |
+| `s2geometry` | ✅ | ✅ |
 | `sdl2` | 💤 | 💤 |
 | `sdl2_mixer` | 💤 | 💤 |
 | `simdutf` | 💤 | 💤 |

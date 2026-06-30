@@ -123,6 +123,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("--mode", choices = ["build", "test"], required=True)
     parser.add_argument("--source", required=True)
+    parser.add_argument("--source_subdir", default="")
     parser.add_argument("--bazel", required=True)
     parser.add_argument("--bundle", default="")
     parser.add_argument("--flag", action="append", default=[])
@@ -137,11 +138,15 @@ def main(argv=None):
         source = os.path.abspath(args.source)
         bazel = os.path.abspath(args.bazel)
 
+    if args.source_subdir:
+        source = os.path.abspath(os.path.join(source, args.source_subdir))
+
     print("kiss: source =", source, file=sys.stderr)
     print("kiss: bazel  =", bazel, file=sys.stderr)
 
     env = os.environ.copy()
     env["PATH"] = os.pathsep.join(_dedupe([
+        os.path.join(source, ".kiss-tools"),
         env.get("PATH", ""),
         "/usr/local/bin",
         "/usr/bin",
@@ -154,7 +159,18 @@ def main(argv=None):
         startup_flags.append("--output_user_root=" + output_user_root)
 
     bep = os.path.join(os.environ.get("TEST_TMPDIR", os.getcwd()), "kiss.bep.json")
-    command_flags = list(args.flag)
+    command_flags = [
+        "--color=no",
+        "--curses=no",
+        "--show_progress",
+        "--show_progress_rate_limit=0.0",
+        "--progress_report_interval=10",
+    ] + list(args.flag)
+    if os.path.isdir(os.path.join(source, ".kiss-tools")):
+        command_flags = [
+            "--action_env=PATH=" + env["PATH"],
+            "--host_action_env=PATH=" + env["PATH"],
+        ] + command_flags
     if args.mode == "test":
         command_flags = [
             "--test_output=errors",
@@ -166,6 +182,7 @@ def main(argv=None):
     cmd = [
         bazel,
         "--batch",
+        "--ignore_all_rc_files",
         "--nohome_rc",
         "--nosystem_rc",
     ] + startup_flags + [

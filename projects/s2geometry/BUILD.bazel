@@ -2,6 +2,19 @@ load("//kiss:defs.bzl", "build_spec", "museum_project", "test_spec")
 load("//kiss:defs.bzl", "LOCAL", "MINIMG", "RBE")
 load("//kiss:defs.bzl", "HERMETIC_LLVM")
 
+S2_TEST_TARGETS = [
+    "//:s1angle_test",
+    "//:s1chord_angle_test",
+    "//:s1interval_test",
+    "//:r1interval_test",
+    "//:r2rect_test",
+    "//:s2cell_id_test",
+    "//:s2coords_test",
+    "//:s2latlng_test",
+    "//:s2point_test",
+    "//:s2cap_test",
+]
+
 # s2geometry — Google's S2, a C++ library for spherical geometry (cells, regions,
 # indexing on the sphere; the math behind geographic systems). Source pinned in
 # //kiss:extension.bzl (@s2geometry_archive, a commit archive), built with
@@ -19,25 +32,11 @@ museum_project(
     strip_prefix = "s2geometry-3f5bd2d93feda62a5d6fd0c3d7992f427968a66b/src",
     toolchains = [HERMETIC_LLVM],
     environments = [LOCAL, RBE, MINIMG],
-    build = build_spec(targets = ["//:s2"], flags = ["-c", "opt"]),
+    build = build_spec(targets = S2_TEST_TARGETS, flags = ["-c", "opt"]),
     # A core of deterministic primitive unit tests — the angle/interval scalar
     # types, S2 cell-id addressing, lat/lng + projection coords, the planar
     # interval/rect helpers, and spherical caps. The full src/ suite (115 tests)
     # includes randomized/heavy index and builder tests; this subset keeps the
     # goal fast and deterministic on local, the container, and RBE.
-    test = test_spec(
-        targets = [
-            "//:s1angle_test",
-            "//:s1chord_angle_test",
-            "//:s1interval_test",
-            "//:r1interval_test",
-            "//:r2rect_test",
-            "//:s2cell_id_test",
-            "//:s2coords_test",
-            "//:s2latlng_test",
-            "//:s2point_test",
-            "//:s2cap_test",
-        ],
-        flags = ["-c", "opt"],
-    ),
+    test = test_spec(targets = S2_TEST_TARGETS, flags = ["-c", "opt"]),
 )

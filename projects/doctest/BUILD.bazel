@@ -10,9 +10,9 @@ load("//kiss:defs.bzl", "HERMETIC_LLVM", "PLATFORMS_DEP")
 #
 # doctest's only Bazel test lives in its examples/ tree, which is a *nested*
 # standalone module (its own MODULE.bazel + WORKSPACE.bazel that pull doctest
-# back in via local_path_override="..", like magic_enum's test/). So we build
-# from examples/ as the root module (strip_prefix), and the parent doctest
-# module is consumed as @doctest. examples/ already declares rules_cc and
+# back in via local_path_override="..", like magic_enum's test/). So we extract
+# the full archive root and run inner Bazel from examples/, leaving the parent
+# doctest module available as @doctest. examples/ already declares rules_cc and
 # bazel_skylib; it lacks platforms, so PLATFORMS_DEP supplies @platforms for the
 # injected RBE platform package.
 #
@@ -21,7 +21,8 @@ load("//kiss:defs.bzl", "HERMETIC_LLVM", "PLATFORMS_DEP")
 museum_project(
     name = "doctest",
     source_archive = "@doctest_archive//file",
-    strip_prefix = "doctest-2.5.2/examples",
+    strip_prefix = "doctest-2.5.2",
+    source_subdir = "examples",
     toolchains = [HERMETIC_LLVM, PLATFORMS_DEP],
     environments = [LOCAL, RBE, MINIMG],
     # Build the doctest library itself (consumed as @doctest from the examples
