@@ -140,10 +140,10 @@ Legend: `✅` = KISS target exists and the latest local build sweep passed where
 | `protobuf` | ✅ | ✅ | ✅ |
 | `quill` | ✅ | 🔍 | ✅ |
 | `re2` | ✅ | ✅ | ✅ |
-| `reflexxes-rmltype2` | ✅ | ✅ | 💤 |
-| `rocksdb` | 💤 | ✅ | 💤 |
-| `rsyslog` | ✅ | ✅ | 💤 |
-| `rules_multirun` | ✅ | ✅ | 💤 |
+| `reflexxes-rmltype2` | ✅ | ✅ | ✅ |
+| `rocksdb` | 💤 | ✅ | ✅ |
+| `rsyslog` | ✅ | ✅ | ❌ |
+| `rules_multirun` | ✅ | ✅ | ✅ |
 | `s2geometry` | ✅ | ✅ | 💤 |
 | `sdl2` | ✅ | ✅ | 💤 |
 | `sdl2_mixer` | ✅ | ✅ | 💤 |
