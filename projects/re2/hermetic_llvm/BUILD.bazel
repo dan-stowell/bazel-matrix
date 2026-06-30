@@ -1,5 +1,11 @@
-load("//kiss:defs.bzl", "build_spec", "museum_project", "test_spec")
+load("//kiss:defs.bzl", "build_spec", "project_modification", "test_spec")
 load("//kiss:defs.bzl", "LOCAL", "RBE")
+load("//kiss:defs.bzl", "overlay")
+
+_HERMETIC_LLVM = overlay(
+    name = "hermetic_llvm",
+    appends = [("//kiss:hermetic_llvm.MODULE.bazel", "MODULE.bazel")],
+)
 
 _RE2_TEST = test_spec(
     targets = [
@@ -12,10 +18,11 @@ _RE2_TEST = test_spec(
     flags = ["-c", "opt"],
 )
 
-museum_project(
-    name = "re2",
+project_modification(
+    name = "re2_hermetic_llvm",
     source_archive = "@re2_archive//file",
     strip_prefix = "re2-2025-11-05",
+    toolchains = [_HERMETIC_LLVM],
     bazel_version = "8.7.0",
     environments = [LOCAL, RBE],
     build = build_spec(targets = ["//:re2"], flags = ["-c", "opt"]),

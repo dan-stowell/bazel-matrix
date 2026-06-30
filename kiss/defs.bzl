@@ -432,12 +432,40 @@ def museum_project(
         strip_prefix = "",
         source_subdir = "",
         toolchains = [],
+        rbe_toolchains = None,
         bazel_version = DEFAULT_INNER_BAZEL_VERSION,
         clients = None,
         visibility = ["//visibility:public"]):
     if clients:
         fail("KISS-only museum_project does not support clients=; use bazel_version=")
-    _emit_kiss_targets(source_archive, strip_prefix, source_subdir, toolchains, None, build, test, bazel_version, visibility)
+    _emit_kiss_targets(source_archive, strip_prefix, source_subdir, toolchains, rbe_toolchains, build, test, bazel_version, visibility)
+
+def project_modification(
+        name,
+        source_archive,
+        environments,
+        build = None,
+        test = None,
+        strip_prefix = "",
+        source_subdir = "",
+        toolchains = [],
+        rbe_toolchains = None,
+        bazel_version = DEFAULT_INNER_BAZEL_VERSION,
+        clients = None,
+        visibility = ["//visibility:public"]):
+    if clients:
+        fail("KISS-only project_modification does not support clients=; use bazel_version=")
+    _emit_kiss_targets(
+        source_archive,
+        strip_prefix,
+        source_subdir,
+        toolchains,
+        toolchains if rbe_toolchains == None else rbe_toolchains,
+        build,
+        test,
+        bazel_version,
+        visibility,
+    )
 
 def project_test(
         name,
