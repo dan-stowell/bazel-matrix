@@ -331,7 +331,7 @@ def _overlay_build_flags(toolchains):
     return result
 
 def _rbe_toolchains(toolchains, rbe_toolchains):
-    return (rbe_toolchains if rbe_toolchains != None else toolchains) + [_RBE_HERMETIC_LLVM]
+    return rbe_toolchains if rbe_toolchains != None else []
 
 def _emit_kiss_targets(source_archive, strip_prefix, source_subdir, toolchains, rbe_toolchains, build, test, bazel_version, visibility):
     extract_source(
@@ -437,7 +437,7 @@ def museum_project(
         visibility = ["//visibility:public"]):
     if clients:
         fail("KISS-only museum_project does not support clients=; use bazel_version=")
-    _emit_kiss_targets(source_archive, strip_prefix, source_subdir, toolchains, toolchains, build, test, bazel_version, visibility)
+    _emit_kiss_targets(source_archive, strip_prefix, source_subdir, toolchains, None, build, test, bazel_version, visibility)
 
 def project_test(
         name,
@@ -450,7 +450,7 @@ def project_test(
         bazel_version = DEFAULT_INNER_BAZEL_VERSION,
         clients = None,
         visibility = ["//visibility:public"]):
-    _emit_kiss_targets(source_archive, strip_prefix, source_subdir, toolchains, rbe_toolchains or toolchains, None, test, bazel_version, visibility)
+    _emit_kiss_targets(source_archive, strip_prefix, source_subdir, toolchains, rbe_toolchains, None, test, bazel_version, visibility)
 
 def bcr_project(
         name,
