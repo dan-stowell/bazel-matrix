@@ -110,10 +110,10 @@ Legend: `✅` = KISS target exists and the latest local build sweep passed where
 | `jsoncpp` | ✅ | ✅ | ✅ |
 | `jsonnet` | ✅ | ✅ | ✅ |
 | `lcm` | ✅ | ✅ | ✅ |
-| `lexbor` | ✅ | ✅ | 💤 |
-| `lexy` | 💤 | ✅ | 💤 |
-| `libavif` | ✅ | ✅ | 💤 |
-| `libcreate` | ✅ | ✅ | 💤 |
+| `lexbor` | ✅ | ✅ | ✅ |
+| `lexy` | 💤 | ✅ | ✅ |
+| `libavif` | ✅ | ✅ | ❌ |
+| `libcreate` | ✅ | ✅ | ✅ |
 | `libde265` | ✅ | ✅ | 💤 |
 | `libdwarf` | ✅ | ✅ | 💤 |
 | `libevent` | ✅ | ✅ | 💤 |
