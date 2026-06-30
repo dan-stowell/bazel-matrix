@@ -45,7 +45,17 @@ kiss/run_builds.sh --no-clean //projects/re2:kiss_build //projects/snappy:kiss_b
 
 ## Project Status
 
-Legend: `✅` = KISS target exists and the latest relevant sweep passed where applicable; `❌` = latest relevant sweep failed; `🔍` = inspected, but no real upstream Bazel test target exists; `💤` = no KISS target is expected for this project/command; `📦` = as-is source/module; `☁️` = BuildBuddy toolchain modification; `🧰` = hermetic-llvm modification. RBE cells combine variant/result pairs, for example `📦 ❌ / 🧰 ✅`.
+Legend:
+
+- `✅` = KISS target exists and the latest relevant sweep passed where applicable
+- `❌` = latest relevant sweep failed
+- `🔍` = inspected, but no real upstream Bazel test target exists
+- `💤` = no KISS target is expected for this project/command
+- `📦` = as-is source/module
+- `☁️` = BuildBuddy toolchain modification
+- `🧰` = hermetic-llvm modification
+
+RBE cells combine variant/result pairs, for example `📦 ❌ / 🧰 ✅`.
 
 Detailed RBE build failure buckets are tracked in [kiss/rbe_build_status.md](kiss/rbe_build_status.md).
 
