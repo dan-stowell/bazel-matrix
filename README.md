@@ -144,10 +144,10 @@ Legend: `✅` = KISS target exists and the latest local build sweep passed where
 | `rocksdb` | 💤 | ✅ | ✅ |
 | `rsyslog` | ✅ | ✅ | ❌ |
 | `rules_multirun` | ✅ | ✅ | ✅ |
-| `s2geometry` | ✅ | ✅ | 💤 |
-| `sdl2` | ✅ | ✅ | 💤 |
-| `sdl2_mixer` | ✅ | ✅ | 💤 |
-| `simdutf` | ✅ | ✅ | 💤 |
+| `s2geometry` | ✅ | ✅ | ✅ |
+| `sdl2` | ✅ | ✅ | ❌ |
+| `sdl2_mixer` | ✅ | ✅ | ❌ |
+| `simdutf` | ✅ | ✅ | ✅ |
 | `snappy` | ✅ | ✅ | 💤 |
 | `squashfs-tools` | ✅ | ✅ | 💤 |
 | `systemc` | ✅ | ✅ | 💤 |
