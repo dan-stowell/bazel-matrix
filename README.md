@@ -106,10 +106,10 @@ Legend: `✅` = KISS target exists and the latest local build sweep passed where
 | `icu` | ✅ | ✅ | ✅ |
 | `iperf` | ✅ | ✅ | ❌ |
 | `iverilog` | ✅ | ✅ | ❌ |
-| `json` | ✅ | 🔍 | 💤 |
-| `jsoncpp` | ✅ | ✅ | 💤 |
-| `jsonnet` | ✅ | ✅ | 💤 |
-| `lcm` | ✅ | ✅ | 💤 |
+| `json` | ✅ | 🔍 | ✅ |
+| `jsoncpp` | ✅ | ✅ | ✅ |
+| `jsonnet` | ✅ | ✅ | ✅ |
+| `lcm` | ✅ | ✅ | ✅ |
 | `lexbor` | ✅ | ✅ | 💤 |
 | `lexy` | 💤 | ✅ | 💤 |
 | `libavif` | ✅ | ✅ | 💤 |
