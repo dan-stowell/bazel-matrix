@@ -160,6 +160,6 @@ Legend: `✅` = KISS target exists and the latest local build sweep passed where
 | `verilator` | ✅ | ✅ | ❌ |
 | `xkbcommon` | ✅ | ✅ | ✅ |
 | `z3` | ✅ | 🔍 | ❌ |
-| `zlib` | ✅ | 🔍 | 💤 |
-| `zstd` | ✅ | ✅ | 💤 |
-| `zziplib` | ✅ | ✅ | 💤 |
+| `zlib` | ✅ | 🔍 | ✅ |
+| `zstd` | ✅ | ✅ | ✅ |
+| `zziplib` | ✅ | ✅ | ❌ |
