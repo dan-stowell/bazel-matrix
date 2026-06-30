@@ -102,10 +102,10 @@ Legend: `✅` = KISS target exists and the latest local build sweep passed where
 | `hfsm2` | ✅ | ✅ | ✅ |
 | `highs` | ✅ | ✅ | ✅ |
 | `highway` | ✅ | ✅ | ✅ |
-| `iceoryx2` | ✅ | ✅ | 💤 |
-| `icu` | ✅ | ✅ | 💤 |
-| `iperf` | ✅ | ✅ | 💤 |
-| `iverilog` | ✅ | ✅ | 💤 |
+| `iceoryx2` | ✅ | ✅ | ❌ |
+| `icu` | ✅ | ✅ | ✅ |
+| `iperf` | ✅ | ✅ | ❌ |
+| `iverilog` | ✅ | ✅ | ❌ |
 | `json` | ✅ | 🔍 | 💤 |
 | `jsoncpp` | ✅ | ✅ | 💤 |
 | `jsonnet` | ✅ | ✅ | 💤 |
