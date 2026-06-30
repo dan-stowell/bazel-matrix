@@ -376,6 +376,8 @@ def bcr_project(
         visibility = ["//visibility:public"]):
     if clients:
         fail("KISS-only bcr_project does not support clients=; use bazel_version=")
+    if build == None and test != None:
+        build = build_spec(targets = test.targets, flags = test.flags)
     bcr_source(
         name = "kiss_source",
         module = module,

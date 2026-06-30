@@ -1,4 +1,4 @@
-load("//kiss:defs.bzl", "museum_project", "test_spec")
+load("//kiss:defs.bzl", "build_spec", "museum_project", "test_spec")
 load("//kiss:defs.bzl", "LOCAL", "MINIMG")
 load("//kiss:defs.bzl", "HERMETIC_LLVM", "overlay")
 
@@ -26,16 +26,21 @@ load("//kiss:defs.bzl", "HERMETIC_LLVM", "overlay")
 #   bazel run //projects/brotli_go:test_local_linux_amd64   # 4/4 go tests
 BROTLI_GO_PARENT = overlay(
     name = "brotli_go_parent",
-    writes = [("//projects/brotli_go:parent.MODULE.bazel", "../MODULE.bazel")],
+    writes = [("//projects/brotli_go:parent.MODULE.bazel", "MODULE.bazel")],
 )
 
 museum_project(
     name = "brotli_go",
     source_archive = "@brotli_archive//file",
-    strip_prefix = "brotli-1.2.0/go",
+    strip_prefix = "brotli-1.2.0",
+    source_subdir = "go",
     toolchains = [HERMETIC_LLVM, BROTLI_GO_PARENT],
     bazel_version = "8.7.0",
     environments = [LOCAL, MINIMG],
+    build = build_spec(
+        targets = ["//..."],
+        flags = ["-c", "opt", "--linkopt=-Wl,-z,notext"],
+    ),
     test = test_spec(
         targets = ["//..."],
         flags = ["-c", "opt", "--linkopt=-Wl,-z,notext"],
