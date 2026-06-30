@@ -118,10 +118,10 @@ Legend: `✅` = KISS target exists and the latest local build sweep passed where
 | `libdwarf` | ✅ | ✅ | ✅ |
 | `libevent` | ✅ | ✅ | ❌ |
 | `libfastjson` | ✅ | ✅ | ✅ |
-| `libgd` | ✅ | ✅ | 💤 |
-| `libgit2` | ✅ | ✅ | 💤 |
-| `libheif` | ✅ | ✅ | 💤 |
-| `libpcap` | ✅ | ✅ | 💤 |
+| `libgd` | ✅ | ✅ | ❌ |
+| `libgit2` | ✅ | ✅ | ✅ |
+| `libheif` | ✅ | ✅ | ❌ |
+| `libpcap` | ✅ | ✅ | ❌ |
 | `libwebsockets` | ✅ | ✅ | 💤 |
 | `llvm-project` | ✅ | ✅ | 💤 |
 | `magic_enum` | ✅ | ✅ | 💤 |
