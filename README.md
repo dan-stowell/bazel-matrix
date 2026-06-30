@@ -91,11 +91,11 @@ Legend: `✅` = KISS target exists and the latest local build sweep passed where
 | `fuzztest` | ✅ | ✅ | ✅ |
 | `fzf` | ✅ | ✅ | ❌ |
 | `gflags` | ✅ | 🔍 | ✅ |
-| `glm` | ✅ | ✅ | 💤 |
-| `glog` | ✅ | ✅ | 💤 |
-| `go_jsonnet` | ✅ | ✅ | 💤 |
-| `googletest` | ✅ | ✅ | 💤 |
-| `gperftools` | ✅ | ✅ | 💤 |
+| `glm` | ✅ | ✅ | ✅ |
+| `glog` | ✅ | ✅ | ✅ |
+| `go_jsonnet` | ✅ | ✅ | ✅ |
+| `googletest` | ✅ | ✅ | ✅ |
+| `gperftools` | ✅ | ✅ | ✅ |
 | `grpc` | ✅ | ✅ | 💤 |
 | `grpc_gateway` | ✅ | ✅ | 💤 |
 | `gsl-lite` | ✅ | ✅ | 💤 |
