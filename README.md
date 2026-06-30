@@ -54,7 +54,7 @@ Legend: `✅` = KISS target exists and the latest local build sweep passed where
 | `aravis` | ✅ | ✅ | ❌ |
 | `avro-cpp` | ✅ | ✅ | ❌ |
 | `basis_universal` | ✅ | ✅ | ✅ |
-| `bazel` | ✅ | ✅ | 💤 |
+| `bazel` | ✅ | ✅ | ✅ |
 | `behaviortree_cpp` | ✅ | ✅ | ❌ |
 | `benchmark` | ✅ | ✅ | ✅ |
 | `boringssl` | ✅ | ✅ | ❌ |
