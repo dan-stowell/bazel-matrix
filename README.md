@@ -1,4 +1,4 @@
-# 🏛️ bazel-museum
+# bazel-matrix (🌿-💻)
 
 ## Quick Start
 
@@ -27,26 +27,6 @@ Run upstream tests through BuildBuddy RBE when a project has a test target:
 
 ```sh
 bazel test --test_env=BUILDBUDDY_API_KEY //projects/re2:kiss_rbe_test
-```
-
-List all KISS build targets:
-
-```sh
-kiss/run_builds.sh --list
-```
-
-Run all KISS builds sequentially, with a clean outer Bazel output tree before
-each project:
-
-```sh
-kiss/run_builds.sh 2>&1 | tee kiss-builds.log
-```
-
-Useful variants:
-
-```sh
-BAZEL_BUILD_FLAGS="--verbose_failures" kiss/run_builds.sh 2>&1 | tee kiss-builds.log
-kiss/run_builds.sh --no-clean //projects/re2:kiss_build //projects/snappy:kiss_build
 ```
 
 ## Project Status
