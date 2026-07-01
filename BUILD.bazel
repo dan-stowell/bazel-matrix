@@ -290,10 +290,10 @@ HERMETIC_LLVM_TEST_PACKAGES = [package for package in TEST_PACKAGES if package.e
 
 SMOKE_AS_IS_PACKAGES = [
     "abseil_py/as_is",
+    "boringssl/as_is",
+    "fast_float/as_is",
     "glm/as_is",
-    "re2/as_is",
-    "simdutf/as_is",
-    "tinyxml2/as_is",
+    "tomlplusplus/as_is",
 ]
 
 REGULAR_AS_IS_BUILD_PACKAGES = [package for package in AS_IS_BUILD_PACKAGES if package.split("/")[0] not in LARGE_PROJECTS]
