@@ -1,16 +1,4 @@
-load("//kiss:defs.bzl", "bcr_project", "test_spec")
-load("//kiss:defs.bzl", "CIIMG", "LOCAL")
+load("//kiss:defs.bzl", "bcr_project_from_spec")
+load("//projects/libgd:project.bzl", "LIBGD_PROJECT")
 
-# libgd — the GD graphics/image C library (libgd/libgd).
-# A "BCR module" project: the runner bazel_dep()s the module from the Bazel
-# Central Registry and runs its own presubmit test target. Host tier: builds and
-# tests with the ambient toolchain on LOCAL and in the full CI image (CIIMG) — no
-# hermetic LLVM. (RBE/hermetic reached for only when needed.)
-bcr_project(
-    name = "libgd",
-    module = "libgd",
-    version = "2.3.3",
-
-    environments = [LOCAL, CIIMG],
-    test = test_spec(targets = ["@libgd//..."], flags = ["-c", "opt"]),
-)
+bcr_project_from_spec(project = LIBGD_PROJECT)

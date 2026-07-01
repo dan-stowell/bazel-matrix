@@ -1,0 +1,27 @@
+load("//kiss:defs.bzl", "HERMETIC_LLVM", "LOCAL", "MINIMG", "PLATFORMS_DEP", "RBE", "build_spec", "project_spec", "tarball_source")
+# gflags — Google's C++ command-line flags library. Source pinned in
+# //kiss:extension.bzl (@gflags_archive, release v2.3.0). Its root BUILD
+# builds the library through a gflags_library macro that loads cc_library from
+# rules_cc, so it runs on the Bazel 9 inner with the hermetic LLVM toolchain.
+# gflags' tests are CMake-only (test/ uses CMakeLists.txt), so there is no
+# upstream Bazel test target — this is a build-only project. Its
+# bazel/expanded_template/BUILD calls cc_binary *unloaded*, which Bazel 9 no
+# longer autoloads, so it runs on the Bazel 8.7 inner (recent enough for
+# hermetic-llvm, old enough to autoload the cc_* rules). PLATFORMS_DEP supplies
+# @platforms visibility for the injected RBE platform (gflags' MODULE declares no
+# direct platforms dep).
+#
+#   bazel run //projects/gflags:build_local_linux_amd64
+GFLAGS_PROJECT = project_spec(
+    name = "gflags",
+    source = tarball_source(
+        archive = "@gflags_archive//file",
+        strip_prefix = "gflags-2.3.0",
+    ),
+    toolchains = [HERMETIC_LLVM, PLATFORMS_DEP],
+    bazel_version = "8.7.0",
+    environments = [LOCAL, RBE, MINIMG],
+    # The canonical multithreaded gflags library (//:gflags); the sibling
+    # //:gflags_nothreads is the same sources built single-threaded.
+    build = build_spec(targets = ["//:gflags"], flags = ["-c", "opt"]),
+)

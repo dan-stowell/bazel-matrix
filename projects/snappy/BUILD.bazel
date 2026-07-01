@@ -1,18 +1,4 @@
-load("//kiss:defs.bzl", "build_spec", "matrix_project", "test_spec")
-load("//kiss:defs.bzl", "LOCAL", "RBE")
+load("//kiss:defs.bzl", "matrix_project")
+load("//projects/snappy:project.bzl", "SNAPPY_PROJECT")
 
-# snappy — Google's fast compression/decompression library (C++).
-# Source pinned in //kiss:extension.bzl (@snappy_archive, release 1.2.2),
-# built from the upstream source/module as-is. The hermetic LLVM modification
-# lives in //projects/snappy/hermetic_llvm.
-matrix_project(
-    name = "snappy",
-    source_archive = "@snappy_archive//file",
-    strip_prefix = "snappy-1.2.2",
-    bazel_version = "8.7.0",
-    environments = [LOCAL, RBE],
-    build = build_spec(targets = ["//:snappy"], flags = ["-c", "opt"]),
-    # snappy's correctness unit test (reads the bundled testdata corpus). The
-    # sibling snappy_benchmark target is a benchmark, not parity — left out.
-    test = test_spec(targets = ["//:snappy_unittest"], flags = ["-c", "opt"]),
-)
+matrix_project(project = SNAPPY_PROJECT)

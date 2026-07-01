@@ -1,15 +1,4 @@
-load("//kiss:defs.bzl", "bcr_project", "test_spec")
-load("//kiss:defs.bzl", "CIIMG", "LOCAL")
+load("//kiss:defs.bzl", "bcr_project_from_spec")
+load("//projects/trlc:project.bzl", "TRLC_PROJECT")
 
-# TRLC — Treat Requirements Like Code, a requirements DSL (bmw-software-engineering/trlc).
-# A "BCR module" project: the runner bazel_dep()s the module from the Bazel
-# Central Registry and runs its own presubmit test target. Host tier on LOCAL +
-# the full CI image (CIIMG) with the ambient toolchain — no hermetic LLVM.
-bcr_project(
-    name = "trlc",
-    module = "trlc",
-    version = "2.0.5",
-    bazel_version = "8.7.0",
-    environments = [LOCAL, CIIMG],
-    test = test_spec(targets = ["@trlc//api-examples/..."], flags = ["-c", "opt"]),
-)
+bcr_project_from_spec(project = TRLC_PROJECT)

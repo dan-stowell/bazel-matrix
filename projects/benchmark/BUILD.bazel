@@ -1,24 +1,4 @@
-load("//kiss:defs.bzl", "build_spec", "matrix_project", "test_spec")
-load("//kiss:defs.bzl", "LOCAL", "RBE")
+load("//kiss:defs.bzl", "matrix_project")
+load("//projects/benchmark:project.bzl", "BENCHMARK_PROJECT")
 
-# google/benchmark — the C++ microbenchmark library.
-# Source pinned in //kiss:extension.bzl (@benchmark_archive, release
-# v1.9.5), built from the upstream source/module as-is. The hermetic LLVM
-# modification lives in //projects/benchmark/hermetic_llvm.
-matrix_project(
-    name = "benchmark",
-    source_archive = "@benchmark_archive//file",
-    strip_prefix = "benchmark-1.9.5",
-    bazel_version = "8.7.0",
-    environments = [LOCAL, RBE],
-    build = build_spec(targets = ["//:benchmark"], flags = ["-c", "opt"]),
-    # benchmark's own self-test suite (//test) — it exercises the library against
-    # googletest plus output-format assertions. locale_impermeability_test is
-    # excluded everywhere: it switches to the en_US.UTF-8 locale to prove output
-    # is locale-independent, but that locale isn't a Bazel-tracked input in the
-    # hermetic environment (only C.UTF-8 exists), so it can't construct it.
-    test = test_spec(
-        targets = ["//test/...", "-//test:locale_impermeability_test"],
-        flags = ["-c", "opt"],
-    ),
-)
+matrix_project(project = BENCHMARK_PROJECT)

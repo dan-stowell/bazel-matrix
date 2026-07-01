@@ -1,36 +1,4 @@
-load("//kiss:defs.bzl", "build_spec", "matrix_project", "test_spec")
-load("//kiss:defs.bzl", "LOCAL", "MINIMG", "RBE")
-load("//kiss:defs.bzl", "HERMETIC_LLVM", "PLATFORMS_DEP")
+load("//kiss:defs.bzl", "matrix_project")
+load("//projects/jsonnet:project.bzl", "JSONNET_PROJECT")
 
-# jsonnet — Google's data-templating language (the C++ implementation).
-# Source pinned in //kiss:extension.bzl (@jsonnet_archive, release
-# v0.22.0), built with the fully-hermetic LLVM toolchain. jsonnet's own BUILD
-# files load rules_cc, but its core unit tests pull in googletest (cc_*
-# unloaded), so it runs on the Bazel 8.7 inner. PLATFORMS_DEP is applied because
-# jsonnet's MODULE.bazel declares no `platforms` dep (needed by the injected RBE
-# platform package).
-#
-#   bazel run //projects/jsonnet:build_local_linux_amd64
-#   bazel run //projects/jsonnet:test_local_linux_amd64
-matrix_project(
-    name = "jsonnet",
-    source_archive = "@jsonnet_archive//file",
-    strip_prefix = "jsonnet-0.22.0",
-    toolchains = [HERMETIC_LLVM, PLATFORMS_DEP],
-    bazel_version = "8.7.0",
-    environments = [LOCAL, RBE, MINIMG],
-    # The jsonnet CLI (//cmd:jsonnet) — the headline artifact (interpreter built
-    # on libjsonnet).
-    build = build_spec(targets = ["//cmd:jsonnet"], flags = ["-c", "opt"]),
-    # jsonnet's core C++ unit tests (lexer/parser/libjsonnet). The shell-driven
-    # //test_suite golden tests need a shell harness + the built binary, so we
-    # scope to the hermetic core unit tests.
-    test = test_spec(
-        targets = [
-            "//core:lexer_test",
-            "//core:parser_test",
-            "//core:libjsonnet_test",
-        ],
-        flags = ["-c", "opt"],
-    ),
-)
+matrix_project(project = JSONNET_PROJECT)

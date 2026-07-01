@@ -1,21 +1,4 @@
-load("//kiss:defs.bzl", "build_spec", "hermetic_llvm_project_modification", "test_spec")
-load("//kiss:defs.bzl", "LOCAL", "RBE")
+load("//kiss:defs.bzl", "hermetic_llvm_project_modification")
+load("//projects/ftxui:project.bzl", "FTXUI_PROJECT")
 
-# FTXUI — a functional C++ terminal-UI library (screen / dom / component).
-# Source pinned in //kiss:extension.bzl (@ftxui_archive, release v7.0.0),
-# built with the fully-hermetic LLVM toolchain. FTXUI ships first-party Bazel
-# files, but its test target pulls in googletest (cc_* unloaded), so it runs on
-# the Bazel 8.7 inner like the other googletest-consuming C++ projects. (It
-# declares a direct `platforms` dep, so no PLATFORMS_DEP overlay is needed.)
-#
-hermetic_llvm_project_modification(
-    name = "ftxui",
-    source_archive = "@ftxui_archive//file",
-    strip_prefix = "FTXUI-7.0.0",
-    bazel_version = "8.7.0",
-    environments = [LOCAL, RBE],
-    build = build_spec(targets = ["//:ftxui"], flags = ["-c", "opt"]),
-    # FTXUI's monolithic self-test (//:tests) — the screen/dom/component unit
-    # tests, which render to in-memory buffers (no real TTY needed).
-    test = test_spec(targets = ["//:tests"], flags = ["-c", "opt"]),
-)
+hermetic_llvm_project_modification(project = FTXUI_PROJECT)

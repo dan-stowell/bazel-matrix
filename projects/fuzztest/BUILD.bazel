@@ -1,44 +1,4 @@
-load("//kiss:defs.bzl", "build_spec", "matrix_project", "test_spec")
-load("//kiss:defs.bzl", "LOCAL", "RBE")
+load("//kiss:defs.bzl", "matrix_project")
+load("//projects/fuzztest:project.bzl", "FUZZTEST_PROJECT")
 
-# fuzztest — Google's C++ testing/fuzzing framework (the FUZZ_TEST macro,
-# property-based "domains", and the Centipede engine). Source pinned in
-# //kiss:extension.bzl (@fuzztest_archive, a commit archive), built from the
-# upstream source/module as-is. The hermetic LLVM modification lives in
-# //projects/fuzztest/hermetic_llvm. First-party Bazel (MODULE.bazel + loaded cc_*
-# rules; it names its own repo @com_google_fuzztest, which resolves when fuzztest
-# is the root module). Its MODULE declares all deps (abseil, re2, googletest, ... +
-# platforms/skylib), so only the hermetic-LLVM overlay is needed — no dep overlay.
-# Pinned to the Bazel 8.7 inner: a transitive dep registers a rules_go version
-# whose toolchain code uses the native CcInfo symbol that Bazel 9 removed, so the
-# Bazel 9 inner fails toolchain resolution even for the C++ targets; the late
-# Bazel 8 inner keeps those legacy APIs and resolves cleanly.
-#
-matrix_project(
-    name = "fuzztest",
-    source_archive = "@fuzztest_archive//file",
-    strip_prefix = "fuzztest-1a18c86d947c25ff2b73562a90d41a2207e8cba9",
-    bazel_version = "8.7.0",
-    environments = [LOCAL, RBE],
-    build = build_spec(targets = ["//fuzztest:domain_core"], flags = ["-c", "opt"]),
-    # A deterministic core of the property-based "domain" library tests — the
-    # combinators and value/numeric/container/pointer/string domains. These build
-    # on //fuzztest:domain_core (abseil + googletest), deliberately avoiding the
-    # protobuf, flatbuffers, regexp/grammar (antlr4) domain tests, which pull the
-    # heavy codegen deps. Keeps the goal fast and hermetic on local, container, RBE.
-    test = test_spec(
-        targets = [
-            "//domain_tests:aggregate_combinators_test",
-            "//domain_tests:container_combinators_test",
-            "//domain_tests:container_test",
-            "//domain_tests:map_filter_combinator_test",
-            "//domain_tests:misc_domains_test",
-            "//domain_tests:numeric_domains_test",
-            "//domain_tests:pointer_domains_test",
-            "//domain_tests:recursive_domains_test",
-            "//domain_tests:specific_value_domains_test",
-            "//domain_tests:string_domains_test",
-        ],
-        flags = ["-c", "opt"],
-    ),
-)
+matrix_project(project = FUZZTEST_PROJECT)

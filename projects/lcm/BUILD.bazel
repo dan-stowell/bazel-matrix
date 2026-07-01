@@ -1,20 +1,4 @@
-load("//kiss:defs.bzl", "build_spec", "matrix_project", "test_spec")
-load("//kiss:defs.bzl", "LOCAL", "RBE")
+load("//kiss:defs.bzl", "matrix_project")
+load("//projects/lcm:project.bzl", "LCM_PROJECT")
 
-# LCM (Lightweight Communications and Marshalling) — a low-latency message-passing
-# and data-marshalling system widely used in robotics. Source pinned in
-# //kiss:extension.bzl (@lcm_archive, v1.5.2). First-party Bazel, run on
-# the 8.7 inner. The hermetic LLVM modification lives in //projects/lcm/hermetic_llvm.
-# We build the static C++ library
-# and run a C++ unit test. LCM's MODULE declares a direct platforms dep (no
-# PLATFORMS_DEP).
-#
-matrix_project(
-    name = "lcm",
-    source_archive = "@lcm_archive//file",
-    strip_prefix = "lcm-1.5.2",
-    bazel_version = "8.7.0",
-    environments = [LOCAL, RBE],
-    build = build_spec(targets = ["//lcm:lcm-static"], flags = ["-c", "opt"]),
-    test = test_spec(targets = ["//test/cpp:memq_test"], flags = ["-c", "opt"]),
-)
+matrix_project(project = LCM_PROJECT)

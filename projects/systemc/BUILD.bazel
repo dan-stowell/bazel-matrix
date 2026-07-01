@@ -1,16 +1,4 @@
-load("//kiss:defs.bzl", "bcr_project", "test_spec")
-load("//kiss:defs.bzl", "CIIMG", "LOCAL")
+load("//kiss:defs.bzl", "bcr_project_from_spec")
+load("//projects/systemc:project.bzl", "SYSTEMC_PROJECT")
 
-# SystemC — the C++ hardware modeling reference library (accellera-official/systemc).
-# A "BCR module" project: the runner bazel_dep()s the module from the Bazel
-# Central Registry and runs its own presubmit test target. Host tier: builds and
-# tests with the ambient toolchain on LOCAL and in the full CI image (CIIMG) — no
-# hermetic LLVM. (RBE/hermetic reached for only when needed.)
-bcr_project(
-    name = "systemc",
-    module = "systemc",
-    version = "3.0.2.bcr.1",
-
-    environments = [LOCAL, CIIMG],
-    test = test_spec(targets = ["@systemc//..."], flags = ["-c", "opt"]),
-)
+bcr_project_from_spec(project = SYSTEMC_PROJECT)

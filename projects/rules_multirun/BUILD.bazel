@@ -1,15 +1,4 @@
-load("//kiss:defs.bzl", "bcr_project", "test_spec")
-load("//kiss:defs.bzl", "CIIMG", "LOCAL")
+load("//kiss:defs.bzl", "bcr_project_from_spec")
+load("//projects/rules_multirun:project.bzl", "RULES_MULTIRUN_PROJECT")
 
-# rules_multirun — Bazel ruleset to run multiple commands (keith/rules_multirun).
-# A "BCR module" project: the runner bazel_dep()s the module from the Bazel
-# Central Registry and runs its own presubmit test target. Host tier on LOCAL +
-# the full CI image (CIIMG) with the ambient toolchain — no hermetic LLVM.
-bcr_project(
-    name = "rules_multirun",
-    module = "rules_multirun",
-    version = "0.14.0",
-
-    environments = [LOCAL, CIIMG],
-    test = test_spec(targets = ["@rules_multirun//tests/..."], flags = ["-c", "opt"]),
-)
+bcr_project_from_spec(project = RULES_MULTIRUN_PROJECT)

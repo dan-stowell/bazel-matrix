@@ -1,44 +1,4 @@
-load("//kiss:defs.bzl", "build_spec", "matrix_project", "test_spec")
-load("//kiss:defs.bzl", "LOCAL", "RBE")
+load("//kiss:defs.bzl", "matrix_project")
+load("//projects/nsync:project.bzl", "NSYNC_PROJECT")
 
-# nsync — Google's small C library of synchronization primitives (mutexes,
-# condition variables, notes, once), with a C++ wrapper. Source pinned in
-# //kiss:extension.bzl (@nsync_archive, release 1.30.0), built with the
-# upstream source/module as-is. The hermetic LLVM modification lives in
-# //projects/nsync/hermetic_llvm. Its BUILD uses the unloaded cc_* rules, so it
-# runs on the Bazel 8.7 inner. (nsync declares the platforms dep directly, so no
-# PLATFORMS_DEP.)
-#
-matrix_project(
-    name = "nsync",
-    source_archive = "@nsync_archive//file",
-    strip_prefix = "nsync-1.30.0",
-    bazel_version = "8.7.0",
-    environments = [LOCAL, RBE],
-    # The pure-C library. (nsync also ships //:nsync_cpp, a C++ wrapper that
-    # compiles nsync's .c sources as `-x c++` for C++11 atomics. Bazel treats a
-    # .c source as a C action, so the zero-sysroot hermetic toolchain
-    # (--sysroot=/dev/null -nostdlibinc) adds glibc/kernel headers but not libc++,
-    # and the file then includes <mutex> → not found. That fails under the
-    # hermetic toolchain in every environment, so we don't build it here.)
-    build = build_spec(
-        targets = ["//:nsync"],
-        flags = ["-c", "opt"],
-    ),
-    # The functional unit tests for the core primitives — counter, mutex,
-    # condition variable, note, once and waiter. The timing-sensitive
-    # stress/starvation/pingpong tests are left out to keep the suite fast and
-    # deterministic on both local and RBE.
-    test = test_spec(
-        targets = [
-            "//:counter_test",
-            "//:mu_test",
-            "//:cv_test",
-            "//:note_test",
-            "//:once_test",
-            "//:wait_test",
-            "//:dll_test",
-        ],
-        flags = ["-c", "opt"],
-    ),
-)
+matrix_project(project = NSYNC_PROJECT)

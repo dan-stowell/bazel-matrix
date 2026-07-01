@@ -70,6 +70,44 @@ BUILDBUDDY_RBE = overlay(
 )
 ACTIOND_WORKER = overlay(name = "actiond_worker")
 
+def tarball_source(archive, strip_prefix = "", source_subdir = ""):
+    return struct(
+        kind = "tarball",
+        archive = archive,
+        strip_prefix = strip_prefix,
+        source_subdir = source_subdir,
+    )
+
+def bcr_module_source(module, version):
+    return struct(
+        kind = "bcr_module",
+        module = module,
+        version = version,
+        source_subdir = "",
+    )
+
+def project_spec(
+        name,
+        source,
+        environments,
+        build = None,
+        test = None,
+        toolchains = [],
+        rbe_toolchains = None,
+        bazel_version = DEFAULT_INNER_BAZEL_VERSION,
+        clients = None):
+    return struct(
+        name = name,
+        source = source,
+        environments = environments,
+        build = build,
+        test = test,
+        toolchains = toolchains,
+        rbe_toolchains = rbe_toolchains,
+        bazel_version = bazel_version,
+        clients = clients,
+    )
+
 def inner_bazel(version):
     vtag = version.replace(".", "_")
     return select({
@@ -338,6 +376,45 @@ def _overlay_build_flags(toolchains):
 def _rbe_toolchains(toolchains, rbe_toolchains):
     return rbe_toolchains if rbe_toolchains != None else []
 
+def _emit_source(name, source, toolchains):
+    if source.kind == "tarball":
+        extract_source(
+            name = name,
+            archive = source.archive,
+            strip_prefix = source.strip_prefix,
+            appends = _overlay_files(toolchains, "appends"),
+            writes = _overlay_files(toolchains, "writes"),
+        )
+    elif source.kind == "bcr_module":
+        bcr_source(
+            name = name,
+            module = source.module,
+            version = source.version,
+            appends = _overlay_files(toolchains, "appends"),
+            writes = _overlay_files(toolchains, "writes"),
+        )
+    else:
+        fail("unknown source kind: {}".format(source.kind))
+
+def _emit_kiss_targets_for_spec(source, toolchains, rbe_toolchains, build, test, bazel_version, visibility):
+    if source.kind == "bcr_module" and build == None and test != None:
+        build = build_spec(targets = test.targets, flags = test.flags)
+    _emit_source("kiss_source", source, toolchains)
+    rbe_toolchains = _rbe_toolchains(toolchains, rbe_toolchains)
+    if build or test:
+        _emit_source("kiss_rbe_source", source, rbe_toolchains)
+    _emit_kiss_targets_for_source(
+        source = ":kiss_source",
+        rbe_source = ":kiss_rbe_source",
+        source_subdir = source.source_subdir,
+        toolchains = toolchains,
+        rbe_toolchains = rbe_toolchains,
+        build = build,
+        test = test,
+        bazel_version = bazel_version,
+        visibility = visibility,
+    )
+
 def _emit_kiss_targets(source_archive, strip_prefix, source_subdir, toolchains, rbe_toolchains, build, test, bazel_version, visibility):
     extract_source(
         name = "kiss_source",
@@ -451,9 +528,9 @@ def _emit_kiss_targets_for_source(source, rbe_source, source_subdir, toolchains,
         )
 
 def matrix_project(
-        name,
-        source_archive,
-        environments,
+        name = None,
+        environments = None,
+        source_archive = None,
         build = None,
         test = None,
         strip_prefix = "",
@@ -462,15 +539,28 @@ def matrix_project(
         rbe_toolchains = None,
         bazel_version = DEFAULT_INNER_BAZEL_VERSION,
         clients = None,
+        project = None,
         visibility = ["//visibility:public"]):
+    if project:
+        name = project.name
+        source = project.source
+        environments = project.environments
+        build = project.build if build == None else build
+        test = project.test if test == None else test
+        toolchains = project.toolchains if toolchains == [] else toolchains
+        rbe_toolchains = project.rbe_toolchains if rbe_toolchains == None else rbe_toolchains
+        bazel_version = project.bazel_version
+        clients = project.clients if clients == None else clients
+    else:
+        source = tarball_source(source_archive, strip_prefix, source_subdir)
     if clients:
         fail("KISS-only matrix_project does not support clients=; use bazel_version=")
-    _emit_kiss_targets(source_archive, strip_prefix, source_subdir, toolchains, rbe_toolchains, build, test, bazel_version, visibility)
+    _emit_kiss_targets_for_spec(source, toolchains, rbe_toolchains, build, test, bazel_version, visibility)
 
 def project_modification(
-        name,
-        source_archive,
-        environments,
+        name = None,
+        environments = None,
+        source_archive = None,
         build = None,
         test = None,
         strip_prefix = "",
@@ -479,13 +569,24 @@ def project_modification(
         rbe_toolchains = None,
         bazel_version = DEFAULT_INNER_BAZEL_VERSION,
         clients = None,
+        project = None,
         visibility = ["//visibility:public"]):
+    if project:
+        name = project.name
+        source = project.source
+        environments = project.environments
+        build = project.build if build == None else build
+        test = project.test if test == None else test
+        toolchains = project.toolchains + toolchains
+        rbe_toolchains = project.rbe_toolchains if rbe_toolchains == None else rbe_toolchains
+        bazel_version = project.bazel_version
+        clients = project.clients if clients == None else clients
+    else:
+        source = tarball_source(source_archive, strip_prefix, source_subdir)
     if clients:
         fail("KISS-only project_modification does not support clients=; use bazel_version=")
-    _emit_kiss_targets(
-        source_archive,
-        strip_prefix,
-        source_subdir,
+    _emit_kiss_targets_for_spec(
+        source,
         toolchains,
         toolchains if rbe_toolchains == None else rbe_toolchains,
         build,
@@ -495,9 +596,9 @@ def project_modification(
     )
 
 def hermetic_llvm_project_modification(
-        name,
-        source_archive,
-        environments,
+        name = None,
+        environments = None,
+        source_archive = None,
         build = None,
         test = None,
         strip_prefix = "",
@@ -506,6 +607,7 @@ def hermetic_llvm_project_modification(
         rbe_toolchains = None,
         bazel_version = DEFAULT_INNER_BAZEL_VERSION,
         clients = None,
+        project = None,
         visibility = ["//visibility:public"]):
     project_modification(
         name = name,
@@ -519,6 +621,7 @@ def hermetic_llvm_project_modification(
         rbe_toolchains = None if rbe_toolchains == None else [_HERMETIC_LLVM_MODIFICATION] + rbe_toolchains,
         bazel_version = bazel_version,
         clients = clients,
+        project = project,
         visibility = visibility,
     )
 
@@ -549,6 +652,46 @@ def bcr_project(
         visibility = ["//visibility:public"]):
     if clients:
         fail("KISS-only bcr_project does not support clients=; use bazel_version=")
+    _emit_bcr_project(
+        module = module,
+        version = version,
+        build = build,
+        test = test,
+        toolchains = toolchains,
+        rbe_toolchains = rbe_toolchains,
+        bazel_version = bazel_version,
+        visibility = visibility,
+    )
+
+def bcr_project_from_spec(
+        project,
+        toolchains = None,
+        rbe_toolchains = None,
+        visibility = ["//visibility:public"]):
+    if project.clients:
+        fail("KISS-only bcr_project_from_spec does not support clients=; use bazel_version=")
+    if project.source.kind != "bcr_module":
+        fail("bcr_project_from_spec requires a bcr_module source")
+    _emit_bcr_project(
+        module = project.source.module,
+        version = project.source.version,
+        build = project.build,
+        test = project.test,
+        toolchains = project.toolchains if toolchains == None else toolchains,
+        rbe_toolchains = project.rbe_toolchains if rbe_toolchains == None else rbe_toolchains,
+        bazel_version = project.bazel_version,
+        visibility = visibility,
+    )
+
+def _emit_bcr_project(
+        module,
+        version,
+        build,
+        test,
+        toolchains,
+        rbe_toolchains,
+        bazel_version,
+        visibility):
     if build == None and test != None:
         build = build_spec(targets = test.targets, flags = test.flags)
     bcr_source(

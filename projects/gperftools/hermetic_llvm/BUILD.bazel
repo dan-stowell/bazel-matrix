@@ -1,21 +1,4 @@
-load("//kiss:defs.bzl", "build_spec", "hermetic_llvm_project_modification", "test_spec")
-load("//kiss:defs.bzl", "LOCAL", "RBE")
+load("//kiss:defs.bzl", "hermetic_llvm_project_modification")
+load("//projects/gperftools:project.bzl", "GPERFTOOLS_PROJECT")
 
-# gperftools — Google performance tools: the tcmalloc allocator + profilers (C++).
-# Source pinned in //kiss:extension.bzl (@gperftools_archive, release
-# 2.18.1), built with the fully-hermetic LLVM toolchain. First-party Bazel, but
-# its tests pull in googletest (cc_* unloaded), so it runs on the Bazel 8.7
-# inner. (gperftools declares a direct platforms dep, so no PLATFORMS_DEP.)
-#
-hermetic_llvm_project_modification(
-    name = "gperftools",
-    source_archive = "@gperftools_archive//file",
-    strip_prefix = "gperftools-gperftools-2.18.1",
-    bazel_version = "8.7.0",
-    environments = [LOCAL, RBE],
-    build = build_spec(targets = ["//:tcmalloc_minimal"], flags = ["-c", "opt"]),
-    # The core minimal-tcmalloc allocator test — a self-contained allocation
-    # correctness exercise of the library. (gperftools' heap-checker/profiler
-    # tests lean on ptrace/timers and are left out of the hermetic scope.)
-    test = test_spec(targets = ["//:tcmalloc_minimal_test"], flags = ["-c", "opt"]),
-)
+hermetic_llvm_project_modification(project = GPERFTOOLS_PROJECT)

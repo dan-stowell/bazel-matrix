@@ -1,22 +1,4 @@
-load("//kiss:defs.bzl", "build_spec", "matrix_project", "test_spec")
-load("//kiss:defs.bzl", "LOCAL", "MINIMG")
-load("//kiss:defs.bzl", "HERMETIC_LLVM", "PLATFORMS_DEP")
+load("//kiss:defs.bzl", "matrix_project")
+load("//projects/cpptrace:project.bzl", "CPPTRACE_PROJECT")
 
-# cpptrace — a C++ stacktrace / backtrace library. Source pinned in
-# //kiss:extension.bzl (@cpptrace_archive, release v1.0.4). First-party
-# Bazel: the project self-registers toolchains_llvm (a hermetic clang) and pulls
-# zstd/xz via rules_foreign_cc. Built host-locally on a late Bazel 8 inner (its
-# root BUILD calls cc_library unloaded). LOCAL-only.
-#
-#   bazel run //projects/cpptrace:build_local_linux_amd64
-#   bazel run //projects/cpptrace:test_local_linux_amd64
-matrix_project(
-    name = "cpptrace",
-    source_archive = "@cpptrace_archive//file",
-    strip_prefix = "cpptrace-1.0.4",
-    toolchains = [HERMETIC_LLVM, PLATFORMS_DEP],
-    bazel_version = "8.7.0",
-    environments = [LOCAL, MINIMG],
-    build = build_spec(targets = ["//:cpptrace"], flags = ["-c", "opt"]),
-    test = test_spec(targets = ["//test:unittest"], flags = ["-c", "opt"]),
-)
+matrix_project(project = CPPTRACE_PROJECT)

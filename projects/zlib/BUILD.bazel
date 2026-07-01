@@ -1,18 +1,4 @@
-load("//kiss:defs.bzl", "build_spec", "matrix_project")
-load("//kiss:defs.bzl", "LOCAL", "RBE")
+load("//kiss:defs.bzl", "matrix_project")
+load("//projects/zlib:project.bzl", "ZLIB_PROJECT")
 
-# zlib — the ubiquitous DEFLATE compression library (C).
-# Source pinned in //kiss:extension.bzl (@zlib_archive, release v1.3.2),
-# built from the upstream source/module as-is. The hermetic LLVM modification
-# lives in //projects/zlib/hermetic_llvm. zlib ships first-party Bazel files
-# (MODULE.bazel + a BUILD that loads rules_cc), so the default 9.1.1 inner
-# builds it as-authored.
-# Build-only: zlib's BUILD declares the library (//:zlib, an alias to //:z) but
-# no Bazel test targets.
-matrix_project(
-    name = "zlib",
-    source_archive = "@zlib_archive//file",
-    strip_prefix = "zlib-1.3.2",
-    environments = [LOCAL, RBE],
-    build = build_spec(targets = ["//:zlib"], flags = ["-c", "opt"]),
-)
+matrix_project(project = ZLIB_PROJECT)

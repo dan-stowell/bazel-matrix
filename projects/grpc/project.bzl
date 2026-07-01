@@ -1,0 +1,32 @@
+load("//kiss:defs.bzl", "ACTIOND", "HERMETIC_LLVM", "LOCAL", "MINIMG", "RBE", "build_spec", "project_spec", "tarball_source", "test_spec")
+# gRPC — first-party Bazel, the natural companion to protobuf.
+# Source pinned in //kiss:extension.bzl (@grpc_archive, v1.81.1).
+#
+# grpc 1.81.1 ships .bazelversion = 8.0.1: its transitive dep graph predates
+# Bazel 9 (opentelemetry-cpp / aspect_* / rules_go use rules/kwargs Bazel 9
+# removed). We build it with a late Bazel 8 inner (8.7.0) — recent enough to
+# carry the zero-sysroot hermetic-llvm toolchain (which needs repo_metadata,
+# added in Bazel 8.3), yet still pre-Bazel-9 so grpc's deps resolve as authored.
+#
+# grpc is Bazel-first: its ~549 tests are real grpc_cc_test targets. The macro
+# fans each test across multiple "pollers" and defaults uses_polling=True, and
+# large swaths need real sockets / the event engine / TLS+cert fixtures, so a
+# bare `bazel test //test/...` isn't a meaningful pass/fail. The test goal runs
+# a curated hermetic subset — the promise library's pure-CPU unit tests
+# (//test/core/promise/...): 50 pass / 50 skipped, no network. More hermetic
+# //test/core/... areas can be added the same way.
+#
+#   bazel run //projects/grpc:build_local_linux_amd64
+#   bazel run //projects/grpc:test_local_linux_amd64
+GRPC_PROJECT = project_spec(
+    name = "grpc",
+    source = tarball_source(
+        archive = "@grpc_archive//file",
+        strip_prefix = "grpc-1.81.1",
+    ),
+    toolchains = [HERMETIC_LLVM],
+    bazel_version = "8.7.0",
+    environments = [LOCAL, RBE, ACTIOND, MINIMG],
+    build = build_spec(targets = ["//:grpc++", "//:grpc"], flags = ["-c", "opt"]),
+    test = test_spec(targets = ["//test/core/promise/..."], flags = ["-c", "opt"]),
+)

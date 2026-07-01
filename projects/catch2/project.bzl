@@ -1,0 +1,48 @@
+load("//kiss:defs.bzl", "ACTIOND", "HERMETIC_LLVM", "LOCAL", "MINIMG", "PLATFORMS_DEP", "RBE", "build_spec", "project_spec", "tarball_source", "test_spec")
+# Catch2 — C++ test framework.
+# Source pinned in //kiss:extension.bzl (@catch2_archive, v3.15.1), built
+# with the fully-hermetic LLVM toolchain. Iconic artifact: the catch2_main
+# library (and the full framework underneath it).
+#
+# Test goal runs Catch2's monolithic self-test (//tests:catch2_self_test) with
+# three adjustments passed through to the test binary, each reproducing how
+# upstream runs the self-test (via CTest, not bare `bazel test`):
+#   * ~[!shouldfail] / ~[!mayfail]: exclude the meta-tests that deliberately
+#     fail to exercise Catch2's own failure-reporting machinery (e.g. "Testing
+#     checked-if 5", which throws an uncaught exception on purpose). The bare
+#     cc_test has no tag filter, so it otherwise reports those as failures.
+#   * ~[command-line]: exclude the 4 self-tests of Catch2's CLI parser. Bazel
+#     sets BAZEL_TEST=1 and XML_OUTPUT_FILE for every test action, and Catch2
+#     responds by auto-appending a JUnit reporter — so these cases see 2
+#     reporter specs where they assert 1. (Upstream hits neither env var: it
+#     runs the full self-test under CTest and covers the Bazel reporter
+#     separately via tests/TestScripts/*.py.)
+#   * --rng-seed: Catch2 otherwise seeds its randomized self-tests from the
+#     clock, so the bare cc_test is non-deterministic; a fixed seed makes the
+#     goal reproducible (the matrix's whole point).
+# Result: 500 passed / 6 skipped, 84543 assertions.
+#
+#   bazel run //projects/catch2:build_local_linux_amd64
+#   bazel run //projects/catch2:test_local_linux_amd64
+CATCH2_PROJECT = project_spec(
+    name = "catch2",
+    source = tarball_source(
+        archive = "@catch2_archive//file",
+        strip_prefix = "Catch2-3.15.1",
+        ),
+    # PLATFORMS_DEP gives the injected RBE platform package @platforms visibility
+    # (Catch2's MODULE declares no direct platforms dep), needed by the
+    # pin_platform envs (RBE/actiond).
+    toolchains = [HERMETIC_LLVM, PLATFORMS_DEP],
+    environments = [LOCAL, RBE, ACTIOND, MINIMG],
+    build = build_spec(targets = ["//:catch2_main"], flags = ["-c", "opt"]),
+    test = test_spec(
+        targets = ["//tests:catch2_self_test"],
+        flags = [
+            "--test_arg=~[!shouldfail]",
+            "--test_arg=~[!mayfail]",
+            "--test_arg=~[command-line]",
+            "--test_arg=--rng-seed=1",
+        ],
+    ),
+)

@@ -1,19 +1,4 @@
-load("//kiss:defs.bzl", "build_spec", "matrix_project", "test_spec")
-load("//kiss:defs.bzl", "LOCAL", "RBE")
+load("//kiss:defs.bzl", "matrix_project")
+load("//projects/openexr:project.bzl", "OPENEXR_PROJECT")
 
-# OpenEXR — the Academy Software Foundation's high-dynamic-range image format and
-# library (C++). Source pinned in //kiss:extension.bzl (@openexr_archive,
-# v3.4.13-rc3). First-party Bazel: its BUILD loads cc_* from rules_cc, so the
-# default 9.1.1 inner. The hermetic LLVM modification lives in
-# //projects/openexr/hermetic_llvm. OpenEXR's MODULE declares a
-# direct platforms dep (no PLATFORMS_DEP).
-#
-matrix_project(
-    name = "openexr",
-    source_archive = "@openexr_archive//file",
-    strip_prefix = "openexr-3.4.13-rc3",
-    bazel_version = "9.1.1",
-    environments = [LOCAL, RBE],
-    build = build_spec(targets = ["//:OpenEXR"], flags = ["-c", "opt"]),
-    test = test_spec(targets = ["//:IexTest"], flags = ["-c", "opt"]),
-)
+matrix_project(project = OPENEXR_PROJECT)

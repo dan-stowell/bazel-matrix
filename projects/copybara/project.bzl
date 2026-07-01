@@ -1,0 +1,41 @@
+load("//kiss:defs.bzl", "HERMETIC_LLVM", "LOCAL", "MINIMG", "RBE", "build_spec", "project_spec", "tarball_source", "test_spec")
+# Copybara — Google's tool for transforming and moving code between repositories.
+# A genuinely Bazel-native Java project. Build #2: exercises the JVM toolchain
+# (rules_java + Bazel's hermetic remote JDK). Source pinned at tag v20260622.
+#
+#   bazel run //projects/copybara:build_local_darwin_arm64
+#   bazel run //projects/copybara:test_rbe_linux_amd64
+#
+# The hermetic LLVM toolchain supplies the C++ toolchain for the native bits
+# Bazel's Java machinery needs (e.g. @bazel_tools ijar's `zipper`); without it a
+# non-linux host has no matching C++ toolchain once the platform is pinned.
+#
+# Note on host tooling: copybara's tests shell out to version-control binaries.
+# The Mercurial (`hg`) tests are excluded because `hg` isn't a hermetic input
+# (and isn't installed); the Git tests currently use the host `git`. Making git
+# hermetic (a pinned-binary overlay) is a natural follow-up.
+COPYBARA_PROJECT = project_spec(
+    name = "copybara",
+    source = tarball_source(
+        archive = "@copybara_archive//file",
+        strip_prefix = "copybara-20260622",
+    ),
+    toolchains = [HERMETIC_LLVM],
+    environments = [LOCAL, RBE, MINIMG],
+    build = build_spec(targets = ["//java/com/google/copybara:copybara"]),
+    test = test_spec(
+        targets = [
+            "//javatests/...",
+            "-//javatests/com/google/copybara/hg/...",  # needs Mercurial
+        ],
+        exclude_on = {
+            # The executor runs actions as root, so these tests don't observe the
+            # permission-denied / file-locked failures they assert (they pass in
+            # the local goals under a normal uid).
+            "rbe": [
+                "//javatests/com/google/copybara/archive:ArchiveModuleTest_all_tests",
+                "//javatests/com/google/copybara:folder/FolderDestinationTest_all_tests",
+            ],
+        },
+    ),
+)

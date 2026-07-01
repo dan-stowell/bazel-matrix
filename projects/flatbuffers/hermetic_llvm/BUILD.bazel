@@ -1,21 +1,4 @@
-load("//kiss:defs.bzl", "build_spec", "hermetic_llvm_project_modification", "test_spec")
-load("//kiss:defs.bzl", "LOCAL", "RBE")
+load("//kiss:defs.bzl", "hermetic_llvm_project_modification")
+load("//projects/flatbuffers:project.bzl", "FLATBUFFERS_PROJECT")
 
-# FlatBuffers — serialization library + the flatc schema compiler.
-# Source pinned in //kiss:extension.bzl (@flatbuffers_archive, v25.12.19).
-# Built on the Bazel 8.7 inner with zero-sysroot hermetic LLVM: flatbuffers
-# pulls old aspect_bazel_lib / rules_foreign_cc / rules_go transitively, whose
-# toolchains use APIs Bazel 9 removed — Bazel 8.7 resolves them as authored.
-#
-hermetic_llvm_project_modification(
-    name = "flatbuffers",
-    source_archive = "@flatbuffers_archive//file",
-    strip_prefix = "flatbuffers-25.12.19-2026-02-06-03fffb2",
-    bazel_version = "8.7.0",
-    environments = [LOCAL, RBE],
-    build = build_spec(targets = ["//:flatc", "//:flatbuffers"], flags = ["-c", "opt"]),
-    # The C++ test suite is one monolithic cc_test that reads its schema/JSON
-    # fixtures from runfiles (the //tests:test_data filegroup). The Go/TS/Swift
-    # and the bazel-repository integration tests live in other toolchains.
-    test = test_spec(targets = ["//tests:flatbuffers_test"]),
-)
+hermetic_llvm_project_modification(project = FLATBUFFERS_PROJECT)

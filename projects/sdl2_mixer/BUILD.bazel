@@ -1,16 +1,4 @@
-load("//kiss:defs.bzl", "bcr_project", "test_spec")
-load("//kiss:defs.bzl", "CIIMG", "LOCAL")
+load("//kiss:defs.bzl", "bcr_project_from_spec")
+load("//projects/sdl2_mixer:project.bzl", "SDL2_MIXER_PROJECT")
 
-# SDL2_mixer — audio mixer for SDL2 (libsdl-org/SDL_mixer).
-# A "BCR module" project: the runner bazel_dep()s the module from the Bazel
-# Central Registry and runs its own presubmit test target. Host tier: builds and
-# tests with the ambient toolchain on LOCAL and in the full CI image (CIIMG) — no
-# hermetic LLVM. (RBE/hermetic reached for only when needed.)
-bcr_project(
-    name = "sdl2_mixer",
-    module = "sdl2_mixer",
-    version = "2.8.1.bcr.beta.2",
-
-    environments = [LOCAL, CIIMG],
-    test = test_spec(targets = ["@sdl2_mixer//:sdl2_mixer_headers_consumer_compile_test"], flags = ["-c", "opt"]),
-)
+bcr_project_from_spec(project = SDL2_MIXER_PROJECT)

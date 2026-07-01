@@ -1,15 +1,4 @@
-load("//kiss:defs.bzl", "bcr_project", "test_spec")
-load("//kiss:defs.bzl", "CIIMG", "LOCAL")
+load("//kiss:defs.bzl", "bcr_project_from_spec")
+load("//projects/effcee:project.bzl", "EFFCEE_PROJECT")
 
-# Effcee — C++ stateful pattern matching for test output (google/effcee).
-# A "BCR module" project: the runner bazel_dep()s the module from the Bazel
-# Central Registry and runs its own presubmit test target. Host tier on LOCAL +
-# the full CI image (CIIMG) with the ambient toolchain — no hermetic LLVM.
-bcr_project(
-    name = "effcee",
-    module = "effcee",
-    version = "0.0.0-20250222",
-    bazel_version = "8.7.0",
-    environments = [LOCAL, CIIMG],
-    test = test_spec(targets = ["@effcee//..."], flags = ["-c", "opt"]),
-)
+bcr_project_from_spec(project = EFFCEE_PROJECT)

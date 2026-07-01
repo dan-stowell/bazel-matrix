@@ -1,16 +1,4 @@
-load("//kiss:defs.bzl", "bcr_project", "test_spec")
-load("//kiss:defs.bzl", "CIIMG", "LOCAL")
+load("//kiss:defs.bzl", "bcr_project_from_spec")
+load("//projects/marisa-trie:project.bzl", "MARISA_TRIE_PROJECT")
 
-# marisa-trie — matching-and-recursive trie in C++ (s-yata/marisa-trie).
-# A "BCR module" project: the runner bazel_dep()s the module from the Bazel
-# Central Registry and runs its own presubmit test target. Host tier: builds and
-# tests with the ambient toolchain on LOCAL and in the full CI image (CIIMG) — no
-# hermetic LLVM. (RBE/hermetic reached for only when needed.)
-bcr_project(
-    name = "marisa-trie",
-    module = "marisa-trie",
-    version = "0.3.1.bcr.2",
-
-    environments = [LOCAL, CIIMG],
-    test = test_spec(targets = ["@marisa-trie//:base-test"], flags = ["-c", "opt"]),
-)
+bcr_project_from_spec(project = MARISA_TRIE_PROJECT)

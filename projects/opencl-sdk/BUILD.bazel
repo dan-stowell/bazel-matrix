@@ -1,16 +1,4 @@
-load("//kiss:defs.bzl", "bcr_project", "test_spec")
-load("//kiss:defs.bzl", "CIIMG", "LOCAL")
+load("//kiss:defs.bzl", "bcr_project_from_spec")
+load("//projects/opencl-sdk:project.bzl", "OPENCL_SDK_PROJECT")
 
-# OpenCL SDK — Khronos OpenCL headers/loader (KhronosGroup/OpenCL-SDK).
-# A "BCR module" project: the runner bazel_dep()s the module from the Bazel
-# Central Registry and runs its own presubmit test target. Host tier: builds and
-# tests with the ambient toolchain on LOCAL and in the full CI image (CIIMG) — no
-# hermetic LLVM. (RBE/hermetic reached for only when needed.)
-bcr_project(
-    name = "opencl-sdk",
-    module = "opencl-sdk",
-    version = "2025.07.23",
-
-    environments = [LOCAL, CIIMG],
-    test = test_spec(targets = ["@opencl-sdk//..."], flags = ["-c", "opt"]),
-)
+bcr_project_from_spec(project = OPENCL_SDK_PROJECT)

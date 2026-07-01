@@ -1,10 +1,4 @@
-load("//kiss:defs.bzl", "build_spec", "hermetic_llvm_project_modification")
-load("//kiss:defs.bzl", "LOCAL", "RBE")
+load("//kiss:defs.bzl", "hermetic_llvm_project_modification")
+load("//projects/zlib:project.bzl", "ZLIB_PROJECT")
 
-hermetic_llvm_project_modification(
-    name = "zlib_hermetic_llvm",
-    source_archive = "@zlib_archive//file",
-    strip_prefix = "zlib-1.3.2",
-    environments = [LOCAL, RBE],
-    build = build_spec(targets = ["//:zlib"], flags = ["-c", "opt"]),
-)
+hermetic_llvm_project_modification(project = ZLIB_PROJECT)

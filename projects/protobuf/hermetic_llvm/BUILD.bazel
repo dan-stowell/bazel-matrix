@@ -1,20 +1,4 @@
-load("//kiss:defs.bzl", "build_spec", "hermetic_llvm_project_modification", "test_spec")
-load("//kiss:defs.bzl", "LOCAL", "RBE")
+load("//kiss:defs.bzl", "hermetic_llvm_project_modification")
+load("//projects/protobuf:project.bzl", "PROTOBUF_PROJECT")
 
-# Protocol Buffers — the matrix's marquee first-party Bazel C++ project.
-# Source pinned in //kiss:extension.bzl (@protobuf_archive, the v35.1
-# Bazel source dist). Built with the fully-hermetic LLVM toolchain (no host
-# gcc); pulls abseil-cpp / rules_cc / zlib from the BCR via the inner Bazel.
-#
-hermetic_llvm_project_modification(
-    name = "protobuf",
-    source_archive = "@protobuf_archive//file",
-    strip_prefix = "protobuf-35.1",
-    environments = [LOCAL, RBE],
-    # The iconic artifacts: the protoc compiler and the C++ runtime library.
-    build = build_spec(targets = ["//:protoc", "//:protobuf"], flags = ["-c", "opt"]),
-    # The C++ runtime test tree. Other language bindings (Java/Python/Ruby/
-    # Rust/Kotlin/upb) live elsewhere in the repo and need their own toolchains,
-    # so we scope tests to the C++ core for now.
-    test = test_spec(targets = ["//src/google/protobuf/..."]),
-)
+hermetic_llvm_project_modification(project = PROTOBUF_PROJECT)

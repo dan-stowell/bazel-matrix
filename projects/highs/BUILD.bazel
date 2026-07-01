@@ -1,23 +1,4 @@
-load("//kiss:defs.bzl", "build_spec", "matrix_project", "test_spec")
-load("//kiss:defs.bzl", "LOCAL", "MINIMG", "RBE")
-load("//kiss:defs.bzl", "HERMETIC_LLVM", "PLATFORMS_DEP")
+load("//kiss:defs.bzl", "matrix_project")
+load("//projects/highs:project.bzl", "HIGHS_PROJECT")
 
-# HiGHS — a high-performance solver for large-scale linear programming, mixed-
-# integer programming and quadratic programming (C++). Source pinned in
-# //kiss:extension.bzl (@highs_archive, v1.14.0). First-party Bazel: its
-# root BUILD loads cc_* from rules_cc, so the 9.1.1 inner with the hermetic LLVM
-# toolchain. PLATFORMS_DEP supplies @platforms for the RBE platform.
-#
-#   bazel run //projects/highs:build_local_linux_amd64
-#   bazel run //projects/highs:test_local_linux_amd64
-matrix_project(
-    name = "highs",
-    source_archive = "@highs_archive//file",
-    strip_prefix = "HiGHS-1.14.0",
-    toolchains = [HERMETIC_LLVM, PLATFORMS_DEP],
-    bazel_version = "9.1.1",
-    environments = [LOCAL, RBE, MINIMG],
-    build = build_spec(targets = ["//:highs"], flags = ["-c", "opt"]),
-    # A couple of the generated check/*.cpp unit tests (the full set is large).
-    test = test_spec(targets = ["//:TestThrow", "//:TestSpecialLps"], flags = ["-c", "opt"]),
-)
+matrix_project(project = HIGHS_PROJECT)

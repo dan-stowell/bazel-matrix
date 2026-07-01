@@ -1,16 +1,4 @@
-load("//kiss:defs.bzl", "bcr_project", "test_spec")
-load("//kiss:defs.bzl", "CIIMG", "LOCAL")
+load("//kiss:defs.bzl", "bcr_project_from_spec")
+load("//projects/behaviortree_cpp:project.bzl", "BEHAVIORTREE_CPP_PROJECT")
 
-# BehaviorTree.CPP — C++ behavior-tree library (BehaviorTree/BehaviorTree.CPP).
-# A "BCR module" project: the runner bazel_dep()s the module from the Bazel
-# Central Registry and runs its own presubmit test target. Host tier: builds and
-# tests with the ambient toolchain on LOCAL and in the full CI image (CIIMG) — no
-# hermetic LLVM. (RBE/hermetic not wired: reach for it only when needed.)
-bcr_project(
-    name = "behaviortree_cpp",
-    module = "behaviortree_cpp",
-    version = "4.7.0.bcr.3",
-    bazel_version = "8.7.0",
-    environments = [LOCAL, CIIMG],
-    test = test_spec(targets = ["@behaviortree_cpp//:behaviortree_cpp_test"], flags = ["-c", "opt"]),
-)
+bcr_project_from_spec(project = BEHAVIORTREE_CPP_PROJECT)

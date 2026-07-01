@@ -1,16 +1,4 @@
-load("//kiss:defs.bzl", "bcr_project", "test_spec")
-load("//kiss:defs.bzl", "CIIMG", "LOCAL")
+load("//kiss:defs.bzl", "bcr_project_from_spec")
+load("//projects/exprtk:project.bzl", "EXPRTK_PROJECT")
 
-# ExprTk — C++ mathematical expression parsing/evaluation (ArashPartow/exprtk).
-# A "BCR module" project: the runner bazel_dep()s the module from the Bazel
-# Central Registry and runs its own presubmit test target. Host tier: builds and
-# tests with the ambient toolchain on LOCAL and in the full CI image (CIIMG) — no
-# hermetic LLVM. (RBE/hermetic reached for only when needed.)
-bcr_project(
-    name = "exprtk",
-    module = "exprtk",
-    version = "0.0.3.bcr.1",
-    bazel_version = "8.7.0",
-    environments = [LOCAL, CIIMG],
-    test = test_spec(targets = ["@exprtk//:exprtk_test"], flags = ["-c", "opt"]),
-)
+bcr_project_from_spec(project = EXPRTK_PROJECT)

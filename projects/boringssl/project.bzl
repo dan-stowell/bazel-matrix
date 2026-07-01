@@ -1,0 +1,33 @@
+load("//kiss:defs.bzl", "HERMETIC_LLVM", "LOCAL", "MINIMG", "RBE", "build_spec", "project_spec", "tarball_source", "test_spec")
+# BoringSSL — Google's fork of OpenSSL (the crypto/TLS library behind Chrome,
+# Android and gRPC). Source pinned in //kiss:extension.bzl
+# (@boringssl_archive, release 0.20260616.0), built with the fully-hermetic LLVM
+# toolchain (which compiles its C and per-arch assembly). Its BUILD wraps the
+# cc_* rules via util/util.bzl (loaded from @rules_cc), and its deps are current
+# Bazel-9-era BCR modules, so it runs on the default Bazel 9.1.1 inner. It
+# declares the platforms dep directly (no PLATFORMS_DEP); googletest and
+# google_benchmark come from its own MODULE (BCR).
+#
+#   bazel run //projects/boringssl:build_local_linux_amd64
+#   bazel run //projects/boringssl:test_local_linux_amd64
+BORINGSSL_PROJECT = project_spec(
+    name = "boringssl",
+    source = tarball_source(
+        archive = "@boringssl_archive//file",
+        strip_prefix = "boringssl-0.20260616.0",
+    ),
+    toolchains = [HERMETIC_LLVM],
+    environments = [LOCAL, RBE, MINIMG],
+    # The two libraries that are the point of BoringSSL: libcrypto and libssl.
+    build = build_spec(targets = ["//:crypto", "//:ssl"], flags = ["-c", "opt"]),
+    # ssl_test exercises the TLS stack against libcrypto; urandom_test covers the
+    # RNG path. Both are hermetic. crypto_test (size=large, shard_count=32, the
+    # full test-vector suite) is excluded as too heavy for the per-goal timeout.
+    test = test_spec(
+        targets = [
+            "//:ssl_test",
+            "//:urandom_test",
+        ],
+        flags = ["-c", "opt"],
+    ),
+)

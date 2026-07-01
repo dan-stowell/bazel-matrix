@@ -1,20 +1,4 @@
-load("//kiss:defs.bzl", "build_spec", "hermetic_llvm_project_modification", "test_spec")
-load("//kiss:defs.bzl", "LOCAL", "RBE")
+load("//kiss:defs.bzl", "hermetic_llvm_project_modification")
+load("//projects/opencc:project.bzl", "OPENCC_PROJECT")
 
-# OpenCC — Open Chinese Convert, conversion between Traditional/Simplified
-# Chinese (C++). Source pinned in //kiss:extension.bzl (@opencc_archive,
-# release ver.1.3.1), built with the fully-hermetic LLVM toolchain.
-#
-# The library (//:opencc) pulls a handful of BCR modules (marisa-trie,
-# darts-clone, rapidjson, tclap); some call cc_* unloaded, so it runs on the
-# Bazel 8.7 inner. (OpenCC declares platforms directly, so no PLATFORMS_DEP.)
-#
-hermetic_llvm_project_modification(
-    name = "opencc",
-    source_archive = "@opencc_archive//file",
-    strip_prefix = "OpenCC-ver.1.3.1",
-    bazel_version = "8.7.0",
-    environments = [LOCAL, RBE],
-    build = build_spec(targets = ["//:opencc"], flags = ["-c", "opt"]),
-    test = test_spec(targets = ["//src/...", "//test/..."], flags = ["-c", "opt"]),
-)
+hermetic_llvm_project_modification(project = OPENCC_PROJECT)

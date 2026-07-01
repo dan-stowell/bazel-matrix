@@ -1,16 +1,4 @@
-load("//kiss:defs.bzl", "bcr_project", "test_spec")
-load("//kiss:defs.bzl", "CIIMG", "LOCAL")
+load("//kiss:defs.bzl", "bcr_project_from_spec")
+load("//projects/cityhash:project.bzl", "CITYHASH_PROJECT")
 
-# CityHash — string hash functions in C++ (google/cityhash).
-# A "BCR module" project: the runner bazel_dep()s the module from the Bazel
-# Central Registry and runs its own presubmit test target. Host tier: builds and
-# tests with the ambient toolchain on LOCAL and in the full CI image (CIIMG) — no
-# hermetic LLVM. (RBE/hermetic reached for only when needed.)
-bcr_project(
-    name = "cityhash",
-    module = "cityhash",
-    version = "1.1.1",
-
-    environments = [LOCAL, CIIMG],
-    test = test_spec(targets = ["@cityhash//:all"], flags = ["-c", "opt"]),
-)
+bcr_project_from_spec(project = CITYHASH_PROJECT)

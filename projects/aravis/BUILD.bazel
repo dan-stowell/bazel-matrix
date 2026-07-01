@@ -1,16 +1,4 @@
-load("//kiss:defs.bzl", "bcr_project", "test_spec")
-load("//kiss:defs.bzl", "CIIMG", "LOCAL")
+load("//kiss:defs.bzl", "bcr_project_from_spec")
+load("//projects/aravis:project.bzl", "ARAVIS_PROJECT")
 
-# Aravis — GigE/USB3 Vision camera library in C (AravisProject/aravis).
-# A "BCR module" project: the runner bazel_dep()s the module from the Bazel
-# Central Registry and runs its own presubmit test target. Host tier: builds and
-# tests with the ambient toolchain on LOCAL and in the full CI image (CIIMG) — no
-# hermetic LLVM. (RBE/hermetic reached for only when needed.)
-bcr_project(
-    name = "aravis",
-    module = "aravis",
-    version = "0.9.2-20251111063445-57983d013883",
-    bazel_version = "8.7.0",
-    environments = [LOCAL, CIIMG],
-    test = test_spec(targets = ["@aravis//tests/..."], flags = ["-c", "opt"]),
-)
+bcr_project_from_spec(project = ARAVIS_PROJECT)

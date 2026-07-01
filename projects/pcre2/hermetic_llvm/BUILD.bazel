@@ -1,19 +1,4 @@
-load("//kiss:defs.bzl", "build_spec", "hermetic_llvm_project_modification", "test_spec")
-load("//kiss:defs.bzl", "LOCAL", "RBE")
+load("//kiss:defs.bzl", "hermetic_llvm_project_modification")
+load("//projects/pcre2:project.bzl", "PCRE2_PROJECT")
 
-# PCRE2 — Perl Compatible Regular Expressions (version 2), the C regex engine used
-# by Git, PHP, Apache, nginx and many others. Source pinned in
-# //kiss:extension.bzl (@pcre2_archive, pcre2-10.47). First-party Bazel:
-# root BUILD loads cc_* from rules_cc, so the 9.1.1 inner with the hermetic LLVM
-# toolchain. Upstream's Bazel file wraps the pcre2test CLI test harness as
-# //:pcre2_test. pcre2's MODULE declares a direct platforms dep (no PLATFORMS_DEP).
-#
-hermetic_llvm_project_modification(
-    name = "pcre2",
-    source_archive = "@pcre2_archive//file",
-    strip_prefix = "pcre2-pcre2-10.47",
-    bazel_version = "9.1.1",
-    environments = [LOCAL, RBE],
-    build = build_spec(targets = ["//:pcre2"], flags = ["-c", "opt"]),
-    test = test_spec(targets = ["//:pcre2_test"], flags = ["-c", "opt"]),
-)
+hermetic_llvm_project_modification(project = PCRE2_PROJECT)

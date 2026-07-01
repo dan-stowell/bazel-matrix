@@ -1,0 +1,39 @@
+load("//kiss:defs.bzl", "HERMETIC_LLVM", "LOCAL", "MINIMG", "PLATFORMS_DEP", "RBE", "build_spec", "project_spec", "tarball_source", "test_spec")
+# CLI11 — a command-line parser for C++11 (header-only, optionally compiled).
+# Source pinned in //kiss:extension.bzl (@cli11_archive, release v2.4.2),
+# built with the fully-hermetic LLVM toolchain. Its Catch2-based tests use the
+# unloaded cc_* rules, so it runs on the Bazel 8.7 inner. PLATFORMS_DEP supplies
+# the @platforms visibility the injected RBE platform package needs (CLI11's
+# MODULE declares no platforms dep). Catch2 comes from its own MODULE
+# (dev_dependency, pulled from the BCR by the inner Bazel).
+#
+#   bazel run //projects/cli11:build_local_linux_amd64
+#   bazel run //projects/cli11:test_local_linux_amd64
+CLI11_PROJECT = project_spec(
+    name = "cli11",
+    source = tarball_source(
+        archive = "@cli11_archive//file",
+        strip_prefix = "CLI11-2.4.2",
+    ),
+    toolchains = [HERMETIC_LLVM, PLATFORMS_DEP],
+    bazel_version = "8.7.0",
+    environments = [LOCAL, RBE, MINIMG],
+    build = build_spec(targets = ["//:cli11"], flags = ["-c", "opt"]),
+    # A core subset of the Catch2 suite covering parsing, options, subcommands,
+    # help, formatting and the app integration tests (which exercise the
+    # ensure_utf8 helper binaries via $(rootpath) data deps).
+    test = test_spec(
+        targets = [
+            "//tests:AppTest",
+            "//tests:HelpersTest",
+            "//tests:SimpleTest",
+            "//tests:OptionTypeTest",
+            "//tests:CreationTest",
+            "//tests:SubcommandTest",
+            "//tests:HelpTest",
+            "//tests:SetTest",
+            "//tests:FormatterTest",
+        ],
+        flags = ["-c", "opt"],
+    ),
+)

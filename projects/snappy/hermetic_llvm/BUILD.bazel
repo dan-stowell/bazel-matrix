@@ -1,17 +1,4 @@
-load("//kiss:defs.bzl", "build_spec", "hermetic_llvm_project_modification", "test_spec")
-load("//kiss:defs.bzl", "LOCAL", "RBE")
+load("//kiss:defs.bzl", "hermetic_llvm_project_modification")
+load("//projects/snappy:project.bzl", "SNAPPY_PROJECT")
 
-_SNAPPY_TEST = test_spec(
-    targets = ["//:snappy_unittest"],
-    flags = ["-c", "opt"],
-)
-
-hermetic_llvm_project_modification(
-    name = "snappy_hermetic_llvm",
-    source_archive = "@snappy_archive//file",
-    strip_prefix = "snappy-1.2.2",
-    bazel_version = "8.7.0",
-    environments = [LOCAL, RBE],
-    build = build_spec(targets = ["//:snappy"], flags = ["-c", "opt"]),
-    test = _SNAPPY_TEST,
-)
+hermetic_llvm_project_modification(project = SNAPPY_PROJECT)

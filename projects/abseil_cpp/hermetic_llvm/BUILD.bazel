@@ -1,31 +1,4 @@
-load("//kiss:defs.bzl", "build_spec", "hermetic_llvm_project_modification", "test_spec")
-load("//kiss:defs.bzl", "LOCAL", "RBE")
+load("//kiss:defs.bzl", "hermetic_llvm_project_modification")
+load("//projects/abseil_cpp:project.bzl", "ABSEIL_CPP_PROJECT")
 
-# cctz/time tests read the host tzdata, absent off-host (RBE); see below.
-_CCTZ_TIME_TESTS = [
-    "//absl/time:time_test",
-    "//absl/time/internal/cctz:time_zone_format_test",
-    "//absl/time/internal/cctz:time_zone_lookup_test",
-]
-
-# Abseil's C++ common libraries — the matrix's first build.
-# Source pinned in //kiss:extension.bzl (@absl_archive, release
-# 20260526.0). Built with the fully-hermetic LLVM toolchain (no host gcc).
-#
-hermetic_llvm_project_modification(
-    name = "abseil_cpp",
-    source_archive = "@absl_archive//file",
-    strip_prefix = "abseil-cpp-20260526.0",
-    environments = [LOCAL, RBE],
-    build = build_spec(targets = ["//absl/..."], flags = ["-c", "opt"]),
-    test = test_spec(
-        targets = ["//absl/..."],
-        # The cctz/time tests read the system timezone database
-        # (/usr/share/zoneinfo), which the RBE executor image does not ship and
-        # which isn't a Bazel-tracked input — so they're excluded off-host. A hermetic tzdata
-        # input, or a tzdata-bearing executor, would re-include them.
-        exclude_on = {
-            "rbe": _CCTZ_TIME_TESTS,
-        },
-    ),
-)
+hermetic_llvm_project_modification(project = ABSEIL_CPP_PROJECT)

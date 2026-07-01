@@ -1,15 +1,4 @@
-load("//kiss:defs.bzl", "bcr_project", "test_spec")
-load("//kiss:defs.bzl", "CIIMG", "LOCAL")
+load("//kiss:defs.bzl", "bcr_project_from_spec")
+load("//projects/universal-robots-client-library:project.bzl", "UNIVERSAL_ROBOTS_CLIENT_LIBRARY_PROJECT")
 
-# Universal Robots client library — UR robot C++ driver (UniversalRobots/Universal_Robots_Client_Library).
-# A "BCR module" project: the runner bazel_dep()s the module from the Bazel
-# Central Registry and runs its own presubmit test target. Host tier on LOCAL +
-# the full CI image (CIIMG) with the ambient toolchain — no hermetic LLVM.
-bcr_project(
-    name = "universal-robots-client-library",
-    module = "universal-robots-client-library",
-    version = "2.4.0",
-    bazel_version = "8.7.0",
-    environments = [LOCAL, CIIMG],
-    test = test_spec(targets = ["@universal-robots-client-library//:test_bin_parser"], flags = ["-c", "opt"]),
-)
+bcr_project_from_spec(project = UNIVERSAL_ROBOTS_CLIENT_LIBRARY_PROJECT)

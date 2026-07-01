@@ -1,0 +1,15 @@
+load("//kiss:defs.bzl", "CIIMG", "LOCAL", "bcr_module_source", "project_spec", "test_spec")
+# Icarus Verilog — Verilog simulation/synthesis in C++ (steveicarus/iverilog).
+# A "BCR module" project: the runner bazel_dep()s the module from the Bazel
+# Central Registry and runs its own presubmit test target. Host tier: builds and
+# tests with the ambient toolchain on LOCAL and in the full CI image (CIIMG) — no
+# hermetic LLVM. (RBE/hermetic reached for only when needed.)
+IVERILOG_PROJECT = project_spec(
+    name = "iverilog",
+    source = bcr_module_source(
+        module = "iverilog",
+        version = "13.0.bcr.1",
+    ),
+    environments = [LOCAL, CIIMG],
+    test = test_spec(targets = ["@iverilog//..."], flags = ["-c", "opt"]),
+)
