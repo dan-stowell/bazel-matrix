@@ -1,4 +1,4 @@
-# Bazel Museum build configuration.
+# Bazel Matrix build configuration.
 
 # Bzlmod is the only dependency system used in this repo.
 common --enable_bzlmod
@@ -6,6 +6,10 @@ common --noenable_workspace
 
 # Make actions see a consistent environment for reproducibility.
 build --incompatible_strict_action_env
+
+# Publish anonymous, public BuildBuddy invocation links for outer Bazel runs.
+build --bes_results_url=https://app.buildbuddy.io/invocation/
+build --bes_backend=grpcs://remote.buildbuddy.io
 
 # Quieter, more useful test output.
 test --test_output=errors

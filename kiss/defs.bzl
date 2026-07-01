@@ -56,16 +56,20 @@ HERMETIC_ZIP = overlay(
 RULES_RUST_SYSROOT_FIX = overlay(name = "rules_rust_sysroot_fix")
 RULES_CC_DEP = overlay(name = "rules_cc_dep")
 PLATFORMS_DEP = overlay(name = "platforms_dep")
+BUILDBUDDY_BES = overlay(
+    name = "buildbuddy_bes",
+    build_flags = [
+        "--bes_results_url=https://app.buildbuddy.io/invocation/",
+        "--bes_backend=grpcs://remote.buildbuddy.io",
+    ],
+)
 BUILDBUDDY_RBE = overlay(
     name = "buildbuddy_rbe",
     build_flags = [
-        "--bes_results_url=https://buildbuddy.buildbuddy.io/invocation/",
-        "--bes_backend=grpcs://buildbuddy.buildbuddy.io",
-        "--remote_cache=grpcs://buildbuddy.buildbuddy.io",
+        "--remote_cache=grpcs://remote.buildbuddy.io",
         "--remote_timeout=10m",
         "--jobs=32",
-        "--remote_executor=grpcs://buildbuddy.buildbuddy.io",
-        "--remote_header=x-buildbuddy-api-key=$BUILDBUDDY_API_KEY",
+        "--remote_executor=grpcs://remote.buildbuddy.io",
     ],
 )
 ACTIOND_WORKER = overlay(name = "actiond_worker")
@@ -426,7 +430,7 @@ def _emit_kiss_targets(source_archive, strip_prefix, source_subdir, toolchains, 
         )
 
     bazel = inner_bazel(bazel_version)
-    build_flags = _overlay_build_flags(toolchains)
+    build_flags = _overlay_build_flags(toolchains) + _overlay_build_flags([BUILDBUDDY_BES])
     rbe_build_flags = build_flags + _overlay_build_flags([BUILDBUDDY_RBE])
     if build:
         kiss_build(
@@ -467,13 +471,12 @@ def _emit_kiss_targets(source_archive, strip_prefix, source_subdir, toolchains, 
             bazel_arg = inner_bazel_arg(bazel_version),
             flags = rbe_build_flags + test.flags,
             source_subdir = source_subdir,
-            env_inherit = ["BUILDBUDDY_API_KEY"],
             visibility = visibility,
         )
 
 def _emit_kiss_targets_for_source(source, rbe_source, source_subdir, toolchains, build, test, bazel_version, visibility):
     bazel = inner_bazel(bazel_version)
-    build_flags = _overlay_build_flags(toolchains)
+    build_flags = _overlay_build_flags(toolchains) + _overlay_build_flags([BUILDBUDDY_BES])
     rbe_build_flags = build_flags + _overlay_build_flags([BUILDBUDDY_RBE])
     if build:
         kiss_build(
@@ -514,7 +517,6 @@ def _emit_kiss_targets_for_source(source, rbe_source, source_subdir, toolchains,
             bazel_arg = inner_bazel_arg(bazel_version),
             flags = rbe_build_flags + test.flags,
             source_subdir = source_subdir,
-            env_inherit = ["BUILDBUDDY_API_KEY"],
             visibility = visibility,
         )
 
