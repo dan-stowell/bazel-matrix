@@ -136,6 +136,10 @@ def _log_prefix(job):
     return "[{}] ".format(job.replace("/", " ")) if job else ""
 
 
+def _matrix_target(project, variant, environment, command):
+    return "//projects/{}/{}:{}_{}_{}".format(project, variant, project, environment, command)
+
+
 def _job_metadata(job):
     parts = job.split("/")
     if len(parts) != 4:
@@ -149,7 +153,7 @@ def _job_metadata(job):
         "--build_metadata=ENVIRONMENT=" + environment,
         "--build_metadata=COMMAND=" + command,
         "--build_metadata=MATRIX_JOB=" + job,
-        "--tool_tag=bazel-matrix:" + job,
+        "--tool_tag=" + _matrix_target(project, variant, environment, command),
     ]
 
 
