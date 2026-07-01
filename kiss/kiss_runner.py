@@ -230,8 +230,6 @@ def main(argv=None):
     if args.bundle:
         outputs = _load_bep_outputs(bep) if os.path.exists(bep) else []
         with tarfile.open(args.bundle, "w") as tar:
-            if os.path.exists(bep):
-                tar.add(bep, arcname="build.bep.json")
             for output in outputs:
                 tar.add(output["path"], arcname=output["arcname"])
             manifest = {
