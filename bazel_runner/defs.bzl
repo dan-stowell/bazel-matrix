@@ -59,6 +59,7 @@ BUILDBUDDY_BES = overlay(
         "--bes_results_url=https://app.buildbuddy.io/invocation/",
         "--bes_backend=grpcs://remote.buildbuddy.io",
         "--build_metadata=USER=bazel-matrix",
+        "--build_metadata=VISIBILITY=PUBLIC",
     ],
 )
 BUILDBUDDY_RBE = overlay(

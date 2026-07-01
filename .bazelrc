@@ -16,6 +16,7 @@ build --jobs=1
 build --bes_results_url=https://app.buildbuddy.io/invocation/
 build --bes_backend=grpcs://remote.buildbuddy.io
 build --build_metadata=USER=bazel-matrix
+build --build_metadata=VISIBILITY=PUBLIC
 
 # Quieter, more useful test output.
 test --test_output=errors
