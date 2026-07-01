@@ -93,7 +93,6 @@ def project_spec(
         build = None,
         test = None,
         toolchains = [],
-        rbe_toolchains = None,
         bazel_version = DEFAULT_INNER_BAZEL_VERSION,
         clients = None):
     return struct(
@@ -103,7 +102,6 @@ def project_spec(
         build = build,
         test = test,
         toolchains = toolchains,
-        rbe_toolchains = rbe_toolchains,
         bazel_version = bazel_version,
         clients = clients,
     )
@@ -373,9 +371,6 @@ def _overlay_build_flags(toolchains):
         result.extend(toolchain.build_flags)
     return result
 
-def _rbe_toolchains(toolchains, rbe_toolchains):
-    return rbe_toolchains if rbe_toolchains != None else []
-
 def _emit_source(name, source, toolchains):
     if source.kind == "tarball":
         extract_source(
@@ -396,26 +391,24 @@ def _emit_source(name, source, toolchains):
     else:
         fail("unknown source kind: {}".format(source.kind))
 
-def _emit_kiss_targets_for_spec(source, toolchains, rbe_toolchains, build, test, bazel_version, visibility):
+def _emit_kiss_targets_for_spec(source, toolchains, build, test, bazel_version, visibility):
     if source.kind == "bcr_module" and build == None and test != None:
         build = build_spec(targets = test.targets, flags = test.flags)
     _emit_source("kiss_source", source, toolchains)
-    rbe_toolchains = _rbe_toolchains(toolchains, rbe_toolchains)
     if build or test:
-        _emit_source("kiss_rbe_source", source, rbe_toolchains)
+        _emit_source("kiss_rbe_source", source, toolchains)
     _emit_kiss_targets_for_source(
         source = ":kiss_source",
         rbe_source = ":kiss_rbe_source",
         source_subdir = source.source_subdir,
         toolchains = toolchains,
-        rbe_toolchains = rbe_toolchains,
         build = build,
         test = test,
         bazel_version = bazel_version,
         visibility = visibility,
     )
 
-def _emit_kiss_targets(source_archive, strip_prefix, source_subdir, toolchains, rbe_toolchains, build, test, bazel_version, visibility):
+def _emit_kiss_targets(source_archive, strip_prefix, source_subdir, toolchains, build, test, bazel_version, visibility):
     extract_source(
         name = "kiss_source",
         archive = source_archive,
@@ -423,19 +416,18 @@ def _emit_kiss_targets(source_archive, strip_prefix, source_subdir, toolchains, 
         appends = _overlay_files(toolchains, "appends"),
         writes = _overlay_files(toolchains, "writes"),
     )
-    rbe_toolchains = _rbe_toolchains(toolchains, rbe_toolchains)
     if build or test:
         extract_source(
             name = "kiss_rbe_source",
             archive = source_archive,
             strip_prefix = strip_prefix,
-            appends = _overlay_files(rbe_toolchains, "appends"),
-            writes = _overlay_files(rbe_toolchains, "writes"),
+            appends = _overlay_files(toolchains, "appends"),
+            writes = _overlay_files(toolchains, "writes"),
         )
 
     bazel = inner_bazel(bazel_version)
     build_flags = _overlay_build_flags(toolchains)
-    rbe_build_flags = _overlay_build_flags(rbe_toolchains) + _overlay_build_flags([BUILDBUDDY_RBE])
+    rbe_build_flags = build_flags + _overlay_build_flags([BUILDBUDDY_RBE])
     if build:
         kiss_build(
             name = "kiss_build",
@@ -479,11 +471,10 @@ def _emit_kiss_targets(source_archive, strip_prefix, source_subdir, toolchains, 
             visibility = visibility,
         )
 
-def _emit_kiss_targets_for_source(source, rbe_source, source_subdir, toolchains, rbe_toolchains, build, test, bazel_version, visibility):
+def _emit_kiss_targets_for_source(source, rbe_source, source_subdir, toolchains, build, test, bazel_version, visibility):
     bazel = inner_bazel(bazel_version)
     build_flags = _overlay_build_flags(toolchains)
-    rbe_toolchains = _rbe_toolchains(toolchains, rbe_toolchains)
-    rbe_build_flags = _overlay_build_flags(rbe_toolchains) + _overlay_build_flags([BUILDBUDDY_RBE])
+    rbe_build_flags = build_flags + _overlay_build_flags([BUILDBUDDY_RBE])
     if build:
         kiss_build(
             name = "kiss_build",
@@ -536,7 +527,6 @@ def matrix_project(
         strip_prefix = "",
         source_subdir = "",
         toolchains = [],
-        rbe_toolchains = None,
         bazel_version = DEFAULT_INNER_BAZEL_VERSION,
         clients = None,
         project = None,
@@ -548,14 +538,13 @@ def matrix_project(
         build = project.build if build == None else build
         test = project.test if test == None else test
         toolchains = project.toolchains if toolchains == [] else toolchains
-        rbe_toolchains = project.rbe_toolchains if rbe_toolchains == None else rbe_toolchains
         bazel_version = project.bazel_version
         clients = project.clients if clients == None else clients
     else:
         source = tarball_source(source_archive, strip_prefix, source_subdir)
     if clients:
         fail("KISS-only matrix_project does not support clients=; use bazel_version=")
-    _emit_kiss_targets_for_spec(source, toolchains, rbe_toolchains, build, test, bazel_version, visibility)
+    _emit_kiss_targets_for_spec(source, toolchains, build, test, bazel_version, visibility)
 
 def project_modification(
         name = None,
@@ -566,7 +555,6 @@ def project_modification(
         strip_prefix = "",
         source_subdir = "",
         toolchains = [],
-        rbe_toolchains = None,
         bazel_version = DEFAULT_INNER_BAZEL_VERSION,
         clients = None,
         project = None,
@@ -578,7 +566,6 @@ def project_modification(
         build = project.build if build == None else build
         test = project.test if test == None else test
         toolchains = project.toolchains + toolchains
-        rbe_toolchains = project.rbe_toolchains if rbe_toolchains == None else rbe_toolchains
         bazel_version = project.bazel_version
         clients = project.clients if clients == None else clients
     else:
@@ -588,7 +575,6 @@ def project_modification(
     _emit_kiss_targets_for_spec(
         source,
         toolchains,
-        toolchains if rbe_toolchains == None else rbe_toolchains,
         build,
         test,
         bazel_version,
@@ -604,7 +590,6 @@ def hermetic_llvm_project_modification(
         strip_prefix = "",
         source_subdir = "",
         toolchains = [],
-        rbe_toolchains = None,
         bazel_version = DEFAULT_INNER_BAZEL_VERSION,
         clients = None,
         project = None,
@@ -618,7 +603,6 @@ def hermetic_llvm_project_modification(
         strip_prefix = strip_prefix,
         source_subdir = source_subdir,
         toolchains = [_HERMETIC_LLVM_MODIFICATION] + toolchains,
-        rbe_toolchains = None if rbe_toolchains == None else [_HERMETIC_LLVM_MODIFICATION] + rbe_toolchains,
         bazel_version = bazel_version,
         clients = clients,
         project = project,
@@ -632,11 +616,10 @@ def project_test(
         strip_prefix = "",
         source_subdir = "",
         toolchains = [],
-        rbe_toolchains = None,
         bazel_version = DEFAULT_INNER_BAZEL_VERSION,
         clients = None,
         visibility = ["//visibility:public"]):
-    _emit_kiss_targets(source_archive, strip_prefix, source_subdir, toolchains, rbe_toolchains, None, test, bazel_version, visibility)
+    _emit_kiss_targets(source_archive, strip_prefix, source_subdir, toolchains, None, test, bazel_version, visibility)
 
 def bcr_project(
         name,
@@ -646,7 +629,6 @@ def bcr_project(
         build = None,
         test = None,
         toolchains = None,
-        rbe_toolchains = None,
         bazel_version = DEFAULT_INNER_BAZEL_VERSION,
         clients = None,
         visibility = ["//visibility:public"]):
@@ -658,7 +640,6 @@ def bcr_project(
         build = build,
         test = test,
         toolchains = toolchains,
-        rbe_toolchains = rbe_toolchains,
         bazel_version = bazel_version,
         visibility = visibility,
     )
@@ -666,7 +647,6 @@ def bcr_project(
 def bcr_project_from_spec(
         project,
         toolchains = None,
-        rbe_toolchains = None,
         visibility = ["//visibility:public"]):
     if project.clients:
         fail("KISS-only bcr_project_from_spec does not support clients=; use bazel_version=")
@@ -678,7 +658,6 @@ def bcr_project_from_spec(
         build = project.build,
         test = project.test,
         toolchains = project.toolchains if toolchains == None else toolchains,
-        rbe_toolchains = project.rbe_toolchains if rbe_toolchains == None else rbe_toolchains,
         bazel_version = project.bazel_version,
         visibility = visibility,
     )
@@ -689,7 +668,6 @@ def _emit_bcr_project(
         build,
         test,
         toolchains,
-        rbe_toolchains,
         bazel_version,
         visibility):
     if build == None and test != None:
@@ -702,22 +680,18 @@ def _emit_bcr_project(
         writes = _overlay_files(toolchains or [], "writes"),
     )
     if build or test:
-        computed_rbe_toolchains = _rbe_toolchains(toolchains or [], rbe_toolchains)
         bcr_source(
             name = "kiss_rbe_source",
             module = module,
             version = version,
-            appends = _overlay_files(computed_rbe_toolchains, "appends"),
-            writes = _overlay_files(computed_rbe_toolchains, "writes"),
+            appends = _overlay_files(toolchains or [], "appends"),
+            writes = _overlay_files(toolchains or [], "writes"),
         )
-    else:
-        computed_rbe_toolchains = rbe_toolchains
     _emit_kiss_targets_for_source(
         source = ":kiss_source",
         rbe_source = ":kiss_rbe_source",
         source_subdir = "",
         toolchains = toolchains or [],
-        rbe_toolchains = computed_rbe_toolchains,
         build = build,
         test = test,
         bazel_version = bazel_version,
