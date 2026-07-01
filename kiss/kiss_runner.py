@@ -133,7 +133,7 @@ def _expand_env_refs(value, env):
 
 
 def _log_prefix(job):
-    return "[{}] ".format(job) if job else ""
+    return "[{}] ".format(job.replace("/", " ")) if job else ""
 
 
 def _run_with_prefix(cmd, cwd, env, prefix):

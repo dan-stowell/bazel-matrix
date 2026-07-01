@@ -283,7 +283,7 @@ def _job_label(package, target_name):
         variant = "unknown"
     environment = "rbe" if target_name.startswith("kiss_rbe_") else "local"
     command = "test" if target_name.endswith("_test") else "build"
-    return "{} {} {} {}".format(project, variant, environment, command)
+    return "{}/{}/{}/{}".format(project, variant, environment, command)
 
 def _kiss_build_impl(ctx):
     source = _single_file(ctx.attr.source[DefaultInfo].files, "source")
