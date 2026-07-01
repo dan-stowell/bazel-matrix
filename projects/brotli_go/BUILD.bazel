@@ -1,0 +1,1 @@
+exports_files(["parent.MODULE.bazel"])
