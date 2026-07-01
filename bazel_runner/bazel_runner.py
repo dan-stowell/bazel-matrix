@@ -136,6 +136,23 @@ def _log_prefix(job):
     return "[{}] ".format(job.replace("/", " ")) if job else ""
 
 
+def _job_metadata(job):
+    parts = job.split("/")
+    if len(parts) != 4:
+        return []
+
+    project, variant, environment, command = parts
+    return [
+        "--build_metadata=ROLE=inner",
+        "--build_metadata=PROJECT=" + project,
+        "--build_metadata=VARIANT=" + variant,
+        "--build_metadata=ENVIRONMENT=" + environment,
+        "--build_metadata=COMMAND=" + command,
+        "--build_metadata=MATRIX_JOB=" + job,
+        "--tool_tag=bazel-matrix:" + job,
+    ]
+
+
 def _run_with_prefix(cmd, cwd, env, prefix):
     proc = subprocess.Popen(
         cmd,
@@ -204,7 +221,7 @@ def main(argv=None):
         "--show_progress",
         "--show_progress_rate_limit=0.0",
         "--progress_report_interval=10",
-    ] + expanded_flags
+    ] + _job_metadata(args.job) + expanded_flags
     if os.path.isdir(os.path.join(source, ".bazel-runner-tools")):
         command_flags = [
             "--action_env=PATH=" + env["PATH"],
