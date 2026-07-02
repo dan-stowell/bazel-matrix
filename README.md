@@ -131,15 +131,15 @@ Legend:
 | [`protobuf`](https://github.com/protocolbuffers/protobuf) | 📦 ✅ [101 / 102](https://app.buildbuddy.io/invocation/59828833-9399-408f-84b9-022d02533f46) | 🧰 ✅ |
 | [`quill`](https://github.com/odygrd/quill) | 🚫 | 🚫 |
 | [`re2`](https://github.com/google/re2) | 📦 ✅ [16 / 16](https://app.buildbuddy.io/invocation/078fe8ea-dee1-4a63-a936-3729d540f165) | 🧰 ✅ |
-| [`reflexxes-rmltype2`](https://registry-preview.bazel.build/modules/reflexxes-rmltype2/1.2.7/) | 📦 ✅ | 🧰 ✅ |
-| [`rocksdb`](https://registry-preview.bazel.build/modules/rocksdb/9.11.2/) | 📦 ✅ | 🧰 ✅ [10 / 10](https://app.buildbuddy.io/invocation/f5f77e34-30d7-455a-85a0-1dd0e8de6514) |
-| [`rsyslog`](https://registry-preview.bazel.build/modules/rsyslog/8.2504.0/) | 📦 ✅ | 🧰 ❌ |
-| [`rules_multirun`](https://registry-preview.bazel.build/modules/rules_multirun/0.14.0/) | 📦 ✅ | 🧰 ✅ |
-| [`s2geometry`](https://github.com/google/s2geometry) | 📦 ✅ | 🧰 ✅ |
-| [`sdl2`](https://registry-preview.bazel.build/modules/sdl2/2.32.0.bcr.beta.6/) | 📦 ✅ | 🧰 ✅ |
-| [`sdl2_mixer`](https://registry-preview.bazel.build/modules/sdl2_mixer/2.8.1.bcr.beta.2/) | 📦 ✅ | 🧰 ✅ |
-| [`simdutf`](https://registry-preview.bazel.build/modules/simdutf/7.7.0/) | 📦 ✅ | 🧰 ✅ |
-| [`snappy`](https://github.com/google/snappy) | 📦 ✅ | 🧰 ✅ |
+| [`reflexxes-rmltype2`](https://registry-preview.bazel.build/modules/reflexxes-rmltype2/1.2.7/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/53a4afbd-5382-4ab3-923d-dc751c500430) | 🧰 ✅ |
+| [`rocksdb`](https://registry-preview.bazel.build/modules/rocksdb/9.11.2/) | 📦 ✅ [10 / 10](https://app.buildbuddy.io/invocation/23246343-7c30-4010-a85f-9e092477dc3b) | 🧰 ✅ [10 / 10](https://app.buildbuddy.io/invocation/f5f77e34-30d7-455a-85a0-1dd0e8de6514) |
+| [`rsyslog`](https://registry-preview.bazel.build/modules/rsyslog/8.2504.0/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/81602b44-68ea-4285-ab92-a281761f2454) | 🧰 ❌ |
+| [`rules_multirun`](https://registry-preview.bazel.build/modules/rules_multirun/0.14.0/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/1540a9ff-6eaf-4e7d-86af-8d4c7b86ab52) | 🧰 ✅ |
+| [`s2geometry`](https://github.com/google/s2geometry) | 📦 ✅ [10 / 10](https://app.buildbuddy.io/invocation/c37b597c-fa2c-43e6-84bb-69689b338e33) | 🧰 ✅ |
+| [`sdl2`](https://registry-preview.bazel.build/modules/sdl2/2.32.0.bcr.beta.6/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/2a8c9b75-b064-49bf-8248-1f705fe38946) | 🧰 ✅ |
+| [`sdl2_mixer`](https://registry-preview.bazel.build/modules/sdl2_mixer/2.8.1.bcr.beta.2/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/778d753c-a9d3-4f3c-9bf7-117f0cff8725) | 🧰 ✅ |
+| [`simdutf`](https://registry-preview.bazel.build/modules/simdutf/7.7.0/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/d22654b6-5089-4a22-b495-287e65704c83) | 🧰 ✅ |
+| [`snappy`](https://github.com/google/snappy) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/b33b269d-a2ca-4a59-99d4-0947c9419975) | 🧰 ✅ |
 | [`squashfs-tools`](https://registry-preview.bazel.build/modules/squashfs-tools/4.7.5/) | 📦 ✅ | 🧰 ✅ |
 | [`systemc`](https://registry-preview.bazel.build/modules/systemc/3.0.2.bcr.1/) | 📦 ✅ | 🧰 ✅ |
 | [`tinyformat`](https://registry-preview.bazel.build/modules/tinyformat/2.3.0/) | 📦 ✅ | 🧰 ✅ |
