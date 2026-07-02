@@ -101,19 +101,19 @@ Legend:
 | [`jsoncpp`](https://github.com/open-source-parsers/jsoncpp) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/bb2ad7ac-759c-4e6a-9779-0d75494bc3fe) | 🧰 ✅ |
 | [`jsonnet`](https://github.com/google/jsonnet) | 📦 ✅ [3 / 3](https://app.buildbuddy.io/invocation/b0fa0818-1523-4c11-b5fe-cf39c5e51e16) | 🧰 ✅ |
 | [`lcm`](https://github.com/lcm-proj/lcm) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/a76bce9e-e67d-4c2f-aea1-5bbf09115a99) | 🧰 ✅ |
-| [`lexbor`](https://registry-preview.bazel.build/modules/lexbor/2.4.0/) | 📦 ✅ | 🧰 ✅ |
-| [`lexy`](https://registry-preview.bazel.build/modules/lexy/2025.05.0/) | 📦 ✅ | 🧰 ✅ |
-| [`libavif`](https://registry-preview.bazel.build/modules/libavif/1.4.1/) | 📦 ✅ | 🧰 ✅ |
-| [`libcreate`](https://registry-preview.bazel.build/modules/libcreate/3.1.0/) | 📦 ✅ | 🧰 ✅ |
-| [`libde265`](https://registry-preview.bazel.build/modules/libde265/1.0.18/) | 📦 ✅ | 🧰 ✅ |
-| [`libdwarf`](https://registry-preview.bazel.build/modules/libdwarf/2.2.0.bcr.1/) | 📦 ✅ | 🧰 ✅ |
-| [`libevent`](https://registry-preview.bazel.build/modules/libevent/2.1.12-stable.bcr.0/) | 📦 ✅ | 🧰 ✅ |
-| [`libfastjson`](https://registry-preview.bazel.build/modules/libfastjson/1.2304.0/) | 📦 ✅ | 🧰 ✅ |
-| [`libgd`](https://registry-preview.bazel.build/modules/libgd/2.3.3/) | 📦 ✅ | 🧰 ✅ |
-| [`libgit2`](https://registry-preview.bazel.build/modules/libgit2/1.9.2.bcr.1/) | 📦 ✅ | 🧰 ✅ |
-| [`libheif`](https://registry-preview.bazel.build/modules/libheif/1.21.2/) | 📦 ✅ | 🧰 ✅ |
-| [`libpcap`](https://registry-preview.bazel.build/modules/libpcap/1.10.5.bcr.3/) | 📦 ✅ | 🧰 ✅ |
-| [`libwebsockets`](https://registry-preview.bazel.build/modules/libwebsockets/4.5.2/) | 📦 ✅ | 🧰 ✅ |
+| [`lexbor`](https://registry-preview.bazel.build/modules/lexbor/2.4.0/) | 📦 ✅ [120 / 120](https://app.buildbuddy.io/invocation/49c86bc9-e8f7-4e02-b9c7-f7c1b19077b4) | 🧰 ✅ |
+| [`lexy`](https://registry-preview.bazel.build/modules/lexy/2025.05.0/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/5ad5ec2f-5c73-450f-b902-a9add30757ad) | 🧰 ✅ |
+| [`libavif`](https://registry-preview.bazel.build/modules/libavif/1.4.1/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/97c7dae7-a526-45c4-b497-b12015552328) | 🧰 ✅ |
+| [`libcreate`](https://registry-preview.bazel.build/modules/libcreate/3.1.0/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/b4a60294-0712-4413-9850-a6e09a926766) | 🧰 ✅ |
+| [`libde265`](https://registry-preview.bazel.build/modules/libde265/1.0.18/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/dd503d08-1ba5-4182-9a80-600f8d5ece7f) | 🧰 ✅ |
+| [`libdwarf`](https://registry-preview.bazel.build/modules/libdwarf/2.2.0.bcr.1/) | 📦 ✅ [18 / 18](https://app.buildbuddy.io/invocation/bdf7766f-93af-4230-bfd0-fa5931f10dc5) | 🧰 ✅ |
+| [`libevent`](https://registry-preview.bazel.build/modules/libevent/2.1.12-stable.bcr.0/) | 📦 ✅ [10 / 10](https://app.buildbuddy.io/invocation/34978759-6979-4c26-b262-61787fb5896b) | 🧰 ✅ |
+| [`libfastjson`](https://registry-preview.bazel.build/modules/libfastjson/1.2304.0/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/939e40d9-dee2-4ad4-a236-6a3cf91bf43a) | 🧰 ✅ |
+| [`libgd`](https://registry-preview.bazel.build/modules/libgd/2.3.3/) | 📦 ✅ [6 / 6](https://app.buildbuddy.io/invocation/4e8305ee-6097-48d7-a41d-4fd75ee63c6c) | 🧰 ✅ |
+| [`libgit2`](https://registry-preview.bazel.build/modules/libgit2/1.9.2.bcr.1/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/b66adc39-ded7-41dd-a0f6-d0a35d8f4cea) | 🧰 ✅ |
+| [`libheif`](https://registry-preview.bazel.build/modules/libheif/1.21.2/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/98921ed1-9365-41e2-953c-693a31b1e7c0) | 🧰 ✅ |
+| [`libpcap`](https://registry-preview.bazel.build/modules/libpcap/1.10.5.bcr.3/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/a8955539-1a3c-43c2-b68f-34a77315768d) | 🧰 ✅ |
+| [`libwebsockets`](https://registry-preview.bazel.build/modules/libwebsockets/4.5.2/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/4912c6d4-b2c5-4561-9d1e-7889b6a0ddc6) | 🧰 ✅ |
 | [`llvm-project`](https://registry-preview.bazel.build/modules/llvm-project/17.0.4.bcr.1/) | 📦 ✅ | 🧰 ❌ |
 | [`magic_enum`](https://github.com/Neargye/magic_enum) | 📦 ✅ | 🧰 ✅ |
 | [`marisa-trie`](https://registry-preview.bazel.build/modules/marisa-trie/0.3.1.bcr.2/) | 📦 ✅ | 🧰 ✅ |
