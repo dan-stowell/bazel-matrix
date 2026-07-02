@@ -1,4 +1,16 @@
-load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification", "overlay")
 load("//projects/opencl-sdk:project.bzl", "OPENCL_SDK_PROJECT")
 
-hermetic_llvm_project_modification(project = OPENCL_SDK_PROJECT)
+# One test links both the extension loader and the ICD stubs, each defining
+# clReleaseDeviceEXT. Upstream never notices because cc_test links
+# dynamically by default; this variant's --dynamic_mode=off surfaces the
+# duplicate. -z muldefs keeps lld permissive like the upstream setup.
+ALLOW_MULDEFS = overlay(
+    name = "allow_muldefs",
+    build_flags = ["--linkopt=-Wl,-z,muldefs"],
+)
+
+hermetic_llvm_project_modification(
+    project = OPENCL_SDK_PROJECT,
+    toolchains = [ALLOW_MULDEFS],
+)
