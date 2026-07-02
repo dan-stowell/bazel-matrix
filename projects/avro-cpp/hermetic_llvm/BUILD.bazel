@@ -1,4 +1,18 @@
-load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification", "overlay")
 load("//projects/avro-cpp:project.bzl", "AVRO_CPP_PROJECT")
 
-hermetic_llvm_project_modification(project = AVRO_CPP_PROJECT)
+# avro-cpp pins an fmt that uses malloc/free without including <cstdlib>;
+# libc++ 22 (hermetic-llvm's runtime) removed the transitive include that
+# used to paper over that. Force-include cstdlib for the variant.
+CSTDLIB_INCLUDE = overlay(
+    name = "cstdlib_include",
+    build_flags = [
+        "--cxxopt=-include",
+        "--cxxopt=cstdlib",
+    ],
+)
+
+hermetic_llvm_project_modification(
+    project = AVRO_CPP_PROJECT,
+    toolchains = [CSTDLIB_INCLUDE],
+)
