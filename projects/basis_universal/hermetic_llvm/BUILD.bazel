@@ -1,0 +1,4 @@
+load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+load("//projects/basis_universal:project.bzl", "BASIS_UNIVERSAL_PROJECT")
+
+hermetic_llvm_project_modification(project = BASIS_UNIVERSAL_PROJECT)

@@ -1,0 +1,4 @@
+load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+load("//projects/libwebsockets:project.bzl", "LIBWEBSOCKETS_PROJECT")
+
+hermetic_llvm_project_modification(project = LIBWEBSOCKETS_PROJECT)

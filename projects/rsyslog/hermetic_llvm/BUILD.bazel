@@ -1,0 +1,4 @@
+load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+load("//projects/rsyslog:project.bzl", "RSYSLOG_PROJECT")
+
+hermetic_llvm_project_modification(project = RSYSLOG_PROJECT)

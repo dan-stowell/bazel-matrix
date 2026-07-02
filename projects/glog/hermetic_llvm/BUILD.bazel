@@ -1,0 +1,4 @@
+load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+load("//projects/glog:project.bzl", "GLOG_PROJECT")
+
+hermetic_llvm_project_modification(project = GLOG_PROJECT)

@@ -1,0 +1,4 @@
+load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+load("//projects/libde265:project.bzl", "LIBDE265_PROJECT")
+
+hermetic_llvm_project_modification(project = LIBDE265_PROJECT)

@@ -1,0 +1,4 @@
+load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+load("//projects/universal-robots-client-library:project.bzl", "UNIVERSAL_ROBOTS_CLIENT_LIBRARY_PROJECT")
+
+hermetic_llvm_project_modification(project = UNIVERSAL_ROBOTS_CLIENT_LIBRARY_PROJECT)

@@ -1,0 +1,4 @@
+load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+load("//projects/avro-cpp:project.bzl", "AVRO_CPP_PROJECT")
+
+hermetic_llvm_project_modification(project = AVRO_CPP_PROJECT)

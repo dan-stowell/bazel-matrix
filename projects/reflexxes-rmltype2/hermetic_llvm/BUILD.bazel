@@ -1,0 +1,4 @@
+load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+load("//projects/reflexxes-rmltype2:project.bzl", "REFLEXXES_RMLTYPE2_PROJECT")
+
+hermetic_llvm_project_modification(project = REFLEXXES_RMLTYPE2_PROJECT)

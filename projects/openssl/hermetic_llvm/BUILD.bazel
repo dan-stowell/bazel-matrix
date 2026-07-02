@@ -1,0 +1,4 @@
+load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+load("//projects/openssl:project.bzl", "OPENSSL_PROJECT")
+
+hermetic_llvm_project_modification(project = OPENSSL_PROJECT)
