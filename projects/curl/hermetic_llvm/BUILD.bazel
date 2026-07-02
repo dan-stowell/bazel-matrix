@@ -1,0 +1,4 @@
+load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+load("//projects/curl:project.bzl", "CURL_PROJECT")
+
+hermetic_llvm_project_modification(project = CURL_PROJECT)

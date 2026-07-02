@@ -1,0 +1,4 @@
+load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+load("//projects/cpptrace:project.bzl", "CPPTRACE_PROJECT")
+
+hermetic_llvm_project_modification(project = CPPTRACE_PROJECT)

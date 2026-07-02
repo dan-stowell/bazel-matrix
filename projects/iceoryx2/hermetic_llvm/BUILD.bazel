@@ -1,0 +1,4 @@
+load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+load("//projects/iceoryx2:project.bzl", "ICEORYX2_PROJECT")
+
+hermetic_llvm_project_modification(project = ICEORYX2_PROJECT)

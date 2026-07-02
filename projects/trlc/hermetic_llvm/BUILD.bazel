@@ -1,0 +1,7 @@
+load("//bazel_runner:defs.bzl", "HERMETIC_PYTHON", "hermetic_llvm_project_modification")
+load("//projects/trlc:project.bzl", "TRLC_PROJECT")
+
+hermetic_llvm_project_modification(
+    project = TRLC_PROJECT,
+    toolchains = [HERMETIC_PYTHON],
+)

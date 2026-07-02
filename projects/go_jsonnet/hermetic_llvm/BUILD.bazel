@@ -1,0 +1,4 @@
+load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+load("//projects/go_jsonnet:project.bzl", "GO_JSONNET_PROJECT")
+
+hermetic_llvm_project_modification(project = GO_JSONNET_PROJECT)

@@ -1,0 +1,7 @@
+load("//bazel_runner:defs.bzl", "HERMETIC_PYTHON", "hermetic_llvm_project_modification")
+load("//projects/rules_multirun:project.bzl", "RULES_MULTIRUN_PROJECT")
+
+hermetic_llvm_project_modification(
+    project = RULES_MULTIRUN_PROJECT,
+    toolchains = [HERMETIC_PYTHON],
+)

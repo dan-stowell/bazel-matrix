@@ -1,0 +1,17 @@
+load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification", "overlay")
+load("//projects/copybara:project.bzl", "COPYBARA_PROJECT")
+
+REMOTE_JDK = overlay(
+    name = "remote_jdk",
+    build_flags = [
+        "--java_language_version=21",
+        "--tool_java_language_version=21",
+        "--java_runtime_version=remotejdk_21",
+        "--tool_java_runtime_version=remotejdk_21",
+    ],
+)
+
+hermetic_llvm_project_modification(
+    project = COPYBARA_PROJECT,
+    toolchains = [REMOTE_JDK],
+)

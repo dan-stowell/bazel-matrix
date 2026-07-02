@@ -1,0 +1,4 @@
+load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+load("//projects/brotli_go:project.bzl", "BROTLI_GO_PROJECT")
+
+hermetic_llvm_project_modification(project = BROTLI_GO_PROJECT)

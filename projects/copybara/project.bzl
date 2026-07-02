@@ -35,6 +35,7 @@ COPYBARA_PROJECT = project_spec(
             "rbe": [
                 "//javatests/com/google/copybara/archive:ArchiveModuleTest_all_tests",
                 "//javatests/com/google/copybara:folder/FolderDestinationTest_all_tests",
+                "//javatests/com/google/copybara/git:GitRepositoryTest_all_tests",
             ],
         },
     ),

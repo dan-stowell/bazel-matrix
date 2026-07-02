@@ -1,0 +1,4 @@
+load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+load("//projects/briansmith_ring:project.bzl", "BRIANSMITH_RING_PROJECT")
+
+hermetic_llvm_project_modification(project = BRIANSMITH_RING_PROJECT)
