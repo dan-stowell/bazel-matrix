@@ -1,4 +1,10 @@
-load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+load("//bazel_runner:defs.bzl", "HERMETIC_PYTHON_FLAGS", "hermetic_llvm_project_modification")
 load("//projects/opencc:project.bzl", "OPENCC_PROJECT")
 
-hermetic_llvm_project_modification(project = OPENCC_PROJECT)
+# OpenCC runs py_binary dictionary-generation tools during the build; the
+# script bootstrap keeps them off the system python3, which RBE workers lack.
+# OpenCC's MODULE already declares rules_python.
+hermetic_llvm_project_modification(
+    project = OPENCC_PROJECT,
+    toolchains = [HERMETIC_PYTHON_FLAGS],
+)
