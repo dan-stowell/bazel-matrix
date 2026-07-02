@@ -147,7 +147,7 @@ Legend:
 | [`trlc`](https://registry-preview.bazel.build/modules/trlc/2.0.5/) | ✅ | 🧰 ✅ |
 | [`universal-robots-client-library`](https://registry-preview.bazel.build/modules/universal-robots-client-library/2.4.0/) | ✅ | 🧰 ✅ |
 | [`verible`](https://github.com/chipsalliance/verible) | ✅ | 🧰 ✅ |
-| [`verilator`](https://registry-preview.bazel.build/modules/verilator/5.046.bcr.5/) | ✅ | 💤 |
+| [`verilator`](https://registry-preview.bazel.build/modules/verilator/5.046.bcr.5/) | ✅ | 🧰 ❌ 0/3 |
 | [`xkbcommon`](https://registry-preview.bazel.build/modules/xkbcommon/1.9.2.bcr.beta.1/) | ✅ | 🧰 ✅ |
 | [`z3`](https://github.com/Z3Prover/z3) | 🚫 | 🚫 |
 | [`zlib`](https://github.com/madler/zlib) | 🚫 | 🚫 |
@@ -166,7 +166,7 @@ status table above.
 | [`behaviortree_cpp`](https://registry-preview.bazel.build/modules/behaviortree_cpp/4.7.0.bcr.3/) | `rbe` | 🧰 ❌ | Its BCR `sed` dependency uses gnulib code that does not parse under clang 22 (`_GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD`). |
 | [`llvm-project`](https://registry-preview.bazel.build/modules/llvm-project/17.0.4.bcr.1/) | `rbe` | 🧰 ❌ | The hermetic LLVM RBE variant analyzes and one unit test target passes, but several LLVM unit test targets fail to build: `SupportHelpers.h` includes private `gtest/gtest-printers.h`, and later Hexagon code hits libc++ comparator errors involving deleted `operator<` for `llvm::rdf::RegisterRef`. |
 | [`rsyslog`](https://registry-preview.bazel.build/modules/rsyslog/8.2504.0/) | `rbe` | 🧰 ❌ | The hermetic build issues are fixed, but the upstream smoke test drives `rsyslogd` with `nc -u -w 0`, which only the netcat-openbsd CLI accepts; the executor images provide a different variant. |
-| [`verilator`](https://registry-preview.bazel.build/modules/verilator/5.046.bcr.5/) | `rbe` | 💤 | No hermetic LLVM variant is tracked yet. |
+| [`verilator`](https://registry-preview.bazel.build/modules/verilator/5.046.bcr.5/) | `rbe` | 🧰 ❌ 0/3 | The hermetic LLVM RBE variant analyzes the test suite, but all three regression tests fail to build because Verilator binaries link with `-latomic` and hermetic `ld.lld` cannot find `libatomic` on the RBE image. |
 | [`brotli_go`](https://github.com/google/brotli) | `rbe` | 🧰 ❌ | The nested Go module pulls in the parent C brotli library, but that nested module still selects host C/C++ tools on RBE (`/bin/gcc`/`cc`), so the hermetic LLVM variant fails before the Go tests build. |
 | [`cpptrace`](https://github.com/jeremy-rifkin/cpptrace) | `rbe` | 🧰 ❌ | The transitive `toolchains_llvm` clang used by dependencies such as `xz` and `zstd` needs `libtinfo.so.5` on the RBE image; `rules_foreign_cc` make bootstrap also fails because that compiler cannot create executables. |
 | [`doctest`](https://github.com/doctest/doctest) | `rbe` | 🧰 ❌ | The nested `examples/` module still selects `/bin/gcc` on RBE instead of the injected hermetic LLVM toolchain, so the example test fails to compile. |
