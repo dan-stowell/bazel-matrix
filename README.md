@@ -32,7 +32,7 @@ Legend:
 
 - `✅` = matrix test target exists and the latest relevant sweep passed where applicable
 - `❌` = latest relevant test sweep failed
-- `🔍` = inspected, but no real upstream Bazel test target exists
+- `🚫` = no real upstream Bazel test target exists
 - `💤` = no matrix test target is expected for this project/environment
 - `🧰` = hermetic-llvm modification
 
@@ -48,7 +48,7 @@ Legend:
 | `benchmark` | ✅ | 🧰 ✅ |
 | `boringssl` | ✅ | 🧰 ✅ |
 | `briansmith_ring` | ✅ | 💤 |
-| `brotli` | 🔍 | 💤 |
+| `brotli` | 🚫 | 🚫 |
 | `brotli_go` | ✅ | 💤 |
 | `buildtools` | ✅ | 💤 |
 | `c-blosc2` | ✅ | 🧰 ✅ |
@@ -79,7 +79,7 @@ Legend:
 | `ftxui` | ✅ | 🧰 ✅ |
 | `fuzztest` | ✅ | 🧰 ✅ |
 | `fzf` | ✅ | 💤 |
-| `gflags` | 🔍 | 💤 |
+| `gflags` | 🚫 | 🚫 |
 | `glm` | ✅ | 🧰 ✅ |
 | `glog` | ✅ | 🧰 ✅ |
 | `go_jsonnet` | ✅ | 💤 |
@@ -95,7 +95,7 @@ Legend:
 | `icu` | ✅ | 🧰 ✅ |
 | `iperf` | ✅ | 🧰 ✅ |
 | `iverilog` | ✅ | 🧰 ✅ |
-| `json` | 🔍 | 💤 |
+| `json` | 🚫 | 🚫 |
 | `jsoncpp` | ✅ | 🧰 ✅ |
 | `jsonnet` | ✅ | 🧰 ✅ |
 | `lcm` | ✅ | 🧰 ✅ |
@@ -127,7 +127,7 @@ Legend:
 | `pcre2` | ✅ | 🧰 ✅ |
 | `prometheus_cpp` | ✅ | 🧰 ✅ |
 | `protobuf` | ✅ | 🧰 ✅ |
-| `quill` | 🔍 | 💤 |
+| `quill` | 🚫 | 🚫 |
 | `re2` | ✅ | 🧰 ✅ |
 | `reflexxes-rmltype2` | ✅ | 🧰 ✅ |
 | `rocksdb` | ✅ | 💤 |
@@ -148,8 +148,8 @@ Legend:
 | `verible` | ✅ | 🧰 ✅ |
 | `verilator` | ✅ | 💤 |
 | `xkbcommon` | ✅ | 🧰 ✅ |
-| `z3` | 🔍 | 💤 |
-| `zlib` | 🔍 | 💤 |
+| `z3` | 🚫 | 🚫 |
+| `zlib` | 🚫 | 🚫 |
 | `zstd` | ✅ | 🧰 ✅ |
 | `zziplib` | ✅ | 🧰 ✅ |
 
@@ -194,9 +194,9 @@ mean porting or re-wiring non-Bazel test suites.
 
 | project | cells | status | why |
 | --- | --- | --- | --- |
-| `brotli` | `local_test / rbe_test` | 🔍 / 💤 | The C library/CLI has no upstream Bazel test target; its C tests are CMake/CTest-based. The nested Go module tests are tracked separately as `brotli_go`. |
-| `gflags` | `local_test / rbe_test` | 🔍 / 💤 | Upstream's tests are CMake-only; the Bazel package exposes the library but no real Bazel test target. |
-| `json` | `local_test / rbe_test` | 🔍 / 💤 | nlohmann/json exposes a header library through Bazel, but its real test suite is wired through CMake/CTest and would require porting many doctest sources plus external test data into Bazel. |
-| `quill` | `local_test / rbe_test` | 🔍 / 💤 | Upstream's Bazel package exposes the library but no real Bazel test target. |
-| `z3` | `local_test / rbe_test` | 🔍 / 💤 | Upstream's Bazel target is a `rules_foreign_cc` CMake build of the solver, with no upstream Bazel test target. |
-| `zlib` | `local_test / rbe_test` | 🔍 / 💤 | Upstream's Bazel package exposes the library but declares no Bazel test targets. |
+| `brotli` | `local_test / rbe_test` | 🚫 | The C library/CLI has no upstream Bazel test target; its C tests are CMake/CTest-based. The nested Go module tests are tracked separately as `brotli_go`. |
+| `gflags` | `local_test / rbe_test` | 🚫 | Upstream's tests are CMake-only; the Bazel package exposes the library but no real Bazel test target. |
+| `json` | `local_test / rbe_test` | 🚫 | nlohmann/json exposes a header library through Bazel, but its real test suite is wired through CMake/CTest and would require porting many doctest sources plus external test data into Bazel. |
+| `quill` | `local_test / rbe_test` | 🚫 | Upstream's Bazel package exposes the library but no real Bazel test target. |
+| `z3` | `local_test / rbe_test` | 🚫 | Upstream's Bazel target is a `rules_foreign_cc` CMake build of the solver, with no upstream Bazel test target. |
+| `zlib` | `local_test / rbe_test` | 🚫 | Upstream's Bazel package exposes the library but declares no Bazel test targets. |
