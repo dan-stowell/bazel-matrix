@@ -56,7 +56,7 @@ Legend:
 | [`ccronexpr`](https://registry-preview.bazel.build/modules/ccronexpr/2.1.0/) | ✅ | 🧰 ✅ |
 | [`cctz`](https://github.com/google/cctz) | ✅ | 🧰 ✅ |
 | [`cityhash`](https://registry-preview.bazel.build/modules/cityhash/1.1.1/) | ✅ | 🧰 ✅ |
-| [`cjson`](https://registry-preview.bazel.build/modules/cjson/1.7.19-0.20240923110858-12c4bf1986c2.bcr.4/) | ❌ | 🧰 ✅ |
+| [`cjson`](https://registry-preview.bazel.build/modules/cjson/1.7.19-0.20240923110858-12c4bf1986c2.bcr.4/) | ✅ | 🧰 ✅ |
 | [`cli11`](https://github.com/CLIUtils/CLI11) | ✅ | 🧰 ✅ |
 | [`copybara`](https://github.com/google/copybara) | ✅ | 💤 |
 | [`cpp-httplib`](https://registry-preview.bazel.build/modules/cpp-httplib/0.46.0/) | ✅ | 🧰 ✅ |
@@ -166,7 +166,6 @@ status table above.
 | [`briansmith_ring`](https://registry-preview.bazel.build/modules/briansmith_ring/0.17.14.bcr.1/) | `rbe` | 💤 | No hermetic LLVM variant is tracked yet. |
 | [`brotli_go`](https://github.com/google/brotli) | `rbe` | 💤 | No hermetic LLVM variant is tracked yet for the nested Go-module test package. |
 | [`buildtools`](https://github.com/bazelbuild/buildtools) | `rbe` | 💤 | No hermetic LLVM variant is tracked yet. |
-| [`cjson`](https://registry-preview.bazel.build/modules/cjson/1.7.19-0.20240923110858-12c4bf1986c2.bcr.4/) | `local` | ❌ | One of the 22 upstream tests is sensitive to the host compiler/libc; the hermetic LLVM variant passes and is the reproducible result. |
 | [`copybara`](https://github.com/google/copybara) | `rbe` | 💤 | No hermetic LLVM variant is tracked yet. |
 | [`cpptrace`](https://github.com/jeremy-rifkin/cpptrace) | `rbe` | 💤 | No hermetic LLVM variant is tracked yet. |
 | [`curl`](https://registry-preview.bazel.build/modules/curl/8.12.0.bcr.1/) | `rbe` | 💤 | No hermetic LLVM variant is tracked yet. |
