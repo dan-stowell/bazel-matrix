@@ -95,14 +95,28 @@ BUILDBUDDY_RBE = overlay(
         "--remote_timeout=10m",
         "--jobs=32",
         "--remote_executor=grpcs://remote.buildbuddy.io",
-        # BuildBuddy's default executor image is Ubuntu 16.04 (glibc 2.23);
-        # hermetic-llvm targets glibc 2.28, so test binaries died with
-        # "libm.so.6: version GLIBC_2.27 not found". Run remote actions in a
-        # newer image instead (hermetic-llvm's rbe.bzl pins the same one).
-        # Only applies when the execution platform sets no exec_properties.
-        "--remote_default_exec_properties=container-image=docker://ubuntu:22.04",
     ],
 )
+
+_CONTAINER_IMAGE_FLAG_PREFIX = "--remote_default_exec_properties=container-image="
+
+# BuildBuddy's default executor image is Ubuntu 16.04 (glibc 2.23);
+# hermetic-llvm targets glibc 2.28, so test binaries died with
+# "libm.so.6: version GLIBC_2.27 not found". Run remote actions in a newer
+# image by default (hermetic-llvm's rbe.bzl pins the same one). Only applies
+# when the execution platform sets no exec_properties.
+DEFAULT_RBE_IMAGE_FLAG = _CONTAINER_IMAGE_FLAG_PREFIX + "docker://ubuntu:22.04"
+
+def _rbe_overlay_flags(toolchains):
+    """BuildBuddy RBE flags, adding the default executor image only when no
+    project overlay supplies its own (duplicate container-image keys crash
+    Bazel with 'Multiple entries with same key')."""
+    flags = _overlay_build_flags([BUILDBUDDY_RBE])
+    for toolchain in toolchains:
+        for flag in toolchain.build_flags:
+            if flag.startswith(_CONTAINER_IMAGE_FLAG_PREFIX):
+                return flags
+    return flags + [DEFAULT_RBE_IMAGE_FLAG]
 
 def tarball_source(archive, strip_prefix = "", source_subdir = ""):
     return struct(
@@ -486,7 +500,7 @@ def _emit_bazel_runner_targets(source_archive, strip_prefix, source_subdir, tool
 
     bazel = inner_bazel(bazel_version)
     build_flags = _overlay_build_flags(toolchains) + _overlay_build_flags([BUILDBUDDY_BES])
-    rbe_build_flags = build_flags + _overlay_build_flags([BUILDBUDDY_RBE])
+    rbe_build_flags = build_flags + _rbe_overlay_flags(toolchains)
     if build:
         bazel_runner_build(
             name = _local_build_name(target_prefix),
@@ -533,7 +547,7 @@ def _emit_bazel_runner_targets(source_archive, strip_prefix, source_subdir, tool
 def _emit_bazel_runner_targets_for_source(source, source_subdir, toolchains, build, test, bazel_version, target_prefix, visibility):
     bazel = inner_bazel(bazel_version)
     build_flags = _overlay_build_flags(toolchains) + _overlay_build_flags([BUILDBUDDY_BES])
-    rbe_build_flags = build_flags + _overlay_build_flags([BUILDBUDDY_RBE])
+    rbe_build_flags = build_flags + _rbe_overlay_flags(toolchains)
     if build:
         bazel_runner_build(
             name = _local_build_name(target_prefix),

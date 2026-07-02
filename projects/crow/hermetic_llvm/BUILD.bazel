@@ -1,4 +1,19 @@
-load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification", "overlay")
 load("//projects/crow:project.bzl", "CROW_PROJECT")
 
-hermetic_llvm_project_modification(project = CROW_PROJECT)
+# Crow's only Bazel test (//tests/ssl:ssltest) shells out to the OpenSSL CLI
+# to mint certificates; plain ubuntu:22.04 doesn't ship it. Run this project's
+# remote actions on BuildBuddy's rbe-ubuntu20-04 image (glibc 2.31 ≥ the
+# toolchain's 2.28 target), which does. Overlay flags precede the default
+# buildbuddy_rbe flags and the first --remote_default_exec_properties wins.
+OPENSSL_CLI_IMAGE = overlay(
+    name = "openssl_cli_image",
+    build_flags = [
+        "--remote_default_exec_properties=container-image=docker://gcr.io/flame-public/rbe-ubuntu20-04:latest",
+    ],
+)
+
+hermetic_llvm_project_modification(
+    project = CROW_PROJECT,
+    toolchains = [OPENSSL_CLI_IMAGE],
+)
