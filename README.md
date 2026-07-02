@@ -51,14 +51,14 @@ Legend:
 | [`boringssl`](https://github.com/google/boringssl) | 📦 ✅ [2 / 2](https://app.buildbuddy.io/invocation/0e9e619f-b6e0-4f2a-bc08-b1c9d6d29fc6) | 🧰 ✅ |
 | [`briansmith_ring`](https://registry-preview.bazel.build/modules/briansmith_ring/0.17.14.bcr.1/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/fe954775-ba38-475b-86f4-5c7e9a009b66) | 🧰 ✅ |
 | [`brotli`](https://github.com/google/brotli) | 🚫 | 🚫 |
-| [`brotli_go`](https://github.com/google/brotli) | 📦 ✅ | 🧰 ❌ |
-| [`buildtools`](https://github.com/bazelbuild/buildtools) | 📦 ✅ | 🧰 ✅ |
-| [`c-blosc2`](https://registry-preview.bazel.build/modules/c-blosc2/2.22.0/) | 📦 ✅ | 🧰 ✅ |
-| [`catch2`](https://github.com/catchorg/Catch2) | 📦 ✅ | 🧰 ✅ |
-| [`ccronexpr`](https://registry-preview.bazel.build/modules/ccronexpr/2.1.0/) | 📦 ✅ | 🧰 ✅ |
-| [`cctz`](https://github.com/google/cctz) | 📦 ✅ | 🧰 ✅ |
-| [`cityhash`](https://registry-preview.bazel.build/modules/cityhash/1.1.1/) | 📦 ✅ | 🧰 ✅ |
-| [`cjson`](https://registry-preview.bazel.build/modules/cjson/1.7.19-0.20240923110858-12c4bf1986c2.bcr.4/) | 📦 ✅ | 🧰 ✅ |
+| [`brotli_go`](https://github.com/google/brotli) | 📦 ✅ [4 / 4](https://app.buildbuddy.io/invocation/d0ed49a7-65f7-4ef9-ab6b-46d4d705c193) | 🧰 ❌ |
+| [`buildtools`](https://github.com/bazelbuild/buildtools) | 📦 ✅ [5 / 5](https://app.buildbuddy.io/invocation/80c81fcd-c6d8-413e-bd93-bc94f816fcaf) | 🧰 ✅ |
+| [`c-blosc2`](https://registry-preview.bazel.build/modules/c-blosc2/2.22.0/) | 📦 ✅ [37 / 37](https://app.buildbuddy.io/invocation/255941ac-c024-4df8-aece-9b7778b207bd) | 🧰 ✅ |
+| [`catch2`](https://github.com/catchorg/Catch2) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/ed4426eb-9c66-49fc-897d-d9160783e459) | 🧰 ✅ |
+| [`ccronexpr`](https://registry-preview.bazel.build/modules/ccronexpr/2.1.0/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/d695ff42-93bc-480e-a2b9-19ff450177b5) | 🧰 ✅ |
+| [`cctz`](https://github.com/google/cctz) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/d52c5f1d-8279-4cd0-842e-c8e8876e4a7b) | 🧰 ✅ |
+| [`cityhash`](https://registry-preview.bazel.build/modules/cityhash/1.1.1/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/07d882b4-ed3d-4cbb-b187-bea2a5556152) | 🧰 ✅ |
+| [`cjson`](https://registry-preview.bazel.build/modules/cjson/1.7.19-0.20240923110858-12c4bf1986c2.bcr.4/) | 📦 ✅ [21 / 21](https://app.buildbuddy.io/invocation/e1387d22-95e9-4b7a-b619-66fcaefacc7d) | 🧰 ✅ |
 | [`cli11`](https://github.com/CLIUtils/CLI11) | 📦 ✅ | 🧰 ✅ |
 | [`copybara`](https://github.com/google/copybara) | 📦 ✅ | 🧰 ✅ |
 | [`cpp-httplib`](https://registry-preview.bazel.build/modules/cpp-httplib/0.46.0/) | 📦 ✅ | 🧰 ✅ |
