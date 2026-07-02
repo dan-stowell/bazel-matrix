@@ -41,10 +41,10 @@ Legend:
 | project_name | local_test | rbe_test |
 | --- | --- | --- |
 | [`abseil_cpp`](https://github.com/abseil/abseil-cpp) | 📦 ✅ [251 / 251](https://app.buildbuddy.io/invocation/3ecd9d6d-2a8e-4c6f-b690-23b82ff03bdd) | 🧰 ✅ |
-| [`abseil_py`](https://github.com/abseil/abseil-py) | 📦 ✅ | 🧰 ✅ |
-| [`aravis`](https://registry-preview.bazel.build/modules/aravis/0.9.2-20251111063445-57983d013883/) | 📦 ✅ | 🧰 ❌ |
-| [`avro-cpp`](https://registry-preview.bazel.build/modules/avro-cpp/1.12.0/) | 📦 ✅ | 🧰 ✅ |
-| [`basis_universal`](https://registry-preview.bazel.build/modules/basis_universal/2.0.3/) | 📦 ✅ | 🧰 ✅ |
+| [`abseil_py`](https://github.com/abseil/abseil-py) | 📦 ✅ [27 / 27](https://app.buildbuddy.io/invocation/26c52517-ee87-4bef-81e1-1fe41b000024) | 🧰 ✅ |
+| [`aravis`](https://registry-preview.bazel.build/modules/aravis/0.9.2-20251111063445-57983d013883/) | 📦 ✅ [7 / 7](https://app.buildbuddy.io/invocation/69ae8c8f-1470-42a6-9c18-d716310c98d0) | 🧰 ❌ |
+| [`avro-cpp`](https://registry-preview.bazel.build/modules/avro-cpp/1.12.0/) | 📦 ✅ [6 / 6](https://app.buildbuddy.io/invocation/7244b93a-4730-4199-bc74-bc1200150f60) | 🧰 ✅ |
+| [`basis_universal`](https://registry-preview.bazel.build/modules/basis_universal/2.0.3/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/ba54c6d2-91cb-475e-a727-185d8de521cc) | 🧰 ✅ |
 | [`bazel`](https://github.com/bazelbuild/bazel) | 📦 ✅ | 💤 |
 | [`behaviortree_cpp`](https://registry-preview.bazel.build/modules/behaviortree_cpp/4.7.0.bcr.3/) | 📦 ✅ | 🧰 ❌ |
 | [`benchmark`](https://github.com/google/benchmark) | 📦 ✅ | 🧰 ✅ |
