@@ -2,7 +2,38 @@
 
 ## Quick Start
 
-Install Bazel or Bazelisk, then run the RE2 build:
+Install Bazel or Bazelisk, then run the as-is smoke tests:
+
+```sh
+bazel test //:smoke_as_is_local_tests
+```
+
+Outer and inner Bazel invocations publish public BuildBuddy invocation links on
+buildbuddy.io by default. If `BUILDBUDDY_API_KEY` is set in your environment,
+Bazel also uploads outer test logs so they are visible from the BuildBuddy
+invocation page.
+
+With a BuildBuddy API key configured, you can also run the hermetic LLVM smoke
+tests through BuildBuddy RBE:
+
+```sh
+bazel test //:smoke_hermetic_llvm_tests
+```
+
+To inspect an individual project, run RE2's upstream tests:
+
+```sh
+bazel test //projects/re2/as_is:re2_local_test
+```
+
+Run RE2's upstream tests through BuildBuddy RBE:
+
+```sh
+bazel test //projects/re2/as_is:re2_rbe_test
+```
+
+Build RE2 and collect the inner Bazel build event stream, manifest, and
+top-level build outputs:
 
 ```sh
 bazel build //projects/re2/as_is:re2_local_build
@@ -13,33 +44,6 @@ The output is:
 ```text
 bazel-bin/projects/re2/as_is/re2_local_build.tar
 ```
-
-That tarball contains the inner Bazel build event stream, a manifest, and RE2's
-top-level build outputs.
-
-Run RE2's upstream tests:
-
-```sh
-bazel test //projects/re2/as_is:re2_local_test
-```
-
-Run upstream tests through BuildBuddy RBE when a project has a test target:
-
-```sh
-bazel test //projects/re2/as_is:re2_rbe_test
-```
-
-Kick the tires without running a full sweep:
-
-```sh
-bazel build //:smoke_as_is_local_builds
-bazel test //:smoke_as_is_local_tests
-bazel build //:smoke_hermetic_llvm_rbe_builds
-bazel test //:smoke_hermetic_llvm_rbe_tests
-```
-
-Outer and inner Bazel invocations publish anonymous, public BuildBuddy invocation
-links by default.
 
 ## Project Layout
 

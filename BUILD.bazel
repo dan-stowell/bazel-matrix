@@ -484,6 +484,11 @@ test_suite(
     tests = SMOKE_HERMETIC_LLVM_RBE_TESTS,
 )
 
+test_suite(
+    name = "smoke_hermetic_llvm_tests",
+    tests = SMOKE_HERMETIC_LLVM_RBE_TESTS,
+)
+
 filegroup(
     name = "as_is_local_builds",
     srcs = AS_IS_LOCAL_BUILDS,
