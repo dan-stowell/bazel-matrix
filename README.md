@@ -67,16 +67,16 @@ Legend:
 | [`crow`](https://github.com/CrowCpp/Crow) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/9f889ad8-e611-4d28-bf8b-704452215209) | 🧰 ✅ |
 | [`cucumber-cpp`](https://registry-preview.bazel.build/modules/cucumber-cpp/0.8.0.bcr.1/) | 📦 ✅ [9 / 9](https://app.buildbuddy.io/invocation/cc5c991f-6800-4513-ab8b-32b5aa492437) | 🧰 ✅ |
 | [`curl`](https://registry-preview.bazel.build/modules/curl/8.12.0.bcr.1/) | 📦 ✅ [2 / 2](https://app.buildbuddy.io/invocation/5ef98629-173c-4ab1-a12a-7d0058ab803a) | 🧰 ✅ |
-| [`cxx`](https://github.com/dtolnay/cxx) | 📦 ✅ | 🧰 ✅ |
-| [`cxxurl`](https://registry-preview.bazel.build/modules/cxxurl/0.3/) | 📦 ✅ | 🧰 ✅ |
-| [`directxmath`](https://registry-preview.bazel.build/modules/directxmath/3.20/) | 📦 ✅ | 🧰 ✅ |
-| [`doctest`](https://github.com/doctest/doctest) | 📦 ✅ | 🧰 ❌ |
-| [`double_conversion`](https://github.com/google/double-conversion) | 📦 ✅ | 🧰 ✅ |
-| [`effcee`](https://registry-preview.bazel.build/modules/effcee/0.0.0-20250222/) | 📦 ✅ | 🧰 ✅ |
-| [`exprtk`](https://registry-preview.bazel.build/modules/exprtk/0.0.3.bcr.1/) | 📦 ✅ | 🧰 ✅ |
-| [`fast_float`](https://github.com/fastfloat/fast_float) | 📦 ✅ | 🧰 ✅ |
-| [`fftw`](https://registry-preview.bazel.build/modules/fftw/3.3.10/) | 📦 ✅ | 🧰 ✅ |
-| [`flatbuffers`](https://github.com/google/flatbuffers) | 📦 ✅ | 🧰 ✅ |
+| [`cxx`](https://github.com/dtolnay/cxx) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/9bcc3aa8-fbdb-44cd-97dc-3000ce4f82eb) | 🧰 ✅ |
+| [`cxxurl`](https://registry-preview.bazel.build/modules/cxxurl/0.3/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/024a5541-e0ca-4784-a0a9-51119fd04b60) | 🧰 ✅ |
+| [`directxmath`](https://registry-preview.bazel.build/modules/directxmath/3.20/) | 📦 ✅ [10 / 10](https://app.buildbuddy.io/invocation/ceb1f9cf-3356-45da-ae3c-278a832c47b4) | 🧰 ✅ |
+| [`doctest`](https://github.com/doctest/doctest) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/e726738c-2f38-4956-b4b5-c38cfa97c3b9) | 🧰 ❌ |
+| [`double_conversion`](https://github.com/google/double-conversion) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/a14e2a07-1991-41a8-a92a-aab32c3c0d83) | 🧰 ✅ |
+| [`effcee`](https://registry-preview.bazel.build/modules/effcee/0.0.0-20250222/) | 📦 ✅ [7 / 7](https://app.buildbuddy.io/invocation/57d577a5-6b32-4bcf-b17e-6bfb15c8ee49) | 🧰 ✅ |
+| [`exprtk`](https://registry-preview.bazel.build/modules/exprtk/0.0.3.bcr.1/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/adbaf030-23d4-4077-81ae-af5c456d2b96) | 🧰 ✅ |
+| [`fast_float`](https://github.com/fastfloat/fast_float) | 📦 ✅ [2 / 2](https://app.buildbuddy.io/invocation/e2438734-cf9f-4a19-a74f-70d3aaf1e9f0) | 🧰 ✅ |
+| [`fftw`](https://registry-preview.bazel.build/modules/fftw/3.3.10/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/818a786f-1f2b-472a-9bb0-7e425b8e90db) | 🧰 ✅ |
+| [`flatbuffers`](https://github.com/google/flatbuffers) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/4981df14-54c5-49cb-99c2-c9a072de964e) | 🧰 ✅ |
 | [`flex`](https://registry-preview.bazel.build/modules/flex/2.6.4.bcr.5/) | 📦 ✅ | 🧰 ✅ |
 | [`ftxui`](https://github.com/ArthurSonzogni/FTXUI) | 📦 ✅ | 🧰 ✅ |
 | [`fuzztest`](https://github.com/google/fuzztest) | 📦 ✅ | 🧰 ✅ |
