@@ -72,27 +72,45 @@ which rules_cc 0.2.19 removed. Decision: bump the appended module to
 `llvm` 0.8.11 (2026-06-26; depends on rules_cc 0.2.20). boringssl's
 hermetic_llvm rbe_test then passes.
 
-## Known per-project issue: abseil_py needs a system python3 remotely
+## Finding: python needs a hermetic interpreter and the script bootstrap
 
-abseil-py's upstream MODULE.bazel registers
-`@rules_python//python/runtime_env_toolchains:all`, i.e. "use `python3` from
-PATH". Remote workers don't have a matching interpreter (none at all on
-ubuntu:22.04; an ancient one on the default image, which breaks `.pth`
-processing with `SyntaxError` + `ModuleNotFoundError: absl`). Fix planned:
-overlay the variant's MODULE.bazel to drop the runtime_env registration so
-rules_python's hermetic interpreter is used.
+Anything python touches fails on RBE workers because the images ship no
+`python3`:
 
-## Sweep results
+- Projects registering `@rules_python//python/runtime_env_toolchains:all`
+  (abseil_py) resolve `python3` from PATH at runtime. Fix: overlay the
+  variant's MODULE.bazel to request a hermetic interpreter instead
+  (`projects/abseil_py/hermetic.MODULE.bazel`).
+- Even with a hermetic runtime, rules_python's default
+  `bootstrap_impl=system_python` stage-1 stub execs `/usr/bin/env python3`.
+  Fix: `--@rules_python//python/config_settings:bootstrap_impl=script`. Two
+  reusable overlays exist: `HERMETIC_PYTHON` (appends a root rules_python dep
+  so the flag's repo is addressable + the flag) and `HERMETIC_PYTHON_FLAGS`
+  (flag only, for projects whose MODULE already declares rules_python —
+  appending a duplicate bazel_dep is an error). This covers py_test wrappers
+  (effcee, googletest) and build-time py_binary codegen tools (lcm's glib,
+  opencc), since the flag reaches exec-config tools too.
 
-See the table below; refreshed by running `bazel test //:hermetic_llvm_rbe_tests`
-(and `//:as_is_rbe_tests` for the as-is column where projects pass as-is).
+## Environmental exclusions (exclude_on = {"rbe": [...]})
 
-Smoke suite (2026-07-02, llvm 0.8.11 + ubuntu:22.04 + --dynamic_mode=off):
+- `abseil_cpp` `//absl/time:time_test`: reads the host timezone database and
+  has no zoneinfo data dep (the cctz tests bundle testdata/zoneinfo and pass
+  with `--test_env=TZDIR=...`).
+- `abseil_py` `//absl/flags:tests/flags_test`: its no-permissions test chmods
+  a file unreadable; RBE executors run as root, which ignores permissions.
+- `protobuf` `//src/google/protobuf/compiler:protoc_x86_64_test`: shells out
+  to the `file` utility, absent on executor images.
 
-| project | variant | rbe_test | note |
-| --- | --- | --- | --- |
-| `abseil_py` | hermetic_llvm | ❌ | runtime_env python toolchain; no python3 on remote image |
-| `boringssl` | hermetic_llvm | ✅ | fixed by llvm 0.8.11 |
-| `fast_float` | hermetic_llvm | ✅ | fixed by --dynamic_mode=off |
-| `glm` | hermetic_llvm | ✅ | fixed by ubuntu:22.04 image (glibc) |
-| `tomlplusplus` | hermetic_llvm | ✅ | fixed by --dynamic_mode=off |
+## Sweep results (2026-07-02)
+
+`bazel test //:hermetic_llvm_rbe_tests`: **47 of 47 pass**
+(https://app.buildbuddy.io/invocation/18f1e442-7034-4bcb-bb81-aec97b5e2d1d).
+
+Passing projects (hermetic_llvm variant, RBE test):
+abseil_cpp, abseil_py, benchmark, boringssl, ccronexpr, cctz, cityhash,
+cjson, cpp-httplib, cpu_features, cxxurl, directxmath, double_conversion,
+effcee, exprtk, fast_float, flatbuffers, ftxui, fuzztest, glm, googletest,
+gperftools, gsl-lite, hfsm2, highway, jsoncpp, lcm, lexbor, libfastjson,
+marisa-trie, nsync, ogg, onetbb, opencc, openexr, pcre2, prometheus_cpp,
+protobuf, re2, s2geometry, simdutf, snappy, tinyformat, tinyxml2,
+tomlplusplus, verible, zstd.
