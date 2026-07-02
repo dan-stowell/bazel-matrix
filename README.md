@@ -116,21 +116,21 @@ Legend:
 | [`libwebsockets`](https://registry-preview.bazel.build/modules/libwebsockets/4.5.2/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/4912c6d4-b2c5-4561-9d1e-7889b6a0ddc6) | 🧰 ✅ |
 | [`llvm-project`](https://registry-preview.bazel.build/modules/llvm-project/17.0.4.bcr.1/) | 📦 ✅ [5 / 5](https://app.buildbuddy.io/invocation/d5885dd1-a810-4a61-a207-eecd2efe6f0e) | 🧰 ❌ |
 | [`magic_enum`](https://github.com/Neargye/magic_enum) | 📦 ✅ [2 / 2](https://app.buildbuddy.io/invocation/dc9be948-ed76-4b76-844c-045862e5aeb8) | 🧰 ✅ |
-| [`marisa-trie`](https://registry-preview.bazel.build/modules/marisa-trie/0.3.1.bcr.2/) | 📦 ✅ | 🧰 ✅ |
-| [`nsync`](https://github.com/google/nsync) | 📦 ✅ | 🧰 ✅ |
-| [`ogg`](https://registry-preview.bazel.build/modules/ogg/1.3.5.bcr.3/) | 📦 ✅ | 🧰 ✅ |
-| [`onetbb`](https://github.com/uxlfoundation/oneTBB) | 📦 ✅ | 🧰 ✅ |
-| [`opencc`](https://github.com/BYVoid/OpenCC) | 📦 ✅ | 🧰 ✅ |
-| [`opencl-sdk`](https://registry-preview.bazel.build/modules/opencl-sdk/2025.07.23/) | 📦 ✅ | 🧰 ✅ |
-| [`openexr`](https://github.com/AcademySoftwareFoundation/openexr) | 📦 ✅ | 🧰 ✅ |
-| [`openssl`](https://registry-preview.bazel.build/modules/openssl/3.5.5.bcr.4/) | 📦 ✅ | 🧰 ✅ |
-| [`opentelemetry_cpp`](https://github.com/open-telemetry/opentelemetry-cpp) | 📦 ✅ | 🧰 ✅ |
-| [`ortools`](https://github.com/google/or-tools) | 📦 ✅ | 🧰 ✅ [87 / 89](https://app.buildbuddy.io/invocation/7ecbdebc-d5e0-4810-8508-a146477fb8cf) |
-| [`pcre2`](https://github.com/PCRE2Project/pcre2) | 📦 ✅ | 🧰 ✅ |
-| [`prometheus_cpp`](https://github.com/jupp0r/prometheus-cpp) | 📦 ✅ | 🧰 ✅ |
-| [`protobuf`](https://github.com/protocolbuffers/protobuf) | 📦 ✅ | 🧰 ✅ |
+| [`marisa-trie`](https://registry-preview.bazel.build/modules/marisa-trie/0.3.1.bcr.2/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/4b7151a6-9716-4379-a0c6-41edec1bc07c) | 🧰 ✅ |
+| [`nsync`](https://github.com/google/nsync) | 📦 ✅ [7 / 7](https://app.buildbuddy.io/invocation/173364a7-6379-4127-b984-a24892fe0461) | 🧰 ✅ |
+| [`ogg`](https://registry-preview.bazel.build/modules/ogg/1.3.5.bcr.3/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/94f6e436-9ddb-4e0d-aff9-69edb1556280) | 🧰 ✅ |
+| [`onetbb`](https://github.com/uxlfoundation/oneTBB) | 📦 ✅ [4 / 4](https://app.buildbuddy.io/invocation/da8f7282-2d67-49d9-afa0-ca6938b99b0c) | 🧰 ✅ |
+| [`opencc`](https://github.com/BYVoid/OpenCC) | 📦 ✅ [19 / 19](https://app.buildbuddy.io/invocation/5364edda-6605-472d-9f07-d2aea0816295) | 🧰 ✅ |
+| [`opencl-sdk`](https://registry-preview.bazel.build/modules/opencl-sdk/2025.07.23/) | 📦 ✅ [10 / 10](https://app.buildbuddy.io/invocation/7b365e25-2db9-4380-9be1-10b2422474ce) | 🧰 ✅ |
+| [`openexr`](https://github.com/AcademySoftwareFoundation/openexr) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/49309456-99d9-4885-a612-f9da2315a9af) | 🧰 ✅ |
+| [`openssl`](https://registry-preview.bazel.build/modules/openssl/3.5.5.bcr.4/) | 📦 ✅ [2 / 2](https://app.buildbuddy.io/invocation/7c8e6377-b0d8-4ddc-8411-ce001c246011) | 🧰 ✅ |
+| [`opentelemetry_cpp`](https://github.com/open-telemetry/opentelemetry-cpp) | 📦 ✅ [42 / 42](https://app.buildbuddy.io/invocation/cbee6888-dc1e-406f-807e-5f8130a6f31b) | 🧰 ✅ |
+| [`ortools`](https://github.com/google/or-tools) | 📦 ✅ [89 / 89](https://app.buildbuddy.io/invocation/e140fb78-050f-492f-abb3-a3f5ece0abfb) | 🧰 ✅ [87 / 89](https://app.buildbuddy.io/invocation/7ecbdebc-d5e0-4810-8508-a146477fb8cf) |
+| [`pcre2`](https://github.com/PCRE2Project/pcre2) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/dc946879-2000-4a29-b160-271eb1b98dad) | 🧰 ✅ |
+| [`prometheus_cpp`](https://github.com/jupp0r/prometheus-cpp) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/35b4ecc6-7c5c-4d57-ad03-e2b5c58df5bb) | 🧰 ✅ |
+| [`protobuf`](https://github.com/protocolbuffers/protobuf) | 📦 ✅ [101 / 102](https://app.buildbuddy.io/invocation/59828833-9399-408f-84b9-022d02533f46) | 🧰 ✅ |
 | [`quill`](https://github.com/odygrd/quill) | 🚫 | 🚫 |
-| [`re2`](https://github.com/google/re2) | 📦 ✅ | 🧰 ✅ |
+| [`re2`](https://github.com/google/re2) | 📦 ✅ [16 / 16](https://app.buildbuddy.io/invocation/078fe8ea-dee1-4a63-a936-3729d540f165) | 🧰 ✅ |
 | [`reflexxes-rmltype2`](https://registry-preview.bazel.build/modules/reflexxes-rmltype2/1.2.7/) | 📦 ✅ | 🧰 ✅ |
 | [`rocksdb`](https://registry-preview.bazel.build/modules/rocksdb/9.11.2/) | 📦 ✅ | 🧰 ✅ [10 / 10](https://app.buildbuddy.io/invocation/f5f77e34-30d7-455a-85a0-1dd0e8de6514) |
 | [`rsyslog`](https://registry-preview.bazel.build/modules/rsyslog/8.2504.0/) | 📦 ✅ | 🧰 ❌ |
