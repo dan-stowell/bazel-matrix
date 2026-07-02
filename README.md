@@ -155,36 +155,36 @@ Legend:
 
 ## Project Notes
 
-Notes are keyed by `(project, status cell)` for active non-green cells in the
+Notes are keyed by `(project, test env)` for active non-green cells in the
 status table above.
 
-| project | cell | status | note |
+| project | test env | status | note |
 | --- | --- | --- | --- |
-| `aravis` | `rbe_test` | 🧰 ❌ | The hermetic LLVM variant fixes glib Python codegen and uses preinstalled `make`/`pkg-config`, but libxml2 still builds through `rules_foreign_cc` outside Bazel's C++ rule flow; the zero-sysroot hermetic clang cannot find crt objects such as `Scrt1.o`. |
-| `bazel` | `rbe_test` | 💤 | No hermetic LLVM RBE test target is tracked yet; this large project is kept out of the regular hermetic RBE test sweep. |
-| `behaviortree_cpp` | `rbe_test` | 🧰 ❌ | Its BCR `sed` dependency uses gnulib code that does not parse under clang 22 (`_GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD`). |
-| `briansmith_ring` | `rbe_test` | 💤 | No hermetic LLVM variant is tracked yet. |
-| `brotli_go` | `rbe_test` | 💤 | No hermetic LLVM variant is tracked yet for the nested Go-module test package. |
-| `buildtools` | `rbe_test` | 💤 | No hermetic LLVM variant is tracked yet. |
-| `cjson` | `local_test` | ❌ | One of the 22 upstream tests is sensitive to the host compiler/libc; the hermetic LLVM variant passes and is the reproducible result. |
-| `copybara` | `rbe_test` | 💤 | No hermetic LLVM variant is tracked yet. |
-| `cpptrace` | `rbe_test` | 💤 | No hermetic LLVM variant is tracked yet. |
-| `curl` | `rbe_test` | 💤 | No hermetic LLVM variant is tracked yet. |
-| `cxx` | `rbe_test` | 💤 | No hermetic LLVM variant is tracked yet. |
-| `doctest` | `rbe_test` | 💤 | No hermetic LLVM variant is tracked yet. |
-| `fftw` | `rbe_test` | 💤 | No hermetic LLVM variant is tracked yet. |
-| `fzf` | `rbe_test` | 💤 | No hermetic LLVM variant is tracked yet. |
-| `go_jsonnet` | `rbe_test` | 💤 | No hermetic LLVM variant is tracked yet. |
-| `grpc` | `rbe_test` | 💤 | No hermetic LLVM variant is tracked yet. |
-| `grpc_gateway` | `rbe_test` | 💤 | No hermetic LLVM variant is tracked yet. |
-| `iceoryx2` | `rbe_test` | 💤 | No hermetic LLVM variant is tracked yet. |
-| `llvm-project` | `rbe_test` | 💤 | No hermetic LLVM variant is tracked yet; this large project is kept out of the regular hermetic RBE test sweep. |
-| `ortools` | `rbe_test` | 💤 | No hermetic LLVM variant is tracked yet. |
-| `rocksdb` | `rbe_test` | 💤 | No hermetic LLVM variant is tracked yet; this large project is kept out of the regular hermetic RBE test sweep. |
-| `rsyslog` | `rbe_test` | 🧰 ❌ | The hermetic build issues are fixed, but the upstream smoke test drives `rsyslogd` with `nc -u -w 0`, which only the netcat-openbsd CLI accepts; the executor images provide a different variant. |
-| `rules_multirun` | `rbe_test` | 💤 | No hermetic LLVM variant is tracked yet. |
-| `trlc` | `rbe_test` | 💤 | No hermetic LLVM variant is tracked yet. |
-| `verilator` | `rbe_test` | 💤 | No hermetic LLVM variant is tracked yet. |
+| `aravis` | `rbe` | 🧰 ❌ | The hermetic LLVM variant fixes glib Python codegen and uses preinstalled `make`/`pkg-config`, but libxml2 still builds through `rules_foreign_cc` outside Bazel's C++ rule flow; the zero-sysroot hermetic clang cannot find crt objects such as `Scrt1.o`. |
+| `bazel` | `rbe` | 💤 | No hermetic LLVM RBE test target is tracked yet; this large project is kept out of the regular hermetic RBE test sweep. |
+| `behaviortree_cpp` | `rbe` | 🧰 ❌ | Its BCR `sed` dependency uses gnulib code that does not parse under clang 22 (`_GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD`). |
+| `briansmith_ring` | `rbe` | 💤 | No hermetic LLVM variant is tracked yet. |
+| `brotli_go` | `rbe` | 💤 | No hermetic LLVM variant is tracked yet for the nested Go-module test package. |
+| `buildtools` | `rbe` | 💤 | No hermetic LLVM variant is tracked yet. |
+| `cjson` | `local` | ❌ | One of the 22 upstream tests is sensitive to the host compiler/libc; the hermetic LLVM variant passes and is the reproducible result. |
+| `copybara` | `rbe` | 💤 | No hermetic LLVM variant is tracked yet. |
+| `cpptrace` | `rbe` | 💤 | No hermetic LLVM variant is tracked yet. |
+| `curl` | `rbe` | 💤 | No hermetic LLVM variant is tracked yet. |
+| `cxx` | `rbe` | 💤 | No hermetic LLVM variant is tracked yet. |
+| `doctest` | `rbe` | 💤 | No hermetic LLVM variant is tracked yet. |
+| `fftw` | `rbe` | 💤 | No hermetic LLVM variant is tracked yet. |
+| `fzf` | `rbe` | 💤 | No hermetic LLVM variant is tracked yet. |
+| `go_jsonnet` | `rbe` | 💤 | No hermetic LLVM variant is tracked yet. |
+| `grpc` | `rbe` | 💤 | No hermetic LLVM variant is tracked yet. |
+| `grpc_gateway` | `rbe` | 💤 | No hermetic LLVM variant is tracked yet. |
+| `iceoryx2` | `rbe` | 💤 | No hermetic LLVM variant is tracked yet. |
+| `llvm-project` | `rbe` | 💤 | No hermetic LLVM variant is tracked yet; this large project is kept out of the regular hermetic RBE test sweep. |
+| `ortools` | `rbe` | 💤 | No hermetic LLVM variant is tracked yet. |
+| `rocksdb` | `rbe` | 💤 | No hermetic LLVM variant is tracked yet; this large project is kept out of the regular hermetic RBE test sweep. |
+| `rsyslog` | `rbe` | 🧰 ❌ | The hermetic build issues are fixed, but the upstream smoke test drives `rsyslogd` with `nc -u -w 0`, which only the netcat-openbsd CLI accepts; the executor images provide a different variant. |
+| `rules_multirun` | `rbe` | 💤 | No hermetic LLVM variant is tracked yet. |
+| `trlc` | `rbe` | 💤 | No hermetic LLVM variant is tracked yet. |
+| `verilator` | `rbe` | 💤 | No hermetic LLVM variant is tracked yet. |
 
 ## Projects Not Tackled Right Now
 
@@ -192,11 +192,11 @@ These projects do not expose meaningful upstream tests that we can run with
 Bazel today. They are intentionally out of scope for now; fixing them would
 mean porting or re-wiring non-Bazel test suites.
 
-| project | cells | status | why |
-| --- | --- | --- | --- |
-| `brotli` | `local_test / rbe_test` | 🚫 | The C library/CLI has no upstream Bazel test target; its C tests are CMake/CTest-based. The nested Go module tests are tracked separately as `brotli_go`. |
-| `gflags` | `local_test / rbe_test` | 🚫 | Upstream's tests are CMake-only; the Bazel package exposes the library but no real Bazel test target. |
-| `json` | `local_test / rbe_test` | 🚫 | nlohmann/json exposes a header library through Bazel, but its real test suite is wired through CMake/CTest and would require porting many doctest sources plus external test data into Bazel. |
-| `quill` | `local_test / rbe_test` | 🚫 | Upstream's Bazel package exposes the library but no real Bazel test target. |
-| `z3` | `local_test / rbe_test` | 🚫 | Upstream's Bazel target is a `rules_foreign_cc` CMake build of the solver, with no upstream Bazel test target. |
-| `zlib` | `local_test / rbe_test` | 🚫 | Upstream's Bazel package exposes the library but declares no Bazel test targets. |
+| project | status | why |
+| --- | --- | --- |
+| `brotli` | 🚫 | The C library/CLI has no upstream Bazel test target; its C tests are CMake/CTest-based. The nested Go module tests are tracked separately as `brotli_go`. |
+| `gflags` | 🚫 | Upstream's tests are CMake-only; the Bazel package exposes the library but no real Bazel test target. |
+| `json` | 🚫 | nlohmann/json exposes a header library through Bazel, but its real test suite is wired through CMake/CTest and would require porting many doctest sources plus external test data into Bazel. |
+| `quill` | 🚫 | Upstream's Bazel package exposes the library but no real Bazel test target. |
+| `z3` | 🚫 | Upstream's Bazel target is a `rules_foreign_cc` CMake build of the solver, with no upstream Bazel test target. |
+| `zlib` | 🚫 | Upstream's Bazel package exposes the library but declares no Bazel test targets. |
