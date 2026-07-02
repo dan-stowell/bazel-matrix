@@ -61,121 +61,127 @@ Legend:
 
 RBE cells combine variant/result pairs, for example `📦 ❌ / 🧰 ✅`.
 
-Detailed RBE build failure buckets are tracked in [bazel_runner/rbe_build_status.md](bazel_runner/rbe_build_status.md).
+The `rbe_test` column is from the 2026-07-02 sweeps of
+`//:hermetic_llvm_rbe_tests` (84 of 87 targets pass); `💤` there means the
+project has no hermetic_llvm rbe_test target (no test spec, or no variant
+yet). The `rbe_build` column's as-is (`📦`) results are from the 2026-06-30
+build sweep; see [bazel_runner/rbe_build_status.md](bazel_runner/rbe_build_status.md)
+for its failure buckets and [bazel_runner/rbe_test_status.md](bazel_runner/rbe_test_status.md)
+for the RBE test findings, fixes, and environmental exclusions.
 
-| project_name | build | test | rbe_build |
-| --- | --- | --- | --- |
-| `abseil_cpp` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `abseil_py` | ✅ | ✅ | 📦 ✅ |
-| `aravis` | ✅ | ✅ | 📦 ❌ |
-| `avro-cpp` | ✅ | ✅ | 📦 ❌ |
-| `basis_universal` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `bazel` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `behaviortree_cpp` | ✅ | ✅ | 📦 ❌ |
-| `benchmark` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `boringssl` | ✅ | ✅ | 📦 ✅ |
-| `briansmith_ring` | ✅ | ✅ | 📦 ❌ |
-| `brotli` | ✅ | 🔍 | 📦 ❌ / 🧰 ✅ |
-| `brotli_go` | ✅ | ✅ | 📦 ❌ |
-| `buildtools` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `c-blosc2` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `catch2` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `ccronexpr` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `cctz` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `cityhash` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `cjson` | 💤 | ❌ | 📦 ❌ / 🧰 ✅ |
-| `cli11` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `copybara` | ✅ | ✅ | 📦 ❌ |
-| `cpp-httplib` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `cpptrace` | ✅ | ✅ | 📦 ❌ |
-| `cpu_features` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `crow` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `cucumber-cpp` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `curl` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `cxx` | ✅ | ✅ | 📦 ❌ |
-| `cxxurl` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `directxmath` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `doctest` | ✅ | ✅ | 📦 ✅ |
-| `double_conversion` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `effcee` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `exprtk` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `fast_float` | ✅ | ✅ | 📦 ✅ |
-| `fftw` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `flatbuffers` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `flex` | ✅ | ✅ | 📦 ❌ |
-| `ftxui` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `fuzztest` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `fzf` | ✅ | ✅ | 📦 ❌ |
-| `gflags` | ✅ | 🔍 | 📦 ❌ / 🧰 ✅ |
-| `glm` | ✅ | ✅ | 📦 ✅ |
-| `glog` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `go_jsonnet` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `googletest` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `gperftools` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `grpc` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `grpc_gateway` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `gsl-lite` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `hfsm2` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `highs` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `highway` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `iceoryx2` | ✅ | ✅ | 📦 ❌ |
-| `icu` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `iperf` | ✅ | ✅ | 📦 ❌ |
-| `iverilog` | ✅ | ✅ | 📦 ❌ |
-| `json` | ✅ | 🔍 | 📦 ✅ |
-| `jsoncpp` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `jsonnet` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `lcm` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `lexbor` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `lexy` | 💤 | ✅ | 📦 ❌ / 🧰 ✅ |
-| `libavif` | ✅ | ✅ | 📦 ❌ |
-| `libcreate` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `libde265` | ✅ | ✅ | 📦 ❌ |
-| `libdwarf` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `libevent` | ✅ | ✅ | 📦 ❌ |
-| `libfastjson` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `libgd` | ✅ | ✅ | 📦 ❌ |
-| `libgit2` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `libheif` | ✅ | ✅ | 📦 ❌ |
-| `libpcap` | ✅ | ✅ | 📦 ❌ |
-| `libwebsockets` | ✅ | ✅ | 📦 ❌ |
-| `llvm-project` | ✅ | ✅ | 📦 ❌ |
-| `magic_enum` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `marisa-trie` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `nsync` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `ogg` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `onetbb` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `opencc` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `opencl-sdk` | ✅ | ✅ | 📦 ❌ |
-| `openexr` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `openssl` | ✅ | ✅ | 📦 ❌ |
-| `opentelemetry_cpp` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `ortools` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `pcre2` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `prometheus_cpp` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `protobuf` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `quill` | ✅ | 🔍 | 📦 ✅ |
-| `re2` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `reflexxes-rmltype2` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `rocksdb` | 💤 | ✅ | 📦 ❌ / 🧰 ✅ |
-| `rsyslog` | ✅ | ✅ | 📦 ❌ |
-| `rules_multirun` | ✅ | ✅ | 📦 ✅ |
-| `s2geometry` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `sdl2` | ✅ | ✅ | 📦 ❌ |
-| `sdl2_mixer` | ✅ | ✅ | 📦 ❌ |
-| `simdutf` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `snappy` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `squashfs-tools` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `systemc` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `tinyformat` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `tinyxml2` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `tomlplusplus` | 💤 | ✅ | 📦 ✅ |
-| `trlc` | ✅ | ✅ | 📦 ✅ |
-| `universal-robots-client-library` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `verible` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `verilator` | ✅ | ✅ | 📦 ❌ |
-| `xkbcommon` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `z3` | ✅ | 🔍 | 📦 ❌ |
-| `zlib` | ✅ | 🔍 | 📦 ❌ / 🧰 ✅ |
-| `zstd` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ |
-| `zziplib` | ✅ | ✅ | 📦 ❌ |
+| project_name | build | test | rbe_build | rbe_test |
+| --- | --- | --- | --- | --- |
+| `abseil_cpp` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `abseil_py` | ✅ | ✅ | 📦 ✅ | 🧰 ✅ |
+| `aravis` | ✅ | ✅ | 📦 ❌ | 🧰 ❌ |
+| `avro-cpp` | ✅ | ✅ | 📦 ❌ | 🧰 ✅ |
+| `basis_universal` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `bazel` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 💤 |
+| `behaviortree_cpp` | ✅ | ✅ | 📦 ❌ | 🧰 ❌ |
+| `benchmark` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `boringssl` | ✅ | ✅ | 📦 ✅ | 🧰 ✅ |
+| `briansmith_ring` | ✅ | ✅ | 📦 ❌ | 💤 |
+| `brotli` | ✅ | 🔍 | 📦 ❌ / 🧰 ✅ | 💤 |
+| `brotli_go` | ✅ | ✅ | 📦 ❌ | 💤 |
+| `buildtools` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 💤 |
+| `c-blosc2` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `catch2` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `ccronexpr` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `cctz` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `cityhash` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `cjson` | 💤 | ❌ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `cli11` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `copybara` | ✅ | ✅ | 📦 ❌ | 💤 |
+| `cpp-httplib` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `cpptrace` | ✅ | ✅ | 📦 ❌ | 💤 |
+| `cpu_features` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `crow` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `cucumber-cpp` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `curl` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 💤 |
+| `cxx` | ✅ | ✅ | 📦 ❌ | 💤 |
+| `cxxurl` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `directxmath` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `doctest` | ✅ | ✅ | 📦 ✅ | 💤 |
+| `double_conversion` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `effcee` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `exprtk` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `fast_float` | ✅ | ✅ | 📦 ✅ | 🧰 ✅ |
+| `fftw` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 💤 |
+| `flatbuffers` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `flex` | ✅ | ✅ | 📦 ❌ | 🧰 ✅ |
+| `ftxui` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `fuzztest` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `fzf` | ✅ | ✅ | 📦 ❌ | 💤 |
+| `gflags` | ✅ | 🔍 | 📦 ❌ / 🧰 ✅ | 💤 |
+| `glm` | ✅ | ✅ | 📦 ✅ | 🧰 ✅ |
+| `glog` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `go_jsonnet` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 💤 |
+| `googletest` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `gperftools` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `grpc` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 💤 |
+| `grpc_gateway` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 💤 |
+| `gsl-lite` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `hfsm2` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `highs` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `highway` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `iceoryx2` | ✅ | ✅ | 📦 ❌ | 💤 |
+| `icu` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `iperf` | ✅ | ✅ | 📦 ❌ | 🧰 ✅ |
+| `iverilog` | ✅ | ✅ | 📦 ❌ | 🧰 ✅ |
+| `json` | ✅ | 🔍 | 📦 ✅ | 💤 |
+| `jsoncpp` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `jsonnet` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `lcm` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `lexbor` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `lexy` | 💤 | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `libavif` | ✅ | ✅ | 📦 ❌ | 🧰 ✅ |
+| `libcreate` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `libde265` | ✅ | ✅ | 📦 ❌ | 🧰 ✅ |
+| `libdwarf` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `libevent` | ✅ | ✅ | 📦 ❌ | 🧰 ✅ |
+| `libfastjson` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `libgd` | ✅ | ✅ | 📦 ❌ | 🧰 ✅ |
+| `libgit2` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `libheif` | ✅ | ✅ | 📦 ❌ | 🧰 ✅ |
+| `libpcap` | ✅ | ✅ | 📦 ❌ | 🧰 ✅ |
+| `libwebsockets` | ✅ | ✅ | 📦 ❌ | 🧰 ✅ |
+| `llvm-project` | ✅ | ✅ | 📦 ❌ | 💤 |
+| `magic_enum` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `marisa-trie` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `nsync` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `ogg` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `onetbb` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `opencc` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `opencl-sdk` | ✅ | ✅ | 📦 ❌ | 🧰 ✅ |
+| `openexr` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `openssl` | ✅ | ✅ | 📦 ❌ | 🧰 ✅ |
+| `opentelemetry_cpp` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `ortools` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 💤 |
+| `pcre2` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `prometheus_cpp` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `protobuf` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `quill` | ✅ | 🔍 | 📦 ✅ | 💤 |
+| `re2` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `reflexxes-rmltype2` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `rocksdb` | 💤 | ✅ | 📦 ❌ / 🧰 ✅ | 💤 |
+| `rsyslog` | ✅ | ✅ | 📦 ❌ | 🧰 ❌ |
+| `rules_multirun` | ✅ | ✅ | 📦 ✅ | 💤 |
+| `s2geometry` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `sdl2` | ✅ | ✅ | 📦 ❌ | 🧰 ✅ |
+| `sdl2_mixer` | ✅ | ✅ | 📦 ❌ | 🧰 ✅ |
+| `simdutf` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `snappy` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `squashfs-tools` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `systemc` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `tinyformat` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `tinyxml2` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `tomlplusplus` | 💤 | ✅ | 📦 ✅ | 🧰 ✅ |
+| `trlc` | ✅ | ✅ | 📦 ✅ | 💤 |
+| `universal-robots-client-library` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `verible` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `verilator` | ✅ | ✅ | 📦 ❌ | 💤 |
+| `xkbcommon` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `z3` | ✅ | 🔍 | 📦 ❌ | 💤 |
+| `zlib` | ✅ | 🔍 | 📦 ❌ / 🧰 ✅ | 💤 |
+| `zstd` | ✅ | ✅ | 📦 ❌ / 🧰 ✅ | 🧰 ✅ |
+| `zziplib` | ✅ | ✅ | 📦 ❌ | 🧰 ✅ |
