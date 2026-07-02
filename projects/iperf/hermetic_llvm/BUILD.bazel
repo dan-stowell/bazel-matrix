@@ -1,4 +1,15 @@
-load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification", "overlay")
 load("//projects/iperf:project.bzl", "IPERF_PROJECT")
 
-hermetic_llvm_project_modification(project = IPERF_PROJECT)
+# iperf reads tcpi_snd_wnd from struct tcp_info, which glibc added in 2.32;
+# the toolchain's default target is glibc 2.28. Target 2.36 instead (any
+# executor image this repo uses is at least that new).
+GLIBC_2_36 = overlay(
+    name = "glibc_2_36",
+    build_flags = ["--platforms=@llvm//platforms:linux_x86_64_gnu.2.36"],
+)
+
+hermetic_llvm_project_modification(
+    project = IPERF_PROJECT,
+    toolchains = [GLIBC_2_36],
+)
