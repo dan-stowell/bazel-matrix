@@ -114,8 +114,8 @@ Legend:
 | [`libheif`](https://registry-preview.bazel.build/modules/libheif/1.21.2/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/98921ed1-9365-41e2-953c-693a31b1e7c0) | 🧰 ✅ |
 | [`libpcap`](https://registry-preview.bazel.build/modules/libpcap/1.10.5.bcr.3/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/a8955539-1a3c-43c2-b68f-34a77315768d) | 🧰 ✅ |
 | [`libwebsockets`](https://registry-preview.bazel.build/modules/libwebsockets/4.5.2/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/4912c6d4-b2c5-4561-9d1e-7889b6a0ddc6) | 🧰 ✅ |
-| [`llvm-project`](https://registry-preview.bazel.build/modules/llvm-project/17.0.4.bcr.1/) | 📦 ✅ | 🧰 ❌ |
-| [`magic_enum`](https://github.com/Neargye/magic_enum) | 📦 ✅ | 🧰 ✅ |
+| [`llvm-project`](https://registry-preview.bazel.build/modules/llvm-project/17.0.4.bcr.1/) | 📦 ✅ [5 / 5](https://app.buildbuddy.io/invocation/d5885dd1-a810-4a61-a207-eecd2efe6f0e) | 🧰 ❌ |
+| [`magic_enum`](https://github.com/Neargye/magic_enum) | 📦 ✅ [2 / 2](https://app.buildbuddy.io/invocation/dc9be948-ed76-4b76-844c-045862e5aeb8) | 🧰 ✅ |
 | [`marisa-trie`](https://registry-preview.bazel.build/modules/marisa-trie/0.3.1.bcr.2/) | 📦 ✅ | 🧰 ✅ |
 | [`nsync`](https://github.com/google/nsync) | 📦 ✅ | 🧰 ✅ |
 | [`ogg`](https://registry-preview.bazel.build/modules/ogg/1.3.5.bcr.3/) | 📦 ✅ | 🧰 ✅ |
