@@ -43,6 +43,13 @@ _RBE_HERMETIC_LLVM = overlay(
 _HERMETIC_LLVM_MODIFICATION = overlay(
     name = "hermetic_llvm",
     appends = [("//bazel_runner:hermetic_llvm.MODULE.bazel", "MODULE.bazel")],
+    # cc_test defaults to linkstatic = 0, so test binaries dynamically link
+    # libc++.so.1/libc++abi.so.1 from the hermetic toolchain. On RBE workers the
+    # dynamic loader cannot resolve those runfiles-relative solibs and falls
+    # back to the worker image's /usr/local/lib copies, which are incompatible
+    # ("undefined symbol: __msan_va_arg_overflow_size_tls"). Forcing static
+    # linking removes the runtime dependency on worker system libraries.
+    build_flags = ["--dynamic_mode=off"],
 )
 CC_NODETECT = overlay(name = "cc_nodetect")
 HERMETIC_ZIP = overlay(
