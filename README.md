@@ -34,126 +34,126 @@ Legend:
 - `❌` = latest relevant test sweep failed
 - `🚫` = no real upstream Bazel test target exists
 - `💤` = no matrix test target is expected for this project/environment
-- `🌿` = as-is modification
+- `📦` = as-is modification
 - `🧰` = hermetic-llvm modification
 - `N / M` = upstream tests passing out of the meaningful test suite tracked here
 
 | project_name | local_test | rbe_test |
 | --- | --- | --- |
-| [`abseil_cpp`](https://github.com/abseil/abseil-cpp) | 🌿 ✅ | 🧰 ✅ |
-| [`abseil_py`](https://github.com/abseil/abseil-py) | 🌿 ✅ | 🧰 ✅ |
-| [`aravis`](https://registry-preview.bazel.build/modules/aravis/0.9.2-20251111063445-57983d013883/) | 🌿 ✅ | 🧰 ❌ |
-| [`avro-cpp`](https://registry-preview.bazel.build/modules/avro-cpp/1.12.0/) | 🌿 ✅ | 🧰 ✅ |
-| [`basis_universal`](https://registry-preview.bazel.build/modules/basis_universal/2.0.3/) | 🌿 ✅ | 🧰 ✅ |
-| [`bazel`](https://github.com/bazelbuild/bazel) | 🌿 ✅ | 💤 |
-| [`behaviortree_cpp`](https://registry-preview.bazel.build/modules/behaviortree_cpp/4.7.0.bcr.3/) | 🌿 ✅ | 🧰 ❌ |
-| [`benchmark`](https://github.com/google/benchmark) | 🌿 ✅ | 🧰 ✅ |
-| [`boringssl`](https://github.com/google/boringssl) | 🌿 ✅ | 🧰 ✅ |
-| [`briansmith_ring`](https://registry-preview.bazel.build/modules/briansmith_ring/0.17.14.bcr.1/) | 🌿 ✅ | 🧰 ✅ |
+| [`abseil_cpp`](https://github.com/abseil/abseil-cpp) | 📦 ✅ | 🧰 ✅ |
+| [`abseil_py`](https://github.com/abseil/abseil-py) | 📦 ✅ | 🧰 ✅ |
+| [`aravis`](https://registry-preview.bazel.build/modules/aravis/0.9.2-20251111063445-57983d013883/) | 📦 ✅ | 🧰 ❌ |
+| [`avro-cpp`](https://registry-preview.bazel.build/modules/avro-cpp/1.12.0/) | 📦 ✅ | 🧰 ✅ |
+| [`basis_universal`](https://registry-preview.bazel.build/modules/basis_universal/2.0.3/) | 📦 ✅ | 🧰 ✅ |
+| [`bazel`](https://github.com/bazelbuild/bazel) | 📦 ✅ | 💤 |
+| [`behaviortree_cpp`](https://registry-preview.bazel.build/modules/behaviortree_cpp/4.7.0.bcr.3/) | 📦 ✅ | 🧰 ❌ |
+| [`benchmark`](https://github.com/google/benchmark) | 📦 ✅ | 🧰 ✅ |
+| [`boringssl`](https://github.com/google/boringssl) | 📦 ✅ | 🧰 ✅ |
+| [`briansmith_ring`](https://registry-preview.bazel.build/modules/briansmith_ring/0.17.14.bcr.1/) | 📦 ✅ | 🧰 ✅ |
 | [`brotli`](https://github.com/google/brotli) | 🚫 | 🚫 |
-| [`brotli_go`](https://github.com/google/brotli) | 🌿 ✅ | 🧰 ❌ |
-| [`buildtools`](https://github.com/bazelbuild/buildtools) | 🌿 ✅ | 🧰 ✅ |
-| [`c-blosc2`](https://registry-preview.bazel.build/modules/c-blosc2/2.22.0/) | 🌿 ✅ | 🧰 ✅ |
-| [`catch2`](https://github.com/catchorg/Catch2) | 🌿 ✅ | 🧰 ✅ |
-| [`ccronexpr`](https://registry-preview.bazel.build/modules/ccronexpr/2.1.0/) | 🌿 ✅ | 🧰 ✅ |
-| [`cctz`](https://github.com/google/cctz) | 🌿 ✅ | 🧰 ✅ |
-| [`cityhash`](https://registry-preview.bazel.build/modules/cityhash/1.1.1/) | 🌿 ✅ | 🧰 ✅ |
-| [`cjson`](https://registry-preview.bazel.build/modules/cjson/1.7.19-0.20240923110858-12c4bf1986c2.bcr.4/) | 🌿 ✅ | 🧰 ✅ |
-| [`cli11`](https://github.com/CLIUtils/CLI11) | 🌿 ✅ | 🧰 ✅ |
-| [`copybara`](https://github.com/google/copybara) | 🌿 ✅ | 🧰 ✅ |
-| [`cpp-httplib`](https://registry-preview.bazel.build/modules/cpp-httplib/0.46.0/) | 🌿 ✅ | 🧰 ✅ |
-| [`cpptrace`](https://github.com/jeremy-rifkin/cpptrace) | 🌿 ✅ | 🧰 ❌ |
-| [`cpu_features`](https://github.com/google/cpu_features) | 🌿 ✅ | 🧰 ✅ |
-| [`crow`](https://github.com/CrowCpp/Crow) | 🌿 ✅ | 🧰 ✅ |
-| [`cucumber-cpp`](https://registry-preview.bazel.build/modules/cucumber-cpp/0.8.0.bcr.1/) | 🌿 ✅ | 🧰 ✅ |
-| [`curl`](https://registry-preview.bazel.build/modules/curl/8.12.0.bcr.1/) | 🌿 ✅ | 🧰 ✅ |
-| [`cxx`](https://github.com/dtolnay/cxx) | 🌿 ✅ | 🧰 ✅ |
-| [`cxxurl`](https://registry-preview.bazel.build/modules/cxxurl/0.3/) | 🌿 ✅ | 🧰 ✅ |
-| [`directxmath`](https://registry-preview.bazel.build/modules/directxmath/3.20/) | 🌿 ✅ | 🧰 ✅ |
-| [`doctest`](https://github.com/doctest/doctest) | 🌿 ✅ | 🧰 ❌ |
-| [`double_conversion`](https://github.com/google/double-conversion) | 🌿 ✅ | 🧰 ✅ |
-| [`effcee`](https://registry-preview.bazel.build/modules/effcee/0.0.0-20250222/) | 🌿 ✅ | 🧰 ✅ |
-| [`exprtk`](https://registry-preview.bazel.build/modules/exprtk/0.0.3.bcr.1/) | 🌿 ✅ | 🧰 ✅ |
-| [`fast_float`](https://github.com/fastfloat/fast_float) | 🌿 ✅ | 🧰 ✅ |
-| [`fftw`](https://registry-preview.bazel.build/modules/fftw/3.3.10/) | 🌿 ✅ | 🧰 ✅ |
-| [`flatbuffers`](https://github.com/google/flatbuffers) | 🌿 ✅ | 🧰 ✅ |
-| [`flex`](https://registry-preview.bazel.build/modules/flex/2.6.4.bcr.5/) | 🌿 ✅ | 🧰 ✅ |
-| [`ftxui`](https://github.com/ArthurSonzogni/FTXUI) | 🌿 ✅ | 🧰 ✅ |
-| [`fuzztest`](https://github.com/google/fuzztest) | 🌿 ✅ | 🧰 ✅ |
-| [`fzf`](https://registry-preview.bazel.build/modules/fzf/0.71.0/) | 🌿 ✅ | 🧰 ❌ |
+| [`brotli_go`](https://github.com/google/brotli) | 📦 ✅ | 🧰 ❌ |
+| [`buildtools`](https://github.com/bazelbuild/buildtools) | 📦 ✅ | 🧰 ✅ |
+| [`c-blosc2`](https://registry-preview.bazel.build/modules/c-blosc2/2.22.0/) | 📦 ✅ | 🧰 ✅ |
+| [`catch2`](https://github.com/catchorg/Catch2) | 📦 ✅ | 🧰 ✅ |
+| [`ccronexpr`](https://registry-preview.bazel.build/modules/ccronexpr/2.1.0/) | 📦 ✅ | 🧰 ✅ |
+| [`cctz`](https://github.com/google/cctz) | 📦 ✅ | 🧰 ✅ |
+| [`cityhash`](https://registry-preview.bazel.build/modules/cityhash/1.1.1/) | 📦 ✅ | 🧰 ✅ |
+| [`cjson`](https://registry-preview.bazel.build/modules/cjson/1.7.19-0.20240923110858-12c4bf1986c2.bcr.4/) | 📦 ✅ | 🧰 ✅ |
+| [`cli11`](https://github.com/CLIUtils/CLI11) | 📦 ✅ | 🧰 ✅ |
+| [`copybara`](https://github.com/google/copybara) | 📦 ✅ | 🧰 ✅ |
+| [`cpp-httplib`](https://registry-preview.bazel.build/modules/cpp-httplib/0.46.0/) | 📦 ✅ | 🧰 ✅ |
+| [`cpptrace`](https://github.com/jeremy-rifkin/cpptrace) | 📦 ✅ | 🧰 ❌ |
+| [`cpu_features`](https://github.com/google/cpu_features) | 📦 ✅ | 🧰 ✅ |
+| [`crow`](https://github.com/CrowCpp/Crow) | 📦 ✅ | 🧰 ✅ |
+| [`cucumber-cpp`](https://registry-preview.bazel.build/modules/cucumber-cpp/0.8.0.bcr.1/) | 📦 ✅ | 🧰 ✅ |
+| [`curl`](https://registry-preview.bazel.build/modules/curl/8.12.0.bcr.1/) | 📦 ✅ | 🧰 ✅ |
+| [`cxx`](https://github.com/dtolnay/cxx) | 📦 ✅ | 🧰 ✅ |
+| [`cxxurl`](https://registry-preview.bazel.build/modules/cxxurl/0.3/) | 📦 ✅ | 🧰 ✅ |
+| [`directxmath`](https://registry-preview.bazel.build/modules/directxmath/3.20/) | 📦 ✅ | 🧰 ✅ |
+| [`doctest`](https://github.com/doctest/doctest) | 📦 ✅ | 🧰 ❌ |
+| [`double_conversion`](https://github.com/google/double-conversion) | 📦 ✅ | 🧰 ✅ |
+| [`effcee`](https://registry-preview.bazel.build/modules/effcee/0.0.0-20250222/) | 📦 ✅ | 🧰 ✅ |
+| [`exprtk`](https://registry-preview.bazel.build/modules/exprtk/0.0.3.bcr.1/) | 📦 ✅ | 🧰 ✅ |
+| [`fast_float`](https://github.com/fastfloat/fast_float) | 📦 ✅ | 🧰 ✅ |
+| [`fftw`](https://registry-preview.bazel.build/modules/fftw/3.3.10/) | 📦 ✅ | 🧰 ✅ |
+| [`flatbuffers`](https://github.com/google/flatbuffers) | 📦 ✅ | 🧰 ✅ |
+| [`flex`](https://registry-preview.bazel.build/modules/flex/2.6.4.bcr.5/) | 📦 ✅ | 🧰 ✅ |
+| [`ftxui`](https://github.com/ArthurSonzogni/FTXUI) | 📦 ✅ | 🧰 ✅ |
+| [`fuzztest`](https://github.com/google/fuzztest) | 📦 ✅ | 🧰 ✅ |
+| [`fzf`](https://registry-preview.bazel.build/modules/fzf/0.71.0/) | 📦 ✅ | 🧰 ❌ |
 | [`gflags`](https://github.com/gflags/gflags) | 🚫 | 🚫 |
-| [`glm`](https://registry-preview.bazel.build/modules/glm/1.0.3/) | 🌿 ✅ | 🧰 ✅ |
-| [`glog`](https://github.com/google/glog) | 🌿 ✅ | 🧰 ✅ |
-| [`go_jsonnet`](https://github.com/google/go-jsonnet) | 🌿 ✅ | 🧰 ✅ |
-| [`googletest`](https://github.com/google/googletest) | 🌿 ✅ | 🧰 ✅ |
-| [`gperftools`](https://github.com/gperftools/gperftools) | 🌿 ✅ | 🧰 ✅ |
-| [`grpc`](https://github.com/grpc/grpc) | 🌿 ✅ | 🧰 ✅ |
-| [`grpc_gateway`](https://github.com/grpc-ecosystem/grpc-gateway) | 🌿 ✅ | 🧰 ❌ |
-| [`gsl-lite`](https://registry-preview.bazel.build/modules/gsl-lite/1.1.0/) | 🌿 ✅ | 🧰 ✅ |
-| [`hfsm2`](https://registry-preview.bazel.build/modules/hfsm2/2.10.0/) | 🌿 ✅ | 🧰 ✅ |
-| [`highs`](https://github.com/ERGO-Code/HiGHS) | 🌿 ✅ | 🧰 ✅ |
-| [`highway`](https://github.com/google/highway) | 🌿 ✅ | 🧰 ✅ |
-| [`iceoryx2`](https://github.com/eclipse-iceoryx/iceoryx2) | 🌿 ✅ | 🧰 ✅ |
-| [`icu`](https://registry-preview.bazel.build/modules/icu/78.2.bcr.1/) | 🌿 ✅ | 🧰 ✅ |
-| [`iperf`](https://registry-preview.bazel.build/modules/iperf/3.18.0/) | 🌿 ✅ | 🧰 ✅ |
-| [`iverilog`](https://registry-preview.bazel.build/modules/iverilog/13.0.bcr.1/) | 🌿 ✅ | 🧰 ✅ |
+| [`glm`](https://registry-preview.bazel.build/modules/glm/1.0.3/) | 📦 ✅ | 🧰 ✅ |
+| [`glog`](https://github.com/google/glog) | 📦 ✅ | 🧰 ✅ |
+| [`go_jsonnet`](https://github.com/google/go-jsonnet) | 📦 ✅ | 🧰 ✅ |
+| [`googletest`](https://github.com/google/googletest) | 📦 ✅ | 🧰 ✅ |
+| [`gperftools`](https://github.com/gperftools/gperftools) | 📦 ✅ | 🧰 ✅ |
+| [`grpc`](https://github.com/grpc/grpc) | 📦 ✅ | 🧰 ✅ |
+| [`grpc_gateway`](https://github.com/grpc-ecosystem/grpc-gateway) | 📦 ✅ | 🧰 ❌ |
+| [`gsl-lite`](https://registry-preview.bazel.build/modules/gsl-lite/1.1.0/) | 📦 ✅ | 🧰 ✅ |
+| [`hfsm2`](https://registry-preview.bazel.build/modules/hfsm2/2.10.0/) | 📦 ✅ | 🧰 ✅ |
+| [`highs`](https://github.com/ERGO-Code/HiGHS) | 📦 ✅ | 🧰 ✅ |
+| [`highway`](https://github.com/google/highway) | 📦 ✅ | 🧰 ✅ |
+| [`iceoryx2`](https://github.com/eclipse-iceoryx/iceoryx2) | 📦 ✅ | 🧰 ✅ |
+| [`icu`](https://registry-preview.bazel.build/modules/icu/78.2.bcr.1/) | 📦 ✅ | 🧰 ✅ |
+| [`iperf`](https://registry-preview.bazel.build/modules/iperf/3.18.0/) | 📦 ✅ | 🧰 ✅ |
+| [`iverilog`](https://registry-preview.bazel.build/modules/iverilog/13.0.bcr.1/) | 📦 ✅ | 🧰 ✅ |
 | [`json`](https://github.com/nlohmann/json) | 🚫 | 🚫 |
-| [`jsoncpp`](https://github.com/open-source-parsers/jsoncpp) | 🌿 ✅ | 🧰 ✅ |
-| [`jsonnet`](https://github.com/google/jsonnet) | 🌿 ✅ | 🧰 ✅ |
-| [`lcm`](https://github.com/lcm-proj/lcm) | 🌿 ✅ | 🧰 ✅ |
-| [`lexbor`](https://registry-preview.bazel.build/modules/lexbor/2.4.0/) | 🌿 ✅ | 🧰 ✅ |
-| [`lexy`](https://registry-preview.bazel.build/modules/lexy/2025.05.0/) | 🌿 ✅ | 🧰 ✅ |
-| [`libavif`](https://registry-preview.bazel.build/modules/libavif/1.4.1/) | 🌿 ✅ | 🧰 ✅ |
-| [`libcreate`](https://registry-preview.bazel.build/modules/libcreate/3.1.0/) | 🌿 ✅ | 🧰 ✅ |
-| [`libde265`](https://registry-preview.bazel.build/modules/libde265/1.0.18/) | 🌿 ✅ | 🧰 ✅ |
-| [`libdwarf`](https://registry-preview.bazel.build/modules/libdwarf/2.2.0.bcr.1/) | 🌿 ✅ | 🧰 ✅ |
-| [`libevent`](https://registry-preview.bazel.build/modules/libevent/2.1.12-stable.bcr.0/) | 🌿 ✅ | 🧰 ✅ |
-| [`libfastjson`](https://registry-preview.bazel.build/modules/libfastjson/1.2304.0/) | 🌿 ✅ | 🧰 ✅ |
-| [`libgd`](https://registry-preview.bazel.build/modules/libgd/2.3.3/) | 🌿 ✅ | 🧰 ✅ |
-| [`libgit2`](https://registry-preview.bazel.build/modules/libgit2/1.9.2.bcr.1/) | 🌿 ✅ | 🧰 ✅ |
-| [`libheif`](https://registry-preview.bazel.build/modules/libheif/1.21.2/) | 🌿 ✅ | 🧰 ✅ |
-| [`libpcap`](https://registry-preview.bazel.build/modules/libpcap/1.10.5.bcr.3/) | 🌿 ✅ | 🧰 ✅ |
-| [`libwebsockets`](https://registry-preview.bazel.build/modules/libwebsockets/4.5.2/) | 🌿 ✅ | 🧰 ✅ |
-| [`llvm-project`](https://registry-preview.bazel.build/modules/llvm-project/17.0.4.bcr.1/) | 🌿 ✅ | 🧰 ❌ |
-| [`magic_enum`](https://github.com/Neargye/magic_enum) | 🌿 ✅ | 🧰 ✅ |
-| [`marisa-trie`](https://registry-preview.bazel.build/modules/marisa-trie/0.3.1.bcr.2/) | 🌿 ✅ | 🧰 ✅ |
-| [`nsync`](https://github.com/google/nsync) | 🌿 ✅ | 🧰 ✅ |
-| [`ogg`](https://registry-preview.bazel.build/modules/ogg/1.3.5.bcr.3/) | 🌿 ✅ | 🧰 ✅ |
-| [`onetbb`](https://github.com/uxlfoundation/oneTBB) | 🌿 ✅ | 🧰 ✅ |
-| [`opencc`](https://github.com/BYVoid/OpenCC) | 🌿 ✅ | 🧰 ✅ |
-| [`opencl-sdk`](https://registry-preview.bazel.build/modules/opencl-sdk/2025.07.23/) | 🌿 ✅ | 🧰 ✅ |
-| [`openexr`](https://github.com/AcademySoftwareFoundation/openexr) | 🌿 ✅ | 🧰 ✅ |
-| [`openssl`](https://registry-preview.bazel.build/modules/openssl/3.5.5.bcr.4/) | 🌿 ✅ | 🧰 ✅ |
-| [`opentelemetry_cpp`](https://github.com/open-telemetry/opentelemetry-cpp) | 🌿 ✅ | 🧰 ✅ |
-| [`ortools`](https://github.com/google/or-tools) | 🌿 ✅ | 🧰 ✅ [87 / 89](https://app.buildbuddy.io/invocation/7ecbdebc-d5e0-4810-8508-a146477fb8cf) |
-| [`pcre2`](https://github.com/PCRE2Project/pcre2) | 🌿 ✅ | 🧰 ✅ |
-| [`prometheus_cpp`](https://github.com/jupp0r/prometheus-cpp) | 🌿 ✅ | 🧰 ✅ |
-| [`protobuf`](https://github.com/protocolbuffers/protobuf) | 🌿 ✅ | 🧰 ✅ |
+| [`jsoncpp`](https://github.com/open-source-parsers/jsoncpp) | 📦 ✅ | 🧰 ✅ |
+| [`jsonnet`](https://github.com/google/jsonnet) | 📦 ✅ | 🧰 ✅ |
+| [`lcm`](https://github.com/lcm-proj/lcm) | 📦 ✅ | 🧰 ✅ |
+| [`lexbor`](https://registry-preview.bazel.build/modules/lexbor/2.4.0/) | 📦 ✅ | 🧰 ✅ |
+| [`lexy`](https://registry-preview.bazel.build/modules/lexy/2025.05.0/) | 📦 ✅ | 🧰 ✅ |
+| [`libavif`](https://registry-preview.bazel.build/modules/libavif/1.4.1/) | 📦 ✅ | 🧰 ✅ |
+| [`libcreate`](https://registry-preview.bazel.build/modules/libcreate/3.1.0/) | 📦 ✅ | 🧰 ✅ |
+| [`libde265`](https://registry-preview.bazel.build/modules/libde265/1.0.18/) | 📦 ✅ | 🧰 ✅ |
+| [`libdwarf`](https://registry-preview.bazel.build/modules/libdwarf/2.2.0.bcr.1/) | 📦 ✅ | 🧰 ✅ |
+| [`libevent`](https://registry-preview.bazel.build/modules/libevent/2.1.12-stable.bcr.0/) | 📦 ✅ | 🧰 ✅ |
+| [`libfastjson`](https://registry-preview.bazel.build/modules/libfastjson/1.2304.0/) | 📦 ✅ | 🧰 ✅ |
+| [`libgd`](https://registry-preview.bazel.build/modules/libgd/2.3.3/) | 📦 ✅ | 🧰 ✅ |
+| [`libgit2`](https://registry-preview.bazel.build/modules/libgit2/1.9.2.bcr.1/) | 📦 ✅ | 🧰 ✅ |
+| [`libheif`](https://registry-preview.bazel.build/modules/libheif/1.21.2/) | 📦 ✅ | 🧰 ✅ |
+| [`libpcap`](https://registry-preview.bazel.build/modules/libpcap/1.10.5.bcr.3/) | 📦 ✅ | 🧰 ✅ |
+| [`libwebsockets`](https://registry-preview.bazel.build/modules/libwebsockets/4.5.2/) | 📦 ✅ | 🧰 ✅ |
+| [`llvm-project`](https://registry-preview.bazel.build/modules/llvm-project/17.0.4.bcr.1/) | 📦 ✅ | 🧰 ❌ |
+| [`magic_enum`](https://github.com/Neargye/magic_enum) | 📦 ✅ | 🧰 ✅ |
+| [`marisa-trie`](https://registry-preview.bazel.build/modules/marisa-trie/0.3.1.bcr.2/) | 📦 ✅ | 🧰 ✅ |
+| [`nsync`](https://github.com/google/nsync) | 📦 ✅ | 🧰 ✅ |
+| [`ogg`](https://registry-preview.bazel.build/modules/ogg/1.3.5.bcr.3/) | 📦 ✅ | 🧰 ✅ |
+| [`onetbb`](https://github.com/uxlfoundation/oneTBB) | 📦 ✅ | 🧰 ✅ |
+| [`opencc`](https://github.com/BYVoid/OpenCC) | 📦 ✅ | 🧰 ✅ |
+| [`opencl-sdk`](https://registry-preview.bazel.build/modules/opencl-sdk/2025.07.23/) | 📦 ✅ | 🧰 ✅ |
+| [`openexr`](https://github.com/AcademySoftwareFoundation/openexr) | 📦 ✅ | 🧰 ✅ |
+| [`openssl`](https://registry-preview.bazel.build/modules/openssl/3.5.5.bcr.4/) | 📦 ✅ | 🧰 ✅ |
+| [`opentelemetry_cpp`](https://github.com/open-telemetry/opentelemetry-cpp) | 📦 ✅ | 🧰 ✅ |
+| [`ortools`](https://github.com/google/or-tools) | 📦 ✅ | 🧰 ✅ [87 / 89](https://app.buildbuddy.io/invocation/7ecbdebc-d5e0-4810-8508-a146477fb8cf) |
+| [`pcre2`](https://github.com/PCRE2Project/pcre2) | 📦 ✅ | 🧰 ✅ |
+| [`prometheus_cpp`](https://github.com/jupp0r/prometheus-cpp) | 📦 ✅ | 🧰 ✅ |
+| [`protobuf`](https://github.com/protocolbuffers/protobuf) | 📦 ✅ | 🧰 ✅ |
 | [`quill`](https://github.com/odygrd/quill) | 🚫 | 🚫 |
-| [`re2`](https://github.com/google/re2) | 🌿 ✅ | 🧰 ✅ |
-| [`reflexxes-rmltype2`](https://registry-preview.bazel.build/modules/reflexxes-rmltype2/1.2.7/) | 🌿 ✅ | 🧰 ✅ |
-| [`rocksdb`](https://registry-preview.bazel.build/modules/rocksdb/9.11.2/) | 🌿 ✅ | 🧰 ✅ [10 / 10](https://app.buildbuddy.io/invocation/f5f77e34-30d7-455a-85a0-1dd0e8de6514) |
-| [`rsyslog`](https://registry-preview.bazel.build/modules/rsyslog/8.2504.0/) | 🌿 ✅ | 🧰 ❌ |
-| [`rules_multirun`](https://registry-preview.bazel.build/modules/rules_multirun/0.14.0/) | 🌿 ✅ | 🧰 ✅ |
-| [`s2geometry`](https://github.com/google/s2geometry) | 🌿 ✅ | 🧰 ✅ |
-| [`sdl2`](https://registry-preview.bazel.build/modules/sdl2/2.32.0.bcr.beta.6/) | 🌿 ✅ | 🧰 ✅ |
-| [`sdl2_mixer`](https://registry-preview.bazel.build/modules/sdl2_mixer/2.8.1.bcr.beta.2/) | 🌿 ✅ | 🧰 ✅ |
-| [`simdutf`](https://registry-preview.bazel.build/modules/simdutf/7.7.0/) | 🌿 ✅ | 🧰 ✅ |
-| [`snappy`](https://github.com/google/snappy) | 🌿 ✅ | 🧰 ✅ |
-| [`squashfs-tools`](https://registry-preview.bazel.build/modules/squashfs-tools/4.7.5/) | 🌿 ✅ | 🧰 ✅ |
-| [`systemc`](https://registry-preview.bazel.build/modules/systemc/3.0.2.bcr.1/) | 🌿 ✅ | 🧰 ✅ |
-| [`tinyformat`](https://registry-preview.bazel.build/modules/tinyformat/2.3.0/) | 🌿 ✅ | 🧰 ✅ |
-| [`tinyxml2`](https://registry-preview.bazel.build/modules/tinyxml2/11.0.0/) | 🌿 ✅ | 🧰 ✅ |
-| [`tomlplusplus`](https://registry-preview.bazel.build/modules/tomlplusplus/3.4.0/) | 🌿 ✅ | 🧰 ✅ |
-| [`trlc`](https://registry-preview.bazel.build/modules/trlc/2.0.5/) | 🌿 ✅ | 🧰 ✅ |
-| [`universal-robots-client-library`](https://registry-preview.bazel.build/modules/universal-robots-client-library/2.4.0/) | 🌿 ✅ | 🧰 ✅ |
-| [`verible`](https://github.com/chipsalliance/verible) | 🌿 ✅ | 🧰 ✅ |
-| [`verilator`](https://registry-preview.bazel.build/modules/verilator/5.046.bcr.5/) | 🌿 ✅ | 🧰 ❌ [0 / 3](https://app.buildbuddy.io/invocation/d672774e-7791-4219-b09d-71f9be5fe4f1) |
-| [`xkbcommon`](https://registry-preview.bazel.build/modules/xkbcommon/1.9.2.bcr.beta.1/) | 🌿 ✅ | 🧰 ✅ |
+| [`re2`](https://github.com/google/re2) | 📦 ✅ | 🧰 ✅ |
+| [`reflexxes-rmltype2`](https://registry-preview.bazel.build/modules/reflexxes-rmltype2/1.2.7/) | 📦 ✅ | 🧰 ✅ |
+| [`rocksdb`](https://registry-preview.bazel.build/modules/rocksdb/9.11.2/) | 📦 ✅ | 🧰 ✅ [10 / 10](https://app.buildbuddy.io/invocation/f5f77e34-30d7-455a-85a0-1dd0e8de6514) |
+| [`rsyslog`](https://registry-preview.bazel.build/modules/rsyslog/8.2504.0/) | 📦 ✅ | 🧰 ❌ |
+| [`rules_multirun`](https://registry-preview.bazel.build/modules/rules_multirun/0.14.0/) | 📦 ✅ | 🧰 ✅ |
+| [`s2geometry`](https://github.com/google/s2geometry) | 📦 ✅ | 🧰 ✅ |
+| [`sdl2`](https://registry-preview.bazel.build/modules/sdl2/2.32.0.bcr.beta.6/) | 📦 ✅ | 🧰 ✅ |
+| [`sdl2_mixer`](https://registry-preview.bazel.build/modules/sdl2_mixer/2.8.1.bcr.beta.2/) | 📦 ✅ | 🧰 ✅ |
+| [`simdutf`](https://registry-preview.bazel.build/modules/simdutf/7.7.0/) | 📦 ✅ | 🧰 ✅ |
+| [`snappy`](https://github.com/google/snappy) | 📦 ✅ | 🧰 ✅ |
+| [`squashfs-tools`](https://registry-preview.bazel.build/modules/squashfs-tools/4.7.5/) | 📦 ✅ | 🧰 ✅ |
+| [`systemc`](https://registry-preview.bazel.build/modules/systemc/3.0.2.bcr.1/) | 📦 ✅ | 🧰 ✅ |
+| [`tinyformat`](https://registry-preview.bazel.build/modules/tinyformat/2.3.0/) | 📦 ✅ | 🧰 ✅ |
+| [`tinyxml2`](https://registry-preview.bazel.build/modules/tinyxml2/11.0.0/) | 📦 ✅ | 🧰 ✅ |
+| [`tomlplusplus`](https://registry-preview.bazel.build/modules/tomlplusplus/3.4.0/) | 📦 ✅ | 🧰 ✅ |
+| [`trlc`](https://registry-preview.bazel.build/modules/trlc/2.0.5/) | 📦 ✅ | 🧰 ✅ |
+| [`universal-robots-client-library`](https://registry-preview.bazel.build/modules/universal-robots-client-library/2.4.0/) | 📦 ✅ | 🧰 ✅ |
+| [`verible`](https://github.com/chipsalliance/verible) | 📦 ✅ | 🧰 ✅ |
+| [`verilator`](https://registry-preview.bazel.build/modules/verilator/5.046.bcr.5/) | 📦 ✅ | 🧰 ❌ [0 / 3](https://app.buildbuddy.io/invocation/d672774e-7791-4219-b09d-71f9be5fe4f1) |
+| [`xkbcommon`](https://registry-preview.bazel.build/modules/xkbcommon/1.9.2.bcr.beta.1/) | 📦 ✅ | 🧰 ✅ |
 | [`z3`](https://github.com/Z3Prover/z3) | 🚫 | 🚫 |
 | [`zlib`](https://github.com/madler/zlib) | 🚫 | 🚫 |
-| [`zstd`](https://registry-preview.bazel.build/modules/zstd/1.5.7.bcr.1/) | 🌿 ✅ | 🧰 ✅ |
-| [`zziplib`](https://registry-preview.bazel.build/modules/zziplib/0.13.72/) | 🌿 ✅ | 🧰 ✅ |
+| [`zstd`](https://registry-preview.bazel.build/modules/zstd/1.5.7.bcr.1/) | 📦 ✅ | 🧰 ✅ |
+| [`zziplib`](https://registry-preview.bazel.build/modules/zziplib/0.13.72/) | 📦 ✅ | 🧰 ✅ |
 
 ## Project Notes
 
