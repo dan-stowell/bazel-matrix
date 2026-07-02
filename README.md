@@ -40,7 +40,7 @@ Legend:
 
 | project_name | local_test | rbe_test |
 | --- | --- | --- |
-| [`abseil_cpp`](https://github.com/abseil/abseil-cpp) | 📦 ✅ | 🧰 ✅ |
+| [`abseil_cpp`](https://github.com/abseil/abseil-cpp) | 📦 ✅ [251 / 251](https://app.buildbuddy.io/invocation/3ecd9d6d-2a8e-4c6f-b690-23b82ff03bdd) | 🧰 ✅ |
 | [`abseil_py`](https://github.com/abseil/abseil-py) | 📦 ✅ | 🧰 ✅ |
 | [`aravis`](https://registry-preview.bazel.build/modules/aravis/0.9.2-20251111063445-57983d013883/) | 📦 ✅ | 🧰 ❌ |
 | [`avro-cpp`](https://registry-preview.bazel.build/modules/avro-cpp/1.12.0/) | 📦 ✅ | 🧰 ✅ |
