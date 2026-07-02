@@ -5,3 +5,4 @@
 __pycache__/
 *.pyc
 runner/image-minimg.tsv.lock
+user.bazelrc

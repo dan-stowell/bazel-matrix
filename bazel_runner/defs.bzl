@@ -77,6 +77,12 @@ BUILDBUDDY_RBE = overlay(
         "--remote_timeout=10m",
         "--jobs=32",
         "--remote_executor=grpcs://remote.buildbuddy.io",
+        # BuildBuddy's default executor image is Ubuntu 16.04 (glibc 2.23);
+        # hermetic-llvm targets glibc 2.28, so test binaries died with
+        # "libm.so.6: version GLIBC_2.27 not found". Run remote actions in a
+        # newer image instead (hermetic-llvm's rbe.bzl pins the same one).
+        # Only applies when the execution platform sets no exec_properties.
+        "--remote_default_exec_properties=container-image=docker://ubuntu:22.04",
     ],
 )
 

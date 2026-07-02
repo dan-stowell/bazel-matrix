@@ -226,6 +226,15 @@ def main(argv=None):
         "--show_progress_rate_limit=0.0",
         "--progress_report_interval=10",
     ] + _job_metadata(args.job) + expanded_flags
+    # Inner test invocations get a fresh output root inside the test sandbox,
+    # so without a shared repository cache every run refetches all external
+    # archives (the hermetic LLVM prebuilts alone are hundreds of MB). The
+    # outer .bazelrc exports BAZEL_RUNNER_REPO_CACHE and makes it writable
+    # inside the sandbox.
+    repo_cache = os.environ.get("BAZEL_RUNNER_REPO_CACHE")
+    if repo_cache:
+        os.makedirs(repo_cache, exist_ok=True)
+        command_flags = ["--repository_cache=" + repo_cache] + command_flags
     if os.path.isdir(os.path.join(source, ".bazel-runner-tools")):
         command_flags = [
             "--action_env=PATH=" + env["PATH"],

@@ -23,3 +23,9 @@ build --build_metadata=VISIBILITY=PUBLIC
 
 # Quieter, more useful test output.
 test --test_output=errors
+
+# Host-specific tuning (not committed), e.g. a shared inner repository cache:
+#   test --test_env=BAZEL_RUNNER_REPO_CACHE=<abs path>
+#   test --sandbox_writable_path=<same abs path>
+# Without it, every inner test invocation refetches all external archives.
+try-import %workspace%/user.bazelrc

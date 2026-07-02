@@ -1,2 +1,2 @@
-bazel_dep(name = "llvm", version = "0.7.3")
+bazel_dep(name = "llvm", version = "0.8.11")
 register_toolchains("@llvm//toolchain:all")
