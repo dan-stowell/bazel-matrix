@@ -46,10 +46,10 @@ Legend:
 | [`avro-cpp`](https://registry-preview.bazel.build/modules/avro-cpp/1.12.0/) | 📦 ✅ [6 / 6](https://app.buildbuddy.io/invocation/7244b93a-4730-4199-bc74-bc1200150f60) | 🧰 ✅ |
 | [`basis_universal`](https://registry-preview.bazel.build/modules/basis_universal/2.0.3/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/ba54c6d2-91cb-475e-a727-185d8de521cc) | 🧰 ✅ |
 | [`bazel`](https://github.com/bazelbuild/bazel) | 📦 ✅ | 💤 |
-| [`behaviortree_cpp`](https://registry-preview.bazel.build/modules/behaviortree_cpp/4.7.0.bcr.3/) | 📦 ✅ | 🧰 ❌ |
-| [`benchmark`](https://github.com/google/benchmark) | 📦 ✅ | 🧰 ✅ |
-| [`boringssl`](https://github.com/google/boringssl) | 📦 ✅ | 🧰 ✅ |
-| [`briansmith_ring`](https://registry-preview.bazel.build/modules/briansmith_ring/0.17.14.bcr.1/) | 📦 ✅ | 🧰 ✅ |
+| [`behaviortree_cpp`](https://registry-preview.bazel.build/modules/behaviortree_cpp/4.7.0.bcr.3/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/ff30c3b3-57cf-4e47-9a76-3bed40859c84) | 🧰 ❌ |
+| [`benchmark`](https://github.com/google/benchmark) | 📦 ✅ [49 / 49](https://app.buildbuddy.io/invocation/77e59fe1-8dbc-4682-9898-9d5a6fedaa74) | 🧰 ✅ |
+| [`boringssl`](https://github.com/google/boringssl) | 📦 ✅ [2 / 2](https://app.buildbuddy.io/invocation/0e9e619f-b6e0-4f2a-bc08-b1c9d6d29fc6) | 🧰 ✅ |
+| [`briansmith_ring`](https://registry-preview.bazel.build/modules/briansmith_ring/0.17.14.bcr.1/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/fe954775-ba38-475b-86f4-5c7e9a009b66) | 🧰 ✅ |
 | [`brotli`](https://github.com/google/brotli) | 🚫 | 🚫 |
 | [`brotli_go`](https://github.com/google/brotli) | 📦 ✅ | 🧰 ❌ |
 | [`buildtools`](https://github.com/bazelbuild/buildtools) | 📦 ✅ | 🧰 ✅ |
