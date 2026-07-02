@@ -35,7 +35,7 @@ Legend:
 - `🚫` = no real upstream Bazel test target exists
 - `💤` = no matrix test target is expected for this project/environment
 - `🧰` = hermetic-llvm modification
-- `N/M` = upstream tests passing out of the meaningful test suite tracked here
+- `N / M` = upstream tests passing out of the meaningful test suite tracked here
 
 | project_name | local_test | rbe_test |
 | --- | --- | --- |
@@ -124,14 +124,14 @@ Legend:
 | [`openexr`](https://github.com/AcademySoftwareFoundation/openexr) | ✅ | 🧰 ✅ |
 | [`openssl`](https://registry-preview.bazel.build/modules/openssl/3.5.5.bcr.4/) | ✅ | 🧰 ✅ |
 | [`opentelemetry_cpp`](https://github.com/open-telemetry/opentelemetry-cpp) | ✅ | 🧰 ✅ |
-| [`ortools`](https://github.com/google/or-tools) | ✅ | 🧰 ✅ 87/89 |
+| [`ortools`](https://github.com/google/or-tools) | ✅ | 🧰 ✅ [87 / 89](https://app.buildbuddy.io/invocation/7ecbdebc-d5e0-4810-8508-a146477fb8cf) |
 | [`pcre2`](https://github.com/PCRE2Project/pcre2) | ✅ | 🧰 ✅ |
 | [`prometheus_cpp`](https://github.com/jupp0r/prometheus-cpp) | ✅ | 🧰 ✅ |
 | [`protobuf`](https://github.com/protocolbuffers/protobuf) | ✅ | 🧰 ✅ |
 | [`quill`](https://github.com/odygrd/quill) | 🚫 | 🚫 |
 | [`re2`](https://github.com/google/re2) | ✅ | 🧰 ✅ |
 | [`reflexxes-rmltype2`](https://registry-preview.bazel.build/modules/reflexxes-rmltype2/1.2.7/) | ✅ | 🧰 ✅ |
-| [`rocksdb`](https://registry-preview.bazel.build/modules/rocksdb/9.11.2/) | ✅ | 🧰 ✅ 10/10 |
+| [`rocksdb`](https://registry-preview.bazel.build/modules/rocksdb/9.11.2/) | ✅ | 🧰 ✅ [10 / 10](https://app.buildbuddy.io/invocation/f5f77e34-30d7-455a-85a0-1dd0e8de6514) |
 | [`rsyslog`](https://registry-preview.bazel.build/modules/rsyslog/8.2504.0/) | ✅ | 🧰 ❌ |
 | [`rules_multirun`](https://registry-preview.bazel.build/modules/rules_multirun/0.14.0/) | ✅ | 🧰 ✅ |
 | [`s2geometry`](https://github.com/google/s2geometry) | ✅ | 🧰 ✅ |
@@ -147,7 +147,7 @@ Legend:
 | [`trlc`](https://registry-preview.bazel.build/modules/trlc/2.0.5/) | ✅ | 🧰 ✅ |
 | [`universal-robots-client-library`](https://registry-preview.bazel.build/modules/universal-robots-client-library/2.4.0/) | ✅ | 🧰 ✅ |
 | [`verible`](https://github.com/chipsalliance/verible) | ✅ | 🧰 ✅ |
-| [`verilator`](https://registry-preview.bazel.build/modules/verilator/5.046.bcr.5/) | ✅ | 🧰 ❌ 0/3 |
+| [`verilator`](https://registry-preview.bazel.build/modules/verilator/5.046.bcr.5/) | ✅ | 🧰 ❌ [0 / 3](https://app.buildbuddy.io/invocation/d672774e-7791-4219-b09d-71f9be5fe4f1) |
 | [`xkbcommon`](https://registry-preview.bazel.build/modules/xkbcommon/1.9.2.bcr.beta.1/) | ✅ | 🧰 ✅ |
 | [`z3`](https://github.com/Z3Prover/z3) | 🚫 | 🚫 |
 | [`zlib`](https://github.com/madler/zlib) | 🚫 | 🚫 |
@@ -166,7 +166,7 @@ status table above.
 | [`behaviortree_cpp`](https://registry-preview.bazel.build/modules/behaviortree_cpp/4.7.0.bcr.3/) | `rbe` | 🧰 ❌ | Its BCR `sed` dependency uses gnulib code that does not parse under clang 22 (`_GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD`). |
 | [`llvm-project`](https://registry-preview.bazel.build/modules/llvm-project/17.0.4.bcr.1/) | `rbe` | 🧰 ❌ | The hermetic LLVM RBE variant analyzes and one unit test target passes, but several LLVM unit test targets fail to build: `SupportHelpers.h` includes private `gtest/gtest-printers.h`, and later Hexagon code hits libc++ comparator errors involving deleted `operator<` for `llvm::rdf::RegisterRef`. |
 | [`rsyslog`](https://registry-preview.bazel.build/modules/rsyslog/8.2504.0/) | `rbe` | 🧰 ❌ | The hermetic build issues are fixed, but the upstream smoke test drives `rsyslogd` with `nc -u -w 0`, which only the netcat-openbsd CLI accepts; the executor images provide a different variant. |
-| [`verilator`](https://registry-preview.bazel.build/modules/verilator/5.046.bcr.5/) | `rbe` | 🧰 ❌ 0/3 | The hermetic LLVM RBE variant analyzes the test suite, but all three regression tests fail to build because Verilator binaries link with `-latomic` and hermetic `ld.lld` cannot find `libatomic` on the RBE image. |
+| [`verilator`](https://registry-preview.bazel.build/modules/verilator/5.046.bcr.5/) | `rbe` | 🧰 ❌ [0 / 3](https://app.buildbuddy.io/invocation/d672774e-7791-4219-b09d-71f9be5fe4f1) | The hermetic LLVM RBE variant analyzes the test suite, but all three regression tests fail to build because Verilator binaries link with `-latomic` and hermetic `ld.lld` cannot find `libatomic` on the RBE image. |
 | [`brotli_go`](https://github.com/google/brotli) | `rbe` | 🧰 ❌ | The nested Go module pulls in the parent C brotli library, but that nested module still selects host C/C++ tools on RBE (`/bin/gcc`/`cc`), so the hermetic LLVM variant fails before the Go tests build. |
 | [`cpptrace`](https://github.com/jeremy-rifkin/cpptrace) | `rbe` | 🧰 ❌ | The transitive `toolchains_llvm` clang used by dependencies such as `xz` and `zstd` needs `libtinfo.so.5` on the RBE image; `rules_foreign_cc` make bootstrap also fails because that compiler cannot create executables. |
 | [`doctest`](https://github.com/doctest/doctest) | `rbe` | 🧰 ❌ | The nested `examples/` module still selects `/bin/gcc` on RBE instead of the injected hermetic LLVM toolchain, so the example test fails to compile. |
