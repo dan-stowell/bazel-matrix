@@ -1,4 +1,27 @@
-load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification", "overlay")
 load("//projects/rsyslog:project.bzl", "RSYSLOG_PROJECT")
 
-hermetic_llvm_project_modification(project = RSYSLOG_PROJECT)
+# Two accommodations for the hermetic toolchain:
+# - rsyslog's template.h includes "regexp.h" meaning its own runtime/regexp.h.
+#   The BCR build exposes runtime/ via -isystem, which lands after the
+#   toolchain's glibc -isystem — where a #error stub regexp.h shadows it
+#   (host builds win because builtin glibc dirs are searched last). -iquote
+#   is searched before any -isystem, restoring upstream resolution.
+# - rsyslogd.c includes linux/close_range.h (kernel 5.9+); the default
+#   glibc 2.28 target pairs older kernel headers, gnu.2.34 pairs 5.10+.
+# - smoke_test drives rsyslogd with nc(1); run on BuildBuddy's
+#   rbe-ubuntu22-04 image, which ships netcat (plain ubuntu:22.04 does not)
+#   and whose glibc 2.35 satisfies the gnu.2.34 target below.
+RSYSLOG_HERMETIC_FIXES = overlay(
+    name = "rsyslog_hermetic_fixes",
+    build_flags = [
+        "--copt=-iquoteexternal/rsyslog+/runtime",
+        "--platforms=@llvm//platforms:linux_x86_64_gnu.2.34",
+        "--remote_default_exec_properties=container-image=docker://gcr.io/flame-public/rbe-ubuntu22-04:latest",
+    ],
+)
+
+hermetic_llvm_project_modification(
+    project = RSYSLOG_PROJECT,
+    toolchains = [RSYSLOG_HERMETIC_FIXES],
+)
