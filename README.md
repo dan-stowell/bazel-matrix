@@ -87,20 +87,20 @@ Legend:
 | [`go_jsonnet`](https://github.com/google/go-jsonnet) | 📦 ✅ [8 / 8](https://app.buildbuddy.io/invocation/30c19e71-cbbc-4d30-9d82-8a0b0e1dae7f) | 🧰 ✅ |
 | [`googletest`](https://github.com/google/googletest) | 📦 ✅ [41 / 41](https://app.buildbuddy.io/invocation/e949899f-e558-4698-a2ac-3b8caccc528c) | 🧰 ✅ |
 | [`gperftools`](https://github.com/gperftools/gperftools) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/a1dd6390-bc86-46c3-969c-c078e1885f37) | 🧰 ✅ |
-| [`grpc`](https://github.com/grpc/grpc) | 📦 ✅ | 🧰 ✅ |
-| [`grpc_gateway`](https://github.com/grpc-ecosystem/grpc-gateway) | 📦 ✅ | 🧰 ❌ |
-| [`gsl-lite`](https://registry-preview.bazel.build/modules/gsl-lite/1.1.0/) | 📦 ✅ | 🧰 ✅ |
-| [`hfsm2`](https://registry-preview.bazel.build/modules/hfsm2/2.10.0/) | 📦 ✅ | 🧰 ✅ |
-| [`highs`](https://github.com/ERGO-Code/HiGHS) | 📦 ✅ | 🧰 ✅ |
-| [`highway`](https://github.com/google/highway) | 📦 ✅ | 🧰 ✅ |
-| [`iceoryx2`](https://github.com/eclipse-iceoryx/iceoryx2) | 📦 ✅ | 🧰 ✅ |
-| [`icu`](https://registry-preview.bazel.build/modules/icu/78.2.bcr.1/) | 📦 ✅ | 🧰 ✅ |
-| [`iperf`](https://registry-preview.bazel.build/modules/iperf/3.18.0/) | 📦 ✅ | 🧰 ✅ |
-| [`iverilog`](https://registry-preview.bazel.build/modules/iverilog/13.0.bcr.1/) | 📦 ✅ | 🧰 ✅ |
+| [`grpc`](https://github.com/grpc/grpc) | 📦 ❌ [49 / 100](https://app.buildbuddy.io/invocation/e1617d2a-eeb6-49e6-a60e-7ff0c1986fd3) | 🧰 ✅ |
+| [`grpc_gateway`](https://github.com/grpc-ecosystem/grpc-gateway) | 📦 ✅ [8 / 8](https://app.buildbuddy.io/invocation/4b61860b-9197-4284-a5c4-7ff5aab2cf0d) | 🧰 ❌ |
+| [`gsl-lite`](https://registry-preview.bazel.build/modules/gsl-lite/1.1.0/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/ca38731b-3157-40e6-ba61-736014e83689) | 🧰 ✅ |
+| [`hfsm2`](https://registry-preview.bazel.build/modules/hfsm2/2.10.0/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/32b18158-520f-4290-914b-a9f45944a306) | 🧰 ✅ |
+| [`highs`](https://github.com/ERGO-Code/HiGHS) | 📦 ✅ [2 / 2](https://app.buildbuddy.io/invocation/e03e6258-992b-4e43-a776-1bf3e6e841aa) | 🧰 ✅ |
+| [`highway`](https://github.com/google/highway) | 📦 ✅ [5 / 5](https://app.buildbuddy.io/invocation/0020d934-aaec-417a-b693-385eb2dc46f1) | 🧰 ✅ |
+| [`iceoryx2`](https://github.com/eclipse-iceoryx/iceoryx2) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/fbbd1192-d4f9-4e01-b653-f131c0551474) | 🧰 ✅ |
+| [`icu`](https://registry-preview.bazel.build/modules/icu/78.2.bcr.1/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/04327330-558c-409a-b12d-e197bd426c30) | 🧰 ✅ |
+| [`iperf`](https://registry-preview.bazel.build/modules/iperf/3.18.0/) | 📦 ✅ [4 / 4](https://app.buildbuddy.io/invocation/5cd98178-b2ec-42e2-9f0b-5cf91ca5234a) | 🧰 ✅ |
+| [`iverilog`](https://registry-preview.bazel.build/modules/iverilog/13.0.bcr.1/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/880a4f5b-84cc-419c-a9b2-2090c067abd0) | 🧰 ✅ |
 | [`json`](https://github.com/nlohmann/json) | 🚫 | 🚫 |
-| [`jsoncpp`](https://github.com/open-source-parsers/jsoncpp) | 📦 ✅ | 🧰 ✅ |
-| [`jsonnet`](https://github.com/google/jsonnet) | 📦 ✅ | 🧰 ✅ |
-| [`lcm`](https://github.com/lcm-proj/lcm) | 📦 ✅ | 🧰 ✅ |
+| [`jsoncpp`](https://github.com/open-source-parsers/jsoncpp) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/bb2ad7ac-759c-4e6a-9779-0d75494bc3fe) | 🧰 ✅ |
+| [`jsonnet`](https://github.com/google/jsonnet) | 📦 ✅ [3 / 3](https://app.buildbuddy.io/invocation/b0fa0818-1523-4c11-b5fe-cf39c5e51e16) | 🧰 ✅ |
+| [`lcm`](https://github.com/lcm-proj/lcm) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/a76bce9e-e67d-4c2f-aea1-5bbf09115a99) | 🧰 ✅ |
 | [`lexbor`](https://registry-preview.bazel.build/modules/lexbor/2.4.0/) | 📦 ✅ | 🧰 ✅ |
 | [`lexy`](https://registry-preview.bazel.build/modules/lexy/2025.05.0/) | 📦 ✅ | 🧰 ✅ |
 | [`libavif`](https://registry-preview.bazel.build/modules/libavif/1.4.1/) | 📦 ✅ | 🧰 ✅ |
@@ -167,6 +167,7 @@ status table above.
 | [`behaviortree_cpp`](https://registry-preview.bazel.build/modules/behaviortree_cpp/4.7.0.bcr.3/) | `rbe` | 🧰 ❌ | Its BCR `sed` dependency uses gnulib code that does not parse under clang 22 (`_GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD`). |
 | [`copybara`](https://github.com/google/copybara) | `local` | 📦 ❌ [0 / 1](https://app.buildbuddy.io/invocation/e3b93272-ffa9-411e-b679-b584ed20e42c) | The as-is local wrapper reaches Copybara analysis, but `rules_java` selects `local_jdk` inside the sandbox and analysis fails before upstream test targets are found. |
 | [`cpptrace`](https://github.com/jeremy-rifkin/cpptrace) | `local` | 📦 ❌ [0 / 1](https://app.buildbuddy.io/invocation/9bc6a206-7aec-4ee1-82c2-7d017215e6fd) | The as-is local Bazel test target fails. The underlying gtest binary runs 91 cases and reports 85 passing and 6 failing, all in stack-trace resolution/current-trace behavior. |
+| [`grpc`](https://github.com/grpc/grpc) | `local` | 📦 ❌ [49 / 100](https://app.buildbuddy.io/invocation/e1617d2a-eeb6-49e6-a60e-7ff0c1986fd3) | The as-is local suite ran 100 Bazel test targets: 49 passed, 1 failed to build, and 50 were skipped. |
 | [`llvm-project`](https://registry-preview.bazel.build/modules/llvm-project/17.0.4.bcr.1/) | `rbe` | 🧰 ❌ | The hermetic LLVM RBE variant analyzes and one unit test target passes, but several LLVM unit test targets fail to build: `SupportHelpers.h` includes private `gtest/gtest-printers.h`, and later Hexagon code hits libc++ comparator errors involving deleted `operator<` for `llvm::rdf::RegisterRef`. |
 | [`rsyslog`](https://registry-preview.bazel.build/modules/rsyslog/8.2504.0/) | `rbe` | 🧰 ❌ | The hermetic build issues are fixed, but the upstream smoke test drives `rsyslogd` with `nc -u -w 0`, which only the netcat-openbsd CLI accepts; the executor images provide a different variant. |
 | [`verilator`](https://registry-preview.bazel.build/modules/verilator/5.046.bcr.5/) | `rbe` | 🧰 ❌ [0 / 3](https://app.buildbuddy.io/invocation/d672774e-7791-4219-b09d-71f9be5fe4f1) | The hermetic LLVM RBE variant analyzes the test suite, but all three regression tests fail to build because Verilator binaries link with `-latomic` and hermetic `ld.lld` cannot find `libatomic` on the RBE image. |
