@@ -17,7 +17,7 @@ With a BuildBuddy API key configured, you can also run the hermetic LLVM smoke
 tests through BuildBuddy RBE:
 
 ```sh
-bazel test //:smoke_hermetic_llvm_tests
+bazel test //:smoke_hermetic_llvm_rbe_tests
 ```
 
 To inspect an individual project, run RE2's upstream tests:
