@@ -35,6 +35,7 @@ Legend:
 - `🚫` = no real upstream Bazel test target exists
 - `💤` = no matrix test target is expected for this project/environment
 - `🧰` = hermetic-llvm modification
+- `N/M` = upstream tests passing out of the meaningful test suite tracked here
 
 | project_name | local_test | rbe_test |
 | --- | --- | --- |
@@ -123,7 +124,7 @@ Legend:
 | [`openexr`](https://github.com/AcademySoftwareFoundation/openexr) | ✅ | 🧰 ✅ |
 | [`openssl`](https://registry-preview.bazel.build/modules/openssl/3.5.5.bcr.4/) | ✅ | 🧰 ✅ |
 | [`opentelemetry_cpp`](https://github.com/open-telemetry/opentelemetry-cpp) | ✅ | 🧰 ✅ |
-| [`ortools`](https://github.com/google/or-tools) | ✅ | 💤 |
+| [`ortools`](https://github.com/google/or-tools) | ✅ | 🧰 ✅ 87/89 |
 | [`pcre2`](https://github.com/PCRE2Project/pcre2) | ✅ | 🧰 ✅ |
 | [`prometheus_cpp`](https://github.com/jupp0r/prometheus-cpp) | ✅ | 🧰 ✅ |
 | [`protobuf`](https://github.com/protocolbuffers/protobuf) | ✅ | 🧰 ✅ |
@@ -164,7 +165,6 @@ status table above.
 | [`bazel`](https://github.com/bazelbuild/bazel) | `rbe` | 💤 | No hermetic LLVM RBE test target is tracked yet; this large project is kept out of the regular hermetic RBE test sweep. |
 | [`behaviortree_cpp`](https://registry-preview.bazel.build/modules/behaviortree_cpp/4.7.0.bcr.3/) | `rbe` | 🧰 ❌ | Its BCR `sed` dependency uses gnulib code that does not parse under clang 22 (`_GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD`). |
 | [`llvm-project`](https://registry-preview.bazel.build/modules/llvm-project/17.0.4.bcr.1/) | `rbe` | 💤 | No hermetic LLVM variant is tracked yet; this large project is kept out of the regular hermetic RBE test sweep. |
-| [`ortools`](https://github.com/google/or-tools) | `rbe` | 💤 | No hermetic LLVM variant is tracked yet. |
 | [`rocksdb`](https://registry-preview.bazel.build/modules/rocksdb/9.11.2/) | `rbe` | 💤 | No hermetic LLVM variant is tracked yet; this large project is kept out of the regular hermetic RBE test sweep. |
 | [`rsyslog`](https://registry-preview.bazel.build/modules/rsyslog/8.2504.0/) | `rbe` | 🧰 ❌ | The hermetic build issues are fixed, but the upstream smoke test drives `rsyslogd` with `nc -u -w 0`, which only the netcat-openbsd CLI accepts; the executor images provide a different variant. |
 | [`verilator`](https://registry-preview.bazel.build/modules/verilator/5.046.bcr.5/) | `rbe` | 💤 | No hermetic LLVM variant is tracked yet. |
