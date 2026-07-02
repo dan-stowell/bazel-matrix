@@ -77,16 +77,16 @@ Legend:
 | [`fast_float`](https://github.com/fastfloat/fast_float) | 📦 ✅ [2 / 2](https://app.buildbuddy.io/invocation/e2438734-cf9f-4a19-a74f-70d3aaf1e9f0) | 🧰 ✅ |
 | [`fftw`](https://registry-preview.bazel.build/modules/fftw/3.3.10/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/818a786f-1f2b-472a-9bb0-7e425b8e90db) | 🧰 ✅ |
 | [`flatbuffers`](https://github.com/google/flatbuffers) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/4981df14-54c5-49cb-99c2-c9a072de964e) | 🧰 ✅ |
-| [`flex`](https://registry-preview.bazel.build/modules/flex/2.6.4.bcr.5/) | 📦 ✅ | 🧰 ✅ |
-| [`ftxui`](https://github.com/ArthurSonzogni/FTXUI) | 📦 ✅ | 🧰 ✅ |
-| [`fuzztest`](https://github.com/google/fuzztest) | 📦 ✅ | 🧰 ✅ |
-| [`fzf`](https://registry-preview.bazel.build/modules/fzf/0.71.0/) | 📦 ✅ | 🧰 ❌ |
+| [`flex`](https://registry-preview.bazel.build/modules/flex/2.6.4.bcr.5/) | 📦 ✅ [16 / 16](https://app.buildbuddy.io/invocation/4088a03b-2fe7-422e-8911-ff612c2dedc3) | 🧰 ✅ |
+| [`ftxui`](https://github.com/ArthurSonzogni/FTXUI) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/57783f0f-a8fe-460b-a584-a206bdf4969a) | 🧰 ✅ |
+| [`fuzztest`](https://github.com/google/fuzztest) | 📦 ✅ [10 / 10](https://app.buildbuddy.io/invocation/e7c51910-1643-43af-a0c8-35ac3ee70a84) | 🧰 ✅ |
+| [`fzf`](https://registry-preview.bazel.build/modules/fzf/0.71.0/) | 📦 ✅ [4 / 4](https://app.buildbuddy.io/invocation/3a7df7b3-2d4a-4043-8c8a-f17d7d4e4fac) | 🧰 ❌ |
 | [`gflags`](https://github.com/gflags/gflags) | 🚫 | 🚫 |
-| [`glm`](https://registry-preview.bazel.build/modules/glm/1.0.3/) | 📦 ✅ | 🧰 ✅ |
-| [`glog`](https://github.com/google/glog) | 📦 ✅ | 🧰 ✅ |
-| [`go_jsonnet`](https://github.com/google/go-jsonnet) | 📦 ✅ | 🧰 ✅ |
-| [`googletest`](https://github.com/google/googletest) | 📦 ✅ | 🧰 ✅ |
-| [`gperftools`](https://github.com/gperftools/gperftools) | 📦 ✅ | 🧰 ✅ |
+| [`glm`](https://registry-preview.bazel.build/modules/glm/1.0.3/) | 📦 ✅ [117 / 117](https://app.buildbuddy.io/invocation/2796121d-1810-4eb9-949e-464bf3295147) | 🧰 ✅ |
+| [`glog`](https://github.com/google/glog) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/4d82f8c7-7f29-45e9-88d7-3d32dd576e2b) | 🧰 ✅ |
+| [`go_jsonnet`](https://github.com/google/go-jsonnet) | 📦 ✅ [8 / 8](https://app.buildbuddy.io/invocation/30c19e71-cbbc-4d30-9d82-8a0b0e1dae7f) | 🧰 ✅ |
+| [`googletest`](https://github.com/google/googletest) | 📦 ✅ [41 / 41](https://app.buildbuddy.io/invocation/e949899f-e558-4698-a2ac-3b8caccc528c) | 🧰 ✅ |
+| [`gperftools`](https://github.com/gperftools/gperftools) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/a1dd6390-bc86-46c3-969c-c078e1885f37) | 🧰 ✅ |
 | [`grpc`](https://github.com/grpc/grpc) | 📦 ✅ | 🧰 ✅ |
 | [`grpc_gateway`](https://github.com/grpc-ecosystem/grpc-gateway) | 📦 ✅ | 🧰 ❌ |
 | [`gsl-lite`](https://registry-preview.bazel.build/modules/gsl-lite/1.1.0/) | 📦 ✅ | 🧰 ✅ |
