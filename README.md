@@ -131,7 +131,7 @@ Legend:
 | [`quill`](https://github.com/odygrd/quill) | 🚫 | 🚫 |
 | [`re2`](https://github.com/google/re2) | ✅ | 🧰 ✅ |
 | [`reflexxes-rmltype2`](https://registry-preview.bazel.build/modules/reflexxes-rmltype2/1.2.7/) | ✅ | 🧰 ✅ |
-| [`rocksdb`](https://registry-preview.bazel.build/modules/rocksdb/9.11.2/) | ✅ | 💤 |
+| [`rocksdb`](https://registry-preview.bazel.build/modules/rocksdb/9.11.2/) | ✅ | 🧰 ✅ 10/10 |
 | [`rsyslog`](https://registry-preview.bazel.build/modules/rsyslog/8.2504.0/) | ✅ | 🧰 ❌ |
 | [`rules_multirun`](https://registry-preview.bazel.build/modules/rules_multirun/0.14.0/) | ✅ | 🧰 ✅ |
 | [`s2geometry`](https://github.com/google/s2geometry) | ✅ | 🧰 ✅ |
@@ -165,7 +165,6 @@ status table above.
 | [`bazel`](https://github.com/bazelbuild/bazel) | `rbe` | 💤 | No hermetic LLVM RBE test target is tracked yet; this large project is kept out of the regular hermetic RBE test sweep. |
 | [`behaviortree_cpp`](https://registry-preview.bazel.build/modules/behaviortree_cpp/4.7.0.bcr.3/) | `rbe` | 🧰 ❌ | Its BCR `sed` dependency uses gnulib code that does not parse under clang 22 (`_GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD`). |
 | [`llvm-project`](https://registry-preview.bazel.build/modules/llvm-project/17.0.4.bcr.1/) | `rbe` | 🧰 ❌ | The hermetic LLVM RBE variant analyzes and one unit test target passes, but several LLVM unit test targets fail to build: `SupportHelpers.h` includes private `gtest/gtest-printers.h`, and later Hexagon code hits libc++ comparator errors involving deleted `operator<` for `llvm::rdf::RegisterRef`. |
-| [`rocksdb`](https://registry-preview.bazel.build/modules/rocksdb/9.11.2/) | `rbe` | 💤 | No hermetic LLVM variant is tracked yet; this large project is kept out of the regular hermetic RBE test sweep. |
 | [`rsyslog`](https://registry-preview.bazel.build/modules/rsyslog/8.2504.0/) | `rbe` | 🧰 ❌ | The hermetic build issues are fixed, but the upstream smoke test drives `rsyslogd` with `nc -u -w 0`, which only the netcat-openbsd CLI accepts; the executor images provide a different variant. |
 | [`verilator`](https://registry-preview.bazel.build/modules/verilator/5.046.bcr.5/) | `rbe` | 💤 | No hermetic LLVM variant is tracked yet. |
 | [`brotli_go`](https://github.com/google/brotli) | `rbe` | 🧰 ❌ | The nested Go module pulls in the parent C brotli library, but that nested module still selects host C/C++ tools on RBE (`/bin/gcc`/`cc`), so the hermetic LLVM variant fails before the Go tests build. |
