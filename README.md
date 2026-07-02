@@ -140,20 +140,20 @@ Legend:
 | [`sdl2_mixer`](https://registry-preview.bazel.build/modules/sdl2_mixer/2.8.1.bcr.beta.2/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/778d753c-a9d3-4f3c-9bf7-117f0cff8725) | 🧰 ✅ |
 | [`simdutf`](https://registry-preview.bazel.build/modules/simdutf/7.7.0/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/d22654b6-5089-4a22-b495-287e65704c83) | 🧰 ✅ |
 | [`snappy`](https://github.com/google/snappy) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/b33b269d-a2ca-4a59-99d4-0947c9419975) | 🧰 ✅ |
-| [`squashfs-tools`](https://registry-preview.bazel.build/modules/squashfs-tools/4.7.5/) | 📦 ✅ | 🧰 ✅ |
-| [`systemc`](https://registry-preview.bazel.build/modules/systemc/3.0.2.bcr.1/) | 📦 ✅ | 🧰 ✅ |
-| [`tinyformat`](https://registry-preview.bazel.build/modules/tinyformat/2.3.0/) | 📦 ✅ | 🧰 ✅ |
-| [`tinyxml2`](https://registry-preview.bazel.build/modules/tinyxml2/11.0.0/) | 📦 ✅ | 🧰 ✅ |
-| [`tomlplusplus`](https://registry-preview.bazel.build/modules/tomlplusplus/3.4.0/) | 📦 ✅ | 🧰 ✅ |
-| [`trlc`](https://registry-preview.bazel.build/modules/trlc/2.0.5/) | 📦 ✅ | 🧰 ✅ |
-| [`universal-robots-client-library`](https://registry-preview.bazel.build/modules/universal-robots-client-library/2.4.0/) | 📦 ✅ | 🧰 ✅ |
-| [`verible`](https://github.com/chipsalliance/verible) | 📦 ✅ | 🧰 ✅ |
-| [`verilator`](https://registry-preview.bazel.build/modules/verilator/5.046.bcr.5/) | 📦 ✅ | 🧰 ❌ [0 / 3](https://app.buildbuddy.io/invocation/d672774e-7791-4219-b09d-71f9be5fe4f1) |
-| [`xkbcommon`](https://registry-preview.bazel.build/modules/xkbcommon/1.9.2.bcr.beta.1/) | 📦 ✅ | 🧰 ✅ |
+| [`squashfs-tools`](https://registry-preview.bazel.build/modules/squashfs-tools/4.7.5/) | 📦 ✅ [2 / 2](https://app.buildbuddy.io/invocation/2f5ad446-34e5-42be-b469-32976bd6af0f) | 🧰 ✅ |
+| [`systemc`](https://registry-preview.bazel.build/modules/systemc/3.0.2.bcr.1/) | 📦 ✅ [3 / 3](https://app.buildbuddy.io/invocation/c730fc4c-53b2-44f5-aa0c-a8da0792f763) | 🧰 ✅ |
+| [`tinyformat`](https://registry-preview.bazel.build/modules/tinyformat/2.3.0/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/d85314c4-4ee6-4b45-bf65-0bbb1a2344bc) | 🧰 ✅ |
+| [`tinyxml2`](https://registry-preview.bazel.build/modules/tinyxml2/11.0.0/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/600f611b-45ef-4991-b56d-798ff7446b94) | 🧰 ✅ |
+| [`tomlplusplus`](https://registry-preview.bazel.build/modules/tomlplusplus/3.4.0/) | 📦 ✅ [2 / 2](https://app.buildbuddy.io/invocation/b67bd16e-9a99-4e6e-a02c-1babde4a3f90) | 🧰 ✅ |
+| [`trlc`](https://registry-preview.bazel.build/modules/trlc/2.0.5/) | 📦 ✅ [3 / 3](https://app.buildbuddy.io/invocation/d4a1c9f5-cddf-4dc5-b852-b6f431843c33) | 🧰 ✅ |
+| [`universal-robots-client-library`](https://registry-preview.bazel.build/modules/universal-robots-client-library/2.4.0/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/d3e1ca38-7573-49f1-bb0e-abc4154bc00d) | 🧰 ✅ |
+| [`verible`](https://github.com/chipsalliance/verible) | 📦 ✅ [10 / 10](https://app.buildbuddy.io/invocation/66c8051a-cd62-4070-83a3-c8807c7adcbe) | 🧰 ✅ |
+| [`verilator`](https://registry-preview.bazel.build/modules/verilator/5.046.bcr.5/) | 📦 ✅ [3 / 3](https://app.buildbuddy.io/invocation/5beea0ba-1f33-4395-b679-439d58eba818) | 🧰 ❌ [0 / 3](https://app.buildbuddy.io/invocation/d672774e-7791-4219-b09d-71f9be5fe4f1) |
+| [`xkbcommon`](https://registry-preview.bazel.build/modules/xkbcommon/1.9.2.bcr.beta.1/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/b1793a81-92c4-4a4e-ac84-99eaa0373b63) | 🧰 ✅ |
 | [`z3`](https://github.com/Z3Prover/z3) | 🚫 | 🚫 |
 | [`zlib`](https://github.com/madler/zlib) | 🚫 | 🚫 |
-| [`zstd`](https://registry-preview.bazel.build/modules/zstd/1.5.7.bcr.1/) | 📦 ✅ | 🧰 ✅ |
-| [`zziplib`](https://registry-preview.bazel.build/modules/zziplib/0.13.72/) | 📦 ✅ | 🧰 ✅ |
+| [`zstd`](https://registry-preview.bazel.build/modules/zstd/1.5.7.bcr.1/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/4b8dd893-cf58-4401-9bca-cf0ec1b0d659) | 🧰 ✅ |
+| [`zziplib`](https://registry-preview.bazel.build/modules/zziplib/0.13.72/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/b7552eae-fc48-4b9c-bf55-6394f8064655) | 🧰 ✅ |
 
 ## Project Notes
 
