@@ -20,9 +20,16 @@ build --bes_results_url=https://app.buildbuddy.io/invocation/
 build --bes_backend=grpcs://remote.buildbuddy.io
 build --build_metadata=USER=bazel-matrix
 build --build_metadata=VISIBILITY=PUBLIC
+build --credential_helper=remote.buildbuddy.io=%workspace%/tools/buildbuddy_credential_helper.py
 
 # Quieter, more useful test output.
 test --test_output=errors
+# Let Bazel upload BEP-referenced test logs to BuildBuddy when
+# BUILDBUDDY_API_KEY is present. Do not use the outer invocation as a general
+# remote cache for local action results.
+test --remote_cache=grpcs://remote.buildbuddy.io
+test --remote_build_event_upload=minimal
+test --noremote_upload_local_results
 
 # Host-specific tuning (not committed), e.g. a shared inner repository cache:
 #   test --test_env=BAZEL_RUNNER_REPO_CACHE=<abs path>
