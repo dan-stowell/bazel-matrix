@@ -61,7 +61,13 @@ BAZEL_PROJECT = project_spec(
     # hermetic C++ core, mirroring grpc (promise core) and ortools (CP-SAT core).
     test = test_spec(
         targets = ["//src/test/cpp/..."],
-        flags = ["--check_direct_dependencies=off"],
+        flags = [
+            "--check_direct_dependencies=off",
+            "--java_language_version=21",
+            "--tool_java_language_version=21",
+            "--java_runtime_version=remotejdk_21",
+            "--tool_java_runtime_version=remotejdk_21",
+        ],
         # file_test's permission/large-file assertions fail under the root RBE
         # executor; run it only on the (non-root) local host. See above.
         exclude_on = {"rbe": _ROOT_SENSITIVE_TESTS},

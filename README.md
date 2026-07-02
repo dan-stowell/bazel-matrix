@@ -45,7 +45,7 @@ Legend:
 | [`aravis`](https://registry-preview.bazel.build/modules/aravis/0.9.2-20251111063445-57983d013883/) | 📦 ✅ [7 / 7](https://app.buildbuddy.io/invocation/69ae8c8f-1470-42a6-9c18-d716310c98d0) | 🧰 ❌ |
 | [`avro-cpp`](https://registry-preview.bazel.build/modules/avro-cpp/1.12.0/) | 📦 ✅ [6 / 6](https://app.buildbuddy.io/invocation/7244b93a-4730-4199-bc74-bc1200150f60) | 🧰 ✅ |
 | [`basis_universal`](https://registry-preview.bazel.build/modules/basis_universal/2.0.3/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/ba54c6d2-91cb-475e-a727-185d8de521cc) | 🧰 ✅ |
-| [`bazel`](https://github.com/bazelbuild/bazel) | 📦 ✅ | 💤 |
+| [`bazel`](https://github.com/bazelbuild/bazel) | 📦 ✅ [15 / 15](https://app.buildbuddy.io/invocation/9f711064-5e0c-4358-a855-f0318a723aec) | 💤 |
 | [`behaviortree_cpp`](https://registry-preview.bazel.build/modules/behaviortree_cpp/4.7.0.bcr.3/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/ff30c3b3-57cf-4e47-9a76-3bed40859c84) | 🧰 ❌ |
 | [`benchmark`](https://github.com/google/benchmark) | 📦 ✅ [49 / 49](https://app.buildbuddy.io/invocation/77e59fe1-8dbc-4682-9898-9d5a6fedaa74) | 🧰 ✅ |
 | [`boringssl`](https://github.com/google/boringssl) | 📦 ✅ [2 / 2](https://app.buildbuddy.io/invocation/0e9e619f-b6e0-4f2a-bc08-b1c9d6d29fc6) | 🧰 ✅ |
