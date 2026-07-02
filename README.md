@@ -59,14 +59,14 @@ Legend:
 | [`cctz`](https://github.com/google/cctz) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/d52c5f1d-8279-4cd0-842e-c8e8876e4a7b) | 🧰 ✅ |
 | [`cityhash`](https://registry-preview.bazel.build/modules/cityhash/1.1.1/) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/07d882b4-ed3d-4cbb-b187-bea2a5556152) | 🧰 ✅ |
 | [`cjson`](https://registry-preview.bazel.build/modules/cjson/1.7.19-0.20240923110858-12c4bf1986c2.bcr.4/) | 📦 ✅ [21 / 21](https://app.buildbuddy.io/invocation/e1387d22-95e9-4b7a-b619-66fcaefacc7d) | 🧰 ✅ |
-| [`cli11`](https://github.com/CLIUtils/CLI11) | 📦 ✅ | 🧰 ✅ |
-| [`copybara`](https://github.com/google/copybara) | 📦 ✅ | 🧰 ✅ |
-| [`cpp-httplib`](https://registry-preview.bazel.build/modules/cpp-httplib/0.46.0/) | 📦 ✅ | 🧰 ✅ |
-| [`cpptrace`](https://github.com/jeremy-rifkin/cpptrace) | 📦 ✅ | 🧰 ❌ |
-| [`cpu_features`](https://github.com/google/cpu_features) | 📦 ✅ | 🧰 ✅ |
-| [`crow`](https://github.com/CrowCpp/Crow) | 📦 ✅ | 🧰 ✅ |
-| [`cucumber-cpp`](https://registry-preview.bazel.build/modules/cucumber-cpp/0.8.0.bcr.1/) | 📦 ✅ | 🧰 ✅ |
-| [`curl`](https://registry-preview.bazel.build/modules/curl/8.12.0.bcr.1/) | 📦 ✅ | 🧰 ✅ |
+| [`cli11`](https://github.com/CLIUtils/CLI11) | 📦 ✅ [9 / 9](https://app.buildbuddy.io/invocation/d8df4037-81d2-476e-bba3-70930c609928) | 🧰 ✅ |
+| [`copybara`](https://github.com/google/copybara) | 📦 ❌ [0 / 1](https://app.buildbuddy.io/invocation/e3b93272-ffa9-411e-b679-b584ed20e42c) | 🧰 ✅ |
+| [`cpp-httplib`](https://registry-preview.bazel.build/modules/cpp-httplib/0.46.0/) | 📦 ✅ [2 / 2](https://app.buildbuddy.io/invocation/15ca3b44-0c02-42e3-b45b-73ff4e7f1bd2) | 🧰 ✅ |
+| [`cpptrace`](https://github.com/jeremy-rifkin/cpptrace) | 📦 ❌ [0 / 1](https://app.buildbuddy.io/invocation/9bc6a206-7aec-4ee1-82c2-7d017215e6fd) | 🧰 ❌ |
+| [`cpu_features`](https://github.com/google/cpu_features) | 📦 ✅ [4 / 4](https://app.buildbuddy.io/invocation/e4e50218-81cf-4349-b5ca-a6737f2c5094) | 🧰 ✅ |
+| [`crow`](https://github.com/CrowCpp/Crow) | 📦 ✅ [1 / 1](https://app.buildbuddy.io/invocation/9f889ad8-e611-4d28-bf8b-704452215209) | 🧰 ✅ |
+| [`cucumber-cpp`](https://registry-preview.bazel.build/modules/cucumber-cpp/0.8.0.bcr.1/) | 📦 ✅ [9 / 9](https://app.buildbuddy.io/invocation/cc5c991f-6800-4513-ab8b-32b5aa492437) | 🧰 ✅ |
+| [`curl`](https://registry-preview.bazel.build/modules/curl/8.12.0.bcr.1/) | 📦 ✅ [2 / 2](https://app.buildbuddy.io/invocation/5ef98629-173c-4ab1-a12a-7d0058ab803a) | 🧰 ✅ |
 | [`cxx`](https://github.com/dtolnay/cxx) | 📦 ✅ | 🧰 ✅ |
 | [`cxxurl`](https://registry-preview.bazel.build/modules/cxxurl/0.3/) | 📦 ✅ | 🧰 ✅ |
 | [`directxmath`](https://registry-preview.bazel.build/modules/directxmath/3.20/) | 📦 ✅ | 🧰 ✅ |
@@ -165,6 +165,8 @@ status table above.
 | [`aravis`](https://registry-preview.bazel.build/modules/aravis/0.9.2-20251111063445-57983d013883/) | `rbe` | 🧰 ❌ | The hermetic LLVM variant fixes glib Python codegen and uses preinstalled `make`/`pkg-config`, but libxml2 still builds through `rules_foreign_cc` outside Bazel's C++ rule flow; the zero-sysroot hermetic clang cannot find crt objects such as `Scrt1.o`. |
 | [`bazel`](https://github.com/bazelbuild/bazel) | `rbe` | 💤 | No hermetic LLVM RBE test target is tracked yet; this large project is kept out of the regular hermetic RBE test sweep. |
 | [`behaviortree_cpp`](https://registry-preview.bazel.build/modules/behaviortree_cpp/4.7.0.bcr.3/) | `rbe` | 🧰 ❌ | Its BCR `sed` dependency uses gnulib code that does not parse under clang 22 (`_GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD`). |
+| [`copybara`](https://github.com/google/copybara) | `local` | 📦 ❌ [0 / 1](https://app.buildbuddy.io/invocation/e3b93272-ffa9-411e-b679-b584ed20e42c) | The as-is local wrapper reaches Copybara analysis, but `rules_java` selects `local_jdk` inside the sandbox and analysis fails before upstream test targets are found. |
+| [`cpptrace`](https://github.com/jeremy-rifkin/cpptrace) | `local` | 📦 ❌ [0 / 1](https://app.buildbuddy.io/invocation/9bc6a206-7aec-4ee1-82c2-7d017215e6fd) | The as-is local Bazel test target fails. The underlying gtest binary runs 91 cases and reports 85 passing and 6 failing, all in stack-trace resolution/current-trace behavior. |
 | [`llvm-project`](https://registry-preview.bazel.build/modules/llvm-project/17.0.4.bcr.1/) | `rbe` | 🧰 ❌ | The hermetic LLVM RBE variant analyzes and one unit test target passes, but several LLVM unit test targets fail to build: `SupportHelpers.h` includes private `gtest/gtest-printers.h`, and later Hexagon code hits libc++ comparator errors involving deleted `operator<` for `llvm::rdf::RegisterRef`. |
 | [`rsyslog`](https://registry-preview.bazel.build/modules/rsyslog/8.2504.0/) | `rbe` | 🧰 ❌ | The hermetic build issues are fixed, but the upstream smoke test drives `rsyslogd` with `nc -u -w 0`, which only the netcat-openbsd CLI accepts; the executor images provide a different variant. |
 | [`verilator`](https://registry-preview.bazel.build/modules/verilator/5.046.bcr.5/) | `rbe` | 🧰 ❌ [0 / 3](https://app.buildbuddy.io/invocation/d672774e-7791-4219-b09d-71f9be5fe4f1) | The hermetic LLVM RBE variant analyzes the test suite, but all three regression tests fail to build because Verilator binaries link with `-latomic` and hermetic `ld.lld` cannot find `libatomic` on the RBE image. |
