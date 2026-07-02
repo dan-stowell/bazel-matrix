@@ -62,6 +62,13 @@ HERMETIC_PYTHON = overlay(
     appends = [("//bazel_runner:hermetic_python.MODULE.bazel", "MODULE.bazel")],
     build_flags = ["--@rules_python//python/config_settings:bootstrap_impl=script"],
 )
+
+# For projects whose root module already declares a rules_python bazel_dep
+# (appending another one is an error): just the bootstrap flag.
+HERMETIC_PYTHON_FLAGS = overlay(
+    name = "hermetic_python_flags",
+    build_flags = ["--@rules_python//python/config_settings:bootstrap_impl=script"],
+)
 CC_NODETECT = overlay(name = "cc_nodetect")
 HERMETIC_ZIP = overlay(
     name = "hermetic_zip",

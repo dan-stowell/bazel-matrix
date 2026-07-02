@@ -1,4 +1,10 @@
-load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+load("//bazel_runner:defs.bzl", "HERMETIC_PYTHON_FLAGS", "hermetic_llvm_project_modification")
 load("//projects/googletest:project.bzl", "GOOGLETEST_PROJECT")
 
-hermetic_llvm_project_modification(project = GOOGLETEST_PROJECT)
+# googletest's *-test py_test wrappers need the script bootstrap to run
+# without a system python3 on RBE workers. googletest's MODULE already
+# declares rules_python, so the flags-only overlay applies.
+hermetic_llvm_project_modification(
+    project = GOOGLETEST_PROJECT,
+    toolchains = [HERMETIC_PYTHON_FLAGS],
+)
