@@ -1,9 +1,29 @@
-load("//bazel_runner:defs.bzl", "HERMETIC_PYTHON", "hermetic_llvm_project_modification")
+load("//bazel_runner:defs.bzl", "HERMETIC_PYTHON", "hermetic_llvm_project_modification", "overlay")
 load("//projects/aravis:project.bzl", "ARAVIS_PROJECT")
 
 # aravis's glib dependency runs py_binary codegen tools (gdbus-codegen);
 # HERMETIC_PYTHON keeps them off the system python3, absent on RBE workers.
+#
+# Its rules_foreign_cc dependency also configure-builds GNU make from source,
+# which fails under the empty-sysroot hermetic clang. Use the preinstalled
+# make and pkg-config toolchains instead (the append makes @rules_foreign_cc addressable from
+# the command line; MVS keeps the project's newer resolution) and run on
+# BuildBuddy's rbe-ubuntu20-04 image, which ships make.
+PREINSTALLED_MAKE = overlay(
+    name = "preinstalled_make",
+    appends = [("//projects/aravis:foreign_cc.MODULE.bazel", "MODULE.bazel")],
+    build_flags = [
+        "--extra_toolchains=@rules_foreign_cc//toolchains:preinstalled_make_toolchain",
+        "--extra_toolchains=@rules_foreign_cc//toolchains:preinstalled_pkgconfig_toolchain",
+        "--remote_default_exec_properties=container-image=docker://gcr.io/flame-public/rbe-ubuntu20-04:latest",
+    ],
+)
+
+# Still failing: libxml2 (foreign_cc configure build) links outside Bazel's
+# cc rule flow, so the empty-sysroot hermetic clang has no crt objects
+# (ld.lld: cannot open Scrt1.o). Needs either a sysroot-bearing variant of
+# the toolchain for foreign_cc subbuilds or an upstream Bazel-native libxml2.
 hermetic_llvm_project_modification(
     project = ARAVIS_PROJECT,
-    toolchains = [HERMETIC_PYTHON],
+    toolchains = [HERMETIC_PYTHON, PREINSTALLED_MAKE],
 )

@@ -121,9 +121,12 @@ Anything python touches fails on RBE workers because the images ship no
 
 - `behaviortree_cpp`: its BCR `sed` dep (gnulib) fails to parse under
   clang 22 (`_GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD`).
-- `aravis`: after the python fix, rules_foreign_cc configure-builds GNU make,
-  which fails with the empty-sysroot hermetic clang on a bare image.
-  Candidate fix: preinstalled-make toolchain + tool-bearing image.
+- `aravis`: fixed in sequence — HERMETIC_PYTHON (glib codegen), preinstalled
+  make + pkg-config toolchains and a tool-bearing image (rules_foreign_cc was
+  configure-building both with the empty-sysroot clang) — but its libxml2
+  foreign_cc configure build still links outside Bazel's cc rule flow, where
+  the zero-sysroot hermetic clang has no crt objects (cannot open Scrt1.o).
+  Needs a sysroot for foreign_cc subbuilds or a Bazel-native libxml2.
 - `rsyslog`: hermetic build fixed (include order, gnu.2.34, rbe-ubuntu22-04
   image), but upstream's smoke_test drives rsyslogd with `nc -u -w 0`, which
   only netcat-openbsd accepts; executor images ship other variants.
