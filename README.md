@@ -177,6 +177,35 @@ that environment.
 | `bazel-skylib` (`native_test`) | 1 | 1 | 1 |
 | `rules_venv` (`py_venv_test`) | 1 | 0 | 0 |
 
+## RBE Executor Images
+
+The hermetic LLVM toolchain carries its own compiler, linker, runtimes, and
+(via the matrix overlays) Python, so the BuildBuddy executor image only has to
+supply three things: **glibc ≥ 2.28** (the toolchain's prebuilt binaries and
+`--dynamic_mode=off` test binaries still link the host libc), **bash** (Bazel's
+test-setup script and genrules hard-require `/bin/bash`), and coreutils.
+
+A 15-project subset covering rules_cc, rules_python, rules_go, rules_rust,
+flex/m4 codegen, and OpenSSL/perl scripting was swept against candidate images
+on 2026-07-03 (`--remote_default_exec_properties=container-image=docker://...`):
+
+| image | size (uncompressed) | glibc | result |
+| --- | --- | --- | --- |
+| `ubuntu:22.04` (matrix default) | 119 MB | 2.35 | ✅ 15 / 15 |
+| `ubuntu:24.04` | 119 MB | 2.39 | ✅ 15 / 15 |
+| `debian:12-slim` | 116 MB | 2.36 | ✅ 15 / 15 |
+| `debian:13-slim` | 119 MB | 2.41 | ✅ 15 / 15 |
+| `gcr.io/flame-public/rbe-ubuntu20-04` | — | 2.31 | ✅ 15 / 15 |
+| `busybox:glibc` | 6.8 MB | 2.36 | ❌ 0 / 15 — no `/bin/bash` |
+| `alpine:3.21` | 12 MB | musl | ❌ 0 / 15 — musl and no bash |
+
+Conclusion: any mainstream glibc ≥ 2.28 image with bash works interchangeably;
+there is no meaningfully smaller off-the-shelf image, because the tiny images
+all drop bash (and Bazel will not run tests without it). The floor for an
+off-the-shelf image is the ~116 MB debian-slim class. A purpose-built image of
+busybox:glibc plus a static bash and coreutils (~10 MB) would likely work and
+is the next experiment if image size ever matters.
+
 ## Project Notes
 
 Notes are keyed by `(project, test env)` for active non-green cells in the
