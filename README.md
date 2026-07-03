@@ -158,6 +158,25 @@ environment): local passed 99 / 107 outer targets, RBE passed 97 / 107.
 | [`zstd`](https://registry-preview.bazel.build/modules/zstd/1.5.7.bcr.1/) | ✅ [1 / 1](https://app.buildbuddy.io/invocation/4b8dd893-cf58-4401-9bca-cf0ec1b0d659) | ✅ [1 / 1](https://app.buildbuddy.io/invocation/15e41d9f-2ce4-4d7d-b76d-86854086d4da) | ✅ [1 / 1](https://app.buildbuddy.io/invocation/d271bf33-72cd-4462-afd3-78d810d033a4) |
 | [`zziplib`](https://registry-preview.bazel.build/modules/zziplib/0.13.72/) | ✅ [1 / 1](https://app.buildbuddy.io/invocation/b7552eae-fc48-4b9c-bf55-6394f8064655) | ✅ [1 / 1](https://app.buildbuddy.io/invocation/c0304eba-543a-4326-a012-d1ca2bc06db1) | ✅ [1 / 1](https://app.buildbuddy.io/invocation/9840fccc-3e4e-4eb3-adbb-7bf8c33d7a4a) |
 
+## Rulesets
+
+Each project's test targets were classified by their rule kind (from the
+BuildBuddy target data of the 2026-07-03 hermetic_llvm sweep invocations); a
+project with test targets from several rulesets counts toward each. The
+passing columns count projects whose hermetic_llvm suite is fully green in
+that environment.
+
+| ruleset | projects with tests | passing locally | passing on RBE |
+| --- | --- | --- | --- |
+| `rules_cc` | 92 | 86 | 85 |
+| `rules_python` | 5 | 5 | 5 |
+| `rules_go` | 5 | 3 | 2 |
+| `sh_test` (Bazel built-in) | 5 | 3 | 2 |
+| `rules_rust` | 2 | 2 | 2 |
+| `rules_java` | 1 | 0 | 1 |
+| `bazel-skylib` (`native_test`) | 1 | 1 | 1 |
+| `rules_venv` (`py_venv_test`) | 1 | 0 | 0 |
+
 ## Project Notes
 
 Notes are keyed by `(project, test env)` for active non-green cells in the
