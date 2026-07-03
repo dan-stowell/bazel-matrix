@@ -1,0 +1,4 @@
+alias(
+    name = "linux-actiond",
+    actual = "@actiond//cmd/linux-actiond:linux-actiond_linux_x86_64",
+)

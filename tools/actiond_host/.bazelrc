@@ -1,0 +1,24 @@
+# Flags replicated from actiond's own .bazelrc so a dependency build matches
+# what upstream CI produces (and hits its remote cache).
+common --downloader_config=bazel_downloader.cfg
+# Look up downloads in the repository cache by checksum alone, so archives
+# that have vanished upstream (e.g. pruned kernel.org point releases) can be
+# seeded into the cache out of band.
+common --repo_env=BAZEL_HTTP_RULES_URLS_AS_DEFAULT_CANONICAL_ID=0
+common --@rules_zig//zig/settings:use_cc_common_link=true
+common --@rules_zig//zig/settings:mode=release_fast
+common --stripopt=--strip-all
+common --sandbox_add_mount_pair=/tmp
+
+common --bes_results_url=https://app.buildbuddy.io/invocation/
+common --bes_backend=grpcs://remote.buildbuddy.io
+common --build_metadata=USER=bazel-matrix
+common --credential_helper=remote.buildbuddy.io=%workspace%/credential_helper.sh
+
+common:remote --jobs=200
+common:remote --extra_execution_platforms=@llvm//:rbe_platform
+common:remote --noexperimental_throttle_remote_action_building
+common:remote --remote_cache=grpcs://remote.buildbuddy.io
+common:remote --remote_executor=grpcs://remote.buildbuddy.io
+common:remote --remote_timeout=120
+common:remote --shell_executable=/bin/bash
