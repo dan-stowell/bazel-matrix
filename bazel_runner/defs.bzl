@@ -98,6 +98,28 @@ BUILDBUDDY_RBE = overlay(
     ],
 )
 
+# actiond (github.com/hermeticbuild/actiond) is a local Remote Execution API
+# worker+cache that runs actions inside a Linux VM in an empty chroot. Start it
+# with: linux-actiond serve-vm --listen=127.0.0.1:8980 --root=~/.cache/actiond/vm
+# Actions that need a shell request the embedded bash runtime via the
+# requires-bash exec property; dynamically linked tools/tests request a glibc
+# mount via the libc property (hermetic-llvm targets glibc 2.28, so any
+# embedded runtime >= 2.31 satisfies it).
+ACTIOND = overlay(
+    name = "actiond",
+    build_flags = [
+        "--remote_executor=grpc://127.0.0.1:8980",
+        "--remote_cache=grpc://127.0.0.1:8980",
+        "--spawn_strategy=remote",
+        "--genrule_strategy=remote",
+        "--remote_local_fallback=false",
+        "--remote_upload_local_results=false",
+        "--noremote_cache_compression",
+        "--remote_default_exec_properties=requires-bash=",
+        "--remote_default_exec_properties=libc=glibc2.35",
+    ],
+)
+
 _CONTAINER_IMAGE_FLAG_PREFIX = "--remote_default_exec_properties=container-image="
 
 # BuildBuddy's default executor image is Ubuntu 16.04 (glibc 2.23);
@@ -328,7 +350,12 @@ def _job_label(package, target_name):
     else:
         project = package
         variant = "unknown"
-    environment = "rbe" if "_rbe_" in target_name else "local"
+    if "_actiond_" in target_name:
+        environment = "actiond"
+    elif "_rbe_" in target_name:
+        environment = "rbe"
+    else:
+        environment = "local"
     command = "test" if target_name.endswith("_test") else "build"
     return "{}/{}/{}/{}".format(project, variant, environment, command)
 
@@ -343,6 +370,9 @@ def _local_test_name(project_name):
 
 def _rbe_test_name(project_name):
     return project_name + "_rbe_test"
+
+def _actiond_test_name(project_name):
+    return project_name + "_actiond_test"
 
 def _bazel_runner_build_impl(ctx):
     source = _single_file(ctx.attr.source[DefaultInfo].files, "source")
@@ -435,10 +465,14 @@ def bazel_runner_test(name, source, targets, bazel = None, bazel_data = None, ba
 def _spec_targets(spec, environment):
     """Target patterns for a build/test spec in an environment.
 
-    exclude_on maps an environment name ("local"/"rbe") to target patterns to
-    exclude there, e.g. tests that read host state absent on RBE workers.
+    exclude_on maps an environment name ("local"/"rbe"/"actiond") to target
+    patterns to exclude there, e.g. tests that read host state absent on RBE
+    workers. actiond's empty chroot is at least as constrained as an RBE
+    worker image, so the actiond environment inherits the rbe exclusions.
     """
     excluded = spec.exclude_on.get(environment, [])
+    if environment == "actiond":
+        excluded = spec.exclude_on.get("rbe", []) + excluded
     return spec.targets + ["-" + target for target in excluded]
 
 def _overlay_files(toolchains, field):
@@ -543,6 +577,16 @@ def _emit_bazel_runner_targets(source_archive, strip_prefix, source_subdir, tool
             env_inherit = ["BUILDBUDDY_API_KEY"],
             visibility = visibility,
         )
+        bazel_runner_test(
+            name = _actiond_test_name(target_prefix),
+            source = ":bazel_runner_source",
+            targets = _spec_targets(test, "actiond"),
+            bazel_data = inner_bazel_data(bazel_version),
+            bazel_arg = inner_bazel_arg(bazel_version),
+            flags = build_flags + _overlay_build_flags([ACTIOND]) + test.flags,
+            source_subdir = source_subdir,
+            visibility = visibility,
+        )
 
 def _emit_bazel_runner_targets_for_source(source, source_subdir, toolchains, build, test, bazel_version, target_prefix, visibility):
     bazel = inner_bazel(bazel_version)
@@ -588,6 +632,16 @@ def _emit_bazel_runner_targets_for_source(source, source_subdir, toolchains, bui
             flags = rbe_build_flags + test.flags,
             source_subdir = source_subdir,
             env_inherit = ["BUILDBUDDY_API_KEY"],
+            visibility = visibility,
+        )
+        bazel_runner_test(
+            name = _actiond_test_name(target_prefix),
+            source = source,
+            targets = _spec_targets(test, "actiond"),
+            bazel_data = inner_bazel_data(bazel_version),
+            bazel_arg = inner_bazel_arg(bazel_version),
+            flags = build_flags + _overlay_build_flags([ACTIOND]) + test.flags,
+            source_subdir = source_subdir,
             visibility = visibility,
         )
 
