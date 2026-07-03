@@ -110,6 +110,9 @@ ACTIOND = overlay(
     build_flags = [
         "--remote_executor=grpc://127.0.0.1:8980",
         "--remote_cache=grpc://127.0.0.1:8980",
+        # Actions queue behind the single local VM; the default 60s call
+        # deadline expires while they wait.
+        "--remote_timeout=10m",
         "--spawn_strategy=remote",
         "--genrule_strategy=remote",
         "--remote_local_fallback=false",
