@@ -86,6 +86,18 @@ http_file(
     ],
 )
 
+# diff3 for the minimal RBE executor image: busybox ships diff but not diff3
+# (GNU diffutils is Priority: required on debian/ubuntu, so tests such as
+# copybara's may shell out to it).
+http_file(
+    name = "diffutils_deb",
+    sha256 = "d3412669f7ae53ba895c3a509620ea7494ec1a36faa204c5215442ced381a479",
+    urls = [
+        "https://deb.debian.org/debian/pool/main/d/diffutils/diffutils_3.10-4_amd64.deb",
+        "https://snapshot.debian.org/archive/debian/20260101T000000Z/pool/main/d/diffutils/diffutils_3.10-4_amd64.deb",
+    ],
+)
+
 # Hermetic Python toolchain so runner tests run the same everywhere.
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
 python.toolchain(
