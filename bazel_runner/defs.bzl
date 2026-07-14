@@ -112,7 +112,7 @@ DEFAULT_RBE_IMAGE_FLAG = _CONTAINER_IMAGE_FLAG_PREFIX + "docker://ubuntu:22.04"
 # `bazel run //tools/rbe_image:rbe_minimal_push` before a sweep). Actions
 # reference it by digest, which is stable while the image's pinned inputs
 # are.
-MINIMAL_RBE_IMAGE_FLAG = _CONTAINER_IMAGE_FLAG_PREFIX + "docker://ttl.sh/bazel-matrix-rbe-minimal@sha256:5ff4562ac04a495751bf70418c6b252970f250fd5ddae7d8d28e14b700f87674"
+MINIMAL_RBE_IMAGE_FLAG = _CONTAINER_IMAGE_FLAG_PREFIX + "docker://ttl.sh/bazel-matrix-rbe-minimal@sha256:8cc7b09d8571f3f2bc89215f201b8ac6a29bb60264956cccf3cc4cb07294962d"
 
 def _rbe_overlay_flags(toolchains, default_image_flag = DEFAULT_RBE_IMAGE_FLAG):
     """BuildBuddy RBE flags, adding the default executor image only when no

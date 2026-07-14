@@ -75,6 +75,17 @@ http_file(
     ],
 )
 
+# libz.so.1 for the minimal RBE executor image: prebuilt rustc and remote
+# JDKs dynamically link the system zlib.
+http_file(
+    name = "zlib1g_deb",
+    sha256 = "015be740d6236ad114582dea500c1d907f29e16d6db00566ca32fb68d71ac90d",
+    urls = [
+        "https://deb.debian.org/debian/pool/main/z/zlib/zlib1g_1.3.dfsg+really1.3.1-1+b1_amd64.deb",
+        "https://snapshot.debian.org/archive/debian/20260101T000000Z/pool/main/z/zlib/zlib1g_1.3.dfsg+really1.3.1-1+b1_amd64.deb",
+    ],
+)
+
 # Hermetic Python toolchain so runner tests run the same everywhere.
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
 python.toolchain(
