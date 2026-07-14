@@ -495,6 +495,8 @@ AS_IS_LOCAL_TESTS = ["//projects/%s:%s_local_test" % (package, package.split("/"
 LARGE_AS_IS_LOCAL_TESTS = ["//projects/%s:%s_local_test" % (package, package.split("/")[0]) for package in LARGE_AS_IS_TEST_PACKAGES]
 HERMETIC_LLVM_LOCAL_TESTS = ["//projects/%s:%s_local_test" % (package, package.split("/")[0]) for package in REGULAR_HERMETIC_LLVM_TEST_PACKAGES]
 LARGE_HERMETIC_LLVM_LOCAL_TESTS = ["//projects/%s:%s_local_test" % (package, package.split("/")[0]) for package in LARGE_HERMETIC_LLVM_TEST_PACKAGES]
+HERMETIC_LLVM_RBE_MINIMAL_TESTS = ["//projects/%s:%s_rbe_minimal_test" % (package, package.split("/")[0]) for package in REGULAR_HERMETIC_LLVM_TEST_PACKAGES]
+LARGE_HERMETIC_LLVM_RBE_MINIMAL_TESTS = ["//projects/%s:%s_rbe_minimal_test" % (package, package.split("/")[0]) for package in LARGE_HERMETIC_LLVM_TEST_PACKAGES]
 AS_IS_RBE_TESTS = ["//projects/%s:%s_rbe_test" % (package, package.split("/")[0]) for package in REGULAR_AS_IS_TEST_PACKAGES]
 LARGE_AS_IS_RBE_TESTS = ["//projects/%s:%s_rbe_test" % (package, package.split("/")[0]) for package in LARGE_AS_IS_TEST_PACKAGES]
 HERMETIC_LLVM_RBE_TESTS = ["//projects/%s:%s_rbe_test" % (package, package.split("/")[0]) for package in REGULAR_HERMETIC_LLVM_TEST_PACKAGES]
@@ -657,6 +659,24 @@ test_suite(
     tests = [
         ":hermetic_llvm_rbe_tests",
         ":large_hermetic_llvm_rbe_tests",
+    ],
+)
+
+test_suite(
+    name = "hermetic_llvm_rbe_minimal_tests",
+    tests = HERMETIC_LLVM_RBE_MINIMAL_TESTS,
+)
+
+test_suite(
+    name = "large_hermetic_llvm_rbe_minimal_tests",
+    tests = LARGE_HERMETIC_LLVM_RBE_MINIMAL_TESTS,
+)
+
+test_suite(
+    name = "all_hermetic_llvm_rbe_minimal_tests",
+    tests = [
+        ":hermetic_llvm_rbe_minimal_tests",
+        ":large_hermetic_llvm_rbe_minimal_tests",
     ],
 )
 

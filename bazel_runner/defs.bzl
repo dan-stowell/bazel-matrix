@@ -107,7 +107,14 @@ _CONTAINER_IMAGE_FLAG_PREFIX = "--remote_default_exec_properties=container-image
 # when the execution platform sets no exec_properties.
 DEFAULT_RBE_IMAGE_FLAG = _CONTAINER_IMAGE_FLAG_PREFIX + "docker://ubuntu:22.04"
 
-def _rbe_overlay_flags(toolchains):
+# Minimal executor image built by //tools/rbe_image and pushed to ttl.sh
+# (anonymous public registry, 24h retention: re-run
+# `bazel run //tools/rbe_image:rbe_minimal_push` before a sweep). Actions
+# reference it by digest, which is stable while the image's pinned inputs
+# are.
+MINIMAL_RBE_IMAGE_FLAG = _CONTAINER_IMAGE_FLAG_PREFIX + "docker://ttl.sh/bazel-matrix-rbe-minimal@sha256:5ff4562ac04a495751bf70418c6b252970f250fd5ddae7d8d28e14b700f87674"
+
+def _rbe_overlay_flags(toolchains, default_image_flag = DEFAULT_RBE_IMAGE_FLAG):
     """BuildBuddy RBE flags, adding the default executor image only when no
     project overlay supplies its own (duplicate container-image keys crash
     Bazel with 'Multiple entries with same key')."""
@@ -116,7 +123,7 @@ def _rbe_overlay_flags(toolchains):
         for flag in toolchain.build_flags:
             if flag.startswith(_CONTAINER_IMAGE_FLAG_PREFIX):
                 return flags
-    return flags + [DEFAULT_RBE_IMAGE_FLAG]
+    return flags + [default_image_flag]
 
 def tarball_source(archive, strip_prefix = "", source_subdir = ""):
     return struct(
@@ -328,7 +335,9 @@ def _job_label(package, target_name):
     else:
         project = package
         variant = "unknown"
-    if "_rbe_" in target_name:
+    if "_rbe_minimal_" in target_name:
+        environment = "rbe_minimal"
+    elif "_rbe_" in target_name:
         environment = "rbe"
     else:
         environment = "local"
@@ -346,6 +355,9 @@ def _local_test_name(project_name):
 
 def _rbe_test_name(project_name):
     return project_name + "_rbe_test"
+
+def _rbe_minimal_test_name(project_name):
+    return project_name + "_rbe_minimal_test"
 
 def _bazel_runner_build_impl(ctx):
     source = _single_file(ctx.attr.source[DefaultInfo].files, "source")
@@ -438,10 +450,15 @@ def bazel_runner_test(name, source, targets, bazel = None, bazel_data = None, ba
 def _spec_targets(spec, environment):
     """Target patterns for a build/test spec in an environment.
 
-    exclude_on maps an environment name ("local"/"rbe") to target patterns to
-    exclude there, e.g. tests that read host state absent on RBE workers.
+    exclude_on maps an environment name ("local"/"rbe"/"rbe_minimal") to
+    target patterns to exclude there, e.g. tests that read host state absent
+    on RBE workers. The minimal executor image is at least as constrained as
+    the default one, so the rbe_minimal environment inherits the rbe
+    exclusions.
     """
     excluded = spec.exclude_on.get(environment, [])
+    if environment == "rbe_minimal":
+        excluded = spec.exclude_on.get("rbe", []) + excluded
     return spec.targets + ["-" + target for target in excluded]
 
 def _overlay_files(toolchains, field):
@@ -546,6 +563,17 @@ def _emit_bazel_runner_targets(source_archive, strip_prefix, source_subdir, tool
             env_inherit = ["BUILDBUDDY_API_KEY"],
             visibility = visibility,
         )
+        bazel_runner_test(
+            name = _rbe_minimal_test_name(target_prefix),
+            source = ":bazel_runner_source",
+            targets = _spec_targets(test, "rbe_minimal"),
+            bazel_data = inner_bazel_data(bazel_version),
+            bazel_arg = inner_bazel_arg(bazel_version),
+            flags = build_flags + _rbe_overlay_flags(toolchains, MINIMAL_RBE_IMAGE_FLAG) + test.flags,
+            source_subdir = source_subdir,
+            env_inherit = ["BUILDBUDDY_API_KEY"],
+            visibility = visibility,
+        )
 
 def _emit_bazel_runner_targets_for_source(source, source_subdir, toolchains, build, test, bazel_version, target_prefix, visibility):
     bazel = inner_bazel(bazel_version)
@@ -589,6 +617,17 @@ def _emit_bazel_runner_targets_for_source(source, source_subdir, toolchains, bui
             bazel_data = inner_bazel_data(bazel_version),
             bazel_arg = inner_bazel_arg(bazel_version),
             flags = rbe_build_flags + test.flags,
+            source_subdir = source_subdir,
+            env_inherit = ["BUILDBUDDY_API_KEY"],
+            visibility = visibility,
+        )
+        bazel_runner_test(
+            name = _rbe_minimal_test_name(target_prefix),
+            source = source,
+            targets = _spec_targets(test, "rbe_minimal"),
+            bazel_data = inner_bazel_data(bazel_version),
+            bazel_arg = inner_bazel_arg(bazel_version),
+            flags = build_flags + _rbe_overlay_flags(toolchains, MINIMAL_RBE_IMAGE_FLAG) + test.flags,
             source_subdir = source_subdir,
             env_inherit = ["BUILDBUDDY_API_KEY"],
             visibility = visibility,
