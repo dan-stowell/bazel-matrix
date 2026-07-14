@@ -53,7 +53,8 @@ genrule(
 
 # diff3 does not compare files itself: it execs `diff` from PATH, and
 # busybox's diff makes it misdetect conflicts as clean merges. Ship GNU diff
-# at /usr/bin so it shadows the busybox applet.
+# at both /bin and /usr/bin: Bazel's strict_action_env PATH puts /bin first,
+# so /usr/bin alone loses to the busybox applet.
 genrule(
     name = "diff",
     srcs = ["@diffutils_deb//file"],
@@ -80,11 +81,15 @@ image_layer(
         "/lib/libgcc_s.so.1": ":libgcc_s",
         "/lib/libstdc++.so.6": ":libstdcxx",
         "/lib/libz.so.1": ":libz",
+        "/bin/diff": ":diff",
+        "/bin/diff3": ":diff3",
         "/usr/bin/diff": ":diff",
         "/usr/bin/diff3": ":diff3",
     },
     file_metadata = {
         "/bin/bash": file_metadata(mode = "0755"),
+        "/bin/diff": file_metadata(mode = "0755"),
+        "/bin/diff3": file_metadata(mode = "0755"),
         "/usr/bin/diff": file_metadata(mode = "0755"),
         "/usr/bin/diff3": file_metadata(mode = "0755"),
     },
