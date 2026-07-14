@@ -198,13 +198,56 @@ on 2026-07-03 (`--remote_default_exec_properties=container-image=docker://...`):
 | `gcr.io/flame-public/rbe-ubuntu20-04` | — | 2.31 | ✅ 15 / 15 |
 | `busybox:glibc` | 6.8 MB | 2.36 | ❌ 0 / 15 — no `/bin/bash` |
 | `alpine:3.21` | 12 MB | musl | ❌ 0 / 15 — musl and no bash |
+| `cgr.dev/chainguard/bash` | 54 MB | 2.4x | ❌ 0 / 14 — OCI entrypoint breaks actions (see below) |
+| `ttl.sh/bazel-matrix-rbe-minimal` | 12 MB | 2.41 | ✅ 14 / 14 — purpose-built, see below |
 
-Conclusion: any mainstream glibc ≥ 2.28 image with bash works interchangeably;
-there is no meaningfully smaller off-the-shelf image, because the tiny images
-all drop bash (and Bazel will not run tests without it). The floor for an
-off-the-shelf image is the ~116 MB debian-slim class. A purpose-built image of
-busybox:glibc plus a static bash and coreutils (~10 MB) would likely work and
-is the next experiment if image size ever matters.
+Conclusion: any mainstream glibc ≥ 2.28 image with bash **and an empty OCI
+entrypoint** works interchangeably; there is no meaningfully smaller
+off-the-shelf image, because the tiny images all drop bash (and Bazel will not
+run tests without it). The floor for an off-the-shelf image is the ~116 MB
+debian-slim class; below that it takes the purpose-built image described next.
+
+The chainguard/bash failure mode (2026-07-14) is worth recording: the image
+has everything the sweep needs (glibc 2.4x with all compat stubs, busybox
+coreutils, bash 5.3), but it declares `ENTRYPOINT ["/bin/bash", "-c"]`, and
+BuildBuddy executors prepend the image entrypoint to every action command.
+Under `bash -c` the action's own binary becomes the script text and its
+arguments become `$0 $1 …`, so every action runs its tool with **no
+arguments** (`glibc-stubs-generator` reported `missing required parameter:
+'-target'` while `-target` sat right there in the action line). Executor
+images must leave the entrypoint empty.
+
+### The minimal image: `//tools/rbe_image`
+
+The purpose-built image speculated about above now exists. It is assembled
+hermetically by [rules_img](https://registry.bazel.build/modules/rules_img)
+in [`tools/rbe_image`](tools/rbe_image) — ~12 MB uncompressed, one tenth of
+the debian-slim class — from:
+
+- **`busybox:glibc`** (digest-pinned): glibc 2.41, coreutils applets,
+  `/usr/bin/env`, `/tmp`, `/etc/passwd`.
+- **A static bash 5.2** at `/bin/bash`
+  ([robxu9/bash-static](https://github.com/robxu9/bash-static), sha256-pinned).
+- **Symlinks `libdl.so.2` / `librt.so.1` / `libutil.so.1` → `libc.so.6`**:
+  binaries built against pre-2.34 glibc (e.g. the hermetic python
+  interpreter) still list these in `DT_NEEDED`, but all their symbols live in
+  `libc.so.6` now and ld.so deduplicates the symlinked load by inode.
+- **`libgcc_s.so.1`, `libstdc++.so.6`, `libcrypt.so.1`, `libz.so.1`**
+  extracted from sha256-pinned Debian packages (a `.deb` is an `ar` archive;
+  `extract_deb.py` parses it with the python stdlib). Prebuilt tools that a
+  sweep runs on the executor still expect these system libraries: rustc
+  links libgcc_s and libz, rules_perl's perl links libcrypt, and trlc's cvc5
+  solver links libstdc++.
+- **No OCI entrypoint** (see above) and the conventional `PATH`.
+
+`bazel run //tools/rbe_image:rbe_minimal_push` publishes it to
+[ttl.sh](https://ttl.sh) (anonymous public registry, 24-hour retention) as
+`ttl.sh/bazel-matrix-rbe-minimal:24h`; `MINIMAL_RBE_IMAGE_FLAG` in
+`bazel_runner/defs.bzl` pins the digest that `<project>_rbe_minimal_test`
+targets pass to BuildBuddy. Every input is content-pinned (base image
+digest, bash sha256, .deb sha256s), so a re-push after the 24-hour window
+should reproduce the same digest; if it does not, update
+`MINIMAL_RBE_IMAGE_FLAG` to the newly printed one.
 
 ## Project Notes
 
