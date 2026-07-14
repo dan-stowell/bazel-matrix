@@ -10,6 +10,71 @@ module(
 bazel_dep(name = "rules_python", version = "2.0.3")
 bazel_dep(name = "platforms", version = "1.1.0")
 
+# rules_img builds the minimal RBE executor image (see //tools/rbe_image).
+bazel_dep(name = "rules_img", version = "0.3.15")
+
+pull = use_repo_rule("@rules_img//img:pull.bzl", "pull")
+
+# Base of the minimal RBE executor image: busybox's glibc variant (glibc 2.41
+# plus coreutils applets in ~7 MB). Digest pins the multi-arch index of the
+# busybox:glibc tag.
+pull(
+    name = "busybox_glibc",
+    digest = "sha256:3ba030337caebbfc2232b22b1e435eb213b28e5844a34942c74555bf904a265a",
+    registry = "index.docker.io",
+    repository = "library/busybox",
+    tag = "glibc",
+)
+
+http_file = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
+
+# Statically linked bash for the minimal RBE executor image: Bazel's
+# test-setup script and genrules hard-require /bin/bash, and busybox does not
+# provide one.
+http_file(
+    name = "bash_static_linux_x86_64",
+    executable = True,
+    sha256 = "64469a9512a00199c85622ec56f870f97d50457a4e06e0cfa39bae7adf0cc8f2",
+    urls = ["https://github.com/robxu9/bash-static/releases/download/5.2.015-1.2.3-2/bash-linux-x86_64"],
+)
+
+# libgcc_s.so.1 for the minimal RBE executor image: prebuilt toolchains such
+# as rustc dynamically link the GCC unwinder, which busybox:glibc does not
+# carry. The snapshot.debian.org URL survives the package leaving the
+# archive.
+http_file(
+    name = "libgcc_s1_deb",
+    sha256 = "3c71917b490d1a17aed43196a2787a256ecf060526cdb20216a74bedc061b150",
+    urls = [
+        "https://deb.debian.org/debian/pool/main/g/gcc-14/libgcc-s1_14.2.0-19_amd64.deb",
+        "https://snapshot.debian.org/archive/debian/20260101T000000Z/pool/main/g/gcc-14/libgcc-s1_14.2.0-19_amd64.deb",
+    ],
+)
+
+# libstdc++.so.6 for the minimal RBE executor image: native extensions of
+# python packages (e.g. trlc's cvc5 solver) and other prebuilt tools expect
+# the system C++ runtime that every mainstream base image carries.
+http_file(
+    name = "libstdcxx6_deb",
+    sha256 = "ab1fa05837aa7a92aae748fd07a18a35f7d18bb4a71c4724fe2bbf0e32089de0",
+    urls = [
+        "https://deb.debian.org/debian/pool/main/g/gcc-14/libstdc++6_14.2.0-19_amd64.deb",
+        "https://snapshot.debian.org/archive/debian/20260101T000000Z/pool/main/g/gcc-14/libstdc++6_14.2.0-19_amd64.deb",
+    ],
+)
+
+# libcrypt.so.1 for the minimal RBE executor image: glibc dropped libcrypt
+# (now libxcrypt), but prebuilt interpreters such as rules_perl's perl still
+# link it.
+http_file(
+    name = "libcrypt1_deb",
+    sha256 = "0ebc144d662e3197982d1bf3a7b8b35ca845e54c68811de0328b1f0d7c67585c",
+    urls = [
+        "https://deb.debian.org/debian/pool/main/libx/libxcrypt/libcrypt1_4.4.38-1_amd64.deb",
+        "https://snapshot.debian.org/archive/debian/20260101T000000Z/pool/main/libx/libxcrypt/libcrypt1_4.4.38-1_amd64.deb",
+    ],
+)
+
 # Hermetic Python toolchain so runner tests run the same everywhere.
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
 python.toolchain(

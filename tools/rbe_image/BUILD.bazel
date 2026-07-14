@@ -1,0 +1,81 @@
+load("@rules_img//img:image.bzl", "image_manifest")
+load("@rules_img//img:layer.bzl", "file_metadata", "image_layer")
+load("@rules_img//img:push.bzl", "image_push")
+load("@rules_python//python:defs.bzl", "py_binary")
+
+py_binary(
+    name = "extract_deb",
+    srcs = ["extract_deb.py"],
+)
+
+# rustc and friends dynamically link the GCC unwinder; pull the real
+# library out of Debian's package (a .deb is an ar archive, which
+# extract_deb.py parses directly).
+genrule(
+    name = "libgcc_s",
+    srcs = ["@libgcc_s1_deb//file"],
+    outs = ["libgcc_s.so.1"],
+    cmd = "$(location :extract_deb) $(location @libgcc_s1_deb//file) usr/lib/x86_64-linux-gnu/libgcc_s.so.1 $@",
+    tools = [":extract_deb"],
+)
+
+genrule(
+    name = "libstdcxx",
+    srcs = ["@libstdcxx6_deb//file"],
+    outs = ["libstdc++.so.6"],
+    cmd = "$(location :extract_deb) $(location @libstdcxx6_deb//file) usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.33 $@",
+    tools = [":extract_deb"],
+)
+
+genrule(
+    name = "libcrypt",
+    srcs = ["@libcrypt1_deb//file"],
+    outs = ["libcrypt.so.1"],
+    cmd = "$(location :extract_deb) $(location @libcrypt1_deb//file) usr/lib/x86_64-linux-gnu/libcrypt.so.1.1.0 $@",
+    tools = [":extract_deb"],
+)
+
+# Minimal RBE executor image for the hermetic LLVM sweeps: busybox:glibc
+# (glibc 2.41 + coreutils applets) plus a static bash. The lib*.so symlinks
+# satisfy DT_NEEDED entries of binaries that target pre-2.34 glibc (e.g. the
+# hermetic python interpreter needs libdl/librt/libutil, whose symbols all
+# live in libc.so.6 now; ld.so dedupes the symlink to the already-loaded
+# libc by inode).
+#
+# The image must not define an OCI entrypoint: BuildBuddy executors prepend
+# the image entrypoint to every action command, which breaks argument
+# passing (see the README's executor image notes).
+image_layer(
+    name = "bash_layer",
+    srcs = {
+        "/bin/bash": "@bash_static_linux_x86_64//file",
+        "/lib/libcrypt.so.1": ":libcrypt",
+        "/lib/libgcc_s.so.1": ":libgcc_s",
+        "/lib/libstdc++.so.6": ":libstdcxx",
+    },
+    file_metadata = {"/bin/bash": file_metadata(mode = "0755")},
+    symlinks = {
+        "/usr/bin/bash": "/bin/bash",
+        "/lib/libdl.so.2": "libc.so.6",
+        "/lib/librt.so.1": "libc.so.6",
+        "/lib/libutil.so.1": "libc.so.6",
+    },
+)
+
+image_manifest(
+    name = "rbe_minimal",
+    base = "@busybox_glibc",
+    layers = [":bash_layer"],
+)
+
+# ttl.sh is an anonymous public registry; the 24h tag sets the retention
+# window, so a sweep must re-push (bazel run :rbe_minimal_push) before
+# running. Actions pull the image by digest, which stays stable as long as
+# the pinned inputs above do not change.
+image_push(
+    name = "rbe_minimal_push",
+    image = ":rbe_minimal",
+    registry = "ttl.sh",
+    repository = "bazel-matrix-rbe-minimal",
+    tag = "24h",
+)
