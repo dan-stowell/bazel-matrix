@@ -1,0 +1,23 @@
+{
+  "https://github.com/jarro2783/cxxopts": {
+    "note": "Upstream Bazel exposes a library and fuzz target, but no normal test target for the matrix's four test columns.",
+    "tags": [
+      "not_matrix_candidate",
+      "no_upstream_bazel_tests"
+    ]
+  },
+  "https://github.com/p-ranav/argparse": {
+    "note": "Upstream Bazel exposes a header-only library target, but no normal test target for the matrix's four test columns.",
+    "tags": [
+      "not_matrix_candidate",
+      "no_upstream_bazel_tests"
+    ]
+  },
+  "https://github.com/tinyobjloader/tinyobjloader": {
+    "note": "Upstream Bazel exposes a library target, but no normal test target for the matrix's four test columns.",
+    "tags": [
+      "not_matrix_candidate",
+      "no_upstream_bazel_tests"
+    ]
+  }
+}

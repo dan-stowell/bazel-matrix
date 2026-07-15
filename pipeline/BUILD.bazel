@@ -15,6 +15,7 @@ py_library(
         "sources/bcr.py",
         "sources/jin.py",
         "sources/nicolov.py",
+        "tags.py",
     ],
     deps = ["@rules_python//python/runfiles"],
 )

@@ -32,6 +32,11 @@ For higher GitHub API limits, set `BAZEL_MATRIX_GITHUB_TOKEN`, `GH_TOKEN`, or
 `GITHUB_TOKEN`. If those are not already in the environment, the pipeline also
 checks `$HOME/.profile` for `BAZEL_MATRIX_GITHUB_TOKEN`.
 
+`data/project_tags.json` records manual triage that should survive future
+pipeline runs. Tags are emitted into `data/projects.jsonl`. By default,
+`//pipeline:next_candidates` and `//pipeline:rank` exclude repositories tagged
+`not_matrix_candidate`; pass `--include-tagged` to include them.
+
 ```sh
 bazel run //pipeline:gather
 bazel run //pipeline:gather -- --enrich=none

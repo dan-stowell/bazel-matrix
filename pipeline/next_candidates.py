@@ -16,6 +16,7 @@ def main(argv=None):
     parser.add_argument("--language", default=None)
     parser.add_argument("--min-score", type=float, default=0.0)
     parser.add_argument("--include-built", action="store_true")
+    parser.add_argument("--include-tagged", action="store_true")
     parser.add_argument("--require-first-party-bazel", action=argparse.BooleanOptionalAction, default=True)
     args = parser.parse_args(argv)
 
@@ -28,6 +29,7 @@ def main(argv=None):
     candidates = inventory.candidate_rows(
         rows,
         include_built=args.include_built,
+        include_tagged=args.include_tagged,
         language=args.language,
         require_first_party_bazel=args.require_first_party_bazel,
         min_score=args.min_score,

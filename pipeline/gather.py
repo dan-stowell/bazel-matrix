@@ -17,6 +17,7 @@ import sys
 
 from pipeline import github as ghmod
 from pipeline import model
+from pipeline import tags as tagmod
 from pipeline.sources import bcr, jin, nicolov
 
 _SOURCES = [nicolov, jin, bcr]
@@ -128,12 +129,15 @@ def main(argv=None):
     parser.add_argument("--detect-bazel-min-stars", type=int, default=1000)
     parser.add_argument("--include-hermeticbuild-org", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--output", default=None)
+    parser.add_argument("--tags", default=None)
     args = parser.parse_args(argv)
 
+    base = os.environ.get("BUILD_WORKSPACE_DIRECTORY") or os.getcwd()
     output = args.output
     if not output:
-        base = os.environ.get("BUILD_WORKSPACE_DIRECTORY") or os.getcwd()
         output = os.path.join(base, "data", "projects.jsonl")
+    tag_path = args.tags or tagmod.default_tags_path(base)
+    tag_map = tagmod.load(tag_path)
 
     print("Gathering project sources...", file=sys.stderr)
     projects, reports = _collect_static_sources()
@@ -181,7 +185,7 @@ def main(argv=None):
         projects = list(_merge(projects).values())
 
     reference = max((project.pushed_at for project in projects if project.pushed_at), default="")
-    rows = [project.to_dict(reference) for project in projects]
+    rows = [tagmod.annotate_row(project.to_dict(reference), tag_map) for project in projects]
     rows.sort(key=lambda row: row["repo"].lower())
     _write_jsonl(output, rows)
 
@@ -193,6 +197,7 @@ def main(argv=None):
         "unknown": sum(1 for row in rows if row["category"] == model.CATEGORY_UNKNOWN),
         "enriched": sum(1 for row in rows if row["enriched"]),
         "first_party_bazel": sum(1 for row in rows if row["first_party_bazel"]),
+        "tagged": sum(1 for row in rows if row["tags"]),
     }
     print("Wrote {}".format(output), file=sys.stderr)
     print("  reference_pushed_at={}".format(reference or "n/a"), file=sys.stderr)

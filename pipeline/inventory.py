@@ -5,6 +5,7 @@ import os
 import re
 
 from pipeline import model
+from pipeline import tags as tagmod
 
 _PROJECT_NAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]*$")
 
@@ -122,10 +123,18 @@ def candidate_reasons(row, built):
     slug = slug_from_repo(row.get("repo", ""))
     if slug and not project_name_keys(slug).intersection(built):
         reasons.append("not_in_matrix")
+    for tag in row.get("tags", []):
+        reasons.append("tag:" + tag)
     return reasons
 
 
-def candidate_rows(rows, include_built=False, language=None, require_first_party_bazel=True, min_score=0.0):
+def candidate_rows(
+        rows,
+        include_built=False,
+        include_tagged=False,
+        language=None,
+        require_first_party_bazel=True,
+        min_score=0.0):
     built = existing_project_keys()
     candidates = []
     for row in rows:
@@ -139,6 +148,8 @@ def candidate_rows(rows, include_built=False, language=None, require_first_party
         if not slug:
             continue
         if not include_built and project_name_keys(slug).intersection(built):
+            continue
+        if not include_tagged and tagmod.has_excluded_tag(row):
             continue
         score = float(row.get("candidate_score") or 0.0)
         if score < min_score:
@@ -155,6 +166,8 @@ def candidate_rows(rows, include_built=False, language=None, require_first_party
             "bazel_markers": row.get("bazel_markers", []),
             "in_bcr": bool(row.get("in_bcr")),
             "sources": row.get("sources", []),
+            "tags": row.get("tags", []),
+            "tag_note": row.get("tag_note", ""),
             "description": row.get("description") or "",
             "reasons": candidate_reasons(row, built),
             "next_step": "bazel run //pipeline:add_project -- {}".format(row.get("repo", "")),

@@ -6,6 +6,7 @@ import os
 import sys
 
 from pipeline import model
+from pipeline import tags as tagmod
 
 def _load_jsonl(path):
     rows = []
@@ -52,6 +53,7 @@ def main(argv=None):
     parser.add_argument("--top", type=int, default=30)
     parser.add_argument("--language", default=None)
     parser.add_argument("--include-built", action="store_true")
+    parser.add_argument("--include-tagged", action="store_true")
     args = parser.parse_args(argv)
 
     path = args.input
@@ -73,6 +75,8 @@ def main(argv=None):
             continue
         slug = row.get("repo", "").rstrip("/").rsplit("/", 1)[-1].lower()
         if not args.include_built and slug in built:
+            continue
+        if not args.include_tagged and tagmod.has_excluded_tag(row):
             continue
         project = _as_project(row)
         candidates.append((model.candidate_score(project, reference), project))
