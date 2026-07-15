@@ -9,6 +9,7 @@ import subprocess
 import sys
 import tarfile
 import urllib.parse
+import xml.etree.ElementTree as ET
 
 try:
     from python.runfiles import runfiles
@@ -100,6 +101,168 @@ def _load_bep_outputs(path):
     return sorted(outputs, key=lambda output: output["arcname"])
 
 
+_PASSING_TEST_STATUSES = {"PASSED", "FLAKY"}
+
+
+def _test_case_counts(path):
+    root = ET.parse(path).getroot()
+    counts = {"passed": 0, "failed": 0, "skipped": 0}
+    for case in root.iter("testcase"):
+        if case.find("skipped") is not None:
+            counts["skipped"] += 1
+        elif case.find("failure") is not None or case.find("error") is not None:
+            counts["failed"] += 1
+        else:
+            counts["passed"] += 1
+    return counts
+
+
+def _matrix_status(passed, failed):
+    total = passed + failed
+    if total == 0:
+        return "no_tests"
+    if failed == 0:
+        return "pass"
+    if passed / total > 0.90:
+        return "mostly_pass"
+    return "fail"
+
+
+def _load_test_result(path, job, returncode=0, console_outcomes=None):
+    summaries = {}
+    configured_tests = set()
+    failed_completions = set()
+    explicit_skips = set()
+    attempts = {}
+    invocation_id = ""
+
+    with open(path, encoding="utf-8") as f:
+        for line in f:
+            event = json.loads(line)
+            event_id = event.get("id", {})
+            if "started" in event_id:
+                invocation_id = event.get("started", {}).get("uuid", "")
+
+            configured_id = event_id.get("targetConfigured")
+            configured = event.get("configured", {})
+            if configured_id and "testSize" in configured:
+                configured_tests.add(configured_id.get("label", ""))
+
+            summary_id = event_id.get("testSummary")
+            if summary_id:
+                key = summary_id.get("label", "")
+                summaries[key] = event.get("testSummary", {}).get("overallStatus", "NO_STATUS")
+
+            completed_id = event_id.get("targetCompleted")
+            completed = event.get("completed", {})
+            if completed_id and completed.get("skipped"):
+                explicit_skips.add(completed_id.get("label", ""))
+            if completed_id and completed.get("success") is False:
+                failed_completions.add(completed_id.get("label", ""))
+
+            result_id = event_id.get("testResult")
+            if result_id:
+                base_key = (
+                    result_id.get("label", ""),
+                    result_id.get("configuration", {}).get("id", ""),
+                    result_id.get("run", 0),
+                    result_id.get("shard", 0),
+                )
+                attempt = result_id.get("attempt", 0)
+                previous = attempts.get(base_key)
+                if previous is None or attempt >= previous[0]:
+                    attempts[base_key] = (attempt, event.get("testResult", {}))
+
+    failed_completions.intersection_update(configured_tests)
+    failed_completions.difference_update(summaries)
+    runnable = set(summaries).union(failed_completions)
+    skipped = explicit_skips.union(configured_tests.difference(runnable))
+    passed = sum(status in _PASSING_TEST_STATUSES for status in summaries.values())
+    failed = len(summaries) - passed + len(failed_completions)
+    if console_outcomes:
+        console_labels = set(console_outcomes)
+        if not configured_tests or console_labels == configured_tests:
+            passed = sum(status in _PASSING_TEST_STATUSES for status in console_outcomes.values())
+            failed = sum(
+                status not in _PASSING_TEST_STATUSES and status != "SKIPPED"
+                for status in console_outcomes.values()
+            )
+            skipped = {
+                label for label, status in console_outcomes.items()
+                if status == "SKIPPED"
+            }
+    cases = {"passed": 0, "failed": 0, "skipped": 0, "complete": True}
+    xml_results = 0
+    for _, result in attempts.values():
+        xml_path = None
+        for output in result.get("testActionOutput", []):
+            if output.get("name") == "test.xml":
+                xml_path = _file_uri_path(output.get("uri", ""))
+                break
+        if not xml_path or not os.path.isfile(xml_path):
+            cases["complete"] = False
+            continue
+        try:
+            counts = _test_case_counts(xml_path)
+        except (ET.ParseError, OSError):
+            cases["complete"] = False
+            continue
+        xml_results += 1
+        for field in ("passed", "failed", "skipped"):
+            cases[field] += counts[field]
+
+    parts = job.split("/")
+    project, variant, environment, command = (parts + [""] * 4)[:4]
+    status = _matrix_status(passed, failed)
+    if returncode and status in ("pass", "no_tests"):
+        status = "fail"
+    result = {
+        "status": status,
+        "passed": passed,
+        "total": passed + failed,
+    }
+    if skipped:
+        result["skipped"] = len(skipped)
+    if attempts:
+        result["cases"] = cases
+    if invocation_id:
+        result["invocation"] = "https://app.buildbuddy.io/invocation/" + invocation_id
+    return {
+        "schema_version": 1,
+        "job": job,
+        "project": project,
+        "variant": variant,
+        "environment": environment,
+        "command": command,
+        "exit_code": returncode,
+        "result_key": "{}_{}".format(variant, environment),
+        "result": result,
+        "collection": {
+            "configured_tests": len(configured_tests),
+            "test_summaries": len(summaries),
+            "failed_targets": failed,
+            "test_attempts": len(attempts),
+            "xml_results": xml_results,
+        },
+    }
+
+
+def _write_test_result(bep, job, output_dir, returncode=0, console_outcomes=None):
+    if not output_dir or not os.path.exists(bep):
+        return None
+    os.makedirs(output_dir, exist_ok=True)
+    output = os.path.join(output_dir, "matrix-result.json")
+    with open(output, "w", encoding="utf-8") as f:
+        json.dump(
+            _load_test_result(bep, job, returncode, console_outcomes),
+            f,
+            indent=2,
+            sort_keys=True,
+        )
+        f.write("\n")
+    return output
+
+
 def _sha256(path):
     h = hashlib.sha256()
     with open(path, "rb") as f:
@@ -157,7 +320,18 @@ def _job_metadata(job):
     ]
 
 
-def _run_with_prefix(cmd, cwd, env, prefix):
+_TARGET_OUTCOME_RE = re.compile(
+    r"^(//\S+)\s+(FAILED TO BUILD|PASSED|FAILED|TIMEOUT|FLAKY|SKIPPED)(?:\s|$)"
+)
+
+
+def _record_target_outcome(line, outcomes):
+    match = _TARGET_OUTCOME_RE.match(line)
+    if match:
+        outcomes[match.group(1)] = match.group(2)
+
+
+def _run_with_prefix(cmd, cwd, env, prefix, outcomes=None):
     proc = subprocess.Popen(
         cmd,
         cwd=cwd,
@@ -169,6 +343,8 @@ def _run_with_prefix(cmd, cwd, env, prefix):
     )
     assert proc.stdout is not None
     for line in proc.stdout:
+        if outcomes is not None:
+            _record_target_outcome(line, outcomes)
         sys.stderr.write(prefix + line)
     return proc.wait()
 
@@ -242,6 +418,7 @@ def main(argv=None):
         ] + command_flags
     if args.mode == "test":
         command_flags = [
+            "--build_event_json_file=" + bep,
             "--test_output=errors",
             "--keep_going",
         ] + command_flags
@@ -258,7 +435,24 @@ def main(argv=None):
         args.mode,
     ] + command_flags + ["--"] + args.target
 
-    returncode = _run_with_prefix(cmd, cwd=source, env=env, prefix=prefix)
+    console_outcomes = {} if args.mode == "test" else None
+    returncode = _run_with_prefix(
+        cmd,
+        cwd=source,
+        env=env,
+        prefix=prefix,
+        outcomes=console_outcomes,
+    )
+    if args.mode == "test":
+        result_output = _write_test_result(
+            bep,
+            args.job,
+            os.environ.get("TEST_UNDECLARED_OUTPUTS_DIR", ""),
+            returncode,
+            console_outcomes,
+        )
+        if result_output:
+            print(prefix + "matrix result: " + result_output, file=sys.stderr)
     if returncode != 0:
         return returncode
 

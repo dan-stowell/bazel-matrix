@@ -45,6 +45,16 @@ py_test(
     deps = [":lib"],
 )
 
+py_test(
+    name = "update_matrix_test",
+    srcs = [
+        "update_matrix.py",
+        "update_matrix_test.py",
+    ],
+    main = "update_matrix_test.py",
+    deps = [":lib"],
+)
+
 py_binary(
     name = "rank",
     srcs = ["rank.py"],
@@ -60,6 +70,12 @@ py_binary(
 py_binary(
     name = "render_readme",
     srcs = ["render_readme.py"],
+    deps = [":lib"],
+)
+
+py_binary(
+    name = "update_matrix",
+    srcs = ["update_matrix.py"],
     deps = [":lib"],
 )
 

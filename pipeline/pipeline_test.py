@@ -111,11 +111,63 @@ class MatrixReadmeTest(unittest.TestCase):
         rendered = matrix.render([row], {
             "https://github.com/acme/demo": {"tags": ["featured"]},
         })
-        self.assertEqual(2, rendered.count("[`Demo`](https://github.com/acme/demo)"))
+        self.assertEqual(2, rendered.count("[`acme/demo`](https://github.com/acme/demo)"))
         self.assertIn("[2 / 2](https://app.buildbuddy.io/invocation/example)", rendered)
 
     def test_result_without_invocation_is_rendered(self):
         self.assertEqual("🚫", matrix.result_cell({"status": "no_tests"}))
+
+    def test_mostly_passing_and_skipped_targets_are_rendered(self):
+        self.assertEqual(
+            "🟢 49 / 50<br><sub>50 targets skipped</sub>",
+            matrix.result_cell({
+                "status": "mostly_pass",
+                "passed": 49,
+                "total": 50,
+                "skipped": 50,
+            }),
+        )
+
+    def test_result_cases_are_rendered_as_secondary_counts(self):
+        result = {
+            "status": "fail",
+            "passed": 1,
+            "total": 2,
+            "cases": {
+                "passed": 85,
+                "failed": 6,
+                "skipped": 2,
+                "complete": False,
+            },
+        }
+        self.assertEqual(
+            "❌ 1 / 2<br><sub>cases: 85 / 91 (+2 skipped; partial)</sub>",
+            matrix.result_cell(result),
+        )
+
+    def test_case_counts_are_validated(self):
+        with self.assertRaisesRegex(ValueError, "invalid as_is_local cases failed"):
+            matrix._validate_cases("demo", "as_is_local", {
+                "passed": 1,
+                "failed": -1,
+                "skipped": 0,
+                "complete": True,
+            })
+
+    def test_target_counts_are_validated(self):
+        with self.assertRaisesRegex(ValueError, "invalid as_is_local target counts"):
+            matrix.validate_result("demo", "as_is_local", {
+                "status": "fail",
+                "passed": 2,
+                "total": 1,
+            })
+
+        with self.assertRaisesRegex(ValueError, "cases missing complete"):
+            matrix._validate_cases("demo", "as_is_local", {
+                "passed": 1,
+                "failed": 0,
+                "skipped": 0,
+            })
 
 
 if __name__ == "__main__":

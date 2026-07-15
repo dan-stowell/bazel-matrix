@@ -93,6 +93,15 @@ def slug_from_repo(repo_url):
     return slug.lower()
 
 
+def github_repo_slug(repo_url):
+    """Return the case-preserving GitHub owner/repository slug."""
+    parsed = model.parse_github(repo_url)
+    if not parsed:
+        return ""
+    owner, repo = parsed
+    return owner + "/" + repo.removesuffix(".git")
+
+
 def starlark_constant(slug):
     value = re.sub(r"[^A-Za-z0-9]+", "_", slug).strip("_").upper()
     if not value:

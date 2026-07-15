@@ -1,4 +1,4 @@
-load("@rules_python//python:defs.bzl", "py_binary")
+load("@rules_python//python:defs.bzl", "py_binary", "py_test")
 
 exports_files(["hermetic_llvm.MODULE.bazel", "hermetic_python.MODULE.bazel", "bazel_runner.py", "zip.py"])
 
@@ -6,6 +6,16 @@ py_binary(
     name = "bazel_runner",
     srcs = ["bazel_runner.py"],
     main = "bazel_runner.py",
+)
+
+py_test(
+    name = "bazel_runner_test",
+    srcs = [
+        "bazel_runner.py",
+        "bazel_runner_test.py",
+    ],
+    main = "bazel_runner_test.py",
+    deps = ["@rules_python//python/runfiles"],
 )
 
 # OS+CPU config settings used by bazel_runner rules to pick the matching pinned inner
