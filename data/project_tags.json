@@ -13,6 +13,13 @@
       "no_upstream_bazel_tests"
     ]
   },
+  "https://github.com/gabime/spdlog": {
+    "note": "BCR spdlog 1.17.0 exposes @spdlog//:spdlog_test, but that target depends on @catch2 declared as a dev_dependency, so it is not visible when spdlog is consumed through the matrix's BCR wrapper module.",
+    "tags": [
+      "not_matrix_candidate",
+      "incompatible_bazel_layout"
+    ]
+  },
   "https://github.com/tinyobjloader/tinyobjloader": {
     "note": "Upstream Bazel exposes a library target, but no normal test target for the matrix's four test columns.",
     "tags": [
