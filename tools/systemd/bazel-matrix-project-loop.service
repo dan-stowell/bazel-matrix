@@ -7,4 +7,4 @@ Type=oneshot
 WorkingDirectory=/home/exedev/bazel-matrix
 ExecStart=/home/exedev/bazel-matrix/tools/run-one-project-loop.sh
 KillSignal=SIGINT
-TimeoutStopSec=2min
+TimeoutStopSec=20s
