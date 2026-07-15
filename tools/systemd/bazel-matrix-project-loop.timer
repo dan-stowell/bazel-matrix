@@ -6,6 +6,3 @@ OnCalendar=*:0/10
 AccuracySec=30s
 Persistent=true
 Unit=bazel-matrix-project-loop.service
-
-[Install]
-WantedBy=timers.target
