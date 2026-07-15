@@ -105,5 +105,6 @@ collection is enabled for each project:
 Case `failed` includes both assertion failures and framework-reported errors.
 The case pass-rate denominator is `passed + failed`; skipped cases are shown
 separately. `complete` indicates whether every executed test action supplied
-structured case XML. Case counts are rendered beneath the primary Bazel test
-target counts and may be omitted until reliable data is available.
+structured case XML. Case and skipped-target counts remain structured data and
+are intentionally not rendered in the compact README table. Case data may be
+omitted until reliable collection is available.

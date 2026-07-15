@@ -117,9 +117,9 @@ class MatrixReadmeTest(unittest.TestCase):
     def test_result_without_invocation_is_rendered(self):
         self.assertEqual("🚫", matrix.result_cell({"status": "no_tests"}))
 
-    def test_mostly_passing_and_skipped_targets_are_rendered(self):
+    def test_skipped_targets_do_not_crowd_primary_result(self):
         self.assertEqual(
-            "🟢 49 / 50<br><sub>50 targets skipped</sub>",
+            "🟢 49 / 50",
             matrix.result_cell({
                 "status": "mostly_pass",
                 "passed": 49,
@@ -128,7 +128,7 @@ class MatrixReadmeTest(unittest.TestCase):
             }),
         )
 
-    def test_result_cases_are_rendered_as_secondary_counts(self):
+    def test_result_cases_do_not_crowd_primary_result(self):
         result = {
             "status": "fail",
             "passed": 1,
@@ -141,7 +141,7 @@ class MatrixReadmeTest(unittest.TestCase):
             },
         }
         self.assertEqual(
-            "❌ 1 / 2<br><sub>cases: 85 / 91 (+2 skipped; partial)</sub>",
+            "❌ 1 / 2",
             matrix.result_cell(result),
         )
 

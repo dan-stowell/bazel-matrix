@@ -88,19 +88,6 @@ def load(path):
     return rows
 
 
-def _case_detail(cases):
-    runnable = cases["passed"] + cases["failed"]
-    qualifiers = []
-    if cases["skipped"]:
-        qualifiers.append("{} skipped".format(cases["skipped"]))
-    if not cases["complete"]:
-        qualifiers.append("partial")
-    detail = "cases: {} / {}".format(cases["passed"], runnable)
-    if qualifiers:
-        detail += " (+{})".format("; ".join(qualifiers))
-    return detail
-
-
 def result_cell(result):
     marker = STATUS_MARKERS[result["status"]]
     cell = marker
@@ -110,10 +97,6 @@ def result_cell(result):
         if invocation:
             counts = "[{}]({})".format(counts, invocation)
         cell += " " + counts
-    if result.get("skipped"):
-        cell += "<br><sub>{} targets skipped</sub>".format(result["skipped"])
-    if "cases" in result:
-        cell += "<br><sub>{}</sub>".format(_case_detail(result["cases"]))
     return cell
 
 
