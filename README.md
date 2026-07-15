@@ -20,75 +20,6 @@ To test an individual project, run that project's tests:
 bazel test //projects/re2/hermetic_llvm:re2_local_test
 ```
 
-## Project Discovery
-
-`bazel run //pipeline:gather` refreshes `data/projects.jsonl`, one JSON object
-per discovered GitHub repository, ordered stably by repository URL. The pipeline
-combines the Bazel Central Registry, two public awesome-bazel lists, and the
-`hermeticbuild` GitHub organization, then enriches project entries through the
-pinned hermetic `gh` binary.
-
-For higher GitHub API limits, set `BAZEL_MATRIX_GITHUB_TOKEN`, `GH_TOKEN`, or
-`GITHUB_TOKEN`. If those are not already in the environment, the pipeline also
-checks `$HOME/.profile` for `BAZEL_MATRIX_GITHUB_TOKEN`.
-
-`data/project_tags.json` records manual triage that should survive future
-pipeline runs. Tags are emitted into `data/projects.jsonl`. By default,
-`//pipeline:next_candidates` and `//pipeline:rank` exclude repositories tagged
-`not_matrix_candidate`; pass `--include-tagged` to include them.
-
-```sh
-bazel run //pipeline:gather
-bazel run //pipeline:gather -- --enrich=none
-bazel run //pipeline:rank -- --top 50
-bazel run //pipeline:next_candidates -- --top 50 --output /tmp/candidates.jsonl
-```
-
-To start adding a candidate to the matrix, scaffold it from the snapshot:
-
-```sh
-bazel run //pipeline:add_project -- https://github.com/org/repo
-```
-
-The scaffold is intentionally inactive. Fill in the source archive pin in
-`//bazel_runner:extension.bzl`, add the generated archive repo to `MODULE.bazel`,
-then activate the generated `as_is` and `hermetic_llvm` BUILD files.
-
-### Candidate Scaffold Run Log
-
-On 2026-07-15, the default first-party Bazel candidate queue was exhausted into
-inactive scaffolds:
-
-- Initial queue after the first three proof scaffolds: 36 candidates
-  ([invocation](https://app.buildbuddy.io/invocation/b86fa0c0-f945-4e4d-9953-6961826a164f)).
-- `bazel run //pipeline:add_project` created all 36 remaining scaffolds; sample
-  invocations:
-  [first](https://app.buildbuddy.io/invocation/5801f2ed-b50b-446b-ad39-a04dc0962f15),
-  [last](https://app.buildbuddy.io/invocation/2a097995-4584-4490-8faf-e6b17a47c2cd).
-- Post-run queue size: 0 candidates
-  ([invocation](https://app.buildbuddy.io/invocation/ff62a821-a174-4e25-9bba-a03a072e7bad)).
-- Validation: `bazel build //pipeline:next_candidates //pipeline:add_project`
-  passed
-  ([invocation](https://app.buildbuddy.io/invocation/92587a84-23c5-4913-8975-33ebcae9025a)).
-- Validation: `bazel query //...` passed, with the pre-existing
-  `//tools/rbe_image` rule/file-name warnings.
-- Smoke tests: `bazel test //:smoke_as_is_local_tests` passed 5 / 5 from cache
-  ([invocation](https://app.buildbuddy.io/invocation/f83ce340-3041-418d-8725-d21d2ba75bce)).
-
-## Developer Tools
-
-Buildifier is available as a Bazel dev dependency:
-
-```sh
-bazel run -- @buildifier_prebuilt//:buildifier -mode=fix "$PWD/MODULE.bazel"
-```
-
-## Project Layout
-
-Project packages live under `//projects/<project_name>/<modification_name>`.
-* `as_is` means using unmodified project source code or [Bazel Central Registry](https://registry-preview.bazel.build/) module.
-* `hermetic_llvm` means modifying the project source or Bazel Central Registry module to use the [hermetic LLVM toolchain](https://github.com/hermeticbuild/hermetic-llvm) (does not rely on your laptop's C/C++ compiler).
-
 ## Project Status
 
 Legend:
@@ -103,10 +34,9 @@ Legend:
 
 The hermetic_llvm sweeps recorded below ran 2026-07-03 (107 test targets per
 environment): local passed 99 / 107 outer targets, RBE passed 97 / 107. The
-rbe_minimal sweep ran 2026-07-14 on the 13.6 MB minimal executor image (see
-[RBE Executor Images](#rbe-executor-images)) and also passed 97 / 107 — the
-identical pass/fail set as the default ubuntu:22.04 image, at a tenth of the
-size.
+rbe_minimal sweep ran 2026-07-14 on the 13.6 MB minimal executor image and also
+passed 97 / 107 — the identical pass/fail set as the default ubuntu:22.04 image,
+at a tenth of the size.
 
 | project_name | local_test 📦 as_is | local_test 🧰 hermetic_llvm | rbe_test 🧰 hermetic_llvm | rbe_minimal_test 🧰 hermetic_llvm |
 | --- | --- | --- | --- | --- |
@@ -224,103 +154,6 @@ size.
 | [`zlib`](https://github.com/madler/zlib) | 🚫 | 🚫 | 🚫 | 🚫 |
 | [`zstd`](https://registry-preview.bazel.build/modules/zstd/1.5.7.bcr.1/) | ✅ [1 / 1](https://app.buildbuddy.io/invocation/4b8dd893-cf58-4401-9bca-cf0ec1b0d659) | ✅ [1 / 1](https://app.buildbuddy.io/invocation/15e41d9f-2ce4-4d7d-b76d-86854086d4da) | ✅ [1 / 1](https://app.buildbuddy.io/invocation/d271bf33-72cd-4462-afd3-78d810d033a4) | ✅ [1 / 1](https://app.buildbuddy.io/invocation/76087a5c-4400-4874-a524-69a504af2fc8) |
 | [`zziplib`](https://registry-preview.bazel.build/modules/zziplib/0.13.72/) | ✅ [1 / 1](https://app.buildbuddy.io/invocation/b7552eae-fc48-4b9c-bf55-6394f8064655) | ✅ [1 / 1](https://app.buildbuddy.io/invocation/c0304eba-543a-4326-a012-d1ca2bc06db1) | ✅ [1 / 1](https://app.buildbuddy.io/invocation/9840fccc-3e4e-4eb3-adbb-7bf8c33d7a4a) | ✅ [1 / 1](https://app.buildbuddy.io/invocation/00c4429d-a398-4014-b5e5-c8f69224b09d) |
-
-## Rulesets
-
-Each project's test targets were classified by their rule kind (from the
-BuildBuddy target data of the 2026-07-03 hermetic_llvm sweep invocations); a
-project with test targets from several rulesets counts toward each. The
-passing columns count projects whose hermetic_llvm suite is fully green in
-that environment.
-
-| ruleset | projects with tests | passing locally | passing on RBE |
-| --- | --- | --- | --- |
-| `rules_cc` | 92 | 86 | 85 |
-| `rules_python` | 5 | 5 | 5 |
-| `rules_go` | 5 | 3 | 2 |
-| `sh_test` (Bazel built-in) | 5 | 3 | 2 |
-| `rules_rust` | 2 | 2 | 2 |
-| `rules_java` | 1 | 0 | 1 |
-| `bazel-skylib` (`native_test`) | 1 | 1 | 1 |
-| `rules_venv` (`py_venv_test`) | 1 | 0 | 0 |
-
-## RBE Executor Images
-
-The hermetic LLVM toolchain carries its own compiler, linker, runtimes, and
-(via the matrix overlays) Python, so the BuildBuddy executor image only has to
-supply three things: **glibc ≥ 2.28** (the toolchain's prebuilt binaries and
-`--dynamic_mode=off` test binaries still link the host libc), **bash** (Bazel's
-test-setup script and genrules hard-require `/bin/bash`), and coreutils.
-
-A 15-project subset covering rules_cc, rules_python, rules_go, rules_rust,
-flex/m4 codegen, and OpenSSL/perl scripting was swept against candidate images
-on 2026-07-03 (`--remote_default_exec_properties=container-image=docker://...`):
-
-| image | size (uncompressed) | glibc | result |
-| --- | --- | --- | --- |
-| `ubuntu:22.04` (matrix default) | 119 MB | 2.35 | ✅ 15 / 15 |
-| `ubuntu:24.04` | 119 MB | 2.39 | ✅ 15 / 15 |
-| `debian:12-slim` | 116 MB | 2.36 | ✅ 15 / 15 |
-| `debian:13-slim` | 119 MB | 2.41 | ✅ 15 / 15 |
-| `gcr.io/flame-public/rbe-ubuntu20-04` | — | 2.31 | ✅ 15 / 15 |
-| `busybox:glibc` | 6.8 MB | 2.36 | ❌ 0 / 15 — no `/bin/bash` |
-| `alpine:3.21` | 12 MB | musl | ❌ 0 / 15 — musl and no bash |
-| `cgr.dev/chainguard/bash` | 54 MB | 2.4x | ❌ 0 / 14 — OCI entrypoint breaks actions (see below) |
-| `ttl.sh/bazel-matrix-rbe-minimal` | 13.6 MB | 2.41 | ✅ 97 / 107 full sweep — parity with ubuntu:22.04, see below |
-
-Conclusion: any mainstream glibc ≥ 2.28 image with bash **and an empty OCI
-entrypoint** works interchangeably; there is no meaningfully smaller
-off-the-shelf image, because the tiny images all drop bash (and Bazel will not
-run tests without it). The floor for an off-the-shelf image is the ~116 MB
-debian-slim class; below that it takes the purpose-built image described next.
-
-The chainguard/bash failure mode (2026-07-14) is worth recording: the image
-has everything the sweep needs (glibc 2.4x with all compat stubs, busybox
-coreutils, bash 5.3), but it declares `ENTRYPOINT ["/bin/bash", "-c"]`, and
-BuildBuddy executors prepend the image entrypoint to every action command.
-Under `bash -c` the action's own binary becomes the script text and its
-arguments become `$0 $1 …`, so every action runs its tool with **no
-arguments** (`glibc-stubs-generator` reported `missing required parameter:
-'-target'` while `-target` sat right there in the action line). Executor
-images must leave the entrypoint empty.
-
-### The minimal image: `//tools/rbe_image`
-
-The purpose-built image speculated about above now exists. It is assembled
-hermetically by [rules_img](https://registry.bazel.build/modules/rules_img)
-in [`tools/rbe_image`](tools/rbe_image) — 13.6 MB uncompressed (4.5 MB
-compressed), one ninth of the debian-slim class — from:
-
-- **`busybox:glibc`** (digest-pinned): glibc 2.41, coreutils applets,
-  `/usr/bin/env`, `/tmp`, `/etc/passwd`.
-- **A static bash 5.2** at `/bin/bash`
-  ([robxu9/bash-static](https://github.com/robxu9/bash-static), sha256-pinned).
-- **Symlinks `libdl.so.2` / `librt.so.1` / `libutil.so.1` → `libc.so.6`**:
-  binaries built against pre-2.34 glibc (e.g. the hermetic python
-  interpreter) still list these in `DT_NEEDED`, but all their symbols live in
-  `libc.so.6` now and ld.so deduplicates the symlinked load by inode.
-- **`libgcc_s.so.1`, `libstdc++.so.6`, `libcrypt.so.1`, `libz.so.1`**
-  extracted from sha256-pinned Debian packages (a `.deb` is an `ar` archive;
-  `extract_deb.py` parses it with the python stdlib). Prebuilt tools that a
-  sweep runs on the executor still expect these system libraries: rustc
-  links libgcc_s and libz, rules_perl's perl links libcrypt, and trlc's cvc5
-  solver links libstdc++.
-- **GNU `diff` and `diff3`** from the pinned diffutils package (copybara's
-  merge tests shell out to diff3). Two traps here: diff3 does not compare
-  files itself — it execs `diff` from `PATH` with GNU-only options that
-  busybox's applet rejects, quietly turning merge conflicts into clean
-  merges — and Bazel's strict action `PATH` is `/bin:/usr/bin:/usr/local/bin`,
-  so the GNU binaries must sit at `/bin` to beat the busybox applets.
-- **No OCI entrypoint** (see above) and the conventional `PATH`.
-
-`bazel run //tools/rbe_image:rbe_minimal_push` publishes it to
-[ttl.sh](https://ttl.sh) (anonymous public registry, 24-hour retention) as
-`ttl.sh/bazel-matrix-rbe-minimal:24h`; `MINIMAL_RBE_IMAGE_FLAG` in
-`bazel_runner/defs.bzl` pins the digest that `<project>_rbe_minimal_test`
-targets pass to BuildBuddy. Every input is content-pinned (base image
-digest, bash sha256, .deb sha256s), so a re-push after the 24-hour window
-should reproduce the same digest; if it does not, update
-`MINIMAL_RBE_IMAGE_FLAG` to the newly printed one.
 
 ## Project Notes
 

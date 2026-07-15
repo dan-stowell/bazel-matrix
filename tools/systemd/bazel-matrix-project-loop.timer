@@ -1,8 +1,0 @@
-[Unit]
-Description=Run Bazel Matrix project loop every 10 minutes
-
-[Timer]
-OnCalendar=*:0/10
-AccuracySec=30s
-Persistent=true
-Unit=bazel-matrix-project-loop.service
