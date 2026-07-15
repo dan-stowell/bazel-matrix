@@ -175,8 +175,16 @@ def _load_test_result(path, job, returncode=0, console_outcomes=None):
 
     failed_completions.intersection_update(configured_tests)
     failed_completions.difference_update(summaries)
-    runnable = set(summaries).union(failed_completions)
-    skipped = explicit_skips.union(configured_tests.difference(runnable))
+    unresolved = configured_tests.difference(summaries, failed_completions, explicit_skips)
+    if returncode:
+        # A failed build often emits no targetCompleted event for test targets
+        # whose shared dependency failed. They are failed-to-build targets, not
+        # skipped tests. On a successful invocation, the same absence represents
+        # a configured test that Bazel intentionally did not run.
+        failed_completions.update(unresolved)
+    else:
+        explicit_skips.update(unresolved)
+    skipped = explicit_skips
     passed = sum(status in _PASSING_TEST_STATUSES for status in summaries.values())
     failed = len(summaries) - passed + len(failed_completions)
     if console_outcomes:

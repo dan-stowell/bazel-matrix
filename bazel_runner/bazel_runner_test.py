@@ -100,6 +100,35 @@ class MatrixResultTest(unittest.TestCase):
         self.assertEqual("fail", artifact["result"]["status"])
         self.assertEqual(1, artifact["exit_code"])
 
+    def test_unresolved_configured_tests_fail_when_build_fails(self):
+        with tempfile.TemporaryDirectory() as directory:
+            bep = os.path.join(directory, "bep.json")
+            events = []
+            for label in ("//:passes", "//:fails_one", "//:fails_two"):
+                events.append({
+                    "id": {"targetConfigured": {"label": label}},
+                    "configured": {"testSize": "SMALL"},
+                })
+            events.append({
+                "id": {"testSummary": {"label": "//:passes"}},
+                "testSummary": {"overallStatus": "PASSED"},
+            })
+            with open(bep, "w", encoding="utf-8") as f:
+                for event in events:
+                    f.write(json.dumps(event) + "\n")
+
+            artifact = bazel_runner._load_test_result(
+                bep,
+                "demo/hermetic_llvm/local/test",
+                returncode=1,
+            )
+
+        self.assertEqual("fail", artifact["result"]["status"])
+        self.assertEqual(1, artifact["result"]["passed"])
+        self.assertEqual(3, artifact["result"]["total"])
+        self.assertNotIn("skipped", artifact["result"])
+        self.assertEqual(2, artifact["collection"]["failed_targets"])
+
     def test_console_target_outcomes_are_parsed(self):
         outcomes = {}
         for line in (

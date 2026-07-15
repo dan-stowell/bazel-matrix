@@ -5,10 +5,11 @@ load("//bazel_runner:defs.bzl", "LOCAL", "bcr_module_source", "project_spec", "t
 # LOCAL with the ambient toolchain — no hermetic LLVM. Pinned to
 # BCR 17.0.4.bcr.1.
 #
-# The full @llvm-project//llvm/unittests:all is enormous; this scopes to the
-# foundational unit tests that build on libSupport / libIR (ADT containers,
-# Support, bitstream, FileCheck, and the IR tests the BCR presubmit names) — they
-# build in a couple of minutes with a small footprint, not the whole of LLVM.
+# The BCR module exposes 32 aggregate tests in llvm/unittests. Their configured
+# dependency closure is only modestly larger than the former five-target subset,
+# so run the complete package. Disable optional libpfm support because the BCR
+# module does not declare an @pfm repository; LLVM's default "external" setting
+# otherwise leaves the full suite unloadable.
 LLVM_PROJECT_PROJECT = project_spec(
     name = "llvm-project",
     source = bcr_module_source(
@@ -17,13 +18,11 @@ LLVM_PROJECT_PROJECT = project_spec(
     ),
     environments = [LOCAL],
     test = test_spec(
-        targets = [
-            "@llvm-project//llvm/unittests:adt_tests",
-            "@llvm-project//llvm/unittests:SupportTests",
-            "@llvm-project//llvm/unittests:bitstream_tests",
-            "@llvm-project//llvm/unittests:filecheck_tests",
-            "@llvm-project//llvm/unittests:ir_tests",
+        targets = ["@llvm-project//llvm/unittests:all"],
+        flags = [
+            "-c",
+            "opt",
+            "--@llvm-project//llvm:pfm=disable",
         ],
-        flags = ["-c", "opt"],
     ),
 )
