@@ -26,5 +26,12 @@
       "not_matrix_candidate",
       "no_upstream_bazel_tests"
     ]
+  },
+  "https://github.com/ocornut/imgui": {
+    "note": "BCR imgui 1.92.2 exposes library and example binary targets, and its BCR presubmit only builds @imgui//...; there is no normal upstream Bazel test target for the matrix's four test columns.",
+    "tags": [
+      "not_matrix_candidate",
+      "no_upstream_bazel_tests"
+    ]
   }
 }
