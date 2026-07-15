@@ -5,7 +5,7 @@ Here are working [Bazel](https://bazel.build/) builds and test suites for public
 ## Quick Start
 
 1. [Install Bazelisk](https://github.com/bazelbuild/bazelisk#installation)
-2. `bazel test //:smoke_hermetic_llvm_local_tests`
+2. `bazel test //:smoke_as_is_local_tests`
 
 With a [BuildBuddy API key](https://www.buildbuddy.io/docs/quickstart/) configured,
 you can also run the hermetic LLVM smoke tests through BuildBuddy RBE:

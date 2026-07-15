@@ -69,14 +69,12 @@ HERMETIC_PYTHON_FLAGS = overlay(
     name = "hermetic_python_flags",
     build_flags = ["--@rules_python//python/config_settings:bootstrap_impl=script"],
 )
-CC_NODETECT = overlay(name = "cc_nodetect")
 HERMETIC_ZIP = overlay(
     name = "hermetic_zip",
     writes = [("//bazel_runner:zip.py", ".bazel-runner-tools/zip")],
     build_flags = ["--strategy=Genrule=local"],
 )
 RULES_RUST_SYSROOT_FIX = overlay(name = "rules_rust_sysroot_fix")
-RULES_CC_DEP = overlay(name = "rules_cc_dep")
 PLATFORMS_DEP = overlay(name = "platforms_dep")
 BUILDBUDDY_BES = overlay(
     name = "buildbuddy_bes",
@@ -724,18 +722,6 @@ def hermetic_llvm_project_modification(
         project = project,
         visibility = visibility,
     )
-
-def project_test(
-        name,
-        source_archive,
-        test,
-        strip_prefix = "",
-        source_subdir = "",
-        toolchains = [],
-        bazel_version = DEFAULT_INNER_BAZEL_VERSION,
-        clients = None,
-        visibility = ["//visibility:public"]):
-    _emit_bazel_runner_targets(source_archive, strip_prefix, source_subdir, toolchains, None, test, bazel_version, name, visibility)
 
 def bcr_project(
         name,
