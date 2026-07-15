@@ -4,7 +4,6 @@ set -euo pipefail
 REPO=${BAZEL_MATRIX_REPO:-/home/exedev/bazel-matrix}
 LOCK=${BAZEL_MATRIX_LOCK:-/tmp/bazel-matrix-project-loop.lock}
 PROMPT=${BAZEL_MATRIX_PROMPT:-$REPO/tools/prompts/add-one-project.md}
-MODEL=${CODEX_PROJECT_MODEL:-gpt-5-mini}
 TIMEOUT=${CODEX_PROJECT_TIMEOUT:-6h}
 CODEX_BIN=${CODEX_BIN:-/home/exedev/.local/bin/codex}
 
@@ -27,13 +26,21 @@ echo "$(date -Is) starting bazel-matrix project loop"
 
 git pull --ff-only
 
-timeout "$TIMEOUT" "$CODEX_BIN" \
-  -m "$MODEL" \
-  -s danger-full-access \
-  -a never \
-  --search \
-  exec \
-  -C "$REPO" \
-  - < "$PROMPT"
+codex_args=(
+  "$CODEX_BIN"
+  -s danger-full-access
+  -a never
+  --search
+)
+if [[ -n "${CODEX_PROJECT_MODEL:-}" ]]; then
+  codex_args+=(-m "$CODEX_PROJECT_MODEL")
+fi
+codex_args+=(
+  exec
+  -C "$REPO"
+  -
+)
+
+timeout "$TIMEOUT" "${codex_args[@]}" < "$PROMPT"
 
 echo "$(date -Is) finished bazel-matrix project loop"
