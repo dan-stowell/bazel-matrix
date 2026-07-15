@@ -1,0 +1,6 @@
+# Activate after //projects/iceoryx/as_is is active and builds locally.
+#
+# load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+# load("//projects/iceoryx:project.bzl", "ICEORYX_PROJECT")
+#
+# hermetic_llvm_project_modification(project = ICEORYX_PROJECT)

@@ -1,0 +1,25 @@
+{
+  "archive_repo": "gemmlowp_archive",
+  "archived": false,
+  "bazel_markers": [
+    "BUILD",
+    "WORKSPACE"
+  ],
+  "candidate_score": 3.499,
+  "category": "project",
+  "classification_reason": "listed under nicolov 'Projects built with Bazel'",
+  "description": "Low-precision matrix multiplication",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": false,
+  "language": "C++",
+  "name": "gemmlowp",
+  "pushed_at": "2024-01-29T14:40:32Z",
+  "repo": "https://github.com/google/gemmlowp",
+  "slug": "gemmlowp",
+  "sources": [
+    "nicolov"
+  ],
+  "starlark_constant": "GEMMLOWP_PROJECT",
+  "stars": 1843
+}

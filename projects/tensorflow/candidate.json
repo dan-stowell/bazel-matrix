@@ -1,0 +1,27 @@
+{
+  "archive_repo": "tensorflow_archive",
+  "archived": false,
+  "bazel_markers": [
+    "BUILD",
+    "MODULE.bazel",
+    "WORKSPACE"
+  ],
+  "candidate_score": 7.94,
+  "category": "project",
+  "classification_reason": "listed under nicolov 'Projects built with Bazel'",
+  "description": "Computation using data flow graphs for scalable machine learning.",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": false,
+  "language": "C++",
+  "name": "TensorFlow",
+  "pushed_at": "2026-07-15T13:38:35Z",
+  "repo": "https://github.com/tensorflow/tensorflow",
+  "slug": "tensorflow",
+  "sources": [
+    "jin",
+    "nicolov"
+  ],
+  "starlark_constant": "TENSORFLOW_PROJECT",
+  "stars": 196351
+}

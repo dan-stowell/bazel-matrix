@@ -1,0 +1,6 @@
+# Activate after //projects/container-structure-test/as_is is active and builds locally.
+#
+# load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+# load("//projects/container-structure-test:project.bzl", "CONTAINER_STRUCTURE_TEST_PROJECT")
+#
+# hermetic_llvm_project_modification(project = CONTAINER_STRUCTURE_TEST_PROJECT)

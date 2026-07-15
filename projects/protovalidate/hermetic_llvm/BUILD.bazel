@@ -1,0 +1,6 @@
+# Activate after //projects/protovalidate/as_is is active and builds locally.
+#
+# load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+# load("//projects/protovalidate:project.bzl", "PROTOVALIDATE_PROJECT")
+#
+# hermetic_llvm_project_modification(project = PROTOVALIDATE_PROJECT)

@@ -1,0 +1,25 @@
+{
+  "archive_repo": "gerrit_archive",
+  "archived": false,
+  "bazel_markers": [
+    "BUILD",
+    "MODULE.bazel"
+  ],
+  "candidate_score": 4.62,
+  "category": "project",
+  "classification_reason": "listed under nicolov 'Projects built with Bazel'",
+  "description": "Gerrit Code Review - (mirror of https://gerrit.googlesource.com/gerrit)",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": false,
+  "language": "Java",
+  "name": "Gerrit",
+  "pushed_at": "2026-07-15T12:20:32Z",
+  "repo": "https://github.com/GerritCodeReview/gerrit",
+  "slug": "gerrit",
+  "sources": [
+    "nicolov"
+  ],
+  "starlark_constant": "GERRIT_PROJECT",
+  "stars": 1202
+}

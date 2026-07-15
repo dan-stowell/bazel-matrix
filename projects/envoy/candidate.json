@@ -1,0 +1,26 @@
+{
+  "archive_repo": "envoy_archive",
+  "archived": false,
+  "bazel_markers": [
+    "BUILD",
+    "MODULE.bazel",
+    "WORKSPACE"
+  ],
+  "candidate_score": 6.684,
+  "category": "project",
+  "classification_reason": "listed under nicolov 'Projects built with Bazel'",
+  "description": "Cloud-native high-performance edge/middle/service proxy",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": false,
+  "language": "C++",
+  "name": "Envoy",
+  "pushed_at": "2026-07-15T10:26:42Z",
+  "repo": "https://github.com/envoyproxy/envoy",
+  "slug": "envoy",
+  "sources": [
+    "nicolov"
+  ],
+  "starlark_constant": "ENVOY_PROJECT",
+  "stars": 28576
+}

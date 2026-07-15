@@ -1,0 +1,24 @@
+{
+  "archive_repo": "sonnet_archive",
+  "archived": false,
+  "bazel_markers": [
+    "WORKSPACE"
+  ],
+  "candidate_score": 5.996,
+  "category": "project",
+  "classification_reason": "listed under nicolov 'Projects built with Bazel'",
+  "description": "TensorFlow-based neural network library",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": false,
+  "language": "Python",
+  "name": "Sonnet",
+  "pushed_at": "2026-07-07T22:31:42Z",
+  "repo": "https://github.com/google-deepmind/sonnet",
+  "slug": "sonnet",
+  "sources": [
+    "nicolov"
+  ],
+  "starlark_constant": "SONNET_PROJECT",
+  "stars": 9940
+}

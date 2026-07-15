@@ -1,0 +1,26 @@
+{
+  "archive_repo": "cel_spec_archive",
+  "archived": false,
+  "bazel_markers": [
+    "BUILD.bazel",
+    "MODULE.bazel",
+    "WORKSPACE"
+  ],
+  "candidate_score": 8.973,
+  "category": "project",
+  "classification_reason": "BCR: BCR module not matching ruleset/tooling heuristics",
+  "description": "Common Expression Language -- specification and binary representation",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": true,
+  "language": "Starlark",
+  "name": "cel-spec",
+  "pushed_at": "2026-07-06T15:49:33Z",
+  "repo": "https://github.com/cel-expr/cel-spec",
+  "slug": "cel-spec",
+  "sources": [
+    "bcr"
+  ],
+  "starlark_constant": "CEL_SPEC_PROJECT",
+  "stars": 3884
+}

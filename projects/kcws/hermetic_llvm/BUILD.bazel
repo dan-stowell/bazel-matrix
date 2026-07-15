@@ -1,0 +1,6 @@
+# Activate after //projects/kcws/as_is is active and builds locally.
+#
+# load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+# load("//projects/kcws:project.bzl", "KCWS_PROJECT")
+#
+# hermetic_llvm_project_modification(project = KCWS_PROJECT)

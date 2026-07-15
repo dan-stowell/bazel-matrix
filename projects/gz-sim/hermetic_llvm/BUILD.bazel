@@ -1,0 +1,6 @@
+# Activate after //projects/gz-sim/as_is is active and builds locally.
+#
+# load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+# load("//projects/gz-sim:project.bzl", "GZ_SIM_PROJECT")
+#
+# hermetic_llvm_project_modification(project = GZ_SIM_PROJECT)

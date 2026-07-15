@@ -1,0 +1,6 @@
+# Activate after //projects/drake/as_is is active and builds locally.
+#
+# load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+# load("//projects/drake:project.bzl", "DRAKE_PROJECT")
+#
+# hermetic_llvm_project_modification(project = DRAKE_PROJECT)

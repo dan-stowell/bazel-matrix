@@ -1,0 +1,6 @@
+# Activate after //projects/grpc-kotlin/as_is is active and builds locally.
+#
+# load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+# load("//projects/grpc-kotlin:project.bzl", "GRPC_KOTLIN_PROJECT")
+#
+# hermetic_llvm_project_modification(project = GRPC_KOTLIN_PROJECT)

@@ -1,0 +1,6 @@
+# Activate after //projects/pico-sdk/as_is is active and builds locally.
+#
+# load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+# load("//projects/pico-sdk:project.bzl", "PICO_SDK_PROJECT")
+#
+# hermetic_llvm_project_modification(project = PICO_SDK_PROJECT)

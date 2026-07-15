@@ -1,0 +1,6 @@
+# Activate after //projects/swift-syntax/as_is is active and builds locally.
+#
+# load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+# load("//projects/swift-syntax:project.bzl", "SWIFT_SYNTAX_PROJECT")
+#
+# hermetic_llvm_project_modification(project = SWIFT_SYNTAX_PROJECT)

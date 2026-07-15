@@ -1,0 +1,25 @@
+{
+  "archive_repo": "periphery_archive",
+  "archived": false,
+  "bazel_markers": [
+    "BUILD.bazel",
+    "MODULE.bazel"
+  ],
+  "candidate_score": 9.475,
+  "category": "project",
+  "classification_reason": "BCR: BCR module not matching ruleset/tooling heuristics",
+  "description": "A tool to identify unused code in Swift projects.",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": true,
+  "language": "Swift",
+  "name": "periphery",
+  "pushed_at": "2026-07-10T12:41:43Z",
+  "repo": "https://github.com/peripheryapp/periphery",
+  "slug": "periphery",
+  "sources": [
+    "bcr"
+  ],
+  "starlark_constant": "PERIPHERY_PROJECT",
+  "stars": 6163
+}

@@ -1,0 +1,25 @@
+{
+  "archive_repo": "tinyobjloader_archive",
+  "archived": false,
+  "bazel_markers": [
+    "BUILD.bazel",
+    "MODULE.bazel"
+  ],
+  "candidate_score": 8.962,
+  "category": "project",
+  "classification_reason": "BCR: BCR module not matching ruleset/tooling heuristics",
+  "description": "Tiny but powerful single file wavefront obj loader",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": true,
+  "language": "C++",
+  "name": "tinyobjloader",
+  "pushed_at": "2026-06-19T10:42:44Z",
+  "repo": "https://github.com/tinyobjloader/tinyobjloader",
+  "slug": "tinyobjloader",
+  "sources": [
+    "bcr"
+  ],
+  "starlark_constant": "TINYOBJLOADER_PROJECT",
+  "stars": 3843
+}

@@ -1,0 +1,6 @@
+# Activate after //projects/envoy/as_is is active and builds locally.
+#
+# load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+# load("//projects/envoy:project.bzl", "ENVOY_PROJECT")
+#
+# hermetic_llvm_project_modification(project = ENVOY_PROJECT)

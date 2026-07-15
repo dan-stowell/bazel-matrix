@@ -1,0 +1,25 @@
+{
+  "archive_repo": "cpuinfo_archive",
+  "archived": false,
+  "bazel_markers": [
+    "BUILD.bazel",
+    "MODULE.bazel"
+  ],
+  "candidate_score": 7.682,
+  "category": "project",
+  "classification_reason": "BCR: BCR module not matching ruleset/tooling heuristics",
+  "description": "CPU INFOrmation library (x86/x86-64/ARM/ARM64, Linux/Windows/Android/macOS/iOS)",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": true,
+  "language": "C",
+  "name": "cpuinfo",
+  "pushed_at": "2026-07-14T17:53:47Z",
+  "repo": "https://github.com/pytorch/cpuinfo",
+  "slug": "cpuinfo",
+  "sources": [
+    "bcr"
+  ],
+  "starlark_constant": "CPUINFO_PROJECT",
+  "stars": 1182
+}

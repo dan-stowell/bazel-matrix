@@ -1,0 +1,25 @@
+{
+  "archive_repo": "gz_sim_archive",
+  "archived": false,
+  "bazel_markers": [
+    "BUILD.bazel",
+    "MODULE.bazel"
+  ],
+  "candidate_score": 7.874,
+  "category": "project",
+  "classification_reason": "BCR: BCR module not matching ruleset/tooling heuristics",
+  "description": "Open source robotics simulator. The latest version of Gazebo.",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": true,
+  "language": "C++",
+  "name": "gz-sim",
+  "pushed_at": "2026-07-15T10:49:24Z",
+  "repo": "https://github.com/gazebosim/gz-sim",
+  "slug": "gz-sim",
+  "sources": [
+    "bcr"
+  ],
+  "starlark_constant": "GZ_SIM_PROJECT",
+  "stars": 1410
+}

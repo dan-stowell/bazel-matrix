@@ -1,0 +1,26 @@
+{
+  "archive_repo": "sourcekitten_archive",
+  "archived": false,
+  "bazel_markers": [
+    "BUILD",
+    "MODULE.bazel",
+    "WORKSPACE"
+  ],
+  "candidate_score": 8.461,
+  "category": "project",
+  "classification_reason": "BCR: BCR module not matching ruleset/tooling heuristics",
+  "description": "An adorable little framework and command line tool for interacting with SourceKit.",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": true,
+  "language": "Swift",
+  "name": "sourcekitten",
+  "pushed_at": "2026-06-29T10:05:57Z",
+  "repo": "https://github.com/jpsim/SourceKitten",
+  "slug": "sourcekitten",
+  "sources": [
+    "bcr"
+  ],
+  "starlark_constant": "SOURCEKITTEN_PROJECT",
+  "stars": 2423
+}

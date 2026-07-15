@@ -1,0 +1,6 @@
+# Activate after //projects/ceres-solver/as_is is active and builds locally.
+#
+# load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+# load("//projects/ceres-solver:project.bzl", "CERES_SOLVER_PROJECT")
+#
+# hermetic_llvm_project_modification(project = CERES_SOLVER_PROJECT)

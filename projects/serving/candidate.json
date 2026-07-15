@@ -1,0 +1,24 @@
+{
+  "archive_repo": "serving_archive",
+  "archived": false,
+  "bazel_markers": [
+    "WORKSPACE"
+  ],
+  "candidate_score": 5.705,
+  "category": "project",
+  "classification_reason": "listed under nicolov 'Projects built with Bazel'",
+  "description": "A flexible, high-performance serving system for machine learning models",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": false,
+  "language": "C++",
+  "name": "TensorFlow serving",
+  "pushed_at": "2026-07-15T13:03:45Z",
+  "repo": "https://github.com/tensorflow/serving",
+  "slug": "serving",
+  "sources": [
+    "nicolov"
+  ],
+  "starlark_constant": "SERVING_PROJECT",
+  "stars": 6353
+}

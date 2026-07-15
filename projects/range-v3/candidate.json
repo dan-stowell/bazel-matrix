@@ -1,0 +1,27 @@
+{
+  "archive_repo": "range_v3_archive",
+  "archived": false,
+  "bazel_markers": [
+    "BUILD.bazel",
+    "MODULE.bazel",
+    "WORKSPACE"
+  ],
+  "candidate_score": 9.102,
+  "category": "project",
+  "classification_reason": "listed under nicolov 'Projects built with Bazel'",
+  "description": "Range library for C++14/17/20, basis for C++20's std::ranges",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": true,
+  "language": "C++",
+  "name": "Range v3",
+  "pushed_at": "2026-04-12T21:47:31Z",
+  "repo": "https://github.com/ericniebler/range-v3",
+  "slug": "range-v3",
+  "sources": [
+    "bcr",
+    "nicolov"
+  ],
+  "starlark_constant": "RANGE_V3_PROJECT",
+  "stars": 4372
+}

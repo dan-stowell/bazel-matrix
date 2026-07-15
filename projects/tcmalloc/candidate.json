@@ -1,0 +1,25 @@
+{
+  "archive_repo": "tcmalloc_archive",
+  "archived": false,
+  "bazel_markers": [
+    "BUILD",
+    "MODULE.bazel"
+  ],
+  "candidate_score": 9.307,
+  "category": "project",
+  "classification_reason": "BCR: BCR module not matching ruleset/tooling heuristics",
+  "description": "",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": true,
+  "language": "C++",
+  "name": "tcmalloc",
+  "pushed_at": "2026-07-15T07:03:28Z",
+  "repo": "https://github.com/google/tcmalloc",
+  "slug": "tcmalloc",
+  "sources": [
+    "bcr"
+  ],
+  "starlark_constant": "TCMALLOC_PROJECT",
+  "stars": 5282
+}

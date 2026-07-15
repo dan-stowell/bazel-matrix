@@ -1,0 +1,26 @@
+{
+  "archive_repo": "swift_syntax_archive",
+  "archived": false,
+  "bazel_markers": [
+    "BUILD.bazel",
+    "MODULE.bazel",
+    "WORKSPACE"
+  ],
+  "candidate_score": 8.915,
+  "category": "project",
+  "classification_reason": "BCR: BCR module not matching ruleset/tooling heuristics",
+  "description": "A set of Swift libraries for parsing, inspecting, generating, and transforming Swift source code.",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": true,
+  "language": "Swift",
+  "name": "swift-syntax",
+  "pushed_at": "2026-07-14T08:52:48Z",
+  "repo": "https://github.com/swiftlang/swift-syntax",
+  "slug": "swift-syntax",
+  "sources": [
+    "bcr"
+  ],
+  "starlark_constant": "SWIFT_SYNTAX_PROJECT",
+  "stars": 3680
+}

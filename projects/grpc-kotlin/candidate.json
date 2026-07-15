@@ -1,0 +1,25 @@
+{
+  "archive_repo": "grpc_kotlin_archive",
+  "archived": false,
+  "bazel_markers": [
+    "BUILD.bazel",
+    "MODULE.bazel"
+  ],
+  "candidate_score": 7.782,
+  "category": "project",
+  "classification_reason": "BCR: BCR module not matching ruleset/tooling heuristics",
+  "description": "Kotlin gRPC implementation. HTTP/2 based RPC",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": true,
+  "language": "Kotlin",
+  "name": "grpc_kotlin",
+  "pushed_at": "2025-12-19T18:33:09Z",
+  "repo": "https://github.com/grpc/grpc-kotlin",
+  "slug": "grpc-kotlin",
+  "sources": [
+    "bcr"
+  ],
+  "starlark_constant": "GRPC_KOTLIN_PROJECT",
+  "stars": 1295
+}

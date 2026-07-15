@@ -1,0 +1,6 @@
+# Activate after //projects/fruit/as_is is active and builds locally.
+#
+# load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+# load("//projects/fruit:project.bzl", "FRUIT_PROJECT")
+#
+# hermetic_llvm_project_modification(project = FRUIT_PROJECT)

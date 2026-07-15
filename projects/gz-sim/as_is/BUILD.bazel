@@ -1,0 +1,6 @@
+# Activate after the source archive is pinned in //bazel_runner:extension.bzl.
+#
+# load("//bazel_runner:defs.bzl", "matrix_project")
+# load("//projects/gz-sim:project.bzl", "GZ_SIM_PROJECT")
+#
+# matrix_project(project = GZ_SIM_PROJECT)

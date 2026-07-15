@@ -1,0 +1,6 @@
+# Activate after the source archive is pinned in //bazel_runner:extension.bzl.
+#
+# load("//bazel_runner:defs.bzl", "matrix_project")
+# load("//projects/grpc-kotlin:project.bzl", "GRPC_KOTLIN_PROJECT")
+#
+# matrix_project(project = GRPC_KOTLIN_PROJECT)

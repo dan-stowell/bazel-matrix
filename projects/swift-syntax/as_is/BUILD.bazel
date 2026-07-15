@@ -1,0 +1,6 @@
+# Activate after the source archive is pinned in //bazel_runner:extension.bzl.
+#
+# load("//bazel_runner:defs.bzl", "matrix_project")
+# load("//projects/swift-syntax:project.bzl", "SWIFT_SYNTAX_PROJECT")
+#
+# matrix_project(project = SWIFT_SYNTAX_PROJECT)

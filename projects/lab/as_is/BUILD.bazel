@@ -1,0 +1,6 @@
+# Activate after the source archive is pinned in //bazel_runner:extension.bzl.
+#
+# load("//bazel_runner:defs.bzl", "matrix_project")
+# load("//projects/lab:project.bzl", "LAB_PROJECT")
+#
+# matrix_project(project = LAB_PROJECT)

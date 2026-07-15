@@ -1,0 +1,25 @@
+{
+  "archive_repo": "kythe_archive",
+  "archived": false,
+  "bazel_markers": [
+    "BUILD",
+    "WORKSPACE"
+  ],
+  "candidate_score": 4.996,
+  "category": "project",
+  "classification_reason": "listed under nicolov 'Projects built with Bazel'",
+  "description": "Kythe is a pluggable, (mostly) language-agnostic ecosystem for building tools that work with code.",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": false,
+  "language": "Go",
+  "name": "Kythe",
+  "pushed_at": "2026-07-08T18:41:00Z",
+  "repo": "https://github.com/kythe/kythe",
+  "slug": "kythe",
+  "sources": [
+    "nicolov"
+  ],
+  "starlark_constant": "KYTHE_PROJECT",
+  "stars": 2141
+}

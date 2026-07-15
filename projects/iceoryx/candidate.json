@@ -1,0 +1,26 @@
+{
+  "archive_repo": "iceoryx_archive",
+  "archived": false,
+  "bazel_markers": [
+    "BUILD.bazel",
+    "MODULE.bazel",
+    "WORKSPACE.bazel"
+  ],
+  "candidate_score": 8.32,
+  "category": "project",
+  "classification_reason": "BCR: BCR module not matching ruleset/tooling heuristics",
+  "description": "Eclipse iceoryx\u2122 - true zero-copy inter-process-communication",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": true,
+  "language": "C++",
+  "name": "iceoryx",
+  "pushed_at": "2026-06-28T15:21:38Z",
+  "repo": "https://github.com/eclipse-iceoryx/iceoryx",
+  "slug": "iceoryx",
+  "sources": [
+    "bcr"
+  ],
+  "starlark_constant": "ICEORYX_PROJECT",
+  "stars": 2127
+}

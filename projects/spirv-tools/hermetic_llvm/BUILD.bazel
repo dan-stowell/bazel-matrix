@@ -1,0 +1,6 @@
+# Activate after //projects/spirv-tools/as_is is active and builds locally.
+#
+# load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+# load("//projects/spirv-tools:project.bzl", "SPIRV_TOOLS_PROJECT")
+#
+# hermetic_llvm_project_modification(project = SPIRV_TOOLS_PROJECT)

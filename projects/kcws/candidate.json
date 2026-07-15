@@ -1,0 +1,24 @@
+{
+  "archive_repo": "kcws_archive",
+  "archived": false,
+  "bazel_markers": [
+    "WORKSPACE"
+  ],
+  "candidate_score": 0.0,
+  "category": "project",
+  "classification_reason": "listed under nicolov 'Projects built with Bazel'",
+  "description": "Deep Learning Chinese Word Segment ",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": false,
+  "language": "C++",
+  "name": "kwcs",
+  "pushed_at": "2018-05-18T03:22:58Z",
+  "repo": "https://github.com/koth/kcws",
+  "slug": "kcws",
+  "sources": [
+    "nicolov"
+  ],
+  "starlark_constant": "KCWS_PROJECT",
+  "stars": 2070
+}

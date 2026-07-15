@@ -1,0 +1,6 @@
+# Activate after //projects/range-v3/as_is is active and builds locally.
+#
+# load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+# load("//projects/range-v3:project.bzl", "RANGE_V3_PROJECT")
+#
+# hermetic_llvm_project_modification(project = RANGE_V3_PROJECT)

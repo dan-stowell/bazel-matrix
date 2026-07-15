@@ -1,0 +1,25 @@
+{
+  "archive_repo": "lab_archive",
+  "archived": false,
+  "bazel_markers": [
+    "BUILD",
+    "WORKSPACE"
+  ],
+  "candidate_score": 2.486,
+  "category": "project",
+  "classification_reason": "listed under nicolov 'Projects built with Bazel'",
+  "description": "A customisable 3D platform for agent-based AI research",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": false,
+  "language": "C",
+  "name": "DeepMind Lab",
+  "pushed_at": "2023-01-04T15:38:37Z",
+  "repo": "https://github.com/google-deepmind/lab",
+  "slug": "lab",
+  "sources": [
+    "nicolov"
+  ],
+  "starlark_constant": "LAB_PROJECT",
+  "stars": 7365
+}

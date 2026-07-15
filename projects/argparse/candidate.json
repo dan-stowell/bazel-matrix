@@ -1,0 +1,25 @@
+{
+  "archive_repo": "argparse_archive",
+  "archived": false,
+  "bazel_markers": [
+    "BUILD.bazel",
+    "WORKSPACE.bazel"
+  ],
+  "candidate_score": 8.862,
+  "category": "project",
+  "classification_reason": "BCR: BCR module not matching ruleset/tooling heuristics",
+  "description": "Argument Parser for Modern C++",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": true,
+  "language": "C++",
+  "name": "argparse",
+  "pushed_at": "2025-01-26T23:27:21Z",
+  "repo": "https://github.com/p-ranav/argparse",
+  "slug": "argparse",
+  "sources": [
+    "bcr"
+  ],
+  "starlark_constant": "ARGPARSE_PROJECT",
+  "stars": 3504
+}

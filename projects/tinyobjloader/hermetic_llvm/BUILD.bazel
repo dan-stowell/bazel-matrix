@@ -1,0 +1,6 @@
+# Activate after //projects/tinyobjloader/as_is is active and builds locally.
+#
+# load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+# load("//projects/tinyobjloader:project.bzl", "TINYOBJLOADER_PROJECT")
+#
+# hermetic_llvm_project_modification(project = TINYOBJLOADER_PROJECT)

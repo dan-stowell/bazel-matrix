@@ -1,0 +1,26 @@
+{
+  "archive_repo": "cppitertools_archive",
+  "archived": false,
+  "bazel_markers": [
+    "BUILD",
+    "MODULE.bazel",
+    "WORKSPACE"
+  ],
+  "candidate_score": 7.89,
+  "category": "project",
+  "classification_reason": "BCR: BCR module not matching ruleset/tooling heuristics",
+  "description": "Implementation of python itertools and builtin iteration functions for C++17",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": true,
+  "language": "C++",
+  "name": "cppitertools",
+  "pushed_at": "2025-12-07T05:47:01Z",
+  "repo": "https://github.com/ryanhaining/cppitertools",
+  "slug": "cppitertools",
+  "sources": [
+    "bcr"
+  ],
+  "starlark_constant": "CPPITERTOOLS_PROJECT",
+  "stars": 1431
+}

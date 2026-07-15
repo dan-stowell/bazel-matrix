@@ -1,0 +1,26 @@
+{
+  "archive_repo": "drake_archive",
+  "archived": false,
+  "bazel_markers": [
+    "BUILD.bazel",
+    "MODULE.bazel",
+    "WORKSPACE"
+  ],
+  "candidate_score": 5.42,
+  "category": "project",
+  "classification_reason": "listed under nicolov 'Projects built with Bazel'",
+  "description": "Model-based design and verification for robotics.",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": false,
+  "language": "C++",
+  "name": "drake",
+  "pushed_at": "2026-07-15T12:47:04Z",
+  "repo": "https://github.com/RobotLocomotion/drake",
+  "slug": "drake",
+  "sources": [
+    "nicolov"
+  ],
+  "starlark_constant": "DRAKE_PROJECT",
+  "stars": 4106
+}

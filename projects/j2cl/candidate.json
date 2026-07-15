@@ -1,0 +1,25 @@
+{
+  "archive_repo": "j2cl_archive",
+  "archived": false,
+  "bazel_markers": [
+    "BUILD",
+    "MODULE.bazel"
+  ],
+  "candidate_score": 7.843,
+  "category": "project",
+  "classification_reason": "BCR: BCR module not matching ruleset/tooling heuristics",
+  "description": "Java to Closure JavaScript transpiler",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": true,
+  "language": "Java",
+  "name": "j2cl",
+  "pushed_at": "2026-07-15T13:06:20Z",
+  "repo": "https://github.com/google/j2cl",
+  "slug": "j2cl",
+  "sources": [
+    "bcr"
+  ],
+  "starlark_constant": "J2CL_PROJECT",
+  "stars": 1371
+}

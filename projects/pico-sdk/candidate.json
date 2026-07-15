@@ -1,0 +1,25 @@
+{
+  "archive_repo": "pico_sdk_archive",
+  "archived": false,
+  "bazel_markers": [
+    "MODULE.bazel",
+    "WORKSPACE"
+  ],
+  "candidate_score": 9.221,
+  "category": "project",
+  "classification_reason": "BCR: BCR module not matching ruleset/tooling heuristics",
+  "description": "",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": true,
+  "language": "C",
+  "name": "pico-sdk",
+  "pushed_at": "2026-07-15T09:47:37Z",
+  "repo": "https://github.com/raspberrypi/pico-sdk",
+  "slug": "pico-sdk",
+  "sources": [
+    "bcr"
+  ],
+  "starlark_constant": "PICO_SDK_PROJECT",
+  "stars": 4881
+}

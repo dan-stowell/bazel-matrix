@@ -1,0 +1,6 @@
+# Activate after //projects/serving/as_is is active and builds locally.
+#
+# load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+# load("//projects/serving:project.bzl", "SERVING_PROJECT")
+#
+# hermetic_llvm_project_modification(project = SERVING_PROJECT)

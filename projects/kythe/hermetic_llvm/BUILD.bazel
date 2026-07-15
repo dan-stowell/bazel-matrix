@@ -1,0 +1,6 @@
+# Activate after //projects/kythe/as_is is active and builds locally.
+#
+# load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+# load("//projects/kythe:project.bzl", "KYTHE_PROJECT")
+#
+# hermetic_llvm_project_modification(project = KYTHE_PROJECT)

@@ -1,0 +1,6 @@
+# Activate after //projects/argparse/as_is is active and builds locally.
+#
+# load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+# load("//projects/argparse:project.bzl", "ARGPARSE_PROJECT")
+#
+# hermetic_llvm_project_modification(project = ARGPARSE_PROJECT)

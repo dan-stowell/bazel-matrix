@@ -1,0 +1,25 @@
+{
+  "archive_repo": "livegrep_archive",
+  "archived": false,
+  "bazel_markers": [
+    "BUILD",
+    "MODULE.bazel"
+  ],
+  "candidate_score": 5.021,
+  "category": "project",
+  "classification_reason": "listed under nicolov 'Projects built with Bazel'",
+  "description": "Interactively grep source code. Source for http://livegrep.com/",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": false,
+  "language": "C++",
+  "name": "livegrep",
+  "pushed_at": "2026-02-10T15:03:35Z",
+  "repo": "https://github.com/livegrep/livegrep",
+  "slug": "livegrep",
+  "sources": [
+    "nicolov"
+  ],
+  "starlark_constant": "LIVEGREP_PROJECT",
+  "stars": 2224
+}

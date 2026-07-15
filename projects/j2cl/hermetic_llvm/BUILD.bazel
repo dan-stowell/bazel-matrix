@@ -1,0 +1,6 @@
+# Activate after //projects/j2cl/as_is is active and builds locally.
+#
+# load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+# load("//projects/j2cl:project.bzl", "J2CL_PROJECT")
+#
+# hermetic_llvm_project_modification(project = J2CL_PROJECT)

@@ -1,0 +1,6 @@
+# Activate after the source archive is pinned in //bazel_runner:extension.bzl.
+#
+# load("//bazel_runner:defs.bzl", "matrix_project")
+# load("//projects/gemmlowp:project.bzl", "GEMMLOWP_PROJECT")
+#
+# matrix_project(project = GEMMLOWP_PROJECT)

@@ -1,0 +1,6 @@
+# Activate after //projects/cel-spec/as_is is active and builds locally.
+#
+# load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+# load("//projects/cel-spec:project.bzl", "CEL_SPEC_PROJECT")
+#
+# hermetic_llvm_project_modification(project = CEL_SPEC_PROJECT)

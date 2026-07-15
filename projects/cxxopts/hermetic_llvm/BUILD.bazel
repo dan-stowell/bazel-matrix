@@ -1,0 +1,6 @@
+# Activate after //projects/cxxopts/as_is is active and builds locally.
+#
+# load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+# load("//projects/cxxopts:project.bzl", "CXXOPTS_PROJECT")
+#
+# hermetic_llvm_project_modification(project = CXXOPTS_PROJECT)

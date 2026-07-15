@@ -1,0 +1,6 @@
+# Activate after //projects/gerrit/as_is is active and builds locally.
+#
+# load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+# load("//projects/gerrit:project.bzl", "GERRIT_PROJECT")
+#
+# hermetic_llvm_project_modification(project = GERRIT_PROJECT)

@@ -1,0 +1,26 @@
+{
+  "archive_repo": "ceres_solver_archive",
+  "archived": false,
+  "bazel_markers": [
+    "BUILD",
+    "MODULE.bazel",
+    "WORKSPACE"
+  ],
+  "candidate_score": 9.138,
+  "category": "project",
+  "classification_reason": "BCR: BCR module not matching ruleset/tooling heuristics",
+  "description": "A large scale non-linear optimization library",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": true,
+  "language": "C++",
+  "name": "ceres-solver",
+  "pushed_at": "2026-07-03T17:54:06Z",
+  "repo": "https://github.com/ceres-solver/ceres-solver",
+  "slug": "ceres-solver",
+  "sources": [
+    "bcr"
+  ],
+  "starlark_constant": "CERES_SOLVER_PROJECT",
+  "stars": 4520
+}

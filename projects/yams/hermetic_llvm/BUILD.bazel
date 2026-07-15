@@ -1,0 +1,6 @@
+# Activate after //projects/yams/as_is is active and builds locally.
+#
+# load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+# load("//projects/yams:project.bzl", "YAMS_PROJECT")
+#
+# hermetic_llvm_project_modification(project = YAMS_PROJECT)

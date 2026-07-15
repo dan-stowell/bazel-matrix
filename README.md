@@ -49,6 +49,27 @@ The scaffold is intentionally inactive. Fill in the source archive pin in
 `//bazel_runner:extension.bzl`, add the generated archive repo to `MODULE.bazel`,
 then activate the generated `as_is` and `hermetic_llvm` BUILD files.
 
+### Candidate Scaffold Run Log
+
+On 2026-07-15, the default first-party Bazel candidate queue was exhausted into
+inactive scaffolds:
+
+- Initial queue after the first three proof scaffolds: 36 candidates
+  ([invocation](https://app.buildbuddy.io/invocation/b86fa0c0-f945-4e4d-9953-6961826a164f)).
+- `bazel run //pipeline:add_project` created all 36 remaining scaffolds; sample
+  invocations:
+  [first](https://app.buildbuddy.io/invocation/5801f2ed-b50b-446b-ad39-a04dc0962f15),
+  [last](https://app.buildbuddy.io/invocation/2a097995-4584-4490-8faf-e6b17a47c2cd).
+- Post-run queue size: 0 candidates
+  ([invocation](https://app.buildbuddy.io/invocation/ff62a821-a174-4e25-9bba-a03a072e7bad)).
+- Validation: `bazel build //pipeline:next_candidates //pipeline:add_project`
+  passed
+  ([invocation](https://app.buildbuddy.io/invocation/92587a84-23c5-4913-8975-33ebcae9025a)).
+- Validation: `bazel query //...` passed, with the pre-existing
+  `//tools/rbe_image` rule/file-name warnings.
+- Smoke tests: `bazel test //:smoke_as_is_local_tests` passed 5 / 5 from cache
+  ([invocation](https://app.buildbuddy.io/invocation/f83ce340-3041-418d-8725-d21d2ba75bce)).
+
 ## Developer Tools
 
 Buildifier is available as a Bazel dev dependency:

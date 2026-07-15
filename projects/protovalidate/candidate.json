@@ -1,0 +1,26 @@
+{
+  "archive_repo": "protovalidate_archive",
+  "archived": false,
+  "bazel_markers": [
+    "BUILD.bazel",
+    "MODULE.bazel",
+    "WORKSPACE"
+  ],
+  "candidate_score": 7.965,
+  "category": "project",
+  "classification_reason": "BCR: BCR module not matching ruleset/tooling heuristics",
+  "description": "Protocol Buffer Validation - Go, Java, Python, C++ and JS/TS",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": true,
+  "language": "Go",
+  "name": "protovalidate",
+  "pushed_at": "2026-07-13T16:44:10Z",
+  "repo": "https://github.com/bufbuild/protovalidate",
+  "slug": "protovalidate",
+  "sources": [
+    "bcr"
+  ],
+  "starlark_constant": "PROTOVALIDATE_PROJECT",
+  "stars": 1533
+}

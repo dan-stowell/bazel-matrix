@@ -1,0 +1,25 @@
+{
+  "archive_repo": "googleapis_archive",
+  "archived": false,
+  "bazel_markers": [
+    "BUILD.bazel",
+    "WORKSPACE"
+  ],
+  "candidate_score": 9.842,
+  "category": "project",
+  "classification_reason": "BCR: BCR module not matching ruleset/tooling heuristics",
+  "description": "Public interface definitions of Google APIs.",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": true,
+  "language": "Starlark",
+  "name": "googleapis",
+  "pushed_at": "2026-07-15T06:56:35Z",
+  "repo": "https://github.com/googleapis/googleapis",
+  "slug": "googleapis",
+  "sources": [
+    "bcr"
+  ],
+  "starlark_constant": "GOOGLEAPIS_PROJECT",
+  "stars": 8647
+}

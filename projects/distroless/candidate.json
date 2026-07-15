@@ -1,0 +1,26 @@
+{
+  "archive_repo": "distroless_archive",
+  "archived": false,
+  "bazel_markers": [
+    "BUILD",
+    "MODULE.bazel",
+    "WORKSPACE"
+  ],
+  "candidate_score": 6.538,
+  "category": "project",
+  "classification_reason": "listed under jin 'Projects'",
+  "description": "Language focused docker images, minus the operating system.",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": false,
+  "language": "Starlark",
+  "name": "GoogleCloudPlatform/distroless",
+  "pushed_at": "2026-07-15T01:44:10Z",
+  "repo": "https://github.com/GoogleContainerTools/distroless",
+  "slug": "distroless",
+  "sources": [
+    "jin"
+  ],
+  "starlark_constant": "DISTROLESS_PROJECT",
+  "stars": 22830
+}

@@ -1,0 +1,24 @@
+{
+  "archive_repo": "fruit_archive",
+  "archived": false,
+  "bazel_markers": [
+    "BUILD"
+  ],
+  "candidate_score": 4.914,
+  "category": "project",
+  "classification_reason": "listed under nicolov 'Projects built with Bazel'",
+  "description": "Fruit, a dependency injection framework for C++",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": false,
+  "language": "C++",
+  "name": "Fruit",
+  "pushed_at": "2026-04-12T00:10:50Z",
+  "repo": "https://github.com/google/fruit",
+  "slug": "fruit",
+  "sources": [
+    "nicolov"
+  ],
+  "starlark_constant": "FRUIT_PROJECT",
+  "stars": 1887
+}

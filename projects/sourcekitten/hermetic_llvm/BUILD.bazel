@@ -1,0 +1,6 @@
+# Activate after //projects/sourcekitten/as_is is active and builds locally.
+#
+# load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+# load("//projects/sourcekitten:project.bzl", "SOURCEKITTEN_PROJECT")
+#
+# hermetic_llvm_project_modification(project = SOURCEKITTEN_PROJECT)

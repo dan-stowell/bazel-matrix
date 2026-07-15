@@ -1,0 +1,6 @@
+# Activate after //projects/distroless/as_is is active and builds locally.
+#
+# load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+# load("//projects/distroless:project.bzl", "DISTROLESS_PROJECT")
+#
+# hermetic_llvm_project_modification(project = DISTROLESS_PROJECT)

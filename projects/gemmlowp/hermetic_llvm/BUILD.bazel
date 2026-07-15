@@ -1,0 +1,6 @@
+# Activate after //projects/gemmlowp/as_is is active and builds locally.
+#
+# load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+# load("//projects/gemmlowp:project.bzl", "GEMMLOWP_PROJECT")
+#
+# hermetic_llvm_project_modification(project = GEMMLOWP_PROJECT)

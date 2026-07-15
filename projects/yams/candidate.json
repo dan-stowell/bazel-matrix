@@ -1,0 +1,26 @@
+{
+  "archive_repo": "yams_archive",
+  "archived": false,
+  "bazel_markers": [
+    "BUILD",
+    "MODULE.bazel",
+    "WORKSPACE"
+  ],
+  "candidate_score": 7.751,
+  "category": "project",
+  "classification_reason": "BCR: BCR module not matching ruleset/tooling heuristics",
+  "description": "A Sweet and Swifty YAML parser.",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": true,
+  "language": "Swift",
+  "name": "yams",
+  "pushed_at": "2026-06-24T00:53:15Z",
+  "repo": "https://github.com/jpsim/Yams",
+  "slug": "yams",
+  "sources": [
+    "bcr"
+  ],
+  "starlark_constant": "YAMS_PROJECT",
+  "stars": 1259
+}

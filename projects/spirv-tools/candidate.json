@@ -1,0 +1,26 @@
+{
+  "archive_repo": "spirv_tools_archive",
+  "archived": false,
+  "bazel_markers": [
+    "BUILD.bazel",
+    "MODULE.bazel",
+    "WORKSPACE"
+  ],
+  "candidate_score": 7.813,
+  "category": "project",
+  "classification_reason": "BCR: BCR module not matching ruleset/tooling heuristics",
+  "description": "",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": true,
+  "language": "C++",
+  "name": "spirv_tools",
+  "pushed_at": "2026-07-15T03:02:46Z",
+  "repo": "https://github.com/KhronosGroup/SPIRV-Tools",
+  "slug": "spirv-tools",
+  "sources": [
+    "bcr"
+  ],
+  "starlark_constant": "SPIRV_TOOLS_PROJECT",
+  "stars": 1333
+}

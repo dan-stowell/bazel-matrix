@@ -1,0 +1,25 @@
+{
+  "archive_repo": "colossus_archive",
+  "archived": false,
+  "bazel_markers": [
+    "BUILD.bazel",
+    "WORKSPACE"
+  ],
+  "candidate_score": 1.186,
+  "category": "project",
+  "classification_reason": "listed under jin 'Projects'",
+  "description": "An example microservice architecture for Kubernetes using Bazel, Go, Java, Docker, Kubernetes, Minikube, Gazelle, gRPC, Prometheus, Grafana, and more.",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": false,
+  "language": "Starlark",
+  "name": "lucperkins/colossus",
+  "pushed_at": "2022-06-02T18:12:42Z",
+  "repo": "https://github.com/lucperkins/colossus",
+  "slug": "colossus",
+  "sources": [
+    "jin"
+  ],
+  "starlark_constant": "COLOSSUS_PROJECT",
+  "stars": 1041
+}
