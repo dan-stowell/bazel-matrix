@@ -91,6 +91,7 @@ BUILDBUDDY_RBE = overlay(
         "--remote_cache=grpcs://remote.buildbuddy.io",
         "--remote_header=x-buildbuddy-api-key=$BUILDBUDDY_API_KEY",
         "--remote_timeout=10m",
+        "--remote_download_minimal",
         "--jobs=32",
         "--remote_executor=grpcs://remote.buildbuddy.io",
     ],

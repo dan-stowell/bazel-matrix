@@ -111,8 +111,28 @@ class MatrixReadmeTest(unittest.TestCase):
         rendered = matrix.render([row], {
             "https://github.com/acme/demo": {"tags": ["featured"]},
         })
-        self.assertEqual(2, rendered.count("[`acme/demo`](https://github.com/acme/demo)"))
+        self.assertEqual(2, rendered.count("[`demo`](https://github.com/acme/demo)"))
         self.assertIn("[2 / 2](https://app.buildbuddy.io/invocation/example)", rendered)
+
+    def test_readme_displays_and_sorts_by_project_name(self):
+        result = {"status": "pass", "passed": 1, "total": 1}
+
+        def row(name, slug):
+            return {
+                "name": name,
+                "repo": "https://github.com/" + slug,
+                "results": {key: dict(result) for key, _ in matrix.RESULT_COLUMNS},
+            }
+
+        rendered = matrix.table([
+            row("zlib", "aaa/zlib"),
+            row("flatbuffers", "google/flatbuffers"),
+            row("bazel", "zzz/bazel"),
+        ])
+        self.assertIn("[`flatbuffers`](https://github.com/google/flatbuffers)", rendered)
+        self.assertNotIn("`google/flatbuffers`", rendered)
+        self.assertLess(rendered.index("`bazel`"), rendered.index("`flatbuffers`"))
+        self.assertLess(rendered.index("`flatbuffers`"), rendered.index("`zlib`"))
 
     def test_result_without_invocation_is_rendered(self):
         self.assertEqual("🚫", matrix.result_cell({"status": "no_tests"}))

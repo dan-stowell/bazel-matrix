@@ -25,7 +25,8 @@ bazel test //projects/re2/hermetic_llvm:re2_local_test
 ## Project data
 
 The repository has two structured project datasets. Matrix projects are
-displayed and ordered by their GitHub `owner/repository` slug:
+displayed and ordered in the README by their matrix project `name`; links still
+point to the full GitHub repository URL:
 
 - `data/projects.jsonl` contains all Bazel projects known to the discovery
   pipeline.
@@ -67,6 +68,10 @@ Project-specific failure and exclusion context remains in the structured
 `notes` field. Repositories intentionally excluded from the matrix carry
 `not_matrix_candidate` tags and explanatory `tag_note` values in the all-known
 dataset.
+
+RBE jobs explicitly use `--remote_download_minimal` and `--jobs=32`. The former
+avoids downloading remote outputs that are not required by local actions; the
+latter caps inner-Bazel action concurrency at 32.
 
 Each project test writes `matrix-result.json` as an undeclared test output. Run
 the project normally:

@@ -100,15 +100,19 @@ def result_cell(result):
     return cell
 
 
+def _readme_sort_key(row):
+    slug = inventory.github_repo_slug(row["repo"])
+    return (row["name"].lower(), slug.lower())
+
+
 def table(rows):
     headers = ["project"] + [label for _, label in RESULT_COLUMNS]
     lines = [
         "| " + " | ".join(headers) + " |",
         "| " + " | ".join("---" for _ in headers) + " |",
     ]
-    for row in sorted(rows, key=lambda row: inventory.github_repo_slug(row["repo"]).lower()):
-        slug = inventory.github_repo_slug(row["repo"])
-        cells = ["[`{}`]({})".format(slug, row["repo"])]
+    for row in sorted(rows, key=_readme_sort_key):
+        cells = ["[`{}`]({})".format(row["name"], row["repo"])]
         cells.extend(result_cell(row["results"][key]) for key, _ in RESULT_COLUMNS)
         lines.append("| " + " | ".join(cells) + " |")
     return "\n".join(lines)
