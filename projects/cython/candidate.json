@@ -1,0 +1,24 @@
+{
+  "archive_repo": "cython_archive",
+  "archived": false,
+  "bazel_markers": [
+    "BUILD.bazel"
+  ],
+  "candidate_score": 10.083,
+  "category": "project",
+  "classification_reason": "BCR: BCR module not matching ruleset/tooling heuristics",
+  "description": "The most widely used Python to C compiler",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": true,
+  "language": "Cython",
+  "name": "cython",
+  "pushed_at": "2026-07-14T21:43:04Z",
+  "repo": "https://github.com/cython/cython",
+  "slug": "cython",
+  "sources": [
+    "bcr"
+  ],
+  "starlark_constant": "CYTHON_PROJECT",
+  "stars": 10797
+}

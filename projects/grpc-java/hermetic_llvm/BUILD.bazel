@@ -1,0 +1,6 @@
+# Activate after //projects/grpc-java/as_is is active and builds locally.
+#
+# load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+# load("//projects/grpc-java:project.bzl", "GRPC_JAVA_PROJECT")
+#
+# hermetic_llvm_project_modification(project = GRPC_JAVA_PROJECT)

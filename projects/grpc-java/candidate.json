@@ -1,0 +1,26 @@
+{
+  "archive_repo": "grpc_java_archive",
+  "archived": false,
+  "bazel_markers": [
+    "BUILD.bazel",
+    "MODULE.bazel",
+    "WORKSPACE"
+  ],
+  "candidate_score": 10.202,
+  "category": "project",
+  "classification_reason": "BCR: BCR module not matching ruleset/tooling heuristics",
+  "description": "The Java gRPC implementation. HTTP/2 based RPC",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": true,
+  "language": "Java",
+  "name": "grpc-java",
+  "pushed_at": "2026-07-09T15:27:50Z",
+  "repo": "https://github.com/grpc/grpc-java",
+  "slug": "grpc-java",
+  "sources": [
+    "bcr"
+  ],
+  "starlark_constant": "GRPC_JAVA_PROJECT",
+  "stars": 12048
+}

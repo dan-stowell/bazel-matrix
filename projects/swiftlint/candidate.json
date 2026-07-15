@@ -1,0 +1,26 @@
+{
+  "archive_repo": "swiftlint_archive",
+  "archived": false,
+  "bazel_markers": [
+    "BUILD",
+    "MODULE.bazel",
+    "WORKSPACE"
+  ],
+  "candidate_score": 10.734,
+  "category": "project",
+  "classification_reason": "BCR: BCR module not matching ruleset/tooling heuristics",
+  "description": "A tool to enforce Swift style and conventions.",
+  "enriched": true,
+  "first_party_bazel": true,
+  "in_bcr": true,
+  "language": "Swift",
+  "name": "swiftlint",
+  "pushed_at": "2026-07-12T16:22:48Z",
+  "repo": "https://github.com/realm/SwiftLint",
+  "slug": "swiftlint",
+  "sources": [
+    "bcr"
+  ],
+  "starlark_constant": "SWIFTLINT_PROJECT",
+  "stars": 19662
+}

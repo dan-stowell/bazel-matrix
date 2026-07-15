@@ -1,0 +1,6 @@
+# Activate after //projects/swiftlint/as_is is active and builds locally.
+#
+# load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+# load("//projects/swiftlint:project.bzl", "SWIFTLINT_PROJECT")
+#
+# hermetic_llvm_project_modification(project = SWIFTLINT_PROJECT)

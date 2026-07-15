@@ -1,0 +1,6 @@
+# Activate after //projects/cython/as_is is active and builds locally.
+#
+# load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
+# load("//projects/cython:project.bzl", "CYTHON_PROJECT")
+#
+# hermetic_llvm_project_modification(project = CYTHON_PROJECT)
