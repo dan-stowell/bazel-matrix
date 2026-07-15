@@ -27,12 +27,13 @@ echo "$(date -Is) starting bazel-matrix project loop"
 
 git pull --ff-only
 
-timeout "$TIMEOUT" "$CODEX_BIN" exec \
-  -C "$REPO" \
+timeout "$TIMEOUT" "$CODEX_BIN" \
   -m "$MODEL" \
   -s danger-full-access \
   -a never \
   --search \
+  exec \
+  -C "$REPO" \
   - < "$PROMPT"
 
 echo "$(date -Is) finished bazel-matrix project loop"
