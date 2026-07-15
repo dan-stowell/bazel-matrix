@@ -20,6 +20,13 @@
       "incompatible_bazel_layout"
     ]
   },
+  "https://github.com/eclipse-iceoryx/iceoryx": {
+    "note": "BCR iceoryx 2.95.4 exposes real upstream tests, but //projects/iceoryx/as_is:iceoryx_local_test failed during inner Bazel 9.1.1 analysis because BCR googletest and ncurses still use native cc_library removed by Bazel 9.",
+    "tags": [
+      "not_matrix_candidate",
+      "incompatible_bazel_layout"
+    ]
+  },
   "https://github.com/tinyobjloader/tinyobjloader": {
     "note": "Upstream Bazel exposes a library target, but no normal test target for the matrix's four test columns.",
     "tags": [
