@@ -29,6 +29,30 @@ _KNOWN_TOOLING = {
     "stardoc",
 }
 
+_KNOWN_TOOLCHAINS = {
+    "hermetic_cc_toolchain",
+    "toolchains_llvm",
+    "toolchains_protoc",
+}
+
+
+def is_ruleset_module(module_name, owner=""):
+    category, _ = classify_bcr(module_name, owner)
+    return category == model.CATEGORY_RULESET
+
+
+def is_toolchain_module(module_name):
+    """Return whether a BCR module primarily distributes a toolchain."""
+    name = (module_name or "").lower()
+    return (
+        name in _KNOWN_TOOLCHAINS
+        or name.startswith("toolchain_")
+        or name.startswith("toolchains_")
+        or name.endswith("_toolchain")
+        or name.endswith("_toolchains")
+    )
+
+
 def classify_bcr(module_name, owner):
     name = module_name.lower()
     own = (owner or "").lower()

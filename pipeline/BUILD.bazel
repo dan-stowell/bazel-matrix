@@ -1,4 +1,4 @@
-load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+load("@rules_python//python:defs.bzl", "py_binary", "py_library", "py_test")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -35,6 +35,12 @@ py_binary(
         "//bazel_runner:darwin_amd64": ["@gh_cli_darwin_amd64//:gh"],
         "//bazel_runner:darwin_arm64": ["@gh_cli_darwin_arm64//:gh"],
     }),
+    deps = [":lib"],
+)
+
+py_test(
+    name = "pipeline_test",
+    srcs = ["pipeline_test.py"],
     deps = [":lib"],
 )
 

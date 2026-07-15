@@ -133,6 +133,10 @@ def candidate_rows(
         include_built=False,
         include_tagged=False,
         language=None,
+        rulesets=(),
+        exclude_rulesets=(),
+        toolchains=(),
+        exclude_toolchains=(),
         require_first_party_bazel=True,
         min_score=0.0):
     built = existing_project_keys()
@@ -143,6 +147,16 @@ def candidate_rows(
         if require_first_party_bazel and row.get("first_party_bazel") is not True:
             continue
         if language and (row.get("language") or "") != language:
+            continue
+        row_rulesets = set(row.get("rulesets", []))
+        row_toolchains = set(row.get("toolchains", []))
+        if rulesets and not set(rulesets).issubset(row_rulesets):
+            continue
+        if exclude_rulesets and set(exclude_rulesets).intersection(row_rulesets):
+            continue
+        if toolchains and not set(toolchains).issubset(row_toolchains):
+            continue
+        if exclude_toolchains and set(exclude_toolchains).intersection(row_toolchains):
             continue
         slug = slug_from_repo(row.get("repo", ""))
         if not slug:
@@ -164,6 +178,9 @@ def candidate_rows(
             "pushed_at": row.get("pushed_at") or "",
             "first_party_bazel": row.get("first_party_bazel"),
             "bazel_markers": row.get("bazel_markers", []),
+            "rulesets": row.get("rulesets", []),
+            "toolchains": row.get("toolchains", []),
+            "ecosystem_tags": row.get("ecosystem_tags", []),
             "in_bcr": bool(row.get("in_bcr")),
             "sources": row.get("sources", []),
             "tags": row.get("tags", []),

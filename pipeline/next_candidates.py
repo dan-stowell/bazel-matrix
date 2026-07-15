@@ -14,6 +14,10 @@ def main(argv=None):
     parser.add_argument("--output", default="-")
     parser.add_argument("--top", type=int, default=50)
     parser.add_argument("--language", default=None)
+    parser.add_argument("--ruleset", action="append", default=[])
+    parser.add_argument("--exclude-ruleset", action="append", default=[])
+    parser.add_argument("--toolchain", action="append", default=[])
+    parser.add_argument("--exclude-toolchain", action="append", default=[])
     parser.add_argument("--min-score", type=float, default=0.0)
     parser.add_argument("--include-built", action="store_true")
     parser.add_argument("--include-tagged", action="store_true")
@@ -31,6 +35,10 @@ def main(argv=None):
         include_built=args.include_built,
         include_tagged=args.include_tagged,
         language=args.language,
+        rulesets=args.ruleset,
+        exclude_rulesets=args.exclude_ruleset,
+        toolchains=args.toolchain,
+        exclude_toolchains=args.exclude_toolchain,
         require_first_party_bazel=args.require_first_party_bazel,
         min_score=args.min_score,
     )

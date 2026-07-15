@@ -20,6 +20,17 @@ To test an individual project, run that project's tests:
 bazel test //projects/re2/hermetic_llvm:re2_local_test
 ```
 
+## Candidate Discovery
+
+The discovery snapshot records direct BCR ruleset and toolchain dependencies in
+the `rulesets`, `toolchains`, and `ecosystem_tags` fields. Candidate queues can
+select an ecosystem or omit an overrepresented one with repeatable filters:
+
+```sh
+bazel run //pipeline:next_candidates -- --ruleset rules_go --no-require-first-party-bazel
+bazel run //pipeline:next_candidates -- --exclude-ruleset rules_cc --no-require-first-party-bazel
+```
+
 ## Project Status
 
 Legend:

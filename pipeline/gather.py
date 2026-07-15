@@ -198,6 +198,9 @@ def main(argv=None):
         "enriched": sum(1 for row in rows if row["enriched"]),
         "first_party_bazel": sum(1 for row in rows if row["first_party_bazel"]),
         "tagged": sum(1 for row in rows if row["tags"]),
+        "ecosystem_tagged": sum(1 for row in rows if row["ecosystem_tags"]),
+        "ruleset_tagged": sum(1 for row in rows if row["rulesets"]),
+        "toolchain_tagged": sum(1 for row in rows if row["toolchains"]),
     }
     print("Wrote {}".format(output), file=sys.stderr)
     print("  reference_pushed_at={}".format(reference or "n/a"), file=sys.stderr)

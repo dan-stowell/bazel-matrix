@@ -52,6 +52,8 @@ class Project:
     pushed_at: str = ""
     first_party_bazel: object = None
     bazel_markers: list = field(default_factory=list)
+    rulesets: list = field(default_factory=list)
+    toolchains: list = field(default_factory=list)
 
     @property
     def key(self):
@@ -87,8 +89,12 @@ class Project:
         if self.first_party_bazel is None and other.first_party_bazel is not None:
             self.first_party_bazel = other.first_party_bazel
             self.bazel_markers = list(other.bazel_markers)
+        self.rulesets = sorted(set(self.rulesets).union(other.rulesets))
+        self.toolchains = sorted(set(self.toolchains).union(other.toolchains))
 
     def to_dict(self, reference_pushed_at=""):
+        ecosystem_tags = ["ruleset:" + name for name in self.rulesets]
+        ecosystem_tags.extend("toolchain:" + name for name in self.toolchains)
         return {
             "repo": self.repo_url,
             "name": self.name or self.repo_name,
@@ -103,6 +109,9 @@ class Project:
             "in_bcr": self.in_bcr,
             "first_party_bazel": self.first_party_bazel,
             "bazel_markers": sorted(self.bazel_markers),
+            "rulesets": sorted(self.rulesets),
+            "toolchains": sorted(self.toolchains),
+            "ecosystem_tags": sorted(ecosystem_tags),
             "candidate_score": candidate_score(self, reference_pushed_at),
             "enriched": self.enriched,
         }
