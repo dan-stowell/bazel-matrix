@@ -1,0 +1,56 @@
+load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+
+package(default_visibility = ["//visibility:public"])
+
+py_library(
+    name = "lib",
+    srcs = [
+        "__init__.py",
+        "classify.py",
+        "github.py",
+        "inventory.py",
+        "model.py",
+        "netfetch.py",
+        "sources/__init__.py",
+        "sources/bcr.py",
+        "sources/jin.py",
+        "sources/nicolov.py",
+    ],
+    deps = ["@rules_python//python/runfiles"],
+)
+
+py_binary(
+    name = "gather",
+    srcs = ["gather.py"],
+    args = select({
+        "//bazel_runner:linux_amd64": ["--gh-rlocation=$(rlocationpath @gh_cli_linux_amd64//:gh)"],
+        "//bazel_runner:linux_arm64": ["--gh-rlocation=$(rlocationpath @gh_cli_linux_arm64//:gh)"],
+        "//bazel_runner:darwin_amd64": ["--gh-rlocation=$(rlocationpath @gh_cli_darwin_amd64//:gh)"],
+        "//bazel_runner:darwin_arm64": ["--gh-rlocation=$(rlocationpath @gh_cli_darwin_arm64//:gh)"],
+    }),
+    data = select({
+        "//bazel_runner:linux_amd64": ["@gh_cli_linux_amd64//:gh"],
+        "//bazel_runner:linux_arm64": ["@gh_cli_linux_arm64//:gh"],
+        "//bazel_runner:darwin_amd64": ["@gh_cli_darwin_amd64//:gh"],
+        "//bazel_runner:darwin_arm64": ["@gh_cli_darwin_arm64//:gh"],
+    }),
+    deps = [":lib"],
+)
+
+py_binary(
+    name = "rank",
+    srcs = ["rank.py"],
+    deps = [":lib"],
+)
+
+py_binary(
+    name = "next_candidates",
+    srcs = ["next_candidates.py"],
+    deps = [":lib"],
+)
+
+py_binary(
+    name = "add_project",
+    srcs = ["add_project.py"],
+    deps = [":lib"],
+)

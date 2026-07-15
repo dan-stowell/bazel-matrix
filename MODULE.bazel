@@ -10,6 +10,8 @@ module(
 bazel_dep(name = "rules_python", version = "2.0.3")
 bazel_dep(name = "platforms", version = "1.1.0")
 
+bazel_dep(name = "buildifier_prebuilt", version = "8.5.1.2", dev_dependency = True)
+
 # rules_img builds the minimal RBE executor image (see //tools/rbe_image).
 bazel_dep(name = "rules_img", version = "0.3.15")
 
@@ -103,6 +105,17 @@ python = use_extension("@rules_python//python/extensions:python.bzl", "python")
 python.toolchain(
     is_default = True,
     python_version = "3.12",
+)
+
+# Hermetic GitHub CLI used by //pipeline:gather for GitHub API enrichment and
+# organization discovery.
+gh = use_extension("//tools/gh:extension.bzl", "gh_extension")
+use_repo(
+    gh,
+    "gh_cli_darwin_amd64",
+    "gh_cli_darwin_arm64",
+    "gh_cli_linux_amd64",
+    "gh_cli_linux_arm64",
 )
 
 # Hermetic Bazel binary used to run the *inner* project builds in isolation,

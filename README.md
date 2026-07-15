@@ -20,6 +20,43 @@ To test an individual project, run that project's tests:
 bazel test //projects/re2/hermetic_llvm:re2_local_test
 ```
 
+## Project Discovery
+
+`bazel run //pipeline:gather` refreshes `data/projects.jsonl`, one JSON object
+per discovered GitHub repository, ordered stably by repository URL. The pipeline
+combines the Bazel Central Registry, two public awesome-bazel lists, and the
+`hermeticbuild` GitHub organization, then enriches project entries through the
+pinned hermetic `gh` binary.
+
+For higher GitHub API limits, set `BAZEL_MATRIX_GITHUB_TOKEN`, `GH_TOKEN`, or
+`GITHUB_TOKEN`. If those are not already in the environment, the pipeline also
+checks `$HOME/.profile` for `BAZEL_MATRIX_GITHUB_TOKEN`.
+
+```sh
+bazel run //pipeline:gather
+bazel run //pipeline:gather -- --enrich=none
+bazel run //pipeline:rank -- --top 50
+bazel run //pipeline:next_candidates -- --top 50 --output /tmp/candidates.jsonl
+```
+
+To start adding a candidate to the matrix, scaffold it from the snapshot:
+
+```sh
+bazel run //pipeline:add_project -- https://github.com/org/repo
+```
+
+The scaffold is intentionally inactive. Fill in the source archive pin in
+`//bazel_runner:extension.bzl`, add the generated archive repo to `MODULE.bazel`,
+then activate the generated `as_is` and `hermetic_llvm` BUILD files.
+
+## Developer Tools
+
+Buildifier is available as a Bazel dev dependency:
+
+```sh
+bazel run -- @buildifier_prebuilt//:buildifier -mode=fix "$PWD/MODULE.bazel"
+```
+
 ## Project Layout
 
 Project packages live under `//projects/<project_name>/<modification_name>`.
