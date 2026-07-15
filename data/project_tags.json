@@ -1,4 +1,76 @@
 {
+  "https://github.com/bazelbuild/bazel": {
+    "tags": [
+      "featured"
+    ]
+  },
+  "https://github.com/curl/curl": {
+    "tags": [
+      "featured"
+    ]
+  },
+  "https://github.com/grpc/grpc": {
+    "tags": [
+      "featured"
+    ]
+  },
+  "https://github.com/gflags/gflags": {
+    "note": "Upstream's tests are CMake-only; the Bazel package exposes the library but no real Bazel test target.",
+    "tags": [
+      "not_matrix_candidate",
+      "no_upstream_bazel_tests"
+    ]
+  },
+  "https://github.com/google/brotli": {
+    "note": "The C library/CLI has no upstream Bazel test target; its C tests are CMake/CTest-based. The nested Go module tests are tracked separately as brotli_go.",
+    "tags": [
+      "not_matrix_candidate",
+      "no_upstream_bazel_tests"
+    ]
+  },
+  "https://github.com/llvm/llvm-project": {
+    "tags": [
+      "featured"
+    ]
+  },
+  "https://github.com/openssl/openssl": {
+    "tags": [
+      "featured"
+    ]
+  },
+  "https://github.com/madler/zlib": {
+    "note": "Upstream's Bazel package exposes the library but declares no Bazel test targets.",
+    "tags": [
+      "not_matrix_candidate",
+      "no_upstream_bazel_tests"
+    ]
+  },
+  "https://github.com/nlohmann/json": {
+    "note": "nlohmann/json exposes a header library through Bazel, but its real test suite is wired through CMake/CTest and would require porting many doctest sources plus external test data into Bazel.",
+    "tags": [
+      "not_matrix_candidate",
+      "no_upstream_bazel_tests"
+    ]
+  },
+  "https://github.com/odygrd/quill": {
+    "note": "Upstream's Bazel package exposes the library but no real Bazel test target.",
+    "tags": [
+      "not_matrix_candidate",
+      "no_upstream_bazel_tests"
+    ]
+  },
+  "https://github.com/protocolbuffers/protobuf": {
+    "tags": [
+      "featured"
+    ]
+  },
+  "https://github.com/Z3Prover/z3": {
+    "note": "Upstream's Bazel target is a rules_foreign_cc CMake build of the solver, with no upstream Bazel test target.",
+    "tags": [
+      "not_matrix_candidate",
+      "no_upstream_bazel_tests"
+    ]
+  },
   "https://github.com/jarro2783/cxxopts": {
     "note": "Upstream Bazel exposes a library and fuzz target, but no normal test target for the matrix's four test columns.",
     "tags": [

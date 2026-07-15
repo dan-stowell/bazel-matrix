@@ -9,6 +9,7 @@ py_library(
         "classify.py",
         "github.py",
         "inventory.py",
+        "matrix.py",
         "model.py",
         "netfetch.py",
         "sources/__init__.py",
@@ -53,6 +54,12 @@ py_binary(
 py_binary(
     name = "next_candidates",
     srcs = ["next_candidates.py"],
+    deps = [":lib"],
+)
+
+py_binary(
+    name = "render_readme",
+    srcs = ["render_readme.py"],
     deps = [":lib"],
 )
 

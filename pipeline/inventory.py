@@ -18,6 +18,10 @@ def default_snapshot_path():
     return os.path.join(workspace_root(), "data", "projects.jsonl")
 
 
+def default_matrix_path():
+    return os.path.join(workspace_root(), "data", "matrix_projects.jsonl")
+
+
 def load_jsonl(path):
     rows = []
     with open(path, encoding="utf-8") as f:
@@ -67,6 +71,19 @@ def existing_project_keys(root=None):
     return keys
 
 
+def matrix_project_keys(path=None):
+    matrix_path = path or default_matrix_path()
+    if not os.path.exists(matrix_path):
+        return set()
+    keys = set()
+    for row in load_jsonl(matrix_path):
+        keys.update(project_name_keys(row.get("name", "")))
+        slug = slug_from_repo(row.get("repo", ""))
+        if slug:
+            keys.update(project_name_keys(slug))
+    return keys
+
+
 def slug_from_repo(repo_url):
     parsed = model.parse_github(repo_url)
     if not parsed:
@@ -107,7 +124,7 @@ def find_row(rows, repo_or_slug):
     return None
 
 
-def candidate_reasons(row, built):
+def candidate_reasons(row, matrix_projects):
     reasons = []
     if row.get("first_party_bazel") is True:
         reasons.append("first_party_bazel")
@@ -121,7 +138,7 @@ def candidate_reasons(row, built):
         if source.startswith("github_org:hermeticbuild"):
             reasons.append("hermeticbuild_org")
     slug = slug_from_repo(row.get("repo", ""))
-    if slug and not project_name_keys(slug).intersection(built):
+    if slug and not project_name_keys(slug).intersection(matrix_projects):
         reasons.append("not_in_matrix")
     for tag in row.get("tags", []):
         reasons.append("tag:" + tag)
@@ -139,7 +156,8 @@ def candidate_rows(
         exclude_toolchains=(),
         require_first_party_bazel=True,
         min_score=0.0):
-    built = existing_project_keys()
+    attempted = existing_project_keys()
+    matrix_projects = matrix_project_keys()
     candidates = []
     for row in rows:
         if row.get("category") != model.CATEGORY_PROJECT or row.get("archived"):
@@ -161,7 +179,7 @@ def candidate_rows(
         slug = slug_from_repo(row.get("repo", ""))
         if not slug:
             continue
-        if not include_built and project_name_keys(slug).intersection(built):
+        if not include_built and project_name_keys(slug).intersection(attempted):
             continue
         if not include_tagged and tagmod.has_excluded_tag(row):
             continue
@@ -186,7 +204,7 @@ def candidate_rows(
             "tags": row.get("tags", []),
             "tag_note": row.get("tag_note", ""),
             "description": row.get("description") or "",
-            "reasons": candidate_reasons(row, built),
+            "reasons": candidate_reasons(row, matrix_projects),
             "next_step": "bazel run //pipeline:add_project -- {}".format(row.get("repo", "")),
         })
     candidates.sort(key=lambda row: (-row["candidate_score"], -row["stars"], row["repo"].lower()))

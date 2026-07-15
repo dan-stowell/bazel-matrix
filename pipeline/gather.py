@@ -16,6 +16,7 @@ import os
 import sys
 
 from pipeline import github as ghmod
+from pipeline import inventory
 from pipeline import model
 from pipeline import tags as tagmod
 from pipeline.sources import bcr, jin, nicolov
@@ -62,6 +63,24 @@ def _collect_static_sources():
             print("warning: source '{}' failed: {}".format(source.SOURCE_ID, exc), file=sys.stderr)
         reports.append(report)
     return projects, reports
+
+
+def _collect_matrix_source(path):
+    projects = []
+    for row in inventory.load_jsonl(path):
+        repo = model.parse_github(row.get("repo", ""))
+        if not repo:
+            continue
+        owner, repo_name = repo
+        projects.append(model.Project(
+            owner=owner,
+            repo_name=repo_name,
+            name=row.get("name") or repo_name,
+            category=model.CATEGORY_PROJECT,
+            classification_reason="published in bazel-matrix",
+            sources=["matrix"],
+        ))
+    return projects
 
 def _collect_org_source(gh, org):
     projects = []
@@ -130,6 +149,7 @@ def main(argv=None):
     parser.add_argument("--include-hermeticbuild-org", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--output", default=None)
     parser.add_argument("--tags", default=None)
+    parser.add_argument("--matrix", default=None)
     args = parser.parse_args(argv)
 
     base = os.environ.get("BUILD_WORKSPACE_DIRECTORY") or os.getcwd()
@@ -137,10 +157,20 @@ def main(argv=None):
     if not output:
         output = os.path.join(base, "data", "projects.jsonl")
     tag_path = args.tags or tagmod.default_tags_path(base)
+    matrix_path = args.matrix or inventory.default_matrix_path()
     tag_map = tagmod.load(tag_path)
 
     print("Gathering project sources...", file=sys.stderr)
     projects, reports = _collect_static_sources()
+    if os.path.exists(matrix_path):
+        matrix_projects = _collect_matrix_source(matrix_path)
+        projects.extend(matrix_projects)
+        reports.append({
+            "id": "matrix",
+            "url": matrix_path,
+            "ok": True,
+            "raw_count": len(matrix_projects),
+        })
     by_key = _merge(projects)
     print("  {} unique repos from static sources".format(len(by_key)), file=sys.stderr)
 

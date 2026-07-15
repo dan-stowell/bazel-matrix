@@ -3,7 +3,7 @@ import json
 import tarfile
 import unittest
 
-from pipeline import inventory, model
+from pipeline import inventory, matrix, model
 from pipeline.sources import bcr
 
 
@@ -92,6 +92,30 @@ class CandidateEcosystemFilterTest(unittest.TestCase):
             exclude_rulesets=["rules_go"],
         )
         self.assertEqual([], rows)
+
+
+class MatrixReadmeTest(unittest.TestCase):
+    def test_render_uses_featured_tags_and_invocation_links(self):
+        result = {
+            "status": "pass",
+            "passed": 2,
+            "total": 2,
+            "invocation": "https://app.buildbuddy.io/invocation/example",
+        }
+        row = {
+            "name": "demo",
+            "display_name": "Demo",
+            "repo": "https://github.com/acme/demo",
+            "results": {key: dict(result) for key, _ in matrix.RESULT_COLUMNS},
+        }
+        rendered = matrix.render([row], {
+            "https://github.com/acme/demo": {"tags": ["featured"]},
+        })
+        self.assertEqual(2, rendered.count("[`Demo`](https://github.com/acme/demo)"))
+        self.assertIn("[2 / 2](https://app.buildbuddy.io/invocation/example)", rendered)
+
+    def test_result_without_invocation_is_rendered(self):
+        self.assertEqual("🚫", matrix.result_cell({"status": "no_tests"}))
 
 
 if __name__ == "__main__":
