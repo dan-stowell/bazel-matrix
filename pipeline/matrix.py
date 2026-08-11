@@ -130,9 +130,7 @@ unset, they default to BuildBuddy Cloud (`remote.buildbuddy.io` and
 ```sh
 export BUILDBUDDY_API_KEY='...'
 export BUILDBUDDY_BES_RESULTS_URL='https://bazel-matrix.buildbuddy.dev/invocation/'
-export BUILDBUDDY_BES_BACKEND='grpcs://bazel-matrix.buildbuddy.dev'
-export BUILDBUDDY_REMOTE_CACHE='grpcs://bazel-matrix.buildbuddy.dev'
-export BUILDBUDDY_REMOTE_EXECUTOR='grpcs://bazel-matrix.buildbuddy.dev'
+export BUILDBUDDY_GRPC_ENDPOINT='grpcs://bazel-matrix.buildbuddy.dev'
 export BAZEL_RUNNER_REPO_CACHE='/absolute/path/to/bazel-matrix-repository-cache'
 mkdir -p "$BAZEL_RUNNER_REPO_CACHE"
 ```
@@ -148,9 +146,7 @@ bazel --ignore_all_rc_files test \\
   --test_env=BAZEL_RUNNER_REPO_CACHE \\
   --test_env=BUILDBUDDY_API_KEY \\
   --test_env=BUILDBUDDY_BES_RESULTS_URL \\
-  --test_env=BUILDBUDDY_BES_BACKEND \\
-  --test_env=BUILDBUDDY_REMOTE_CACHE \\
-  --test_env=BUILDBUDDY_REMOTE_EXECUTOR \\
+  --test_env=BUILDBUDDY_GRPC_ENDPOINT \\
   //projects/re2/hermetic_llvm:re2_rbe_test
 ```
 
@@ -165,9 +161,7 @@ bazel --ignore_all_rc_files test \\
   --test_env=BAZEL_RUNNER_REPO_CACHE \\
   --test_env=BUILDBUDDY_API_KEY \\
   --test_env=BUILDBUDDY_BES_RESULTS_URL \\
-  --test_env=BUILDBUDDY_BES_BACKEND \\
-  --test_env=BUILDBUDDY_REMOTE_CACHE \\
-  --test_env=BUILDBUDDY_REMOTE_EXECUTOR \\
+  --test_env=BUILDBUDDY_GRPC_ENDPOINT \\
   //:smoke_hermetic_llvm_rbe_tests
 ```
 
@@ -183,9 +177,7 @@ bazel --ignore_all_rc_files build \\
   --action_env=BAZEL_RUNNER_REPO_CACHE \\
   --action_env=BUILDBUDDY_API_KEY \\
   --action_env=BUILDBUDDY_BES_RESULTS_URL \\
-  --action_env=BUILDBUDDY_BES_BACKEND \\
-  --action_env=BUILDBUDDY_REMOTE_CACHE \\
-  --action_env=BUILDBUDDY_REMOTE_EXECUTOR \\
+  --action_env=BUILDBUDDY_GRPC_ENDPOINT \\
   //projects/re2/hermetic_llvm:re2_rbe_build
 
 # Aggregate build:

@@ -80,7 +80,7 @@ BUILDBUDDY_BES = overlay(
     name = "buildbuddy_bes",
     build_flags = [
         "--bes_results_url=$BUILDBUDDY_BES_RESULTS_URL",
-        "--bes_backend=$BUILDBUDDY_BES_BACKEND",
+        "--bes_backend=$BUILDBUDDY_GRPC_ENDPOINT",
         "--build_metadata=USER=bazel-matrix",
         "--build_metadata=VISIBILITY=PUBLIC",
     ],
@@ -88,20 +88,18 @@ BUILDBUDDY_BES = overlay(
 BUILDBUDDY_RBE = overlay(
     name = "buildbuddy_rbe",
     build_flags = [
-        "--remote_cache=$BUILDBUDDY_REMOTE_CACHE",
+        "--remote_cache=$BUILDBUDDY_GRPC_ENDPOINT",
         "--remote_header=x-buildbuddy-api-key=$BUILDBUDDY_API_KEY",
         "--remote_timeout=10m",
         "--remote_download_minimal",
         "--jobs=32",
-        "--remote_executor=$BUILDBUDDY_REMOTE_EXECUTOR",
+        "--remote_executor=$BUILDBUDDY_GRPC_ENDPOINT",
     ],
 )
 
 _BUILDBUDDY_ENDPOINT_ENV_VARS = [
-    "BUILDBUDDY_BES_BACKEND",
     "BUILDBUDDY_BES_RESULTS_URL",
-    "BUILDBUDDY_REMOTE_CACHE",
-    "BUILDBUDDY_REMOTE_EXECUTOR",
+    "BUILDBUDDY_GRPC_ENDPOINT",
 ]
 
 _CONTAINER_IMAGE_FLAG_PREFIX = "--remote_default_exec_properties=container-image="

@@ -85,17 +85,18 @@ class MatrixResultTest(unittest.TestCase):
         self.assertEqual("no_tests", bazel_runner._matrix_status(0, 0))
 
     def test_buildbuddy_endpoints_have_defaults_and_can_be_overridden(self):
-        flag = "--remote_executor=$BUILDBUDDY_REMOTE_EXECUTOR"
-        self.assertEqual(
-            "--remote_executor=grpcs://remote.buildbuddy.io",
-            bazel_runner._expand_env_refs(flag, {}),
-        )
-        self.assertEqual(
-            "--remote_executor=grpcs://bazel-matrix.buildbuddy.dev",
-            bazel_runner._expand_env_refs(flag, {
-                "BUILDBUDDY_REMOTE_EXECUTOR": "grpcs://bazel-matrix.buildbuddy.dev",
-            }),
-        )
+        for option in ("bes_backend", "remote_cache", "remote_executor"):
+            flag = "--{}=$BUILDBUDDY_GRPC_ENDPOINT".format(option)
+            self.assertEqual(
+                "--{}=grpcs://remote.buildbuddy.io".format(option),
+                bazel_runner._expand_env_refs(flag, {}),
+            )
+            self.assertEqual(
+                "--{}=grpcs://bazel-matrix.buildbuddy.dev".format(option),
+                bazel_runner._expand_env_refs(flag, {
+                    "BUILDBUDDY_GRPC_ENDPOINT": "grpcs://bazel-matrix.buildbuddy.dev",
+                }),
+            )
 
     def test_result_uses_configured_bes_results_url(self):
         with tempfile.TemporaryDirectory() as directory:

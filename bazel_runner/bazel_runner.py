@@ -104,10 +104,8 @@ def _load_bep_outputs(path):
 _PASSING_TEST_STATUSES = {"PASSED", "FLAKY"}
 
 _BUILDBUDDY_ENV_DEFAULTS = {
-    "BUILDBUDDY_BES_BACKEND": "grpcs://remote.buildbuddy.io",
     "BUILDBUDDY_BES_RESULTS_URL": "https://app.buildbuddy.io/invocation/",
-    "BUILDBUDDY_REMOTE_CACHE": "grpcs://remote.buildbuddy.io",
-    "BUILDBUDDY_REMOTE_EXECUTOR": "grpcs://remote.buildbuddy.io",
+    "BUILDBUDDY_GRPC_ENDPOINT": "grpcs://remote.buildbuddy.io",
 }
 
 
