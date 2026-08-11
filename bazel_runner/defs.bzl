@@ -51,6 +51,14 @@ _HERMETIC_LLVM_MODIFICATION = overlay(
     # linking removes the runtime dependency on worker system libraries.
     build_flags = ["--dynamic_mode=off"],
 )
+_BUILDBUDDY_TOOLCHAIN_MODIFICATION = overlay(
+    name = "bbt",
+    appends = [("//bazel_runner:buildbuddy_toolchain.MODULE.bazel", "MODULE.bazel")],
+    build_flags = [
+        "--platforms=@toolchains_buildbuddy//platforms:linux_x86_64",
+        "--extra_execution_platforms=@toolchains_buildbuddy//platforms:linux_x86_64",
+    ],
+)
 # For projects with py_test targets: rules_python's default
 # bootstrap_impl=system_python stage-1 stub execs `/usr/bin/env python3` even
 # when a hermetic runtime is attached, and RBE images have no python3. The
@@ -498,7 +506,16 @@ def _emit_source(name, source, toolchains):
     else:
         fail("unknown source kind: {}".format(source.kind))
 
-def _emit_bazel_runner_targets_for_spec(source, toolchains, build, test, bazel_version, target_prefix, visibility):
+def _emit_bazel_runner_targets_for_spec(
+        source,
+        toolchains,
+        build,
+        test,
+        bazel_version,
+        target_prefix,
+        visibility,
+        emit_local = True,
+        emit_rbe_minimal = True):
     if source.kind == "bcr_module" and build == None and test != None:
         build = build_spec(targets = test.targets, flags = test.flags)
     _emit_source("bazel_runner_source", source, toolchains)
@@ -511,6 +528,8 @@ def _emit_bazel_runner_targets_for_spec(source, toolchains, build, test, bazel_v
         bazel_version = bazel_version,
         target_prefix = target_prefix,
         visibility = visibility,
+        emit_local = emit_local,
+        emit_rbe_minimal = emit_rbe_minimal,
     )
 
 def _emit_bazel_runner_targets(source_archive, strip_prefix, source_subdir, toolchains, build, test, bazel_version, target_prefix, visibility):
@@ -580,11 +599,21 @@ def _emit_bazel_runner_targets(source_archive, strip_prefix, source_subdir, tool
             visibility = visibility,
         )
 
-def _emit_bazel_runner_targets_for_source(source, source_subdir, toolchains, build, test, bazel_version, target_prefix, visibility):
+def _emit_bazel_runner_targets_for_source(
+        source,
+        source_subdir,
+        toolchains,
+        build,
+        test,
+        bazel_version,
+        target_prefix,
+        visibility,
+        emit_local = True,
+        emit_rbe_minimal = True):
     bazel = inner_bazel(bazel_version)
     build_flags = _overlay_build_flags(toolchains) + _overlay_build_flags([BUILDBUDDY_BES])
     rbe_build_flags = build_flags + _rbe_overlay_flags(toolchains)
-    if build:
+    if build and emit_local:
         bazel_runner_build(
             name = _local_build_name(target_prefix),
             source = source,
@@ -594,6 +623,7 @@ def _emit_bazel_runner_targets_for_source(source, source_subdir, toolchains, bui
             source_subdir = source_subdir,
             visibility = visibility,
         )
+    if build:
         bazel_runner_build(
             name = _rbe_build_name(target_prefix),
             source = source,
@@ -604,7 +634,7 @@ def _emit_bazel_runner_targets_for_source(source, source_subdir, toolchains, bui
             visibility = visibility,
             use_default_shell_env = True,
         )
-    if test:
+    if test and emit_local:
         bazel_runner_test(
             name = _local_test_name(target_prefix),
             source = source,
@@ -616,6 +646,7 @@ def _emit_bazel_runner_targets_for_source(source, source_subdir, toolchains, bui
             env_inherit = _BUILDBUDDY_ENDPOINT_ENV_VARS,
             visibility = visibility,
         )
+    if test:
         bazel_runner_test(
             name = _rbe_test_name(target_prefix),
             source = source,
@@ -627,6 +658,7 @@ def _emit_bazel_runner_targets_for_source(source, source_subdir, toolchains, bui
             env_inherit = _BUILDBUDDY_ENDPOINT_ENV_VARS + ["BUILDBUDDY_API_KEY"],
             visibility = visibility,
         )
+    if test and emit_rbe_minimal:
         bazel_runner_test(
             name = _rbe_minimal_test_name(target_prefix),
             source = source,
@@ -678,6 +710,8 @@ def project_modification(
         toolchains = [],
         bazel_version = DEFAULT_INNER_BAZEL_VERSION,
         clients = None,
+        emit_local = True,
+        emit_rbe_minimal = True,
         project = None,
         visibility = ["//visibility:public"]):
     if project:
@@ -701,6 +735,8 @@ def project_modification(
         bazel_version,
         name,
         visibility,
+        emit_local = emit_local,
+        emit_rbe_minimal = emit_rbe_minimal,
     )
 
 def hermetic_llvm_project_modification(
@@ -727,6 +763,36 @@ def hermetic_llvm_project_modification(
         toolchains = [_HERMETIC_LLVM_MODIFICATION] + toolchains,
         bazel_version = bazel_version,
         clients = clients,
+        project = project,
+        visibility = visibility,
+    )
+
+def buildbuddy_toolchain_project_modification(
+        name = None,
+        environments = None,
+        source_archive = None,
+        build = None,
+        test = None,
+        strip_prefix = "",
+        source_subdir = "",
+        toolchains = [],
+        bazel_version = DEFAULT_INNER_BAZEL_VERSION,
+        clients = None,
+        project = None,
+        visibility = ["//visibility:public"]):
+    project_modification(
+        name = name,
+        source_archive = source_archive,
+        environments = environments,
+        build = build,
+        test = test,
+        strip_prefix = strip_prefix,
+        source_subdir = source_subdir,
+        toolchains = [_BUILDBUDDY_TOOLCHAIN_MODIFICATION] + toolchains,
+        bazel_version = bazel_version,
+        clients = clients,
+        emit_local = False,
+        emit_rbe_minimal = False,
         project = project,
         visibility = visibility,
     )

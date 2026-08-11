@@ -1,0 +1,6 @@
+# toolchains_buildbuddy's transitive dependencies otherwise upgrade RE2's
+# direct abseil-cpp dependency to a source-incompatible newer release.
+single_version_override(
+    module_name = "abseil-cpp",
+    version = "20250512.1",
+)

@@ -1,0 +1,16 @@
+load("//bazel_runner:defs.bzl", "buildbuddy_toolchain_project_modification", "overlay", "test_spec")
+load("//projects/re2:project.bzl", "RE2_PROJECT")
+
+_RE2_BBT_COMPAT = overlay(
+    name = "re2_bbt_compat",
+    appends = [("//projects/re2/bbt:re2_bbt_compat.MODULE.bazel", "MODULE.bazel")],
+)
+
+buildbuddy_toolchain_project_modification(
+    project = RE2_PROJECT,
+    test = test_spec(
+        targets = RE2_PROJECT.test.targets + ["-//:regexp_benchmark"],
+        flags = RE2_PROJECT.test.flags,
+    ),
+    toolchains = [_RE2_BBT_COMPAT],
+)
