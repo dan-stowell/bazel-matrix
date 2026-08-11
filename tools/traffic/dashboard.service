@@ -1,0 +1,16 @@
+[Unit]
+Description=BBT traffic dashboard (port 8000)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=%i
+WorkingDirectory=/home/%i/bazel-matrix
+ExecStart=/usr/bin/python3 /home/%i/bazel-matrix/tools/traffic/server.py
+Environment=PORT=8000
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -12,7 +12,9 @@
 #
 # For each endpoint, we query `bazel query` for all BBT RBE test targets, then
 # run `bazel test` on them one at a time (sequential — the inner bazel_runner
-# already parallelizes with --jobs=32 over RBE).
+# already parallelizes with --jobs=32 over RBE). Every run is recorded in a
+# SQLite store (db.py) with start/finish time, status, and the BuildBuddy
+# invocation URL.
 #
 # The loop repeats forever; a full pass over all targets on both endpoints is
 # one "round". Logs go to stdout/stderr and are prefixed with the round number
@@ -31,6 +33,7 @@
 #   BAZEL                      bazel binary (default: bazel)
 #   REPO_ROOT                  repo root (default: cwd)
 #   BAZEL_RUNNER_REPO_CACHE    shared inner repo cache (default: a temp dir)
+#   TRAFFIC_DB                 SQLite path (default: tools/traffic/traffic.sqlite)
 #
 
 set -euo pipefail
@@ -50,6 +53,14 @@ done
 REPO_ROOT="${REPO_ROOT:-$(pwd)}"
 REPO_CACHE="${BAZEL_RUNNER_REPO_CACHE:-/tmp/bazel-matrix-traffic-repo-cache}"
 mkdir -p "$REPO_CACHE"
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DB="${TRAFFIC_DB:-$SCRIPT_DIR/db.py}"
+
+# Ensure the SQLite schema exists, then mark any runs left "running" by a
+# previous (killed) process as interrupted.
+python3 "$DB" init >/dev/null
+python3 "$DB" cleanup-orphans >/dev/null 2>&1 || true
 
 # --- Endpoint definitions ---------------------------------------------------
 # Each endpoint is: name|results_url|grpc_endpoint|api_key_env
@@ -74,9 +85,22 @@ resolve_key() {
 
 # Run a single bazel test target against a given endpoint config.
 # Args: round endpoint_name results_url grpc_endpoint api_key target
+# Writes bazel output to a temp log, captures the invocation URL, records
+# start/finish in the SQLite store, and prints the run id on stdout.
 run_target() {
   local round="$1" name="$2" results_url="$3" grpc="$4" api_key="$5" target="$6"
   local prefix="[round ${round} ${name}]"
+
+  local project
+  project="${target#//projects/}"      # cctz/bbt:cctz_rbe_test
+  project="${project%%/*}"              # cctz
+
+  # Record start in the DB; capture the run id.
+  local run_id
+  run_id="$(python3 "$DB" start \
+    --round "$round" --endpoint "$name" \
+    --endpoint-url "$results_url" \
+    --target "$target" --project "$project")"
 
   local cmd=(
     "$BAZEL_BIN"
@@ -96,16 +120,55 @@ run_target() {
   )
 
   if [[ "$DRY_RUN" -eq 1 ]]; then
-    echo "${prefix} DRY-RUN: ${cmd[*]}"
+    echo "${prefix} DRY-RUN (run #${run_id}): ${cmd[*]}"
+    python3 "$DB" finish --id "$run_id" --status skipped
     return 0
   fi
 
-  log "${prefix} target: $target"
-  if ! "${cmd[@]}"; then
-    log "${prefix} FAILED: $target (continuing)"
-    return 1
+  log "${prefix} run #${run_id} target: $target"
+
+  # Run bazel, teeing output to a temp log so we can scrape the invocation URL
+  # from the inner "Streaming build results to:" line afterward.
+  local out_log
+  out_log="$(mktemp)"
+  local rc=0
+  "${cmd[@]}" 2>&1 | tee "$out_log" || rc=${PIPESTATUS[0]}
+
+  # Scrape the inner invocation URL. The inner bazel prints (in the test.log,
+  # not outer stdout):
+  #   INFO: Streaming build results to: https://.../invocation/<uuid>
+  # Fall back to the outer bazel's own line in the tee'd output.
+  local invocation=""
+  invocation="$(grep -m1 'Streaming build results to:' "$out_log" \
+    | sed -n 's/.*Streaming build results to: //p' || true)"
+  if [[ -z "$invocation" && -n "$TESTLOGS_ROOT" ]]; then
+    # test.log path: <testlogs>/<package-path>/<target-name>/test.log
+    local pkg_path="${target#//}"            # projects/cctz/bbt:cctz_rbe_test
+    local tname="${pkg_path##*:}"            # cctz_rbe_test
+    local ppath="${pkg_path%:*}"             # projects/cctz/bbt
+    local tlog="$TESTLOGS_ROOT/$ppath/$tname/test.log"
+    if [[ -f "$tlog" ]]; then
+      invocation="$(grep -m1 'Streaming build results to:' "$tlog" \
+        | sed -n 's/.*Streaming build results to: //p' || true)"
+    fi
   fi
-  log "${prefix} PASSED: $target"
+  rm -f "$out_log"
+
+  local status
+  if [[ "$rc" -eq 0 ]]; then
+    status="passed"
+  else
+    status="failed"
+  fi
+
+  python3 "$DB" finish --id "$run_id" --status "$status" \
+    --exit-code "$rc" ${invocation:+--invocation "$invocation"}
+
+  if [[ "$rc" -ne 0 ]]; then
+    log "${prefix} FAILED run #${run_id}: $target (rc=$rc, continuing)"
+  else
+    log "${prefix} PASSED run #${run_id}: $target"
+  fi
   return 0
 }
 
@@ -120,6 +183,7 @@ query_targets() {
 log "repo root: $REPO_ROOT"
 log "repo cache: $REPO_CACHE"
 log "bazel: $BAZEL_BIN"
+log "DB: $DB"
 log "querying BBT RBE test targets..."
 
 cd "$REPO_ROOT"
@@ -136,6 +200,10 @@ if [[ "$TARGET_COUNT" -eq 0 ]]; then
   rm -f "$TARGETS_FILE"
   exit 1
 fi
+
+# Resolve the outer bazel testlogs root once, for scraping inner invocation URLs.
+TESTLOGS_ROOT="$("$BAZEL_BIN" --ignore_all_rc_files info bazel-testlogs 2>/dev/null || true)"
+log "testlogs root: ${TESTLOGS_ROOT:-<unknown>}"
 
 round=0
 while true; do

@@ -6,3 +6,6 @@ __pycache__/
 *.pyc
 runner/image-minimg.tsv.lock
 user.bazelrc
+
+# Traffic generator runtime state (SQLite + WAL)
+tools/traffic/traffic.sqlite*
