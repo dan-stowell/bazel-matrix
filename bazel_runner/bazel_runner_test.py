@@ -84,6 +84,37 @@ class MatrixResultTest(unittest.TestCase):
         self.assertEqual("pass", bazel_runner._matrix_status(1, 0))
         self.assertEqual("no_tests", bazel_runner._matrix_status(0, 0))
 
+    def test_buildbuddy_endpoints_have_defaults_and_can_be_overridden(self):
+        flag = "--remote_executor=$BUILDBUDDY_REMOTE_EXECUTOR"
+        self.assertEqual(
+            "--remote_executor=grpcs://remote.buildbuddy.io",
+            bazel_runner._expand_env_refs(flag, {}),
+        )
+        self.assertEqual(
+            "--remote_executor=grpcs://bazel-matrix.buildbuddy.dev",
+            bazel_runner._expand_env_refs(flag, {
+                "BUILDBUDDY_REMOTE_EXECUTOR": "grpcs://bazel-matrix.buildbuddy.dev",
+            }),
+        )
+
+    def test_result_uses_configured_bes_results_url(self):
+        with tempfile.TemporaryDirectory() as directory:
+            bep = os.path.join(directory, "bep.json")
+            with open(bep, "w", encoding="utf-8") as f:
+                f.write(json.dumps({
+                    "id": {"started": {}},
+                    "started": {"uuid": "custom-123"},
+                }) + "\n")
+            artifact = bazel_runner._load_test_result(
+                bep,
+                "re2/hermetic_llvm/rbe/test",
+                bes_results_url="https://bazel-matrix.buildbuddy.dev/invocation/",
+            )
+        self.assertEqual(
+            "https://bazel-matrix.buildbuddy.dev/invocation/custom-123",
+            artifact["result"]["invocation"],
+        )
+
     def test_non_test_build_failure_overrides_an_all_passing_summary(self):
         with tempfile.TemporaryDirectory() as directory:
             bep = os.path.join(directory, "bep.json")

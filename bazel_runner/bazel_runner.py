@@ -103,6 +103,13 @@ def _load_bep_outputs(path):
 
 _PASSING_TEST_STATUSES = {"PASSED", "FLAKY"}
 
+_BUILDBUDDY_ENV_DEFAULTS = {
+    "BUILDBUDDY_BES_BACKEND": "grpcs://remote.buildbuddy.io",
+    "BUILDBUDDY_BES_RESULTS_URL": "https://app.buildbuddy.io/invocation/",
+    "BUILDBUDDY_REMOTE_CACHE": "grpcs://remote.buildbuddy.io",
+    "BUILDBUDDY_REMOTE_EXECUTOR": "grpcs://remote.buildbuddy.io",
+}
+
 
 def _test_case_counts(path):
     root = ET.parse(path).getroot()
@@ -128,7 +135,12 @@ def _matrix_status(passed, failed):
     return "fail"
 
 
-def _load_test_result(path, job, returncode=0, console_outcomes=None):
+def _load_test_result(
+        path,
+        job,
+        returncode=0,
+        console_outcomes=None,
+        bes_results_url=None):
     summaries = {}
     configured_tests = set()
     failed_completions = set()
@@ -234,7 +246,9 @@ def _load_test_result(path, job, returncode=0, console_outcomes=None):
     if attempts:
         result["cases"] = cases
     if invocation_id:
-        result["invocation"] = "https://app.buildbuddy.io/invocation/" + invocation_id
+        result["invocation"] = (
+            bes_results_url or _BUILDBUDDY_ENV_DEFAULTS["BUILDBUDDY_BES_RESULTS_URL"]
+        ).rstrip("/") + "/" + invocation_id
     return {
         "schema_version": 1,
         "job": job,
@@ -255,14 +269,26 @@ def _load_test_result(path, job, returncode=0, console_outcomes=None):
     }
 
 
-def _write_test_result(bep, job, output_dir, returncode=0, console_outcomes=None):
+def _write_test_result(
+        bep,
+        job,
+        output_dir,
+        returncode=0,
+        console_outcomes=None,
+        bes_results_url=None):
     if not output_dir or not os.path.exists(bep):
         return None
     os.makedirs(output_dir, exist_ok=True)
     output = os.path.join(output_dir, "matrix-result.json")
     with open(output, "w", encoding="utf-8") as f:
         json.dump(
-            _load_test_result(bep, job, returncode, console_outcomes),
+            _load_test_result(
+                bep,
+                job,
+                returncode,
+                console_outcomes,
+                bes_results_url,
+            ),
             f,
             indent=2,
             sort_keys=True,
@@ -296,9 +322,12 @@ _ENV_REF_RE = re.compile(r"\$(\w+)|\$\{([^}]+)\}")
 def _expand_env_refs(value, env):
     def replace(match):
         name = match.group(1) or match.group(2)
-        if name not in env:
+        if name in env:
+            return env[name]
+        if name in _BUILDBUDDY_ENV_DEFAULTS:
+            return _BUILDBUDDY_ENV_DEFAULTS[name]
+        else:
             raise RuntimeError("environment variable {} is required by flag {!r}".format(name, value))
-        return env[name]
 
     return _ENV_REF_RE.sub(replace, value)
 
@@ -458,6 +487,10 @@ def main(argv=None):
             os.environ.get("TEST_UNDECLARED_OUTPUTS_DIR", ""),
             returncode,
             console_outcomes,
+            env.get(
+                "BUILDBUDDY_BES_RESULTS_URL",
+                _BUILDBUDDY_ENV_DEFAULTS["BUILDBUDDY_BES_RESULTS_URL"],
+            ),
         )
         if result_output:
             print(prefix + "matrix result: " + result_output, file=sys.stderr)

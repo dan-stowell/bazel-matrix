@@ -125,3 +125,78 @@ Here are working [Bazel](https://bazel.build/) builds and test suites for public
 | [`xkbcommon`](https://github.com/xkbcommon/libxkbcommon) | ✅ [1 / 1](https://app.buildbuddy.io/invocation/b1793a81-92c4-4a4e-ac84-99eaa0373b63) | ✅ [1 / 1](https://app.buildbuddy.io/invocation/c6644ce3-592a-4751-9145-62b5e0f97ce3) | ✅ [1 / 1](https://app.buildbuddy.io/invocation/74262651-8e0e-4493-bbee-c4b4e4175151) | ✅ [1 / 1](https://app.buildbuddy.io/invocation/eb3c11bd-12ac-46c5-9ed5-dd6d4f34dc4d) |
 | [`zstd`](https://github.com/facebook/zstd) | ✅ [1 / 1](https://app.buildbuddy.io/invocation/4b8dd893-cf58-4401-9bca-cf0ec1b0d659) | ✅ [1 / 1](https://app.buildbuddy.io/invocation/15e41d9f-2ce4-4d7d-b76d-86854086d4da) | ✅ [1 / 1](https://app.buildbuddy.io/invocation/d271bf33-72cd-4462-afd3-78d810d033a4) | ✅ [1 / 1](https://app.buildbuddy.io/invocation/76087a5c-4400-4874-a524-69a504af2fc8) |
 | [`zziplib`](https://github.com/gdraheim/zziplib) | ✅ [1 / 1](https://app.buildbuddy.io/invocation/b7552eae-fc48-4b9c-bf55-6394f8064655) | ✅ [1 / 1](https://app.buildbuddy.io/invocation/c0304eba-543a-4326-a012-d1ca2bc06db1) | ✅ [1 / 1](https://app.buildbuddy.io/invocation/9840fccc-3e4e-4eb3-adbb-7bf8c33d7a4a) | ✅ [1 / 1](https://app.buildbuddy.io/invocation/00c4429d-a398-4014-b5e5-c8f69224b09d) |
+
+# Running against another BuildBuddy endpoint
+
+Inner Bazel invocations use the following environment variables. If they are
+unset, they default to BuildBuddy Cloud (`remote.buildbuddy.io` and
+`app.buildbuddy.io`):
+
+```sh
+export BUILDBUDDY_API_KEY='...'
+export BUILDBUDDY_BES_RESULTS_URL='https://bazel-matrix.buildbuddy.dev/invocation/'
+export BUILDBUDDY_BES_BACKEND='grpcs://bazel-matrix.buildbuddy.dev'
+export BUILDBUDDY_REMOTE_CACHE='grpcs://bazel-matrix.buildbuddy.dev'
+export BUILDBUDDY_REMOTE_EXECUTOR='grpcs://bazel-matrix.buildbuddy.dev'
+export BAZEL_RUNNER_REPO_CACHE='/absolute/path/to/bazel-matrix-repository-cache'
+mkdir -p "$BAZEL_RUNNER_REPO_CACHE"
+```
+
+Run one project's tests without loading `.bazelrc` or `user.bazelrc`:
+
+```sh
+bazel --ignore_all_rc_files test \
+  --enable_bzlmod \
+  --noenable_workspace \
+  --jobs=1 \
+  --sandbox_writable_path="$BAZEL_RUNNER_REPO_CACHE" \
+  --test_env=BAZEL_RUNNER_REPO_CACHE \
+  --test_env=BUILDBUDDY_API_KEY \
+  --test_env=BUILDBUDDY_BES_RESULTS_URL \
+  --test_env=BUILDBUDDY_BES_BACKEND \
+  --test_env=BUILDBUDDY_REMOTE_CACHE \
+  --test_env=BUILDBUDDY_REMOTE_EXECUTOR \
+  //projects/re2/hermetic_llvm:re2_rbe_test
+```
+
+The same flags work with an aggregate test suite:
+
+```sh
+bazel --ignore_all_rc_files test \
+  --enable_bzlmod \
+  --noenable_workspace \
+  --jobs=1 \
+  --sandbox_writable_path="$BAZEL_RUNNER_REPO_CACHE" \
+  --test_env=BAZEL_RUNNER_REPO_CACHE \
+  --test_env=BUILDBUDDY_API_KEY \
+  --test_env=BUILDBUDDY_BES_RESULTS_URL \
+  --test_env=BUILDBUDDY_BES_BACKEND \
+  --test_env=BUILDBUDDY_REMOTE_CACHE \
+  --test_env=BUILDBUDDY_REMOTE_EXECUTOR \
+  //:smoke_hermetic_llvm_rbe_tests
+```
+
+For an individual or aggregate build, pass the same values through the action
+environment instead:
+
+```sh
+bazel --ignore_all_rc_files build \
+  --enable_bzlmod \
+  --noenable_workspace \
+  --jobs=1 \
+  --sandbox_writable_path="$BAZEL_RUNNER_REPO_CACHE" \
+  --action_env=BAZEL_RUNNER_REPO_CACHE \
+  --action_env=BUILDBUDDY_API_KEY \
+  --action_env=BUILDBUDDY_BES_RESULTS_URL \
+  --action_env=BUILDBUDDY_BES_BACKEND \
+  --action_env=BUILDBUDDY_REMOTE_CACHE \
+  --action_env=BUILDBUDDY_REMOTE_EXECUTOR \
+  //projects/re2/hermetic_llvm:re2_rbe_build
+
+# Aggregate build:
+# Replace the final target with //:smoke_hermetic_llvm_rbe_builds
+```
+
+These settings configure the inner Bazel process. Add outer `--bes_backend`,
+`--bes_results_url`, and `--credential_helper` flags separately if the outer
+orchestration invocation should also be published to BuildBuddy.

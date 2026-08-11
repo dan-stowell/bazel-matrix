@@ -79,8 +79,8 @@ PLATFORMS_DEP = overlay(name = "platforms_dep")
 BUILDBUDDY_BES = overlay(
     name = "buildbuddy_bes",
     build_flags = [
-        "--bes_results_url=https://app.buildbuddy.io/invocation/",
-        "--bes_backend=grpcs://remote.buildbuddy.io",
+        "--bes_results_url=$BUILDBUDDY_BES_RESULTS_URL",
+        "--bes_backend=$BUILDBUDDY_BES_BACKEND",
         "--build_metadata=USER=bazel-matrix",
         "--build_metadata=VISIBILITY=PUBLIC",
     ],
@@ -88,14 +88,21 @@ BUILDBUDDY_BES = overlay(
 BUILDBUDDY_RBE = overlay(
     name = "buildbuddy_rbe",
     build_flags = [
-        "--remote_cache=grpcs://remote.buildbuddy.io",
+        "--remote_cache=$BUILDBUDDY_REMOTE_CACHE",
         "--remote_header=x-buildbuddy-api-key=$BUILDBUDDY_API_KEY",
         "--remote_timeout=10m",
         "--remote_download_minimal",
         "--jobs=32",
-        "--remote_executor=grpcs://remote.buildbuddy.io",
+        "--remote_executor=$BUILDBUDDY_REMOTE_EXECUTOR",
     ],
 )
+
+_BUILDBUDDY_ENDPOINT_ENV_VARS = [
+    "BUILDBUDDY_BES_BACKEND",
+    "BUILDBUDDY_BES_RESULTS_URL",
+    "BUILDBUDDY_REMOTE_CACHE",
+    "BUILDBUDDY_REMOTE_EXECUTOR",
+]
 
 _CONTAINER_IMAGE_FLAG_PREFIX = "--remote_default_exec_properties=container-image="
 
@@ -549,6 +556,7 @@ def _emit_bazel_runner_targets(source_archive, strip_prefix, source_subdir, tool
             bazel_arg = inner_bazel_arg(bazel_version),
             flags = build_flags + test.flags,
             source_subdir = source_subdir,
+            env_inherit = _BUILDBUDDY_ENDPOINT_ENV_VARS,
             visibility = visibility,
         )
         bazel_runner_test(
@@ -559,7 +567,7 @@ def _emit_bazel_runner_targets(source_archive, strip_prefix, source_subdir, tool
             bazel_arg = inner_bazel_arg(bazel_version),
             flags = rbe_build_flags + test.flags,
             source_subdir = source_subdir,
-            env_inherit = ["BUILDBUDDY_API_KEY"],
+            env_inherit = _BUILDBUDDY_ENDPOINT_ENV_VARS + ["BUILDBUDDY_API_KEY"],
             visibility = visibility,
         )
         bazel_runner_test(
@@ -570,7 +578,7 @@ def _emit_bazel_runner_targets(source_archive, strip_prefix, source_subdir, tool
             bazel_arg = inner_bazel_arg(bazel_version),
             flags = build_flags + _rbe_overlay_flags(toolchains, MINIMAL_RBE_IMAGE_FLAG) + test.flags,
             source_subdir = source_subdir,
-            env_inherit = ["BUILDBUDDY_API_KEY"],
+            env_inherit = _BUILDBUDDY_ENDPOINT_ENV_VARS + ["BUILDBUDDY_API_KEY"],
             visibility = visibility,
         )
 
@@ -607,6 +615,7 @@ def _emit_bazel_runner_targets_for_source(source, source_subdir, toolchains, bui
             bazel_arg = inner_bazel_arg(bazel_version),
             flags = build_flags + test.flags,
             source_subdir = source_subdir,
+            env_inherit = _BUILDBUDDY_ENDPOINT_ENV_VARS,
             visibility = visibility,
         )
         bazel_runner_test(
@@ -617,7 +626,7 @@ def _emit_bazel_runner_targets_for_source(source, source_subdir, toolchains, bui
             bazel_arg = inner_bazel_arg(bazel_version),
             flags = rbe_build_flags + test.flags,
             source_subdir = source_subdir,
-            env_inherit = ["BUILDBUDDY_API_KEY"],
+            env_inherit = _BUILDBUDDY_ENDPOINT_ENV_VARS + ["BUILDBUDDY_API_KEY"],
             visibility = visibility,
         )
         bazel_runner_test(
@@ -628,7 +637,7 @@ def _emit_bazel_runner_targets_for_source(source, source_subdir, toolchains, bui
             bazel_arg = inner_bazel_arg(bazel_version),
             flags = build_flags + _rbe_overlay_flags(toolchains, MINIMAL_RBE_IMAGE_FLAG) + test.flags,
             source_subdir = source_subdir,
-            env_inherit = ["BUILDBUDDY_API_KEY"],
+            env_inherit = _BUILDBUDDY_ENDPOINT_ENV_VARS + ["BUILDBUDDY_API_KEY"],
             visibility = visibility,
         )
 

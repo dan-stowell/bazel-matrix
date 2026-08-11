@@ -137,6 +137,23 @@ class MatrixReadmeTest(unittest.TestCase):
     def test_result_without_invocation_is_rendered(self):
         self.assertEqual("🚫", matrix.result_cell({"status": "no_tests"}))
 
+    def test_custom_buildbuddy_invocation_url_is_valid(self):
+        matrix.validate_result("demo", "as_is_local", {
+            "status": "pass",
+            "passed": 1,
+            "total": 1,
+            "invocation": "https://bazel-matrix.buildbuddy.dev/invocation/example",
+        })
+
+    def test_non_https_invocation_url_is_invalid(self):
+        with self.assertRaisesRegex(ValueError, "invalid invocation URL"):
+            matrix.validate_result("demo", "as_is_local", {
+                "status": "pass",
+                "passed": 1,
+                "total": 1,
+                "invocation": "http://example.com/invocation/example",
+            })
+
     def test_skipped_targets_do_not_crowd_primary_result(self):
         self.assertEqual(
             "🟢 49 / 50",

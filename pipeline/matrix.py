@@ -1,6 +1,7 @@
 """Structured matrix status data and README rendering helpers."""
 
 import os
+import urllib.parse
 
 from pipeline import inventory
 
@@ -61,9 +62,11 @@ def validate_result(project, result_name, result):
             raise ValueError("{} has invalid {} target counts".format(project, result_name))
     if "skipped" in result and (type(result["skipped"]) is not int or result["skipped"] < 0):
         raise ValueError("{} has invalid {} skipped count".format(project, result_name))
-    if "invocation" in result and not result["invocation"].startswith(
-            "https://app.buildbuddy.io/invocation/"):
-        raise ValueError("{} has an invalid invocation URL".format(project))
+    if "invocation" in result:
+        invocation = urllib.parse.urlparse(result["invocation"])
+        if (invocation.scheme != "https" or not invocation.netloc or
+                not invocation.path.startswith("/invocation/")):
+            raise ValueError("{} has an invalid invocation URL".format(project))
     if "cases" in result:
         _validate_cases(project, result_name, result["cases"])
 
@@ -118,6 +121,83 @@ def table(rows):
     return "\n".join(lines)
 
 
+EXPLICIT_RBE_USAGE = """# Running against another BuildBuddy endpoint
+
+Inner Bazel invocations use the following environment variables. If they are
+unset, they default to BuildBuddy Cloud (`remote.buildbuddy.io` and
+`app.buildbuddy.io`):
+
+```sh
+export BUILDBUDDY_API_KEY='...'
+export BUILDBUDDY_BES_RESULTS_URL='https://bazel-matrix.buildbuddy.dev/invocation/'
+export BUILDBUDDY_BES_BACKEND='grpcs://bazel-matrix.buildbuddy.dev'
+export BUILDBUDDY_REMOTE_CACHE='grpcs://bazel-matrix.buildbuddy.dev'
+export BUILDBUDDY_REMOTE_EXECUTOR='grpcs://bazel-matrix.buildbuddy.dev'
+export BAZEL_RUNNER_REPO_CACHE='/absolute/path/to/bazel-matrix-repository-cache'
+mkdir -p "$BAZEL_RUNNER_REPO_CACHE"
+```
+
+Run one project's tests without loading `.bazelrc` or `user.bazelrc`:
+
+```sh
+bazel --ignore_all_rc_files test \\
+  --enable_bzlmod \\
+  --noenable_workspace \\
+  --jobs=1 \\
+  --sandbox_writable_path="$BAZEL_RUNNER_REPO_CACHE" \\
+  --test_env=BAZEL_RUNNER_REPO_CACHE \\
+  --test_env=BUILDBUDDY_API_KEY \\
+  --test_env=BUILDBUDDY_BES_RESULTS_URL \\
+  --test_env=BUILDBUDDY_BES_BACKEND \\
+  --test_env=BUILDBUDDY_REMOTE_CACHE \\
+  --test_env=BUILDBUDDY_REMOTE_EXECUTOR \\
+  //projects/re2/hermetic_llvm:re2_rbe_test
+```
+
+The same flags work with an aggregate test suite:
+
+```sh
+bazel --ignore_all_rc_files test \\
+  --enable_bzlmod \\
+  --noenable_workspace \\
+  --jobs=1 \\
+  --sandbox_writable_path="$BAZEL_RUNNER_REPO_CACHE" \\
+  --test_env=BAZEL_RUNNER_REPO_CACHE \\
+  --test_env=BUILDBUDDY_API_KEY \\
+  --test_env=BUILDBUDDY_BES_RESULTS_URL \\
+  --test_env=BUILDBUDDY_BES_BACKEND \\
+  --test_env=BUILDBUDDY_REMOTE_CACHE \\
+  --test_env=BUILDBUDDY_REMOTE_EXECUTOR \\
+  //:smoke_hermetic_llvm_rbe_tests
+```
+
+For an individual or aggregate build, pass the same values through the action
+environment instead:
+
+```sh
+bazel --ignore_all_rc_files build \\
+  --enable_bzlmod \\
+  --noenable_workspace \\
+  --jobs=1 \\
+  --sandbox_writable_path="$BAZEL_RUNNER_REPO_CACHE" \\
+  --action_env=BAZEL_RUNNER_REPO_CACHE \\
+  --action_env=BUILDBUDDY_API_KEY \\
+  --action_env=BUILDBUDDY_BES_RESULTS_URL \\
+  --action_env=BUILDBUDDY_BES_BACKEND \\
+  --action_env=BUILDBUDDY_REMOTE_CACHE \\
+  --action_env=BUILDBUDDY_REMOTE_EXECUTOR \\
+  //projects/re2/hermetic_llvm:re2_rbe_build
+
+# Aggregate build:
+# Replace the final target with //:smoke_hermetic_llvm_rbe_builds
+```
+
+These settings configure the inner Bazel process. Add outer `--bes_backend`,
+`--bes_results_url`, and `--credential_helper` flags separately if the outer
+orchestration invocation should also be published to BuildBuddy.
+"""
+
+
 def render(rows, tag_map):
     featured = [
         row for row in rows
@@ -135,6 +215,8 @@ def render(rows, tag_map):
         "# All projects",
         "",
         table(rows),
+        "",
+        EXPLICIT_RBE_USAGE.rstrip(),
         "",
     ])
 
