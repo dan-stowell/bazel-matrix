@@ -97,6 +97,7 @@ BUILDBUDDY_RBE = overlay(
     name = "buildbuddy_rbe",
     build_flags = [
         "--remote_cache=$BUILDBUDDY_GRPC_ENDPOINT",
+        "--remote_cache_compression",
         "--remote_header=x-buildbuddy-api-key=$BUILDBUDDY_API_KEY",
         "--remote_timeout=10m",
         "--remote_download_minimal",
