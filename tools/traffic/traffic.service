@@ -1,0 +1,21 @@
+[Unit]
+Description=bazel-matrix BBT test traffic generator
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=%i
+WorkingDirectory=/home/%i/bazel-matrix
+# Source the API keys from the user's profile, then run the traffic loop forever.
+ExecStart=/bin/bash -lc 'set -a; . $HOME/.profile; set +a; exec /home/%i/bazel-matrix/tools/traffic/traffic.sh'
+Restart=on-failure
+RestartSec=30
+# Give a single round plenty of time (108 targets × 2 endpoints); a stall
+# shouldn't kill the whole service, so we also rely on the inner bazel timeouts.
+TimeoutStopSec=120
+# Bazel/inner builds are memory-heavy; allow time/space.
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
