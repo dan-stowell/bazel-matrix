@@ -9,8 +9,8 @@ _RE2_BBT_COMPAT = overlay(
 buildbuddy_toolchain_project_modification(
     project = RE2_PROJECT,
     test = test_spec(
-        targets = RE2_PROJECT.test.targets + ["-//:regexp_benchmark"],
         flags = RE2_PROJECT.test.flags,
+        targets = RE2_PROJECT.test.targets + ["-//:regexp_benchmark"],
     ),
     toolchains = [_RE2_BBT_COMPAT],
 )

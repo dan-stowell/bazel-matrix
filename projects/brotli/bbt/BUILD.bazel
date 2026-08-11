@@ -1,0 +1,4 @@
+load("//bazel_runner:defs.bzl", "buildbuddy_toolchain_project_modification")
+load("//projects/brotli:project.bzl", "BROTLI_PROJECT")
+
+buildbuddy_toolchain_project_modification(project = BROTLI_PROJECT)

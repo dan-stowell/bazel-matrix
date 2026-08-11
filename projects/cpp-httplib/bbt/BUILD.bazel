@@ -1,0 +1,4 @@
+load("//bazel_runner:defs.bzl", "buildbuddy_toolchain_project_modification")
+load("//projects/cpp-httplib:project.bzl", "CPP_HTTPLIB_PROJECT")
+
+buildbuddy_toolchain_project_modification(project = CPP_HTTPLIB_PROJECT)

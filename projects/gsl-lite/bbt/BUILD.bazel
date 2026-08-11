@@ -1,0 +1,4 @@
+load("//bazel_runner:defs.bzl", "buildbuddy_toolchain_project_modification")
+load("//projects/gsl-lite:project.bzl", "GSL_LITE_PROJECT")
+
+buildbuddy_toolchain_project_modification(project = GSL_LITE_PROJECT)

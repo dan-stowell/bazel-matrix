@@ -80,6 +80,18 @@ def _hermetic_build(slug):
         """).format(constant=constant, slug=slug)
 
 
+def _bbt_build(slug):
+    constant = inventory.starlark_constant(slug)
+    return textwrap.dedent("""\
+        # Activate after //projects/{slug}/as_is is active.
+        #
+        # load("//bazel_runner:defs.bzl", "buildbuddy_toolchain_project_modification")
+        # load("//projects/{slug}:project.bzl", "{constant}")
+        #
+        # buildbuddy_toolchain_project_modification(project = {constant})
+        """).format(constant=constant, slug=slug)
+
+
 def _readme(slug, row):
     return textwrap.dedent("""\
         # {slug}
@@ -94,7 +106,7 @@ def _readme(slug, row):
         2. Add the archive URL, sha256, and filename to `_PROJECT_SOURCES` in `//bazel_runner:extension.bzl`.
         3. Add the generated archive repo name to the `project_sources` `use_repo()` call in `MODULE.bazel`.
         4. Update `strip_prefix` and build targets in `project.bzl`.
-        5. Activate `as_is/BUILD.bazel`, then `hermetic_llvm/BUILD.bazel`.
+        5. Activate `as_is/BUILD.bazel`, then the `hermetic_llvm` and `bbt` variants.
         """).format(repo=row.get("repo") or "", slug=slug)
 
 
@@ -146,6 +158,7 @@ def main(argv=None):
     _write(os.path.join(project_dir, "project.bzl"), _project_bzl(slug, row), args.force)
     _write(os.path.join(project_dir, "as_is", "BUILD.bazel"), _as_is_build(slug), args.force)
     _write(os.path.join(project_dir, "hermetic_llvm", "BUILD.bazel"), _hermetic_build(slug), args.force)
+    _write(os.path.join(project_dir, "bbt", "BUILD.bazel"), _bbt_build(slug), args.force)
 
     print("created inactive scaffold: {}".format(project_dir))
     print("archive repo: {}".format(candidate["archive_repo"]))

@@ -454,9 +454,16 @@ TEST_PACKAGES = [
 ]
 
 AS_IS_BUILD_PACKAGES = [package for package in BUILD_PACKAGES if package.endswith("/as_is")]
+
 HERMETIC_LLVM_BUILD_PACKAGES = [package for package in BUILD_PACKAGES if package.endswith("/hermetic_llvm")]
+
 AS_IS_TEST_PACKAGES = [package for package in TEST_PACKAGES if package.endswith("/as_is")]
+
 HERMETIC_LLVM_TEST_PACKAGES = [package for package in TEST_PACKAGES if package.endswith("/hermetic_llvm")]
+
+BBT_BUILD_PACKAGES = [package[:-len("as_is")] + "bbt" for package in AS_IS_BUILD_PACKAGES]
+
+BBT_TEST_PACKAGES = [package[:-len("as_is")] + "bbt" for package in AS_IS_TEST_PACKAGES]
 
 SMOKE_AS_IS_PACKAGES = [
     "abseil_py/as_is",
@@ -474,37 +481,171 @@ SMOKE_HERMETIC_LLVM_PACKAGES = [
     "tomlplusplus/hermetic_llvm",
 ]
 
+SMOKE_BBT_PACKAGES = [package[:-len("as_is")] + "bbt" for package in SMOKE_AS_IS_PACKAGES]
+
 REGULAR_AS_IS_BUILD_PACKAGES = [package for package in AS_IS_BUILD_PACKAGES if package.split("/")[0] not in LARGE_PROJECTS]
+
 LARGE_AS_IS_BUILD_PACKAGES = [package for package in AS_IS_BUILD_PACKAGES if package.split("/")[0] in LARGE_PROJECTS]
+
 REGULAR_HERMETIC_LLVM_BUILD_PACKAGES = [package for package in HERMETIC_LLVM_BUILD_PACKAGES if package.split("/")[0] not in LARGE_PROJECTS]
+
 LARGE_HERMETIC_LLVM_BUILD_PACKAGES = [package for package in HERMETIC_LLVM_BUILD_PACKAGES if package.split("/")[0] in LARGE_PROJECTS]
+
 REGULAR_AS_IS_TEST_PACKAGES = [package for package in AS_IS_TEST_PACKAGES if package.split("/")[0] not in LARGE_PROJECTS]
+
 LARGE_AS_IS_TEST_PACKAGES = [package for package in AS_IS_TEST_PACKAGES if package.split("/")[0] in LARGE_PROJECTS]
+
 REGULAR_HERMETIC_LLVM_TEST_PACKAGES = [package for package in HERMETIC_LLVM_TEST_PACKAGES if package.split("/")[0] not in LARGE_PROJECTS]
+
 LARGE_HERMETIC_LLVM_TEST_PACKAGES = [package for package in HERMETIC_LLVM_TEST_PACKAGES if package.split("/")[0] in LARGE_PROJECTS]
 
-AS_IS_LOCAL_BUILDS = ["//projects/%s:%s_local_build" % (package, package.split("/")[0]) for package in REGULAR_AS_IS_BUILD_PACKAGES]
-LARGE_AS_IS_LOCAL_BUILDS = ["//projects/%s:%s_local_build" % (package, package.split("/")[0]) for package in LARGE_AS_IS_BUILD_PACKAGES]
-HERMETIC_LLVM_LOCAL_BUILDS = ["//projects/%s:%s_local_build" % (package, package.split("/")[0]) for package in REGULAR_HERMETIC_LLVM_BUILD_PACKAGES]
-LARGE_HERMETIC_LLVM_LOCAL_BUILDS = ["//projects/%s:%s_local_build" % (package, package.split("/")[0]) for package in LARGE_HERMETIC_LLVM_BUILD_PACKAGES]
-AS_IS_RBE_BUILDS = ["//projects/%s:%s_rbe_build" % (package, package.split("/")[0]) for package in REGULAR_AS_IS_BUILD_PACKAGES]
-LARGE_AS_IS_RBE_BUILDS = ["//projects/%s:%s_rbe_build" % (package, package.split("/")[0]) for package in LARGE_AS_IS_BUILD_PACKAGES]
-HERMETIC_LLVM_RBE_BUILDS = ["//projects/%s:%s_rbe_build" % (package, package.split("/")[0]) for package in REGULAR_HERMETIC_LLVM_BUILD_PACKAGES]
-LARGE_HERMETIC_LLVM_RBE_BUILDS = ["//projects/%s:%s_rbe_build" % (package, package.split("/")[0]) for package in LARGE_HERMETIC_LLVM_BUILD_PACKAGES]
-AS_IS_LOCAL_TESTS = ["//projects/%s:%s_local_test" % (package, package.split("/")[0]) for package in REGULAR_AS_IS_TEST_PACKAGES]
-LARGE_AS_IS_LOCAL_TESTS = ["//projects/%s:%s_local_test" % (package, package.split("/")[0]) for package in LARGE_AS_IS_TEST_PACKAGES]
-HERMETIC_LLVM_LOCAL_TESTS = ["//projects/%s:%s_local_test" % (package, package.split("/")[0]) for package in REGULAR_HERMETIC_LLVM_TEST_PACKAGES]
-LARGE_HERMETIC_LLVM_LOCAL_TESTS = ["//projects/%s:%s_local_test" % (package, package.split("/")[0]) for package in LARGE_HERMETIC_LLVM_TEST_PACKAGES]
-HERMETIC_LLVM_RBE_MINIMAL_TESTS = ["//projects/%s:%s_rbe_minimal_test" % (package, package.split("/")[0]) for package in REGULAR_HERMETIC_LLVM_TEST_PACKAGES]
-LARGE_HERMETIC_LLVM_RBE_MINIMAL_TESTS = ["//projects/%s:%s_rbe_minimal_test" % (package, package.split("/")[0]) for package in LARGE_HERMETIC_LLVM_TEST_PACKAGES]
-AS_IS_RBE_TESTS = ["//projects/%s:%s_rbe_test" % (package, package.split("/")[0]) for package in REGULAR_AS_IS_TEST_PACKAGES]
-LARGE_AS_IS_RBE_TESTS = ["//projects/%s:%s_rbe_test" % (package, package.split("/")[0]) for package in LARGE_AS_IS_TEST_PACKAGES]
-HERMETIC_LLVM_RBE_TESTS = ["//projects/%s:%s_rbe_test" % (package, package.split("/")[0]) for package in REGULAR_HERMETIC_LLVM_TEST_PACKAGES]
-LARGE_HERMETIC_LLVM_RBE_TESTS = ["//projects/%s:%s_rbe_test" % (package, package.split("/")[0]) for package in LARGE_HERMETIC_LLVM_TEST_PACKAGES]
-SMOKE_AS_IS_LOCAL_BUILDS = ["//projects/%s:%s_local_build" % (package, package.split("/")[0]) for package in SMOKE_AS_IS_PACKAGES]
-SMOKE_AS_IS_LOCAL_TESTS = ["//projects/%s:%s_local_test" % (package, package.split("/")[0]) for package in SMOKE_AS_IS_PACKAGES]
-SMOKE_HERMETIC_LLVM_RBE_BUILDS = ["//projects/%s:%s_rbe_build" % (package, package.split("/")[0]) for package in SMOKE_HERMETIC_LLVM_PACKAGES]
-SMOKE_HERMETIC_LLVM_RBE_TESTS = ["//projects/%s:%s_rbe_test" % (package, package.split("/")[0]) for package in SMOKE_HERMETIC_LLVM_PACKAGES]
+REGULAR_BBT_BUILD_PACKAGES = [package for package in BBT_BUILD_PACKAGES if package.split("/")[0] not in LARGE_PROJECTS]
+
+LARGE_BBT_BUILD_PACKAGES = [package for package in BBT_BUILD_PACKAGES if package.split("/")[0] in LARGE_PROJECTS]
+
+REGULAR_BBT_TEST_PACKAGES = [package for package in BBT_TEST_PACKAGES if package.split("/")[0] not in LARGE_PROJECTS]
+
+LARGE_BBT_TEST_PACKAGES = [package for package in BBT_TEST_PACKAGES if package.split("/")[0] in LARGE_PROJECTS]
+
+AS_IS_LOCAL_BUILDS = ["//projects/%s:%s_local_build" % (
+    package,
+    package.split("/")[0],
+) for package in REGULAR_AS_IS_BUILD_PACKAGES]
+
+LARGE_AS_IS_LOCAL_BUILDS = ["//projects/%s:%s_local_build" % (
+    package,
+    package.split("/")[0],
+) for package in LARGE_AS_IS_BUILD_PACKAGES]
+
+HERMETIC_LLVM_LOCAL_BUILDS = ["//projects/%s:%s_local_build" % (
+    package,
+    package.split("/")[0],
+) for package in REGULAR_HERMETIC_LLVM_BUILD_PACKAGES]
+
+LARGE_HERMETIC_LLVM_LOCAL_BUILDS = ["//projects/%s:%s_local_build" % (
+    package,
+    package.split("/")[0],
+) for package in LARGE_HERMETIC_LLVM_BUILD_PACKAGES]
+
+AS_IS_RBE_BUILDS = ["//projects/%s:%s_rbe_build" % (
+    package,
+    package.split("/")[0],
+) for package in REGULAR_AS_IS_BUILD_PACKAGES]
+
+LARGE_AS_IS_RBE_BUILDS = ["//projects/%s:%s_rbe_build" % (
+    package,
+    package.split("/")[0],
+) for package in LARGE_AS_IS_BUILD_PACKAGES]
+
+HERMETIC_LLVM_RBE_BUILDS = ["//projects/%s:%s_rbe_build" % (
+    package,
+    package.split("/")[0],
+) for package in REGULAR_HERMETIC_LLVM_BUILD_PACKAGES]
+
+LARGE_HERMETIC_LLVM_RBE_BUILDS = ["//projects/%s:%s_rbe_build" % (
+    package,
+    package.split("/")[0],
+) for package in LARGE_HERMETIC_LLVM_BUILD_PACKAGES]
+
+BBT_RBE_BUILDS = ["//projects/%s:%s_rbe_build" % (
+    package,
+    package.split("/")[0],
+) for package in REGULAR_BBT_BUILD_PACKAGES]
+
+LARGE_BBT_RBE_BUILDS = ["//projects/%s:%s_rbe_build" % (
+    package,
+    package.split("/")[0],
+) for package in LARGE_BBT_BUILD_PACKAGES]
+
+AS_IS_LOCAL_TESTS = ["//projects/%s:%s_local_test" % (
+    package,
+    package.split("/")[0],
+) for package in REGULAR_AS_IS_TEST_PACKAGES]
+
+LARGE_AS_IS_LOCAL_TESTS = ["//projects/%s:%s_local_test" % (
+    package,
+    package.split("/")[0],
+) for package in LARGE_AS_IS_TEST_PACKAGES]
+
+HERMETIC_LLVM_LOCAL_TESTS = ["//projects/%s:%s_local_test" % (
+    package,
+    package.split("/")[0],
+) for package in REGULAR_HERMETIC_LLVM_TEST_PACKAGES]
+
+LARGE_HERMETIC_LLVM_LOCAL_TESTS = ["//projects/%s:%s_local_test" % (
+    package,
+    package.split("/")[0],
+) for package in LARGE_HERMETIC_LLVM_TEST_PACKAGES]
+
+HERMETIC_LLVM_RBE_MINIMAL_TESTS = ["//projects/%s:%s_rbe_minimal_test" % (
+    package,
+    package.split("/")[0],
+) for package in REGULAR_HERMETIC_LLVM_TEST_PACKAGES]
+
+LARGE_HERMETIC_LLVM_RBE_MINIMAL_TESTS = ["//projects/%s:%s_rbe_minimal_test" % (
+    package,
+    package.split("/")[0],
+) for package in LARGE_HERMETIC_LLVM_TEST_PACKAGES]
+
+AS_IS_RBE_TESTS = ["//projects/%s:%s_rbe_test" % (
+    package,
+    package.split("/")[0],
+) for package in REGULAR_AS_IS_TEST_PACKAGES]
+
+LARGE_AS_IS_RBE_TESTS = ["//projects/%s:%s_rbe_test" % (
+    package,
+    package.split("/")[0],
+) for package in LARGE_AS_IS_TEST_PACKAGES]
+
+HERMETIC_LLVM_RBE_TESTS = ["//projects/%s:%s_rbe_test" % (
+    package,
+    package.split("/")[0],
+) for package in REGULAR_HERMETIC_LLVM_TEST_PACKAGES]
+
+LARGE_HERMETIC_LLVM_RBE_TESTS = ["//projects/%s:%s_rbe_test" % (
+    package,
+    package.split("/")[0],
+) for package in LARGE_HERMETIC_LLVM_TEST_PACKAGES]
+
+BBT_RBE_TESTS = ["//projects/%s:%s_rbe_test" % (
+    package,
+    package.split("/")[0],
+) for package in REGULAR_BBT_TEST_PACKAGES]
+
+LARGE_BBT_RBE_TESTS = ["//projects/%s:%s_rbe_test" % (
+    package,
+    package.split("/")[0],
+) for package in LARGE_BBT_TEST_PACKAGES]
+
+SMOKE_AS_IS_LOCAL_BUILDS = ["//projects/%s:%s_local_build" % (
+    package,
+    package.split("/")[0],
+) for package in SMOKE_AS_IS_PACKAGES]
+
+SMOKE_AS_IS_LOCAL_TESTS = ["//projects/%s:%s_local_test" % (
+    package,
+    package.split("/")[0],
+) for package in SMOKE_AS_IS_PACKAGES]
+
+SMOKE_HERMETIC_LLVM_RBE_BUILDS = ["//projects/%s:%s_rbe_build" % (
+    package,
+    package.split("/")[0],
+) for package in SMOKE_HERMETIC_LLVM_PACKAGES]
+
+SMOKE_HERMETIC_LLVM_RBE_TESTS = ["//projects/%s:%s_rbe_test" % (
+    package,
+    package.split("/")[0],
+) for package in SMOKE_HERMETIC_LLVM_PACKAGES]
+
+SMOKE_BBT_RBE_BUILDS = ["//projects/%s:%s_rbe_build" % (
+    package,
+    package.split("/")[0],
+) for package in SMOKE_BBT_PACKAGES]
+
+SMOKE_BBT_RBE_TESTS = ["//projects/%s:%s_rbe_test" % (
+    package,
+    package.split("/")[0],
+) for package in SMOKE_BBT_PACKAGES]
 
 filegroup(
     name = "smoke_as_is_local_builds",
@@ -516,6 +657,11 @@ filegroup(
     srcs = SMOKE_HERMETIC_LLVM_RBE_BUILDS,
 )
 
+filegroup(
+    name = "smoke_bbt_rbe_builds",
+    srcs = SMOKE_BBT_RBE_BUILDS,
+)
+
 test_suite(
     name = "smoke_as_is_local_tests",
     tests = SMOKE_AS_IS_LOCAL_TESTS,
@@ -524,6 +670,11 @@ test_suite(
 test_suite(
     name = "smoke_hermetic_llvm_rbe_tests",
     tests = SMOKE_HERMETIC_LLVM_RBE_TESTS,
+)
+
+test_suite(
+    name = "smoke_bbt_rbe_tests",
+    tests = SMOKE_BBT_RBE_TESTS,
 )
 
 filegroup(
@@ -595,6 +746,24 @@ filegroup(
     srcs = [
         ":as_is_rbe_builds",
         ":large_as_is_rbe_builds",
+    ],
+)
+
+filegroup(
+    name = "bbt_rbe_builds",
+    srcs = BBT_RBE_BUILDS,
+)
+
+filegroup(
+    name = "large_bbt_rbe_builds",
+    srcs = LARGE_BBT_RBE_BUILDS,
+)
+
+filegroup(
+    name = "all_bbt_rbe_builds",
+    srcs = [
+        ":bbt_rbe_builds",
+        ":large_bbt_rbe_builds",
     ],
 )
 
@@ -685,5 +854,23 @@ test_suite(
     tests = [
         ":as_is_rbe_tests",
         ":large_as_is_rbe_tests",
+    ],
+)
+
+test_suite(
+    name = "bbt_rbe_tests",
+    tests = BBT_RBE_TESTS,
+)
+
+test_suite(
+    name = "large_bbt_rbe_tests",
+    tests = LARGE_BBT_RBE_TESTS,
+)
+
+test_suite(
+    name = "all_bbt_rbe_tests",
+    tests = [
+        ":bbt_rbe_tests",
+        ":large_bbt_rbe_tests",
     ],
 )

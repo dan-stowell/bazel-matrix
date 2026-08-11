@@ -1,0 +1,4 @@
+load("//bazel_runner:defs.bzl", "buildbuddy_toolchain_project_modification")
+load("//projects/verible:project.bzl", "VERIBLE_PROJECT")
+
+buildbuddy_toolchain_project_modification(project = VERIBLE_PROJECT)

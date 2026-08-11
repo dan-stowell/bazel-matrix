@@ -1,0 +1,4 @@
+load("//bazel_runner:defs.bzl", "buildbuddy_toolchain_project_modification")
+load("//projects/go_jsonnet:project.bzl", "GO_JSONNET_PROJECT")
+
+buildbuddy_toolchain_project_modification(project = GO_JSONNET_PROJECT)

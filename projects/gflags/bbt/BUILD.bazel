@@ -1,0 +1,4 @@
+load("//bazel_runner:defs.bzl", "buildbuddy_toolchain_project_modification")
+load("//projects/gflags:project.bzl", "GFLAGS_PROJECT")
+
+buildbuddy_toolchain_project_modification(project = GFLAGS_PROJECT)
