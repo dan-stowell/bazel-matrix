@@ -102,6 +102,18 @@ run_target() {
     --endpoint-url "$results_url" \
     --target "$target" --project "$project")"
 
+  # The inner bazel_runner's py_test uses env_inherit to pick up
+  # BUILDBUDDY_API_KEY / BUILDBUDDY_BES_RESULTS_URL / BUILDBUDDY_GRPC_ENDPOINT
+  # from the *outer* bazel client's environment. --test_env does NOT override
+  # env_inherit, so we must export these vars in the shell before invoking bazel.
+  # Save and restore the originals so each endpoint gets its own key.
+  local _saved_key="${BUILDBUDDY_API_KEY:-}"
+  local _saved_url="${BUILDBUDDY_BES_RESULTS_URL:-}"
+  local _saved_grpc="${BUILDBUDDY_GRPC_ENDPOINT:-}"
+  export BUILDBUDDY_API_KEY="$api_key"
+  export BUILDBUDDY_BES_RESULTS_URL="$results_url"
+  export BUILDBUDDY_GRPC_ENDPOINT="$grpc"
+
   local cmd=(
     "$BAZEL_BIN"
     --ignore_all_rc_files
@@ -111,9 +123,6 @@ run_target() {
     --jobs=1
     --sandbox_writable_path="$REPO_CACHE"
     --test_env=BAZEL_RUNNER_REPO_CACHE="$REPO_CACHE"
-    --test_env=BUILDBUDDY_API_KEY="$api_key"
-    --test_env=BUILDBUDDY_BES_RESULTS_URL="$results_url"
-    --test_env=BUILDBUDDY_GRPC_ENDPOINT="$grpc"
     --build_metadata=USER=bazel-matrix-traffic
     --build_metadata=VISIBILITY=PUBLIC
     "$target"
@@ -153,6 +162,11 @@ run_target() {
     fi
   fi
   rm -f "$out_log"
+
+  # Restore the outer environment so the next endpoint iteration starts clean.
+  export BUILDBUDDY_API_KEY="$_saved_key"
+  export BUILDBUDDY_BES_RESULTS_URL="$_saved_url"
+  export BUILDBUDDY_GRPC_ENDPOINT="$_saved_grpc"
 
   local status
   if [[ "$rc" -eq 0 ]]; then
