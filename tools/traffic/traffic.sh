@@ -43,6 +43,12 @@ set -euo pipefail
 ROUNDS=""
 DRY_RUN=0
 BAZEL_BIN="${BAZEL:-bazel}"
+# Per-test wall-clock timeout in seconds. The inner bazel_runner's py_test has
+# timeout="eternal", so without this a stuck inner bazel (hung RBE connection,
+# deadlocked sandbox, etc.) blocks the loop forever. --test_timeout overrides
+# the rule's eternal timeout, and the `timeout` wrapper is a belt-and-suspenders
+# kill in case Bazel itself is the one that's stuck.
+PER_TEST_TIMEOUT="${PER_TEST_TIMEOUT:-600}"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -139,6 +145,7 @@ run_target() {
     --jobs=1
     --sandbox_writable_path="$REPO_CACHE"
     --test_env=BAZEL_RUNNER_REPO_CACHE="$REPO_CACHE"
+    --test_timeout="$PER_TEST_TIMEOUT"
     "${inner_flags[@]}"
     --build_metadata=USER=bazel-matrix-traffic
     --build_metadata=VISIBILITY=PUBLIC
@@ -153,12 +160,19 @@ run_target() {
 
   log "${prefix} run #${run_id} target: $target"
 
-  # Run bazel, teeing output to a temp log so we can scrape the invocation URL
-  # from the inner "Streaming build results to:" line afterward.
+  # Run bazel under `timeout` so a stuck invocation is killed even if
+  # Bazel itself ignores --test_timeout (e.g. the bazel server hangs during
+  # analysis). Give a small grace margin beyond --test_timeout so Bazel's own
+  # timeout fires first and produces a proper test result.
   local out_log
   out_log="$(mktemp)"
   local rc=0
-  "${cmd[@]}" 2>&1 | tee "$out_log" || rc=${PIPESTATUS[0]}
+  local wall=$((PER_TEST_TIMEOUT + 60))
+  timeout --kill-after=10s "${wall}s" "${cmd[@]}" 2>&1 | tee "$out_log" || rc=${PIPESTATUS[0]}
+  # timeout returns 124 when the time limit is reached, 137 when SIGKILL is sent.
+  if [[ "$rc" -eq 124 || "$rc" -eq 137 ]]; then
+    log "${prefix} TIMEOUT run #${run_id}: $target (killed after ${wall}s)"
+  fi
 
   # Scrape the inner invocation URL. The inner bazel prints (in the test.log,
   # not outer stdout):
@@ -188,6 +202,8 @@ run_target() {
   local status
   if [[ "$rc" -eq 0 ]]; then
     status="passed"
+  elif [[ "$rc" -eq 124 || "$rc" -eq 137 ]]; then
+    status="timed_out"
   else
     status="failed"
   fi

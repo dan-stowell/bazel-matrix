@@ -84,6 +84,7 @@ _STATUS_CLASS = {
     "passed": "s-pass",
     "failed": "s-fail",
     "running": "s-run",
+    "timed_out": "s-timeout",
     "skipped": "s-skip",
     "interrupted": "s-skip",
 }
@@ -138,7 +139,7 @@ def render_page(data: dict) -> str:
         f'<div class="card"><div class="card-num">{data["max_round"]}</div>'
         f'<div class="card-label">rounds</div></div>'
     )
-    for st in ("running", "passed", "failed", "interrupted"):
+    for st in ("running", "passed", "failed", "timed_out", "interrupted"):
         cards.append(
             f'<div class="card"><div class="card-num">{stats.get(st, 0)}</div>'
             f'<div class="card-label">{st}</div></div>'
@@ -250,7 +251,8 @@ def render_page(data: dict) -> str:
   .s-pass {{ background: rgba(63,185,80,.15); color: var(--pass); }}
   .s-fail {{ background: rgba(248,81,73,.15); color: var(--fail); }}
   .s-run  {{ background: rgba(210,153,34,.15); color: var(--run); }}
-  .s-skip {{ background: rgba(139,148,158,.15); color: var(--skip); }}
+  .s-skip    {{ background: rgba(139,148,158,.15); color: var(--skip); }}
+  .s-timeout {{ background: rgba(210,153,34,.15); color: var(--run); }}
   .s-unk  {{ background: rgba(139,148,158,.15); color: var(--muted); }}
   .ep {{
     display: inline-block; padding: 1px 7px; border-radius: 4px;
