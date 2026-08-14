@@ -1,24 +1,27 @@
 #!/usr/bin/env bash
 #
 # traffic.sh — loop over every BBT RBE test target and run it, one project at a
-# time, against two BuildBuddy endpoints in sequence. The goal is to generate a
-# steady stream of test traffic on both instances.
+# time, against bazel-matrix.buildbuddy.dev. The goal is to generate a steady
+# stream of real RBE action traffic on the BuildBuddy dev instance.
 #
-# Endpoints (configured via environment, with the API keys the caller sources):
+# To maximize the number of actual remote executions (not cache hits):
+#   • --nocache_test_results      force re-running every test action
+#   • --noremote_accept_cached    force re-executing every remote action
+#   • fresh --remote_instance_name per test  prevents cross-test cache hits
 #
-#   1. bazel-matrix.buildbuddy.dev  — uses $DEV_BUILDBUDDY_API_KEY as the
+# Endpoint (configured via environment, with the API key the caller sources):
+#
+#   bazel-matrix.buildbuddy.dev  — uses $DEV_BUILDBUDDY_API_KEY as the
 #      BUILDBUDDY_API_KEY for the inner bazel runner.
-#   2. bazel-matrix.buildbuddy.io   — uses $BUILDBUDDY_API_KEY.
 #
-# For each endpoint, we query `bazel query` for all BBT RBE test targets, then
-# run `bazel test` on them one at a time (sequential — the inner bazel_runner
-# already parallelizes with --jobs=32 over RBE). Every run is recorded in a
-# SQLite store (db.py) with start/finish time, status, and the BuildBuddy
-# invocation URL.
+# We query `bazel query` for all BBT RBE test targets, then run `bazel test`
+# on them one at a time (sequential — the inner bazel_runner already
+# parallelizes with --jobs=32 over RBE). Every run is recorded in a SQLite
+# store (db.py) with start/finish time, status, and the BuildBuddy invocation
+# URL.
 #
-# The loop repeats forever; a full pass over all targets on both endpoints is
-# one "round". Logs go to stdout/stderr and are prefixed with the round number
-# and endpoint.
+# The loop repeats forever; a full pass over all targets is one "round".
+# Logs go to stdout/stderr and are prefixed with the round number.
 #
 # Usage:
 #   ./tools/traffic/traffic.sh [--rounds N] [--dry-run]
@@ -28,7 +31,6 @@
 #   --dry-run    print the commands instead of running them
 #
 # Environment:
-#   BUILDBUDDY_API_KEY         key for bazel-matrix.buildbuddy.io
 #   DEV_BUILDBUDDY_API_KEY     key for bazel-matrix.buildbuddy.dev
 #   BAZEL                      bazel binary (default: bazel)
 #   REPO_ROOT                  repo root (default: cwd)
@@ -64,9 +66,9 @@ python3 "$DB" cleanup-orphans >/dev/null 2>&1 || true
 
 # --- Endpoint definitions ---------------------------------------------------
 # Each endpoint is: name|results_url|grpc_endpoint|api_key_env
+# Only buildbuddy.dev — the io endpoint is intentionally omitted.
 ENDPOINTS=(
   "dev|https://bazel-matrix.buildbuddy.dev/invocation/|grpcs://bazel-matrix.buildbuddy.dev|DEV_BUILDBUDDY_API_KEY"
-  "io|https://app.buildbuddy.io/invocation/|grpcs://remote.buildbuddy.io|BUILDBUDDY_API_KEY"
 )
 
 log() { echo "[traffic] $*" >&2; }
@@ -114,6 +116,20 @@ run_target() {
   export BUILDBUDDY_BES_RESULTS_URL="$results_url"
   export BUILDBUDDY_GRPC_ENDPOINT="$grpc"
 
+  # Flags injected into the *inner* bazel_runner via --test_arg=--flag=...
+  # These force real RBE action execution instead of cache hits:
+  #   --nocache_test_results     re-run every test action (not just build)
+  #   --noremote_accept_cached   re-execute every remote action (build + test)
+  #   --remote_instance_name     fresh per test so the remote cache key is
+  #                              unique — prevents cross-test cache hits on
+  #                              BuildBuddy's shared remote cache.
+  local instance_name="traffic-r${round}-${run_id}-$(date +%s)-$RANDOM"
+  local inner_flags=(
+    --test_arg=--flag=--nocache_test_results
+    --test_arg=--flag=--noremote_accept_cached
+    "--test_arg=--flag=--remote_instance_name=${instance_name}"
+  )
+
   local cmd=(
     "$BAZEL_BIN"
     --ignore_all_rc_files
@@ -123,6 +139,7 @@ run_target() {
     --jobs=1
     --sandbox_writable_path="$REPO_CACHE"
     --test_env=BAZEL_RUNNER_REPO_CACHE="$REPO_CACHE"
+    "${inner_flags[@]}"
     --build_metadata=USER=bazel-matrix-traffic
     --build_metadata=VISIBILITY=PUBLIC
     "$target"
