@@ -46,11 +46,6 @@ alias(
 )
 
 alias(
-    name = "dictionary",
-    actual = "@brotli//:dictionary",
-)
-
-alias(
     name = "enc_headers",
     actual = "@brotli//:enc_headers",
 )

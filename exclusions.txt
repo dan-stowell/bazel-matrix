@@ -2,3 +2,8 @@
 # One per line: <pattern> <reason>. Patterns are an exact label
 # (@m//pkg:name), a package subtree (@m//pkg/...), or a whole repo (@m//...).
 # `nopatch:<module> <reason>` keeps a module's dev dependencies dev-only.
+@protobuf//ruby/... needs rules_ruby, which protobuf pins with its own (ignored) override
+@protobuf//csharp/protos/... refers to Google-internal @protobuf//net/proto2/compiler/public
+@protobuf//benchmarks/... needs googleapis protos (googleads v17) missing from the BCR googleapis
+@brotli//:dictionary dictionary.bin is not in the BCR source archive
+@protobuf//:generated_protos genrule cmd uses root-relative src/ paths, so it only works with protobuf as the root module

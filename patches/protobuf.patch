@@ -1,14 +1,6 @@
 --- a/MODULE.bazel
 +++ b/MODULE.bazel
-@@ -96,7 +96,6 @@
- 
- register_toolchains(
-     "@ruby_toolchains//:all",
--    dev_dependency = True,
- )
- 
- # Define toolchains that use pre-built protoc binaries.
-@@ -141,7 +140,7 @@
+@@ -141,7 +141,7 @@
  )
  use_repo(system_python, "system_python")
  
@@ -17,7 +9,7 @@
  
  [
      pip.parse(
-@@ -167,23 +166,20 @@
+@@ -167,23 +167,20 @@
  
  local_runtime_repo(
      name = "local_python3",
@@ -44,7 +36,7 @@
  
  # As of October 2025, our minimum supported Rust version is 1.79. However, we
  # use 1.85.0 here so that we can get some test coverage with Rust edition 2024.
-@@ -244,7 +240,7 @@
+@@ -244,7 +241,7 @@
  bazel_dep(name = "re2", version = "2024-07-02.bcr.1")
  
  # Development dependencies
@@ -53,7 +45,7 @@
  protobuf_maven_dev.install(
      name = "protobuf_maven_dev",
      artifacts = PROTOBUF_MAVEN_ARTIFACTS + [
-@@ -265,13 +261,12 @@
+@@ -265,13 +262,12 @@
  )
  use_repo(protobuf_maven_dev, "protobuf_maven_dev")
  
@@ -70,7 +62,7 @@
      repo_name = "com_google_absl_py",
  )
  
-@@ -280,11 +275,11 @@
+@@ -280,11 +276,11 @@
  use_repo(cc_configure, "local_config_cc")
  
  # For the Lua upb implementation
@@ -85,7 +77,7 @@
  
  # For testing runtime against old gencode from a previous major version.
  bazel_dep(name = "com_google_protobuf_v25", version = "25.0", dev_dependency = True)
-@@ -334,7 +329,7 @@
+@@ -334,7 +330,7 @@
  )
  
  # Python headers for release
@@ -94,7 +86,7 @@
  python_headers.source_archive(
      sha256 = "c4e0cbad57c90690cb813fb4663ef670b4d0f587d8171e2c42bd4c9245bd2758",
      version = "3.10.0",
-@@ -356,7 +351,7 @@
+@@ -356,7 +352,7 @@
      "python-3.10.0",
  )
  
