@@ -1,25 +1,17 @@
-# Run everything on BuildBuddy RBE. Use with `bb remote`, which must also be
-# given this container-image as --container_image (see README.md) so the
-# runner's autodetected C++ toolchain matches the executors' image.
-# tools/sync.py reads the image from here.
-common:remote-minimal --remote_executor=grpcs://buildbuddy.buildbuddy.io
-common:remote-minimal --remote_cache=grpcs://buildbuddy.buildbuddy.io
-common:remote-minimal --bes_backend=grpcs://buildbuddy.buildbuddy.io
-common:remote-minimal --bes_results_url=https://buildbuddy.buildbuddy.io/invocation/
-common:remote-minimal --remote_download_minimal
-common:remote-minimal --jobs=100
-common:remote-minimal --remote_default_exec_properties=container-image=docker://gcr.io/flame-public/rbe-ubuntu22-04@sha256:0d84a80bb0fc36ba5381942adcf6493249594dcc9044845c617b78c9b621cae3
+# Run everything on BuildBuddy RBE with --config=remote-minimal; see
+# README.md. tools/sync.py reads the image from tools/remote.bazelrc.
+import %workspace%/tools/remote.bazelrc
+
+# Keep reproducible repos (the project sources) in the remote cache.
+startup --experimental_remote_repo_contents_cache
 
 # Keep going so one broken project doesn't hide the rest.
 common --keep_going
 
-# The generated //<module> aliases and test_suites point at targets that are
-# mostly private to their module.
-common --nocheck_visibility
+# The outer graph is a handful of rules_python repos and generated repos.
+common --lockfile_mode=off
 
-# The executor image has no JDK; use a downloaded one.
-common --java_runtime_version=remotejdk_21
-common --tool_java_runtime_version=remotejdk_21
-
-# Declared bazel_dep versions must be the resolved ones.
-common --check_direct_dependencies=error
+# `test //...` runs each project's inner test, which builds everything the
+# inner build would; don't also run the inner builds.
+test --build_tests_only
+test --test_output=errors

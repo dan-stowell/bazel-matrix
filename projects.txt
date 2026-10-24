@@ -1,0 +1,15 @@
+# The projects: BCR modules, each built and tested as the root of its own
+# inner workspace. This is the one hand-edited input; run
+# `python3 tools/sync.py` after changing it (see README.md).
+#
+# A project line is `module` (latest usable version) or `module@version`.
+# Indented lines below it, each with a reason:
+#   -//inner/pattern/...  reason   leave inner targets out
+#   --inner_flag=value    reason   pass a flag to the inner build and test
+#   bazel 8.4.2           reason   pin the inner Bazel (see tools/project.bzl)
+
+zlib
+abseil-cpp
+re2
+protobuf
+rules_go

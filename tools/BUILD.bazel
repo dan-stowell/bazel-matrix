@@ -1,9 +1,47 @@
+load("@rules_python//python:py_binary.bzl", "py_binary")
 load("@rules_python//python:py_test.bzl", "py_test")
+load(":project.bzl", "INNER_BAZELS")
+
+exports_files([
+    "buildbuddy_credential_helper.py",
+    "inner.bazelrc",
+    "remote.bazelrc",
+])
+
+# Which pinned inner Bazel --//:inner_bazel_version selects.
+[
+    config_setting(
+        name = "inner_bazel_" + v,
+        flag_values = {"//:inner_bazel_version": v},
+    )
+    for v in INNER_BAZELS
+]
+
+py_binary(
+    name = "inner_bazel",
+    srcs = ["inner_bazel.py"],
+)
+
+py_test(
+    name = "inner_bazel_test",
+    srcs = [
+        "inner_bazel.py",
+        "inner_bazel_test.py",
+    ],
+)
 
 py_test(
     name = "sync_test",
     srcs = [
         "sync.py",
         "sync_test.py",
+    ],
+)
+
+py_test(
+    name = "buildbuddy_credential_helper_test",
+    srcs = [
+        "buildbuddy_credential_helper.py",
+        "buildbuddy_credential_helper_test.py",
     ],
 )
