@@ -31,6 +31,9 @@ import time
 import xml.etree.ElementTree as ET
 
 WORK_ROOT = "/tmp/bazel-matrix/work"
+# Where tools/credentials.bzl writes the API key, relative to the outer
+# output base.
+KEY_FILE = "bazel-matrix/api-key"
 RESULTS_URL = "https://buildbuddy.buildbuddy.io/invocation/"
 # Keep the inner JVM within the resources:memory reservation in project.bzl.
 JVM_HEAP = "-Xmx2g"
@@ -52,8 +55,6 @@ def parse_args(argv):
     p.add_argument("--bazel_version", required=True)
     p.add_argument("--rc", action="append", default=[])
     p.add_argument("--credential_helper", required=True)
-    p.add_argument("--credentials", required=True,
-                   help="file naming the API key file; see tools/credentials.bzl")
     p.add_argument("--startup_flag", action="append", default=[])
     p.add_argument("--flag", action="append", default=[])
     p.add_argument("--target", action="append", default=[])
@@ -251,30 +252,53 @@ def remove_stale(root):
             remove_tree(path)
 
 
-def kill(proc):
-    """SIGTERM the inner Bazel's process group, then SIGKILL after KILL_GRACE."""
-    if proc is None or proc.poll() is not None:
-        return
+def output_base(cwd):
+    """The outer output base: the parent of the `execroot` above cwd.
+
+    Build actions run in <output base>/execroot/_main, tests in a runfiles
+    tree below it (both unsandboxed).
+    """
+    path = os.path.realpath(cwd)
+    while path != "/":
+        if os.path.basename(path) == "execroot":
+            return os.path.dirname(path)
+        path = os.path.dirname(path)
+    raise RuntimeError("not under an outer execroot: " + cwd)
+
+
+def _killpg(pgid, sig):
     try:
-        os.killpg(proc.pid, signal.SIGTERM)
-        proc.wait(KILL_GRACE)
-    except subprocess.TimeoutExpired:
-        os.killpg(proc.pid, signal.SIGKILL)
-        proc.wait()
+        os.killpg(pgid, sig)
     except ProcessLookupError:
         pass
 
 
+def kill(proc):
+    """Stops the inner Bazel's whole process group.
+
+    SIGTERM first; after KILL_GRACE seconds (or as soon as the leader is
+    gone), SIGKILL whatever is left in the group, then reap the leader.
+    """
+    if proc is None:
+        return
+    _killpg(proc.pid, signal.SIGTERM)
+    try:
+        proc.wait(KILL_GRACE)
+    except subprocess.TimeoutExpired:
+        pass
+    _killpg(proc.pid, signal.SIGKILL)
+    proc.wait()
+
+
 def main(argv=None):
     args = parse_args(argv if argv is not None else sys.argv[1:])
-    for name in ("source", "bazel", "credential_helper", "credentials"):
+    for name in ("source", "bazel", "credential_helper"):
         setattr(args, name, os.path.abspath(getattr(args, name)))
     args.rc = [os.path.abspath(rc) for rc in args.rc]
     if args.mode == "test" and os.environ.get("TEST_TIMEOUT"):
         # Finish (and clean up) before the outer test times out.
         args.timeout = min(args.timeout, int(os.environ["TEST_TIMEOUT"]) - 60)
-    with open(args.credentials) as f:
-        key_file = f.read().strip()
+    key_file = os.path.join(output_base(os.getcwd()), KEY_FILE)
 
     os.makedirs(WORK_ROOT, exist_ok=True)
     remove_stale(WORK_ROOT)
@@ -317,9 +341,10 @@ def main(argv=None):
         try:
             code = state["proc"].wait(args.timeout)
         except subprocess.TimeoutExpired:
-            kill(state["proc"])
             code = 1
             print("inner bazel timed out after %ds" % args.timeout, file=log, flush=True)
+        # Also on success: nothing of the inner Bazel may outlive it.
+        kill(state["proc"])
         try:
             with open(bep, errors="replace") as f:
                 invocation, tests, failed_builds = load_bep(f)

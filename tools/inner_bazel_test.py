@@ -1,6 +1,8 @@
 import json
 import os
+import subprocess
 import tempfile
+import time
 import unittest
 import xml.etree.ElementTree as ET
 
@@ -96,7 +98,7 @@ class CommandTest(unittest.TestCase):
     def test_command(self):
         args = inner_bazel.parse_args([
             "--mode=test", "--project=p", "--source=s", "--bazel=/b", "--bazel_version=9.3.1",
-            "--rc=/r1", "--rc=/r2", "--credential_helper=/h", "--credentials=/k",
+            "--rc=/r1", "--rc=/r2", "--credential_helper=/h",
             "--startup_flag=--experimental_remote_repo_contents_cache",
             "--flag=--copt=-w", "--target=//...", "--target=-//x/...",
         ])
@@ -117,6 +119,42 @@ class CommandTest(unittest.TestCase):
         self.assertEqual(sorted(env), ["BAZEL_MATRIX_KEY_FILE", "HOME", "LANG", "PATH", "TMPDIR"])
         self.assertTrue(env["PATH"].startswith("/w/bin:"))
         self.assertEqual(env["BAZEL_MATRIX_KEY_FILE"], "/k")
+
+
+class OutputBaseTest(unittest.TestCase):
+    def test_found_from_cwd(self):
+        with tempfile.TemporaryDirectory() as d:
+            ob = os.path.realpath(d)
+            for cwd in ("execroot/_main", "execroot/_main/bazel-out/k8/bin/x/test.sh.runfiles/_main"):
+                os.makedirs(os.path.join(ob, cwd), exist_ok=True)
+                self.assertEqual(inner_bazel.output_base(os.path.join(ob, cwd)), ob)
+
+    def test_not_in_execroot(self):
+        with self.assertRaises(RuntimeError):
+            inner_bazel.output_base("/")
+
+
+class KillTest(unittest.TestCase):
+    def test_kills_whole_group(self):
+        # The leader exits on SIGTERM; its child ignores SIGTERM.
+        proc = subprocess.Popen(
+            ["sh", "-c", "sh -c 'trap \"\" TERM; echo $$; exec sleep 60' & wait"],
+            stdout=subprocess.PIPE, text=True, start_new_session=True)
+        child = int(proc.stdout.readline())
+        inner_bazel.kill(proc)
+
+        def gone(pid):
+            try:
+                with open("/proc/%d/stat" % pid) as f:
+                    return f.read().split(") ", 1)[1].startswith("Z")
+            except OSError:
+                return True
+
+        for _ in range(50):
+            if gone(child):
+                break
+            time.sleep(0.1)
+        self.assertTrue(gone(child))
 
 
 class RemoveStaleTest(unittest.TestCase):

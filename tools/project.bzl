@@ -58,7 +58,6 @@ def _args(ctx, mode, path):
         "--rc=" + path(ctx.file._remote_rc),
         "--rc=" + path(ctx.file._inner_rc),
         "--credential_helper=" + path(ctx.file._credential_helper),
-        "--credentials=" + path(ctx.file._credentials),
     ] + ["--startup_flag=" + f for f in INNER_BAZELS[version].startup_flags] + [
         "--flag=" + f
         for f in flags
@@ -117,7 +116,8 @@ _ATTRS = {
     "source": attr.label(allow_single_file = True, mandatory = True),
     "targets": attr.string_list(mandatory = True),
     "_credential_helper": attr.label(allow_single_file = True, default = "//tools:buildbuddy_credential_helper.py"),
-    "_credentials": attr.label(allow_single_file = True, default = "@buildbuddy_credentials//:key_file"),
+    # Not the key: a constant marker that makes the key file exist.
+    "_credentials": attr.label(allow_single_file = True, default = "@buildbuddy_credentials//:marker"),
     "_inner_flags": attr.label(default = "//:inner_flags"),
     "_inner_rc": attr.label(allow_single_file = True, default = "//tools:inner.bazelrc"),
     "_remote_rc": attr.label(allow_single_file = True, default = "//tools:remote.bazelrc"),
