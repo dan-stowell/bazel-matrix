@@ -7,3 +7,23 @@
 @protobuf//benchmarks/... needs googleapis protos (googleads v17) missing from the BCR googleapis
 @brotli//:dictionary dictionary.bin is not in the BCR source archive
 @protobuf//:generated_protos genrule cmd uses root-relative src/ paths, so it only works with protobuf as the root module
+@protobuf//rust/... protobuf's Rust aspects build invalid '../protobuf+/' labels when protobuf is not the root module
+@protobuf//php/... genrule cmd uses root-relative src/ paths, so it only works with protobuf as the root module
+@protobuf//bazel/tests/... analysis tests assert root-module short paths
+@protobuf//upb/wire:decode_benchmark links both gtest_main and benchmark_main (duplicate main)
+@protobuf//upb/mini_table:message_benchmark links both gtest_main and benchmark_main (duplicate main)
+@flatbuffers//ts/... rules_nodejs in the graph uses CcInfo, which Bazel 9 removed
+@flatbuffers//tests/ts/... rules_nodejs in the graph uses CcInfo, which Bazel 9 removed
+@flatbuffers//reflection/ts/... rules_nodejs in the graph uses CcInfo, which Bazel 9 removed
+@flatbuffers//grpc/... flatbuffers' grpc dev dep can't load protobuf 36's upb rules
+@flatbuffers//tests:monster_test_grpc flatbuffers' grpc dev dep can't load protobuf 36's upb rules
+@flatbuffers//tests:test_builder flatbuffers' grpc dev dep can't load protobuf 36's upb rules
+@flatbuffers//swift/... no Swift toolchain on the Linux executors
+@glog//:stl_logging_test glog's BUILD uses @com_github_google_googletest, which its MODULE.bazel never declares
+@glog//:stacktrace_test glog's BUILD uses @com_github_google_googletest, which its MODULE.bazel never declares
+@glog//:cleanup_immediately_test glog's BUILD uses @com_github_google_googletest, which its MODULE.bazel never declares
+@glog//:cleanup_with_absolute_prefix_test glog's BUILD uses @com_github_google_googletest, which its MODULE.bazel never declares
+@glog//:cleanup_with_relative_prefix_test glog's BUILD uses @com_github_google_googletest, which its MODULE.bazel never declares
+@glog//:utilities_test glog's BUILD uses @com_github_google_googletest, which its MODULE.bazel never declares
+@spdlog//:spdlog_test includes tests/test_systemd.cpp, which needs systemd headers the executor image lacks
+@google_benchmark//tools/... py tools need numpy/scipy wheels that don't match the default Python

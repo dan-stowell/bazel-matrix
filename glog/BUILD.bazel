@@ -23,12 +23,6 @@ alias(
 test_suite(
     name = "tests",
     tests = [
-        "@glog//:cleanup_immediately_test",
-        "@glog//:cleanup_with_absolute_prefix_test",
-        "@glog//:cleanup_with_relative_prefix_test",
-        "@glog//:stacktrace_test",
-        "@glog//:stl_logging_test",
-        "@glog//:utilities_test",
         "@glog//bazel/example:main",
     ],
 )

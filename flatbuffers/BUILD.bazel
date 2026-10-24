@@ -36,51 +36,6 @@ alias(
 )
 
 alias(
-    name = "grpc_src_compiler__common_headers",
-    actual = "@flatbuffers//grpc/src/compiler:common_headers",
-)
-
-alias(
-    name = "grpc_src_compiler__cpp_generator",
-    actual = "@flatbuffers//grpc/src/compiler:cpp_generator",
-)
-
-alias(
-    name = "grpc_src_compiler__distribution",
-    actual = "@flatbuffers//grpc/src/compiler:distribution",
-)
-
-alias(
-    name = "grpc_src_compiler__go_generator",
-    actual = "@flatbuffers//grpc/src/compiler:go_generator",
-)
-
-alias(
-    name = "grpc_src_compiler__java_generator",
-    actual = "@flatbuffers//grpc/src/compiler:java_generator",
-)
-
-alias(
-    name = "grpc_src_compiler__python_generator",
-    actual = "@flatbuffers//grpc/src/compiler:python_generator",
-)
-
-alias(
-    name = "grpc_src_compiler__python_generator_private",
-    actual = "@flatbuffers//grpc/src/compiler:python_generator_private",
-)
-
-alias(
-    name = "grpc_src_compiler__swift_generator",
-    actual = "@flatbuffers//grpc/src/compiler:swift_generator",
-)
-
-alias(
-    name = "grpc_src_compiler__ts_generator",
-    actual = "@flatbuffers//grpc/src/compiler:ts_generator",
-)
-
-alias(
     name = "include_codegen__distribution",
     actual = "@flatbuffers//include/codegen:distribution",
 )
@@ -108,31 +63,6 @@ alias(
 alias(
     name = "reflection__reflection_fbs_schema",
     actual = "@flatbuffers//reflection:reflection_fbs_schema",
-)
-
-alias(
-    name = "reflection_ts__reflection_ts_fbs",
-    actual = "@flatbuffers//reflection/ts:reflection_ts_fbs",
-)
-
-alias(
-    name = "reflection_ts__reflection_ts_fbs_includes",
-    actual = "@flatbuffers//reflection/ts:reflection_ts_fbs_includes",
-)
-
-alias(
-    name = "reflection_ts__reflection_ts_fbs_reflection_out",
-    actual = "@flatbuffers//reflection/ts:reflection_ts_fbs_reflection_out",
-)
-
-alias(
-    name = "reflection_ts__reflection_ts_fbs_reflection_srcs",
-    actual = "@flatbuffers//reflection/ts:reflection_ts_fbs_reflection_srcs",
-)
-
-alias(
-    name = "reflection_ts__reflection_ts_fbs_srcs",
-    actual = "@flatbuffers//reflection/ts:reflection_ts_fbs_srcs",
 )
 
 alias(
@@ -168,16 +98,6 @@ alias(
 alias(
     name = "src__generate_fbs",
     actual = "@flatbuffers//src:generate_fbs",
-)
-
-alias(
-    name = "swift__FlexBuffers",
-    actual = "@flatbuffers//swift:FlexBuffers",
-)
-
-alias(
-    name = "swift__swift",
-    actual = "@flatbuffers//swift:swift",
 )
 
 alias(
@@ -306,11 +226,6 @@ alias(
 )
 
 alias(
-    name = "tests__monster_test_grpc",
-    actual = "@flatbuffers//tests:monster_test_grpc",
-)
-
-alias(
     name = "tests__native_type_test_cc_fbs",
     actual = "@flatbuffers//tests:native_type_test_cc_fbs",
 )
@@ -331,105 +246,13 @@ alias(
 )
 
 alias(
-    name = "tests__test_builder",
-    actual = "@flatbuffers//tests:test_builder",
-)
-
-alias(
     name = "tests__test_data_copied_to_bin",
     actual = "@flatbuffers//tests:test_data_copied_to_bin",
-)
-
-alias(
-    name = "tests_ts__typescript_ts_fbs",
-    actual = "@flatbuffers//tests/ts:typescript_ts_fbs",
-)
-
-alias(
-    name = "tests_ts__typescript_ts_fbs_includes",
-    actual = "@flatbuffers//tests/ts:typescript_ts_fbs_includes",
-)
-
-alias(
-    name = "tests_ts__typescript_ts_fbs_srcs",
-    actual = "@flatbuffers//tests/ts:typescript_ts_fbs_srcs",
-)
-
-alias(
-    name = "tests_ts_test_dir__include_ts_fbs",
-    actual = "@flatbuffers//tests/ts/test_dir:include_ts_fbs",
-)
-
-alias(
-    name = "tests_ts_test_dir__include_ts_fbs_includes",
-    actual = "@flatbuffers//tests/ts/test_dir:include_ts_fbs_includes",
-)
-
-alias(
-    name = "tests_ts_test_dir__include_ts_fbs_srcs",
-    actual = "@flatbuffers//tests/ts/test_dir:include_ts_fbs_srcs",
-)
-
-alias(
-    name = "tests_ts_test_dir__typescript_transitive_ts_fbs",
-    actual = "@flatbuffers//tests/ts/test_dir:typescript_transitive_ts_fbs",
-)
-
-alias(
-    name = "tests_ts_test_dir__typescript_transitive_ts_fbs_includes",
-    actual = "@flatbuffers//tests/ts/test_dir:typescript_transitive_ts_fbs_includes",
-)
-
-alias(
-    name = "tests_ts_test_dir__typescript_transitive_ts_fbs_srcs",
-    actual = "@flatbuffers//tests/ts/test_dir:typescript_transitive_ts_fbs_srcs",
-)
-
-alias(
-    name = "ts___gen_tsconfig_flatbuffers_ts",
-    actual = "@flatbuffers//ts:_gen_tsconfig_flatbuffers_ts",
-)
-
-alias(
-    name = "ts__compile_flat_file",
-    actual = "@flatbuffers//ts:compile_flat_file",
-)
-
-alias(
-    name = "ts__distribution",
-    actual = "@flatbuffers//ts:distribution",
-)
-
-alias(
-    name = "ts__flatbuffers",
-    actual = "@flatbuffers//ts:flatbuffers",
-)
-
-alias(
-    name = "ts__flatbuffers_ts",
-    actual = "@flatbuffers//ts:flatbuffers_ts",
-)
-
-alias(
-    name = "ts__flatbuffers_ts_types",
-    actual = "@flatbuffers//ts:flatbuffers_ts_types",
-)
-
-alias(
-    name = "ts__generate_index.ts",
-    actual = "@flatbuffers//ts:generate_index.ts",
 )
 
 test_suite(
     name = "tests",
     tests = [
-        "@flatbuffers//grpc/tests:grpc_callback_client_compile_test",
-        "@flatbuffers//grpc/tests:grpc_callback_compile_test",
-        "@flatbuffers//grpc/tests:grpc_test",
-        "@flatbuffers//tests/ts/test_dir:import_test",
-        "@flatbuffers//tests/ts:JavaScriptComplexArraysTest_test",
-        "@flatbuffers//tests/ts:JavaScriptTest_test",
-        "@flatbuffers//tests/ts:JavaScriptUnionVectorTest_test",
         "@flatbuffers//tests:flatbuffers_test",
     ],
 )
