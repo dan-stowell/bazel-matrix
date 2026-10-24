@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "matrix_project")
-load("//projects/gflags:project.bzl", "GFLAGS_PROJECT")
-
-matrix_project(project = GFLAGS_PROJECT)

@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "bcr_project_from_spec")
-load("//projects/cucumber-cpp:project.bzl", "CUCUMBER_CPP_PROJECT")
-
-bcr_project_from_spec(project = CUCUMBER_CPP_PROJECT)

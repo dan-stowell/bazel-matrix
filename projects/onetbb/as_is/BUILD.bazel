@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "matrix_project")
-load("//projects/onetbb:project.bzl", "ONETBB_PROJECT")
-
-matrix_project(project = ONETBB_PROJECT)

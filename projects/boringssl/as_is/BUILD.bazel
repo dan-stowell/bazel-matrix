@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "matrix_project")
-load("//projects/boringssl:project.bzl", "BORINGSSL_PROJECT")
-
-matrix_project(project = BORINGSSL_PROJECT)

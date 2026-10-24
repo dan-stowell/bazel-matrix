@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "buildbuddy_toolchain_project_modification")
-load("//projects/squashfs-tools:project.bzl", "SQUASHFS_TOOLS_PROJECT")
-
-buildbuddy_toolchain_project_modification(project = SQUASHFS_TOOLS_PROJECT)

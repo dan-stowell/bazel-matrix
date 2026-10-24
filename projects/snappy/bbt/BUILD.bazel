@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "buildbuddy_toolchain_project_modification")
-load("//projects/snappy:project.bzl", "SNAPPY_PROJECT")
-
-buildbuddy_toolchain_project_modification(project = SNAPPY_PROJECT)

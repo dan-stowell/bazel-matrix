@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "matrix_project")
-load("//projects/go_jsonnet:project.bzl", "GO_JSONNET_PROJECT")
-
-matrix_project(project = GO_JSONNET_PROJECT)

@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "matrix_project")
-load("//projects/copybara:project.bzl", "COPYBARA_PROJECT")
-
-matrix_project(project = COPYBARA_PROJECT)

@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "matrix_project")
-load("//projects/buildtools:project.bzl", "BUILDTOOLS_PROJECT")
-
-matrix_project(project = BUILDTOOLS_PROJECT)

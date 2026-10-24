@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
-load("//projects/magic_enum:project.bzl", "MAGIC_ENUM_PROJECT")
-
-hermetic_llvm_project_modification(project = MAGIC_ENUM_PROJECT)

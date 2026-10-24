@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "matrix_project")
-load("//projects/opentelemetry_cpp:project.bzl", "OPENTELEMETRY_CPP_PROJECT")
-
-matrix_project(project = OPENTELEMETRY_CPP_PROJECT)

@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "buildbuddy_toolchain_project_modification")
-load("//projects/sdl2:project.bzl", "SDL2_PROJECT")
-
-buildbuddy_toolchain_project_modification(project = SDL2_PROJECT)

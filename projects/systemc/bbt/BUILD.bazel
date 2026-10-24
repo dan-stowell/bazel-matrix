@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "buildbuddy_toolchain_project_modification")
-load("//projects/systemc:project.bzl", "SYSTEMC_PROJECT")
-
-buildbuddy_toolchain_project_modification(project = SYSTEMC_PROJECT)

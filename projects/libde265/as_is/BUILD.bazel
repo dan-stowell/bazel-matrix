@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "bcr_project_from_spec")
-load("//projects/libde265:project.bzl", "LIBDE265_PROJECT")
-
-bcr_project_from_spec(project = LIBDE265_PROJECT)

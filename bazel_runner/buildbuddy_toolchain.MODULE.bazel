@@ -1,7 +1,0 @@
-bazel_dep(name = "toolchains_buildbuddy", version = "0.0.4")
-
-buildbuddy = use_extension("@toolchains_buildbuddy//:extensions.bzl", "buildbuddy")
-
-register_toolchains(
-    "@toolchains_buildbuddy//toolchains/cc:ubuntu_gcc_x86_64",
-)

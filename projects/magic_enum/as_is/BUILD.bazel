@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "matrix_project")
-load("//projects/magic_enum:project.bzl", "MAGIC_ENUM_PROJECT")
-
-matrix_project(project = MAGIC_ENUM_PROJECT)

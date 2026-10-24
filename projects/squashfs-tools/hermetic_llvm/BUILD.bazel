@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
-load("//projects/squashfs-tools:project.bzl", "SQUASHFS_TOOLS_PROJECT")
-
-hermetic_llvm_project_modification(project = SQUASHFS_TOOLS_PROJECT)

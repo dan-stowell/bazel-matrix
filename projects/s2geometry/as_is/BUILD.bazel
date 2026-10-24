@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "matrix_project")
-load("//projects/s2geometry:project.bzl", "S2GEOMETRY_PROJECT")
-
-matrix_project(project = S2GEOMETRY_PROJECT)

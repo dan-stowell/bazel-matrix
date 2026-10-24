@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "buildbuddy_toolchain_project_modification")
-load("//projects/nsync:project.bzl", "NSYNC_PROJECT")
-
-buildbuddy_toolchain_project_modification(project = NSYNC_PROJECT)

@@ -1,6 +1,0 @@
-# Activate after the source archive is pinned in //bazel_runner:extension.bzl.
-#
-# load("//bazel_runner:defs.bzl", "buildbuddy_toolchain_project_modification")
-# load("//projects/spirv-tools:project.bzl", "SPIRV_TOOLS_PROJECT")
-#
-# buildbuddy_toolchain_project_modification(project = SPIRV_TOOLS_PROJECT)

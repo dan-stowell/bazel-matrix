@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
-load("//projects/abseil_cpp:project.bzl", "ABSEIL_CPP_PROJECT")
-
-hermetic_llvm_project_modification(project = ABSEIL_CPP_PROJECT)

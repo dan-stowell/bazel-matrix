@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "matrix_project")
-load("//projects/ftxui:project.bzl", "FTXUI_PROJECT")
-
-matrix_project(project = FTXUI_PROJECT)

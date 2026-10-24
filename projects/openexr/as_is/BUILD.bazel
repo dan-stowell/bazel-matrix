@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "matrix_project")
-load("//projects/openexr:project.bzl", "OPENEXR_PROJECT")
-
-matrix_project(project = OPENEXR_PROJECT)

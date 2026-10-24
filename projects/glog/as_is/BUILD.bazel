@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "matrix_project")
-load("//projects/glog:project.bzl", "GLOG_PROJECT")
-
-matrix_project(project = GLOG_PROJECT)
