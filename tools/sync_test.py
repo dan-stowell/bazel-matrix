@@ -3,239 +3,92 @@ import unittest
 import sync
 
 
-class ParseProjectsTest(unittest.TestCase):
+class ParseProjectsTxtTest(unittest.TestCase):
     def test_forms(self):
-        text = "\n".join([
-            'module(name = "x")',
-            'bazel_dep(name = "zlib", version = "1.3")',
-            '# bazel_dep(name = "dropped", version = "1")',
-            "bazel_dep(name = 'fmt', version = '12')  # single quotes",
-            'bazel_dep(',
-            '    name = "re2",  # name = "wrong"',
-            '    version = "2025-11-05.bcr.1",',
-            '    repo_name = "com_googlesource_code_re2",',
-            ')',
-            'bazel_dep(dev_dependency = True, name = "rules_python", version = "2")',
-            'include("//:overrides.MODULE.bazel")',
-        ])
-        self.assertEqual(sync.parse_projects(text), [
-            ("zlib", "1.3", "zlib"),
-            ("fmt", "12", "fmt"),
-            ("re2", "2025-11-05.bcr.1", "com_googlesource_code_re2"),
-        ])
+        projects = sync.parse_projects_txt("\n".join([
+            "# comment",
+            "zlib",
+            "re2@2025-11-05.bcr.1",
+            "  -//python/...  needs a python toolchain",
+            "  -//:bench   slow",
+            "  --copt=-w   noisy warnings",
+            "  bazel 8.4.2 needs Bazel 8",
+            "",
+        ]))
+        self.assertEqual([p["name"] for p in projects], ["zlib", "re2"])
+        self.assertIsNone(projects[0]["version"])
+        re2 = projects[1]
+        self.assertEqual(re2["version"], "2025-11-05.bcr.1")
+        self.assertEqual(re2["exclude"], [("//python/...", "needs a python toolchain"),
+                                          ("//:bench", "slow")])
+        self.assertEqual(re2["flags"], [("--copt=-w", "noisy warnings")])
+        self.assertEqual(re2["bazel"], ("8.4.2", "needs Bazel 8"))
+        self.assertEqual(sync.targets(re2), ["//...", "-//python/...", "-//:bench"])
+
+    def test_errors(self):
+        for text in ["zlib\n  -//foo/...", "  -//x  why", "zlib\nzlib",
+                     "zlib\n  //foo  why", "zlib\n  -//foo/*  why", "Bad Name"]:
+            with self.assertRaises(ValueError, msg=text):
+                sync.parse_projects_txt(text)
 
 
-class UndevTest(unittest.TestCase):
-    def check(self, before, after, available=lambda name, version: True):
-        self.assertEqual(sync.undev(before, available), after)
+class PickTest(unittest.TestCase):
+    def test_latest_stable_compatible(self):
+        meta = {"versions": ["1.0", "1.10", "1.9", "2.0-rc1", "1.11"], "yanked_versions": {"1.11": "bad"}}
+        texts = {"1.10": 'module(name = "m", bazel_compatibility = [">=7.0.0"])'}
+        self.assertEqual(sync.pick(meta, texts.get, "9.3.1"), ("1.10", None))
 
-    def test_last_argument(self):
-        self.check('bazel_dep(name = "g", version = "1", dev_dependency = True)\n',
-                   'bazel_dep(name = "g", version = "1")\n')
+    def test_incompatible(self):
+        meta = {"versions": ["1.0"]}
+        text = 'module(\n  name = "m",\n  # bazel_compatibility = [">=99"]\n  bazel_compatibility = ["<9.0.0"],\n)'
+        version, why = sync.pick(meta, {"1.0": text}.get, "9.3.1")
+        self.assertIsNone(version)
+        self.assertIn("excludes Bazel 9.3.1", why)
 
-    def test_first_argument(self):
-        self.check('bazel_dep(dev_dependency = True, name = "g")\n',
-                   'bazel_dep(name = "g")\n')
+    def test_date_versions(self):
+        meta = {"versions": ["2024-07-02", "2025-11-05.bcr.1", "2025-11-05"]}
+        self.assertEqual(sync.pick(meta, lambda v: "", "9.3.1"), ("2025-11-05.bcr.1", None))
 
-    def test_middle_argument(self):
-        self.check('bazel_dep(name = "g", dev_dependency = True, repo_name = "x")\n',
-                   'bazel_dep(name = "g", repo_name = "x")\n')
-
-    def test_only_argument(self):
-        self.check('register_toolchains(dev_dependency = True)\n',
-                   'register_toolchains()\n')
-
-    def test_multi_line_with_comments(self):
-        self.check(
-            'x = use_extension(\n    "@a//:b.bzl",  # (not a paren\n    "c",\n'
-            '    dev_dependency = True,  # dev only\n)\n',
-            'x = use_extension(\n    "@a//:b.bzl",  # (not a paren\n    "c",  # dev only\n)\n',
-        )
-
-    def test_commented_out_dev_dependency_is_left_alone(self):
-        text = 'bazel_dep(name = "g")  # dev_dependency = True\n'
-        self.check(text, text)
-
-    def test_single_quotes(self):
-        self.check("bazel_dep(name = 'g', version = '1', dev_dependency = True)\n",
-                   "bazel_dep(name = 'g', version = '1')\n")
-
-    def test_keeps_overridden_and_unavailable_deps_dev_only(self):
-        text = "\n".join([
-            'bazel_dep(name = "a", version = "1", dev_dependency = True)',
-            'bazel_dep(name = "b", version = "1", dev_dependency = True)',
-            "archive_override(module_name = 'b', urls = ['x'])",
-            'bazel_dep(name = "c", version = "9", dev_dependency = True, repo_name = "cc")',
-            'e = use_extension("@cc//:e.bzl", "e", dev_dependency = True)',
-            'f = use_extension("@a//:f.bzl", "f", dev_dependency = True)',
-            'use_repo(e, "e_repo", other = "e_other")',
-            'register_toolchains("@e_repo//:all", dev_dependency = True)',
-            'register_toolchains("@e_other//:all", dev_dependency = True)',
-            'register_toolchains("@cc-tools//:all", dev_dependency = True)',
-            '',
-        ])
-        self.check(text, "\n".join([
-            'bazel_dep(name = "a", version = "1")',
-            'bazel_dep(name = "b", version = "1", dev_dependency = True)',
-            "archive_override(module_name = 'b', urls = ['x'])",
-            'bazel_dep(name = "c", version = "9", dev_dependency = True, repo_name = "cc")',
-            'e = use_extension("@cc//:e.bzl", "e", dev_dependency = True)',
-            'f = use_extension("@a//:f.bzl", "f")',
-            'use_repo(e, "e_repo", other = "e_other")',
-            'register_toolchains("@e_repo//:all", dev_dependency = True)',
-            'register_toolchains("@e_other//:all", dev_dependency = True)',
-            'register_toolchains("@cc-tools//:all")',
-            '',
-        ]), lambda name, version: name != "c")
-
-    def test_no_dev_deps_no_patch(self):
-        self.assertIsNone(sync.make_patch('bazel_dep(name = "g", version = "1")\n'))
-
-    def test_patch_headers(self):
-        patch = sync.make_patch('bazel_dep(name = "g", version = "1", dev_dependency = True)\n')
-        self.assertTrue(patch.startswith("--- a/MODULE.bazel\n+++ b/MODULE.bazel\n"))
+    def test_deprecated(self):
+        self.assertEqual(sync.pick({"deprecated": "x", "versions": ["1"]}, lambda v: "", "9"),
+                         (None, "deprecated"))
 
 
-class QueryTest(unittest.TestCase):
-    def test_expr_without_exclusions(self):
-        expr = sync.query_expr(["a", "b"], [])
-        self.assertNotIn("rdeps", expr)
-        self.assertEqual(expr, "kind(rule, @a//... + @b//...) except "
-                         "attr(tags, '[\\[ ]manual[,\\]]', @a//... + @b//...)")
-
-    def test_expr_with_exclusions(self):
-        self.assertTrue(sync.query_expr(["a"], ["@a//x/...", "@a//:t"]).endswith(
-            " except rdeps(@a//..., @a//x/... + @a//:t)"))
-
-    def test_parse_ignores_noise(self):
-        out = "\n".join([
-            "\x1b[32mINFO: \x1b[mInvocation ID: 123",
-            "cc_test rule @re2//:set_test",
-            "alias rule @zlib//:z",
-            "cc_library rule @abseil-cpp//absl/strings:strings",
-            "source file @zlib//:zlib.h",
-        ])
-        self.assertEqual(sync.parse_query(out), {
-            "re2": [("cc_test", "@re2//:set_test")],
-            "zlib": [("alias", "@zlib//:z")],
-            "abseil-cpp": [("cc_library", "@abseil-cpp//absl/strings:strings")],
+class SourceEntryTest(unittest.TestCase):
+    def test_archive(self):
+        entry = sync.source_entry("m", "1.0", {
+            "url": "https://a/m.zip", "mirror_urls": ["https://b/m.zip"],
+            "integrity": "sha256-x", "strip_prefix": "m-1.0",
+            "patches": {"b.patch": "sha256-b", "a.patch": "sha256-a"}, "patch_strip": 1,
+            "overlay": {"z/BUILD": "sha256-z", "BUILD": "sha256-o"},
         })
+        self.assertEqual(entry["urls"], ["https://a/m.zip", "https://b/m.zip"])
+        self.assertEqual([p["url"] for p in entry["patches"]], [
+            "https://bcr.bazel.build/modules/m/1.0/patches/b.patch",
+            "https://bcr.bazel.build/modules/m/1.0/patches/a.patch"])
+        self.assertEqual(entry["patch_strip"], 1)
+        self.assertEqual([o["path"] for o in entry["overlay"]], ["BUILD", "z/BUILD"])
+        self.assertNotIn("archive_type", entry)
 
-    CANON = {"re2+": "re2", "protobuf+": "protobuf", "foo+": "foo", "glog+": "glog"}
-
-    def problems(self, lines, patterns):
-        return sync.check_errors("\n".join(lines), self.CANON, patterns)
-
-    def test_covered_load_failures_and_dep_errors_pass(self):
-        self.assertEqual(self.problems([
-            "\x1b[31;1mERROR: \x1b[mTraceback (most recent call last):",
-            '\tFile "/w/output-base/external/re2+/app/BUILD.bazel", line 7, column 10, in <toplevel>',
-            "ERROR: package contains errors: app: Traceback (most recent call last):",
-            "ERROR: error loading package '@@protobuf+//ruby': Unable to find package",
-            "ERROR: Skipping '@protobuf//ruby/...': no targets found beneath 'ruby'",
-            "ERROR: /w/external/glog+/BUILD.bazel:15:9: no such package '@@[unknown repo]//cpu': x",
-            "ERROR: no such package '@@[unknown repo]//cpu': x",
-            "ERROR: error loading package '@@grpc+//': cannot load",
-            "ERROR: /w/external/rules_nodejs+/nodejs/toolchain.bzl:99:44: CcInfo was removed",
-            "ERROR: /w/external/glog+/BUILD.bazel:1:2: no such package "
-            "'@@[unknown repo 'x' requested from @@glog+]//': nope and referenced by '@@glog+//:t'",
-            "ERROR: no such package '@@[unknown repo 'x' requested from @@glog+]//': nope",
-            "ERROR: /w/external/glog+/BUILD.bazel:3:4: no such package '@@dl+//': tmp1 and "
-            "referenced by '@@glog+//:u'",
-            "ERROR: no such package '@@dl+//': tmp2",
-            "ERROR: Evaluation of query \"kind(rule, ...)\" failed",
-        ], ["@re2//app/...", "@protobuf//ruby/..."]), [])
-
-    def test_uncovered_load_failures(self):
-        self.assertEqual(self.problems([
-            "ERROR: error loading package '@@protobuf+//ruby': Unable to find package",
-            "ERROR: Skipping '@foo//...': error loading package under directory '': "
-            "no such package '@@foo+//': error downloading",
-        ], ["@re2//ruby/..."]), [
-            "package failed to load and isn't excluded: @foo//",
-            "package failed to load and isn't excluded: @protobuf//ruby",
-        ])
-
-    def test_stale_exclusions(self):
-        got = self.problems([
-            "ERROR: no such package '@@protobuf+//java/core': BUILD file not found",
-            "ERROR: no such target '@@re2+//:gone': target 'gone' not declared in package ''",
-            "ERROR: Skipping '@glog//old/...': no targets found beneath 'old'",
-        ], ["@protobuf//java/core:t", "@re2//:gone", "@glog//old/..."])
-        self.assertEqual(len(got), 3)
-        self.assertTrue(all(p.startswith("stale exclusion") for p in got), got)
-
-    def test_repo_identity(self):
-        # re2//ruby failing to load doesn't make @protobuf//ruby/... non-stale.
-        got = self.problems([
-            "ERROR: error loading package '@@re2+//ruby': x",
-            "ERROR: Skipping '@protobuf//ruby/...': no targets found beneath 'ruby'",
-        ], ["@protobuf//ruby/...", "@re2//ruby/..."])
-        self.assertEqual(got, ["stale exclusion: @protobuf//ruby/... matches nothing"])
-
-    def test_fails_closed(self):
-        self.assertEqual(self.problems(["ERROR: something new"], []),
-                         ["unrecognised error: something new"])
-        self.assertEqual(self.problems(["ERROR: no such package '@@x+//y': z"], []),
-                         ["unrecognised error: no such package '@@x+//y': z"])
-        self.assertEqual(self.problems(["oops"], []), ["query failed without ERROR lines"])
-
-    def test_covered(self):
-        pats = ["@a//x/...", "@b//...", "@c//:t"]
-        self.assertTrue(sync.covered("a", "x", pats))
-        self.assertTrue(sync.covered("a", "x/y", pats))
-        self.assertFalse(sync.covered("a", "xy", pats))
-        self.assertFalse(sync.covered("b2", "x", pats))
-        self.assertTrue(sync.covered("b", "any", pats))
-        self.assertFalse(sync.covered("c", "", pats))
-
-
-class ExclusionsTest(unittest.TestCase):
-    def test_parse(self):
-        self.assertEqual(sync.parse_exclusions("# c\n\n@a//:b needs tzdata\n"),
-                         [("@a//:b", "needs tzdata")])
+    def test_git_unsupported(self):
         with self.assertRaises(ValueError):
-            sync.parse_exclusions("@a//:b\n")
-
-    def test_forms(self):
-        self.assertEqual(sync.parse_pattern("@a//..."), ("a", "", "..."))
-        self.assertEqual(sync.parse_pattern("@a-b//x/y/..."), ("a-b", "x/y", "..."))
-        self.assertEqual(sync.parse_pattern("@a//x/y:t.h"), ("a", "x/y", "t.h"))
-        self.assertEqual(sync.parse_pattern("@a//:t"), ("a", "", "t"))
-        self.assertEqual(sync.parse_pattern("@p//.github/..."), ("p", ".github", "..."))
-        self.assertEqual(sync.parse_pattern("@p//.github:t"), ("p", ".github", "t"))
-        for bad in ["@a//...:all", "@a//x", "@a//x:all", "@a//x:*", "@a//:v25*",
-                    "@a//x/...:t", "//x:t", "@a//./...", "@a//x/../...",
-                    "@a//../y:t", "@a//x//y/...", "@a//x/..."[:-1]]:
-            self.assertIsNone(sync.parse_pattern(bad), bad)
+            sync.source_entry("m", "1", {"type": "git_repository", "remote": "x"})
 
 
 class RenderBuildTest(unittest.TestCase):
-    def test_aliases_and_suite(self):
-        text = sync.render_build("m", [
-            ("cc_library", "@m//:lib"),
-            ("cc_library", "@m//a/b:lib"),
-            ("cc_library", "@m//a_b:lib"),
-            ("cc_library", "@m//:tests"),
-            ("cc_test", "@m//a:t_test"),
-            ("test_suite", "@m//a:all_tests"),
-        ])
-        self.assertIn('name = "lib",\n    actual = "@m//:lib"', text)
-        self.assertIn('name = "a_b__lib",\n    actual = "@m//a/b:lib"', text)
-        self.assertIn('name = "a_b__lib_2",\n    actual = "@m//a_b:lib"', text)
-        self.assertIn('name = "tests_2",\n    actual = "@m//:tests"', text)
-        self.assertIn('"@m//a:t_test",', text)
-        self.assertNotIn("all_tests", text)
+    def test_render(self):
+        text = sync.render_build({"name": "re2", "exclude": [("//python/...", "why")],
+                                  "flags": [("--copt=-w", "because")], "bazel": ("8.4.2", "old")})
         self.assertTrue(text.startswith(sync.GENERATED))
+        self.assertIn('    name = "re2",\n', text)
+        self.assertIn('        # why\n        "-//python/...",\n', text)
+        self.assertIn('        # because\n        "--copt=-w",\n', text)
+        self.assertIn('    # old\n    bazel_version = "8.4.2",\n', text)
 
-    def test_no_tests_no_suite(self):
-        self.assertNotIn("test_suite", sync.render_build("m", [("cc_library", "@m//:lib")]))
-
-
-class ContainerImageTest(unittest.TestCase):
-    def test_reads_bazelrc(self):
-        rc = "common:x --remote_default_exec_properties=container-image=docker://i@sha256:ab\n"
-        self.assertEqual(sync.container_image(rc), "docker://i@sha256:ab")
+    def test_minimal(self):
+        text = sync.render_build({"name": "zlib", "exclude": [], "flags": [], "bazel": None})
+        self.assertNotIn("flags", text)
+        self.assertNotIn("bazel_version", text)
 
 
 if __name__ == "__main__":

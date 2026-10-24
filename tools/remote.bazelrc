@@ -1,0 +1,19 @@
+# BuildBuddy RBE, for the outer Bazel (imported by //:.bazelrc) and every
+# inner one (passed as --bazelrc). Use the outer with `bb remote`, which must
+# also be given this container-image as --container_image (see README.md) so
+# the runner's autodetected C++ toolchain matches the executors' image.
+common:remote-minimal --remote_executor=grpcs://buildbuddy.buildbuddy.io
+common:remote-minimal --remote_cache=grpcs://buildbuddy.buildbuddy.io
+common:remote-minimal --bes_backend=grpcs://buildbuddy.buildbuddy.io
+common:remote-minimal --bes_results_url=https://buildbuddy.buildbuddy.io/invocation/
+common:remote-minimal --remote_download_minimal
+common:remote-minimal --jobs=100
+common:remote-minimal --remote_default_exec_properties=container-image=docker://gcr.io/flame-public/rbe-ubuntu22-04@sha256:0d84a80bb0fc36ba5381942adcf6493249594dcc9044845c617b78c9b621cae3
+# Fetch downloads through BuildBuddy, which caches them across runners.
+common:remote-minimal --experimental_remote_downloader=grpcs://buildbuddy.buildbuddy.io
+common:remote-minimal --experimental_remote_downloader_local_fallback
+# Recover from remote blobs evicted mid-build (remote_download_minimal).
+common:remote-minimal --rewind_lost_inputs
+# The executor image has no JDK; use a downloaded one.
+common:remote-minimal --java_runtime_version=remotejdk_21
+common:remote-minimal --tool_java_runtime_version=remotejdk_21

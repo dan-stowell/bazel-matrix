@@ -1,0 +1,9 @@
+# Flags for every inner Bazel, read after the project's own rc files (so
+# these win) and after tools/remote.bazelrc. Per-project flags (projects.txt)
+# and --//:inner_flags come after, on the command line.
+common --config=remote-minimal
+common --keep_going
+common --color=no
+common --curses=no
+common --show_progress_rate_limit=30
+common --build_metadata=ROLE=INNER
