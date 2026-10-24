@@ -34,3 +34,25 @@
 @flatbuffers//tests:includer_test_fbs_srcs flatc gets --bfbs-filenames=tests, a root-relative dir
 @flatbuffers//tests:monster_test_grpc flatbuffers' grpc dev dep can't load protobuf 36's upb rules
 @flatbuffers//tests:test_builder flatbuffers' grpc dev dep can't load protobuf 36's upb rules
+@abseil-cpp//absl/time:time_test needs tzdata zoneinfo, absent on the executors
+@abseil-cpp//absl/time/internal/cctz:time_zone_format_test needs tzdata zoneinfo, absent on the executors
+@abseil-cpp//absl/time/internal/cctz:time_zone_lookup_test needs tzdata zoneinfo, absent on the executors
+@protobuf//python:well_known_types_test needs tzdata zoneinfo, absent on the executors
+@catch2//tests:catch2_self_test self test includes deliberately failing cases that only its CMake harness expects
+@protobuf//src/google/protobuf:map_test needs the protobuf source tree at the root ("Could not find protobuf source code")
+@protobuf//src/google/protobuf:text_format_unittest needs the protobuf source tree at the root ("Could not find protobuf source code")
+@protobuf//src/google/protobuf/compiler/cpp:unittest needs the protobuf source tree at the root ("Could not find protobuf source code")
+@protobuf//src/google/protobuf/compiler/cpp:bootstrap_unittest needs the protobuf source tree at the root ("Could not find protobuf source code")
+@protobuf//src/google/protobuf/compiler/ruby:generator_unittest needs the protobuf source tree at the root ("Could not find protobuf source code")
+@protobuf//src/google/protobuf/compiler:command_line_interface_unittest can't find google/protobuf/descriptor.proto outside the root module
+@protobuf//python:message_test needs golden files from the protobuf source tree at the root
+@protobuf//python:text_format_test needs golden files from the protobuf source tree at the root
+@protobuf//editions:defaults_test opens data files by root-relative path
+@protobuf//lua:test_lua can't find module lua.test_pb outside the root module
+@protobuf//objectivec:check_version_stamps reads root-relative source paths
+@protobuf//objectivec:sources_pddm_expansion_test runs root-relative objectivec/DevTools/pddm.py
+@protobuf//pkg/test:gen_file_lists_golden_test golden file lists assume protobuf is the root module
+@protobuf//upb/mini_table:debug_string_staleness_test_fasttable staleness check compares root-relative paths
+@protobuf//upb/mini_table:debug_string_staleness_test_standard staleness check compares root-relative paths
+@protobuf//.github:release_prep_test release script test assumes the protobuf git checkout is the root
+@protobuf//build_defs:cc_proto_blacklist_test reads root-relative paths
