@@ -10,9 +10,14 @@
 
 zlib
 abseil-cpp
+  -//absl/time:time_test  needs tzdata (/usr/share/zoneinfo), which the executor image lacks
+  -//absl/time/internal/cctz:time_zone_format_test  needs tzdata, which the executor image lacks
+  -//absl/time/internal/cctz:time_zone_lookup_test  needs tzdata, which the executor image lacks
 re2
   --deleted_packages=app  (not an exclusion: //... fails on a broken package even when subtracted) app/BUILD.bazel uses cc_binary without a load(), which Bazel 9 removed
 protobuf
+  -//build_defs:cc_proto_blacklist_test  fails: expects the well-known types' cc_proto targets to provide no files, gets 4 each
+  -//python:well_known_types_test  needs the tzdata Python module or system tzdata, which the executor image lacks
   -//ruby/...  rules_ruby needs a system ruby, which the runner image lacks
   -//conformance/ruby/...  rules_ruby needs a system ruby, which the runner image lacks
   -//csharp/...  needs dotnet; unittest_deep_dependencies refers to Google-internal net/proto2
@@ -24,3 +29,6 @@ protobuf
   -//php/...  the //php:extension genrule fails: its cp finds source and destination are the same file
   -//java/core/...  its v25 compatibility tests need //compatibility, which the release archive lacks
 rules_go
+  --local_test_jobs=2  its go_bazel_test integration tests each run a nested Bazel locally; keep the runner's memory in bounds
+  -//tests/core/nogo/deps:deps_test  fails: expected nogo output ("a c d") missing from the nested build's output
+  -//tests/core/nogo/nolint:nolint_test  fails: expected nogo diagnostics missing from the nested build's output

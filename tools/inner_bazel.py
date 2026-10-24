@@ -130,9 +130,11 @@ def test_xml(project, tests, failed_builds, link):
         status, millis = tests[label]
         case = ET.SubElement(suite, "testcase", name=label, classname=project,
                              time="%.3f" % (millis / 1000.0))
-        if status == "SKIPPED":
+        if status in ("SKIPPED", "BUILT"):
+            # BUILT: built but not run, e.g. a test_suite member under an
+            # excluded pattern.
             skipped += 1
-            ET.SubElement(case, "skipped")
+            ET.SubElement(case, "skipped", message=status)
         elif status not in _PASSING:
             failures += 1
             ET.SubElement(case, "failure", message=status).text = "%s %s; see %s" % (label, status, link)
@@ -182,6 +184,14 @@ def _alive(pid):
     except PermissionError:
         pass
     return True
+
+
+def bazel_path_dir(args):
+    """A dir holding only a `bazel` symlink to the inner Bazel."""
+    d = os.path.join(os.path.dirname(args.source_dir), "bin")
+    os.makedirs(d, exist_ok=True)
+    os.symlink(args.bazel, os.path.join(d, "bazel"))
+    return d
 
 
 def remove_tree(path):
@@ -263,7 +273,7 @@ def main(argv=None):
     free_before = shutil.disk_usage(WORK_ROOT).free
     start = time.time()
     try:
-        src = os.path.join(work, "src")
+        src = args.source_dir = os.path.join(work, "src")
         os.makedirs(src)
         subprocess.run(["tar", "-xf", args.source, "-C", src], check=True)
         version_file = os.path.join(src, ".bazelversion")
@@ -278,6 +288,9 @@ def main(argv=None):
         # Build actions get an empty environment; cc autoconfiguration
         # needs a PATH to find the compiler.
         env.setdefault("PATH", "/usr/local/bin:/usr/bin:/bin")
+        # Integration tests (rules_go's go_bazel_test, ...) run `bazel` from
+        # PATH: make that the inner Bazel itself.
+        env["PATH"] = bazel_path_dir(args) + os.pathsep + env["PATH"]
         env.setdefault("HOME", work)
         env["TMPDIR"] = os.path.join(work, "tmp")
         os.makedirs(env["TMPDIR"])

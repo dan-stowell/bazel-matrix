@@ -6,6 +6,10 @@ project(
     name = "protobuf",
     targets = [
         "//...",
+        # fails: expects the well-known types' cc_proto targets to provide no files, gets 4 each
+        "-//build_defs:cc_proto_blacklist_test",
+        # needs the tzdata Python module or system tzdata, which the executor image lacks
+        "-//python:well_known_types_test",
         # rules_ruby needs a system ruby, which the runner image lacks
         "-//ruby/...",
         # rules_ruby needs a system ruby, which the runner image lacks

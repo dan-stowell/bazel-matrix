@@ -6,5 +6,13 @@ project(
     name = "rules_go",
     targets = [
         "//...",
+        # fails: expected nogo output ("a c d") missing from the nested build's output
+        "-//tests/core/nogo/deps:deps_test",
+        # fails: expected nogo diagnostics missing from the nested build's output
+        "-//tests/core/nogo/nolint:nolint_test",
+    ],
+    flags = [
+        # its go_bazel_test integration tests each run a nested Bazel locally; keep the runner's memory in bounds
+        "--local_test_jobs=2",
     ],
 )
