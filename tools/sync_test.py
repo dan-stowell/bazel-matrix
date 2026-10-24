@@ -45,6 +45,33 @@ class UndevTest(unittest.TestCase):
             'x = use_extension(\n    "@a//:b.bzl",\n    "c",\n)\n',
         )
 
+    def test_middle_kwarg(self):
+        self.assertEqual(
+            sync.undev('bazel_dep(name = "g", dev_dependency = True, repo_name = "x")\n'),
+            'bazel_dep(name = "g", repo_name = "x")\n',
+        )
+
+    def test_keeps_overridden_and_unavailable_deps_dev_only(self):
+        text = "\n".join([
+            'bazel_dep(name = "a", version = "1", dev_dependency = True)',
+            'bazel_dep(name = "b", version = "1", dev_dependency = True)',
+            'archive_override(module_name = "b", urls = ["x"])',
+            'bazel_dep(name = "c", version = "9", dev_dependency = True, repo_name = "cc")',
+            'e = use_extension("@cc//:e.bzl", "e", dev_dependency = True)',
+            'f = use_extension("@a//:f.bzl", "f", dev_dependency = True)  # (paren',
+            '',
+        ])
+        got = sync.undev(text, lambda name, version: name != "c")
+        self.assertEqual(got, "\n".join([
+            'bazel_dep(name = "a", version = "1")',
+            'bazel_dep(name = "b", version = "1", dev_dependency = True)',
+            'archive_override(module_name = "b", urls = ["x"])',
+            'bazel_dep(name = "c", version = "9", dev_dependency = True, repo_name = "cc")',
+            'e = use_extension("@cc//:e.bzl", "e", dev_dependency = True)',
+            'f = use_extension("@a//:f.bzl", "f")  # (paren',
+            '',
+        ]))
+
     def test_no_dev_deps_no_patch(self):
         self.assertIsNone(sync.make_patch('bazel_dep(name = "g", version = "1")\n'))
 

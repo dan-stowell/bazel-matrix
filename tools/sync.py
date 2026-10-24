@@ -16,10 +16,12 @@ Run from anywhere: python3 tools/sync.py. It never builds locally.
 
 import argparse
 import difflib
+import json
 import os
 import re
 import subprocess
 import sys
+import urllib.error
 import urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -80,23 +82,78 @@ def parse_projects(module_text):
     return out
 
 
-_DEV_DEP = re.compile(r",(\s*)dev_dependency\s*=\s*True(\s*,)?")
+_DEV_DEP = re.compile(r",\s*dev_dependency\s*=\s*True\b")
+_CALL = re.compile(r"^(?:\w+\s*=\s*)?(\w+)\s*\(", re.M)
+_OVERRIDE = re.compile(
+    r"\b(?:archive|git|local_path|single_version|multiple_version)_override\s*\("
+    r"[^)]*?module_name\s*=\s*\"([^\"]+)\"",
+    re.S,
+)
 
 
-def undev(module_text):
-    """Drops every `dev_dependency = True` argument from a MODULE.bazel."""
+def _calls(text):
+    """Yields (start, end, func) for each top-level call statement."""
+    for m in _CALL.finditer(text):
+        depth, i, quote = 0, m.end() - 1, None
+        while i < len(text):
+            c = text[i]
+            if quote:
+                if c == "\\":
+                    i += 1
+                elif c == quote:
+                    quote = None
+            elif c in "\"'":
+                quote = c
+            elif c == "#":
+                i = text.find("\n", i)
+                if i < 0:
+                    return
+            elif c == "(":
+                depth += 1
+            elif c == ")":
+                depth -= 1
+                if depth == 0:
+                    yield m.start(), i + 1, m.group(1)
+                    break
+            i += 1
 
-    def repl(m):
-        # Keep a trailing comma only if one preceded and followed the kwarg on
-        # separate lines (multi-line call); otherwise just remove the kwarg.
-        return "," if m.group(2) and "\n" in m.group(1) else ""
 
-    return _DEV_DEP.sub(repl, module_text)
+def undev(module_text, available=lambda name, version: True):
+    """Drops `dev_dependency = True` from a MODULE.bazel's calls.
+
+    A dev bazel_dep stays dev-only when the module overrides it itself
+    (non-root overrides are ignored, so it would not resolve) or when
+    available(name, version) is false; so does any other dev call that
+    mentions such a dep's repo.
+    """
+    overridden = set(_OVERRIDE.findall(module_text))
+    calls = [c for c in _calls(module_text) if _DEV_DEP.search(module_text[c[0]:c[1]])]
+    kept = set()
+    for start, end, func in calls:
+        args = module_text[start:end]
+        if func != "bazel_dep":
+            continue
+        name, version = _kwarg(args, "name"), _kwarg(args, "version")
+        if name in overridden or not available(name, version):
+            kept.add(_kwarg(args, "repo_name") or name)
+    out, last = [], 0
+    for start, end, func in calls:
+        args = module_text[start:end]
+        if func == "bazel_dep":
+            keep = (_kwarg(args, "repo_name") or _kwarg(args, "name")) in kept
+        else:
+            keep = any(re.search(r"@" + re.escape(r) + r"\b", args) for r in kept)
+        if not keep:
+            out.append(module_text[last:start])
+            out.append(_DEV_DEP.sub("", args))
+            last = end
+    out.append(module_text[last:])
+    return "".join(out)
 
 
-def make_patch(module_text):
+def make_patch(module_text, available=lambda name, version: True):
     """Returns a -p1 patch for MODULE.bazel that drops dev_dependency, or None."""
-    new = undev(module_text)
+    new = undev(module_text, available)
     if new == module_text:
         return None
     return "".join(
@@ -230,6 +287,18 @@ def fetch(url):
         return r.read().decode()
 
 
+_metadata = {}
+
+
+def bcr_has(name, version):
+    if name not in _metadata:
+        try:
+            _metadata[name] = json.loads(fetch("%s/modules/%s/metadata.json" % (BCR, name)))
+        except urllib.error.HTTPError:
+            _metadata[name] = {"versions": []}
+    return version in _metadata[name]["versions"]
+
+
 def write(path, text):
     path = os.path.join(ROOT, path)
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -245,7 +314,8 @@ def sync_patches(projects, nopatch):
         path = os.path.join("patches", name + ".patch")
         text = None
         if name not in nopatch:
-            text = make_patch(fetch("%s/modules/%s/%s/MODULE.bazel" % (BCR, name, version)))
+            url = "%s/modules/%s/%s/MODULE.bazel" % (BCR, name, version)
+            text = make_patch(fetch(url), bcr_has)
         if text:
             write(path, text)
             patched.append((name, version))

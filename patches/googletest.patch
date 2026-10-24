@@ -1,0 +1,17 @@
+--- a/MODULE.bazel
++++ b/MODULE.bazel
+@@ -59,14 +59,12 @@
+ bazel_dep(
+     name = "rules_python",
+     version = "2.2.0",
+-    dev_dependency = True,
+ )
+ 
+ # https://rules-python.readthedocs.io/en/stable/toolchains.html#library-modules-with-dev-only-python-usage
+ python = use_extension(
+     "@rules_python//python/extensions:python.bzl",
+     "python",
+-    dev_dependency = True,
+ )
+ python.toolchain(
+     ignore_root_user_error = True,

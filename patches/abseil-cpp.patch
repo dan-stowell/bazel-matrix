@@ -1,0 +1,18 @@
+--- a/MODULE.bazel
++++ b/MODULE.bazel
+@@ -22,7 +22,6 @@
+ cc_configure = use_extension(
+     "@rules_cc//cc:extensions.bzl",
+     "cc_configure_extension",
+-    dev_dependency = True,
+ )
+ use_repo(cc_configure, "local_config_cc")
+ 
+@@ -33,7 +32,6 @@
+ bazel_dep(
+     name = "google_benchmark",
+     version = "1.9.5",
+-    dev_dependency = True,
+ )
+ 
+ # Note: Googletest is NOT a dev_dependency. Some Abseil test utilities
