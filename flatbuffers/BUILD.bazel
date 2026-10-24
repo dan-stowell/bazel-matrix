@@ -139,9 +139,3 @@ alias(
     name = "tests__test_data_copied_to_bin",
     actual = "@flatbuffers//tests:test_data_copied_to_bin",
 )
-
-test_suite(
-    name = "tests",
-    tests = [
-    ],
-)

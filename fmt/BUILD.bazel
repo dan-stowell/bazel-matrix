@@ -19,9 +19,3 @@ alias(
     name = "package_metadata_license",
     actual = "@fmt//:package_metadata_license",
 )
-
-test_suite(
-    name = "tests",
-    tests = [
-    ],
-)

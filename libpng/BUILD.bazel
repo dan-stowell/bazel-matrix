@@ -24,9 +24,3 @@ alias(
     name = "pnglibconf_options",
     actual = "@libpng//:pnglibconf_options",
 )
-
-test_suite(
-    name = "tests",
-    tests = [
-    ],
-)

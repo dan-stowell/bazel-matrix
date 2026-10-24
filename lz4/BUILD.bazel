@@ -39,9 +39,3 @@ alias(
     name = "programs__multithreading",
     actual = "@lz4//programs:multithreading",
 )
-
-test_suite(
-    name = "tests",
-    tests = [
-    ],
-)
