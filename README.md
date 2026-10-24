@@ -66,9 +66,10 @@ Each inner run is tagged `resources:cpu:2`/`resources:memory:2500`, so a
 The BuildBuddy API key reaches the inner Bazels through a credential helper
 (`tools/buildbuddy_credential_helper.py`) reading a file that the
 `@buildbuddy_credentials` repo rule writes from the outer client
-environment, scoped to the outer workspace and deleted when the variable is
-unset (`tools/credentials.bzl`). The key is never an action input or
-environment variable, so it's in no action key.
+environment into the outer output base, and deletes when the variable is
+unset (`tools/credentials.bzl`); `tools/inner_bazel.py` finds it from its
+working directory. Neither the key nor its location is an action input or
+environment variable, so the outer cache is shared across checkouts.
 
 ## Layout
 
