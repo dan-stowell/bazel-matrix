@@ -15,3 +15,7 @@ common --keep_going
 # The generated //<module> aliases and test_suites point at targets that are
 # mostly private to their module.
 common --nocheck_visibility
+
+# The executor image has no JDK; use a downloaded one.
+common --java_runtime_version=remotejdk_21
+common --tool_java_runtime_version=remotejdk_21

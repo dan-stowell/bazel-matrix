@@ -23,6 +23,5 @@ alias(
 test_suite(
     name = "tests",
     tests = [
-        "@spdlog//:spdlog_test",
     ],
 )

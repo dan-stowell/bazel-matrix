@@ -55,16 +55,6 @@ alias(
     actual = "@google_benchmark//test:output_test_helper",
 )
 
-alias(
-    name = "tools__compare",
-    actual = "@google_benchmark//tools:compare",
-)
-
-alias(
-    name = "tools__gbench",
-    actual = "@google_benchmark//tools:gbench",
-)
-
 test_suite(
     name = "tests",
     tests = [
