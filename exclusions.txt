@@ -1,14 +1,14 @@
 # Targets tools/sync.py leaves out of the generated //<module> packages.
 # One per line: <pattern> <reason>. Patterns are an exact label
-# (@m//pkg:name), a package subtree (@m//pkg/...), or a whole repo (@m//...).
+# (@m//pkg:name), a label prefix (@m//pkg:v25*), a package subtree
+# (@m//pkg/...), or a whole repo (@m//...).
 # `nopatch:<module> <reason>` keeps a module's dev dependencies dev-only.
 @protobuf//ruby/... needs rules_ruby, which protobuf pins with its own (ignored) override
-@protobuf//csharp/protos/... refers to Google-internal @protobuf//net/proto2/compiler/public
+@protobuf//csharp/... needs dotnet, and csharp/protos refers to Google-internal //net/proto2/compiler/public
 @protobuf//benchmarks/... needs googleapis protos (googleads v17) missing from the BCR googleapis
 @brotli//:dictionary dictionary.bin is not in the BCR source archive
-@protobuf//:generated_protos genrule cmd uses root-relative src/ paths, so it only works with protobuf as the root module
 @protobuf//rust/... protobuf's Rust aspects build invalid '../protobuf+/' labels when protobuf is not the root module
-@protobuf//php/... genrule cmd uses root-relative src/ paths, so it only works with protobuf as the root module
+@protobuf//php/... gen_wkt_sources genrule cmd uses root-relative src/ paths, so it only works with protobuf as the root module
 @protobuf//bazel/tests/... analysis tests assert root-module short paths
 @protobuf//upb/wire:decode_benchmark links both gtest_main and benchmark_main (duplicate main)
 @protobuf//upb/mini_table:message_benchmark links both gtest_main and benchmark_main (duplicate main)
@@ -27,3 +27,11 @@
 @glog//:utilities_test glog's BUILD uses @com_github_google_googletest, which its MODULE.bazel never declares
 @spdlog//:spdlog_test includes tests/test_systemd.cpp, which needs systemd headers the executor image lacks
 @google_benchmark//tools/... py tools need numpy/scipy wheels that don't match the default Python
+@protobuf//conformance:conformance_php_c depends on @protobuf//php (see above)
+@protobuf//:generated_protos genrule cmd uses root-relative src/ paths, so it only works with protobuf as the root module
+@protobuf//:generated_protos_py_genproto depends on @protobuf//:generated_protos (see above)
+@protobuf//java/core:v25* compatibility tests need @protobuf//compatibility, which the BCR archive lacks
+@protobuf//examples/... examples include addressbook.pb.h root-relative, so only work with protobuf as the root module
+@flatbuffers//tests:monster_test_cc_fbs_srcs flatc gets --bfbs-filenames=tests, a root-relative dir
+@flatbuffers//tests:include_test_fbs_srcs flatc gets --bfbs-filenames=tests, a root-relative dir
+@flatbuffers//tests:includer_test_fbs_srcs flatc gets --bfbs-filenames=tests, a root-relative dir

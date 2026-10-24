@@ -161,11 +161,6 @@ alias(
 )
 
 alias(
-    name = "tests__include_test_fbs_srcs",
-    actual = "@flatbuffers//tests:include_test_fbs_srcs",
-)
-
-alias(
     name = "tests__included_test_fbs",
     actual = "@flatbuffers//tests:included_test_fbs",
 )
@@ -191,11 +186,6 @@ alias(
 )
 
 alias(
-    name = "tests__includer_test_fbs_srcs",
-    actual = "@flatbuffers//tests:includer_test_fbs_srcs",
-)
-
-alias(
     name = "tests__monster_extra_cc_fbs",
     actual = "@flatbuffers//tests:monster_extra_cc_fbs",
 )
@@ -218,11 +208,6 @@ alias(
 alias(
     name = "tests__monster_test_cc_fbs_includes",
     actual = "@flatbuffers//tests:monster_test_cc_fbs_includes",
-)
-
-alias(
-    name = "tests__monster_test_cc_fbs_srcs",
-    actual = "@flatbuffers//tests:monster_test_cc_fbs_srcs",
 )
 
 alias(
