@@ -6,5 +6,7 @@ project(
     name = "re2",
     targets = [
         "//...",
+        # app/BUILD.bazel uses cc_binary without a load(), which Bazel 9 removed
+        "-//app/...",
     ],
 )

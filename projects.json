@@ -89,9 +89,15 @@
         }
       },
       "targets": [
-        "//..."
+        "//...",
+        "-//app/..."
       ],
-      "exclude": [],
+      "exclude": [
+        {
+          "pattern": "//app/...",
+          "reason": "app/BUILD.bazel uses cc_binary without a load(), which Bazel 9 removed"
+        }
+      ],
       "flags": [],
       "bazel_version": null
     },
@@ -115,6 +121,10 @@
         "-//conformance/ruby/...",
         "-//csharp/...",
         "-//examples/...",
+        "-//conformance:conformance_csharp",
+        "-//conformance:conformance_csharp_genrule",
+        "-//conformance:conformance_php_c",
+        "-//conformance:conformance_php_c_genrule",
         "-//php/...",
         "-//java/core/..."
       ],
@@ -134,6 +144,22 @@
         {
           "pattern": "//examples/...",
           "reason": "a separate workspace (examples/MODULE.bazel) using protobuf as a dependency"
+        },
+        {
+          "pattern": "//conformance:conformance_csharp",
+          "reason": "needs dotnet"
+        },
+        {
+          "pattern": "//conformance:conformance_csharp_genrule",
+          "reason": "needs dotnet"
+        },
+        {
+          "pattern": "//conformance:conformance_php_c",
+          "reason": "needs //php:extension (below)"
+        },
+        {
+          "pattern": "//conformance:conformance_php_c_genrule",
+          "reason": "needs //php:extension (below)"
         },
         {
           "pattern": "//php/...",
