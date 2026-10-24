@@ -260,6 +260,9 @@ def main(argv=None):
                       file=log, flush=True)
         bep = os.path.join(work, "bep.json")
         env = dict(os.environ)
+        # Build actions get an empty environment; cc autoconfiguration
+        # needs a PATH to find the compiler.
+        env.setdefault("PATH", "/usr/local/bin:/usr/bin:/bin")
         env.setdefault("HOME", work)
         env["TMPDIR"] = os.path.join(work, "tmp")
         os.makedirs(env["TMPDIR"])
