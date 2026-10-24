@@ -61,6 +61,22 @@ class TestXmlTest(unittest.TestCase):
         self.assertIn("https://x/abc", suite.find("system-out").text)
 
 
+class FailedInvocationTest(unittest.TestCase):
+    def test_unexplained_failure(self):
+        root = ET.fromstring(inner_bazel.test_xml("p", {"//:t": ("PASSED", 0)}, [], "L", ok=False))
+        suite = root.find("testsuite")
+        self.assertEqual((suite.get("tests"), suite.get("failures")), ("2", "1"))
+        names = [c.get("name") for c in suite.iter("testcase")]
+        self.assertIn("invocation", names)
+
+    def test_multiple_configurations_keep_failure(self):
+        bep = [
+            ev(id={"testSummary": {"label": "//:t"}}, testSummary={"overallStatus": "FAILED"}),
+            ev(id={"testSummary": {"label": "//:t"}}, testSummary={"overallStatus": "PASSED"}),
+        ]
+        self.assertEqual(inner_bazel.load_bep(bep)[1], {"//:t": ("FAILED", 0)})
+
+
 class CommandTest(unittest.TestCase):
     def test_command(self):
         args = inner_bazel.parse_args([

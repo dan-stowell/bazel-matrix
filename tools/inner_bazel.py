@@ -31,6 +31,7 @@ import xml.etree.ElementTree as ET
 
 WORK_ROOT = "/tmp/bazel-matrix/work"
 REPOSITORY_CACHE = "/tmp/bazel-matrix/repository_cache"
+REPOSITORY_CACHE_LIMIT = 4e9
 
 # Inner exit codes that count as success: 4 is "no test targets found".
 _OK = {"build": {0}, "test": {0, 4}}
@@ -94,14 +95,17 @@ def load_bep(lines):
             test_targets.add(eid["targetConfigured"]["label"])
         if "testSummary" in eid:
             s = event.get("testSummary", {})
-            summaries[eid["testSummary"]["label"]] = (
-                s.get("overallStatus", "NO_STATUS"), int(s.get("totalRunDurationMillis", 0)))
+            label = eid["testSummary"]["label"]
+            # A label can be tested in several configurations; keep a failure.
+            if summaries.get(label, ("PASSED",))[0] in _PASSING:
+                summaries[label] = (
+                    s.get("overallStatus", "NO_STATUS"), int(s.get("totalRunDurationMillis", 0)))
         if "targetCompleted" in eid:
             label = eid["targetCompleted"]["label"]
             if "aborted" in event:
                 aborted[label] = event["aborted"].get("reason", "UNKNOWN")
             else:
-                completed[label] = event.get("completed", {}).get("success", False)
+                completed[label] = completed.get(label, True) and event.get("completed", {}).get("success", False)
         elif "targetConfigured" in eid and "aborted" in event:
             aborted[eid["targetConfigured"]["label"]] = event["aborted"].get("reason", "UNKNOWN")
     tests = {}
@@ -122,8 +126,12 @@ def load_bep(lines):
     return invocation, tests, failed_builds
 
 
-def test_xml(project, tests, failed_builds, link):
-    """A JUnit XML document: one testcase per inner test target."""
+def test_xml(project, tests, failed_builds, link, ok=True):
+    """A JUnit XML document: one testcase per inner test target.
+
+    A failed inner invocation that no target failure explains (a bad flag,
+    a target pattern error, a timeout) gets an `invocation` testcase.
+    """
     suite = ET.Element("testsuite", name=project)
     failures = skipped = 0
     for label in sorted(tests):
@@ -142,7 +150,13 @@ def test_xml(project, tests, failed_builds, link):
         failures += 1
         case = ET.SubElement(suite, "testcase", name=label, classname=project + ".build")
         ET.SubElement(case, "failure", message="FAILED_TO_BUILD").text = "see " + link
-    suite.set("tests", str(len(tests) + len(failed_builds)))
+    count = len(tests) + len(failed_builds)
+    if not ok and not failures:
+        failures += 1
+        count += 1
+        case = ET.SubElement(suite, "testcase", name="invocation", classname=project)
+        ET.SubElement(case, "failure", message="INNER_BAZEL_FAILED").text = "see " + link
+    suite.set("tests", str(count))
     suite.set("failures", str(failures))
     suite.set("skipped", str(skipped))
     ET.SubElement(suite, "system-out").text = "inner invocation: " + link
@@ -208,8 +222,11 @@ def remove_stale(root):
             with open(os.path.join(path, "pid")) as f:
                 pid = int(f.read())
         except (OSError, ValueError):
-            if time.time() - os.path.getmtime(path) < 600:
-                continue
+            try:
+                if time.time() - os.path.getmtime(path) < 600:
+                    continue
+            except OSError:
+                continue  # removed meanwhile
             pid = 0
         if not pid or not _alive(pid):
             remove_tree(path)
@@ -251,6 +268,10 @@ def main(argv=None):
     os.makedirs(WORK_ROOT, exist_ok=True)
     os.makedirs(REPOSITORY_CACHE, exist_ok=True)
     remove_stale(WORK_ROOT)
+    if _du(REPOSITORY_CACHE) > REPOSITORY_CACHE_LIMIT:
+        # Nothing evicts from a repository cache; start over when it's big.
+        remove_tree(REPOSITORY_CACHE)
+        os.makedirs(REPOSITORY_CACHE, exist_ok=True)
     work = tempfile.mkdtemp(prefix=args.project + "-", dir=WORK_ROOT)
     with open(os.path.join(work, "pid"), "w") as f:
         f.write(str(os.getpid()))
@@ -326,6 +347,7 @@ def main(argv=None):
         with open(rc) as f:
             rc_texts.append(f.read())
     link = results_url(rc_texts) + invocation if invocation else "(none)"
+    ok = code in _OK[args.mode]
     summary = summary_text(args.project, args.mode, args.bazel_version, code, link, tests,
                            failed_builds, stats)
     if args.summary:
@@ -334,8 +356,7 @@ def main(argv=None):
     sys.stderr.write(summary)
     if args.mode == "test" and os.environ.get("XML_OUTPUT_FILE"):
         with open(os.environ["XML_OUTPUT_FILE"], "w") as f:
-            f.write(test_xml(args.project, tests, failed_builds, link))
-    ok = code in _OK[args.mode]
+            f.write(test_xml(args.project, tests, failed_builds, link, ok))
     if not ok and args.log:
         with open(args.log) as f:
             sys.stderr.write("".join(f.readlines()[-80:]))

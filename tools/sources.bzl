@@ -40,6 +40,7 @@ def _bcr_source_impl(rctx):
         "--owner=0",
         "--group=0",
         "--numeric-owner",
+        "--mode=u+rwX,go+rX,go-w",
         "--",
     ] + sorted(entries))
     if result.return_code:

@@ -43,7 +43,12 @@ class PickTest(unittest.TestCase):
         text = 'module(\n  name = "m",\n  # bazel_compatibility = [">=99"]\n  bazel_compatibility = ["<9.0.0"],\n)'
         version, why = sync.pick(meta, {"1.0": text}.get, "9.3.1")
         self.assertIsNone(version)
-        self.assertIn("excludes Bazel 9.3.1", why)
+        self.assertIn("no version admits Bazel 9.3.1", why)
+
+    def test_older_compatible(self):
+        meta = {"versions": ["1.0", "2.0"]}
+        texts = {"1.0": "module()", "2.0": 'module(bazel_compatibility = ["<9.0.0"])'}
+        self.assertEqual(sync.pick(meta, texts.get, "9.3.1"), ("1.0", None))
 
     def test_date_versions(self):
         meta = {"versions": ["2024-07-02", "2025-11-05.bcr.1", "2025-11-05"]}

@@ -127,7 +127,7 @@ def bazel_compatibility(module_text):
 
 
 def pick(metadata, module_text_for, bazel):
-    """(version, None) for a module's latest usable version, or (None, why)."""
+    """(version, None) for a module's newest usable version, or (None, why)."""
     if metadata.get("deprecated"):
         return None, "deprecated"
     yanked = metadata.get("yanked_versions") or {}
@@ -137,14 +137,13 @@ def pick(metadata, module_text_for, bazel):
     # Date versions like re2's 2025-11-05 parse as prereleases; a module
     # with nothing else uses its latest.
     stable = [v for v in versions if is_stable(v)] or versions
-    latest = stable[-1]
-    text = module_text_for(latest)
-    if text is None:
-        return None, "no MODULE.bazel for " + latest
-    if not bazel_compatible(bazel_compatibility(text), bazel):
-        return None, "%s: bazel_compatibility %s excludes Bazel %s" % (
-            latest, bazel_compatibility(text), bazel)
-    return latest, None
+    for v in reversed(stable):
+        text = module_text_for(v)
+        if text is not None and bazel_compatible(bazel_compatibility(text), bazel):
+            return v, None
+    latest = module_text_for(stable[-1]) or ""
+    return None, "no version admits Bazel %s (latest %s: bazel_compatibility %s)" % (
+        bazel, stable[-1], bazel_compatibility(latest))
 
 
 # ---------------------------------------------------------------------------
