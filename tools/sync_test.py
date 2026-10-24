@@ -24,9 +24,17 @@ class ParseProjectsTxtTest(unittest.TestCase):
         self.assertEqual(re2["flags"], [("--copt=-w", "noisy warnings")])
         self.assertEqual(re2["bazel"], ("8.4.2", "needs Bazel 8"))
 
+    def test_known_failing(self):
+        projects = sync.parse_projects_txt(
+            "a\n  known-failing build  no Bazel 9: native.cc_library\nb\n  known-failing test  x y\nc\n")
+        self.assertEqual([p["known_failing"] for p in projects],
+                         [("build", "no Bazel 9: native.cc_library"), ("test", "x y"), None])
+
     def test_errors(self):
         for text in ["zlib\n  -//foo/...", "  -//x  why", "zlib\nzlib",
-                     "zlib\n  //foo  why", "zlib\n  -//foo/*  why", "Bad Name"]:
+                     "zlib\n  //foo  why", "zlib\n  -//foo/*  why", "Bad Name",
+                     "zlib\n  known-failing run  why", "zlib\n  known-failing build",
+                     "zlib\n  known-failing build  a\n  known-failing test  b"]:
             with self.assertRaises(ValueError, msg=text):
                 sync.parse_projects_txt(text)
 
@@ -103,6 +111,31 @@ class RenderBuildTest(unittest.TestCase):
         text = sync.render_build({"name": "zlib", "exclude": [], "flags": [], "bazel": None})
         self.assertNotIn("flags", text)
         self.assertNotIn("bazel_version", text)
+        self.assertNotIn("known_failing", text)
+
+    def test_known_failing(self):
+        text = sync.render_build({"name": "m", "exclude": [], "flags": [], "bazel": None,
+                                  "known_failing": ("test", "needs a GPU")})
+        self.assertIn('    # needs a GPU\n    known_failing = "test",\n', text)
+
+
+class StatusTest(unittest.TestCase):
+    def test_counts(self):
+        projects = sync.parse_projects_txt(
+            "a\n  known-failing build  r\n  -//x  r\n  -//y  r\nb\n  known-failing test  r\n"
+            "  --f  r\nc\n")
+        c = sync.counts(projects, [{"name": "d", "reason": "deprecated"}])
+        self.assertEqual(c, {"projects": 3, "known_failing_build": 1, "known_failing_test": 1,
+                             "exclusions": 2, "flags": 1, "skipped": 1})
+        self.assertIn("3 projects: 1 known-failing build, 1 known-failing test", sync.status_line(c))
+
+    def test_update_status(self):
+        readme = "x\n%s\nold\n%s\ny\n" % (sync.STATUS_BEGIN, sync.STATUS_END)
+        new = sync.update_status(readme, "new")
+        self.assertEqual(new, "x\n%s\nnew\n%s\ny\n" % (sync.STATUS_BEGIN, sync.STATUS_END))
+        self.assertEqual(sync.update_status(new, "new"), new)
+        with self.assertRaises(ValueError):
+            sync.update_status("no markers", "new")
 
 
 if __name__ == "__main__":
