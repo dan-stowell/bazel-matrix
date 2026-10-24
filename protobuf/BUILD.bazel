@@ -2141,6 +2141,621 @@ alias(
 )
 
 alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarAnyTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarAnyTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarArrayDecodersTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarArrayDecodersTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarBooleanArrayListTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarBooleanArrayListTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarBoundedByteStringTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarBoundedByteStringTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarByteStringTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarByteStringTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarCachedFieldSizeTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarCachedFieldSizeTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarCheckUtf8Test",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarCheckUtf8Test",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarConcurrentDescriptorsTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarConcurrentDescriptorsTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarDeprecatedFieldTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarDeprecatedFieldTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarDiscardUnknownFieldsTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarDiscardUnknownFieldsTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarDoubleArrayListTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarDoubleArrayListTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarDynamicMessageTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarDynamicMessageTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarEnumTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarEnumTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarExtensionRegistryFactoryTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarExtensionRegistryFactoryTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarFloatArrayListTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarFloatArrayListTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarGeneratedMessageTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarGeneratedMessageTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarIntArrayListTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarIntArrayListTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarInternalLazyFieldTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarInternalLazyFieldTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarInvalidProtocolBufferExceptionTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarInvalidProtocolBufferExceptionTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarIterableByteBufferInputStreamTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarIterableByteBufferInputStreamTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarLazilyParsedMessageSetTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarLazilyParsedMessageSetTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarLazyFieldLiteTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarLazyFieldLiteTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarLazyFieldTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarLazyFieldTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarLazyMessageLiteTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarLazyMessageLiteTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarLazyStringArrayListTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarLazyStringArrayListTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarLazyStringEndToEndTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarLazyStringEndToEndTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarLegacyUnredactedTextFormatTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarLegacyUnredactedTextFormatTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarLiteEqualsAndHashTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarLiteEqualsAndHashTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarLiteralByteStringTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarLiteralByteStringTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarLongArrayListTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarLongArrayListTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarMapForProto2LiteTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarMapForProto2LiteTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarMapForProto2Test",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarMapForProto2Test",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarMapLiteTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarMapLiteTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarMapTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarMapTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarMessageTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarMessageTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarNestedBuildersTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarNestedBuildersTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarPackedFieldTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarPackedFieldTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarParseExceptionsTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarParseExceptionsTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarParserTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarParserTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarProto2UnknownEnumValueTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarProto2UnknownEnumValueTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarProtobufArrayListTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarProtobufArrayListTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarRepeatedFieldBuilderTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarRepeatedFieldBuilderTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarRopeByteStringSubstringTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarRopeByteStringSubstringTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarRopeByteStringTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarRopeByteStringTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarServiceTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarServiceTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarSingleFieldBuilderTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarSingleFieldBuilderTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarSmallSortedMapTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarSmallSortedMapTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarTextFormatParseInfoTreeTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarTextFormatParseInfoTreeTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarTextFormatParseLocationTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarTextFormatParseLocationTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarTextFormatPerformanceTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarTextFormatPerformanceTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarTypeRegistryTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarTypeRegistryTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarUnknownEnumValueTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarUnknownEnumValueTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarUnknownFieldSetPerformanceTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarUnknownFieldSetPerformanceTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarUnknownFieldSetTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarUnknownFieldSetTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarUnmodifiableLazyStringListTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarUnmodifiableLazyStringListTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarUnredactedDebugFormatForTestTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarUnredactedDebugFormatForTestTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarUtf8Test",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarUtf8Test",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarWellKnownTypesTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarWellKnownTypesTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarWireFormatLiteTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarWireFormatLiteTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarWireFormatTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarWireFormatTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarWrappersLiteOfMethodTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarWrappersLiteOfMethodTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_jarTestSuite_v25JarWrappersOfMethodTest",
+    actual = "@protobuf//java/core:v25_core_tests_jarTestSuite_v25JarWrappersOfMethodTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarAnyTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarAnyTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarArrayDecodersTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarArrayDecodersTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarBooleanArrayListTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarBooleanArrayListTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarBoundedByteStringTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarBoundedByteStringTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarByteStringTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarByteStringTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarCachedFieldSizeTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarCachedFieldSizeTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarCheckUtf8Test",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarCheckUtf8Test",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarConcurrentDescriptorsTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarConcurrentDescriptorsTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarDeprecatedFieldTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarDeprecatedFieldTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarDiscardUnknownFieldsTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarDiscardUnknownFieldsTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarDoubleArrayListTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarDoubleArrayListTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarDynamicMessageTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarDynamicMessageTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarEnumTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarEnumTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarExtensionRegistryFactoryTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarExtensionRegistryFactoryTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarFloatArrayListTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarFloatArrayListTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarGeneratedMessageTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarGeneratedMessageTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarIntArrayListTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarIntArrayListTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarInternalLazyFieldTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarInternalLazyFieldTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarInvalidProtocolBufferExceptionTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarInvalidProtocolBufferExceptionTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarIterableByteBufferInputStreamTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarIterableByteBufferInputStreamTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarLazilyParsedMessageSetTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarLazilyParsedMessageSetTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarLazyFieldLiteTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarLazyFieldLiteTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarLazyFieldTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarLazyFieldTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarLazyMessageLiteTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarLazyMessageLiteTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarLazyStringArrayListTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarLazyStringArrayListTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarLazyStringEndToEndTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarLazyStringEndToEndTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarLegacyUnredactedTextFormatTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarLegacyUnredactedTextFormatTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarLiteEqualsAndHashTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarLiteEqualsAndHashTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarLiteralByteStringTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarLiteralByteStringTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarLongArrayListTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarLongArrayListTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarMapForProto2LiteTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarMapForProto2LiteTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarMapForProto2Test",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarMapForProto2Test",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarMapLiteTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarMapLiteTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarMapTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarMapTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarMessageTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarMessageTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarNestedBuildersTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarNestedBuildersTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarPackedFieldTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarPackedFieldTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarParseExceptionsTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarParseExceptionsTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarParserTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarParserTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarProto2UnknownEnumValueTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarProto2UnknownEnumValueTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarProtobufArrayListTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarProtobufArrayListTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarRepeatedFieldBuilderTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarRepeatedFieldBuilderTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarRopeByteStringSubstringTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarRopeByteStringSubstringTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarRopeByteStringTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarRopeByteStringTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarServiceTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarServiceTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarSingleFieldBuilderTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarSingleFieldBuilderTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarSmallSortedMapTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarSmallSortedMapTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarTextFormatParseInfoTreeTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarTextFormatParseInfoTreeTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarTextFormatParseLocationTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarTextFormatParseLocationTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarTextFormatPerformanceTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarTextFormatPerformanceTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarTypeRegistryTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarTypeRegistryTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarUnknownEnumValueTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarUnknownEnumValueTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarUnknownFieldSetPerformanceTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarUnknownFieldSetPerformanceTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarUnknownFieldSetTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarUnknownFieldSetTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarUnmodifiableLazyStringListTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarUnmodifiableLazyStringListTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarUtf8Test",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarUtf8Test",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarWellKnownTypesTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarWellKnownTypesTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarWireFormatLiteTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarWireFormatLiteTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarWireFormatTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarWireFormatTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarWrappersLiteOfMethodTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarWrappersLiteOfMethodTest",
+)
+
+alias(
+    name = "java_core__v25_core_tests_srcjarTestSuite_v25SrcJarWrappersOfMethodTest",
+    actual = "@protobuf//java/core:v25_core_tests_srcjarTestSuite_v25SrcJarWrappersOfMethodTest",
+)
+
+alias(
     name = "java_features_proto",
     actual = "@protobuf//:java_features_proto",
 )

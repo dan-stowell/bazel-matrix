@@ -29,9 +29,3 @@ alias(
     name = "tests__catch2_self_test_helper",
     actual = "@catch2//tests:catch2_self_test_helper",
 )
-
-test_suite(
-    name = "tests",
-    tests = [
-    ],
-)

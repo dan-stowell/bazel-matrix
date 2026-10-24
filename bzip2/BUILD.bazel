@@ -19,9 +19,3 @@ alias(
     name = "version_file",
     actual = "@bzip2//:version_file",
 )
-
-test_suite(
-    name = "tests",
-    tests = [
-    ],
-)

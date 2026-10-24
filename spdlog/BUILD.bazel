@@ -19,9 +19,3 @@ alias(
     name = "use_fmt",
     actual = "@spdlog//:use_fmt",
 )
-
-test_suite(
-    name = "tests",
-    tests = [
-    ],
-)

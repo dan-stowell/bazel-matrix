@@ -9,9 +9,3 @@ alias(
     name = "singleheader-json",
     actual = "@nlohmann_json//:singleheader-json",
 )
-
-test_suite(
-    name = "tests",
-    tests = [
-    ],
-)

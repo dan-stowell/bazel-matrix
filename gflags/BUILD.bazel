@@ -34,9 +34,3 @@ alias(
     name = "gflags_nothreads",
     actual = "@gflags//:gflags_nothreads",
 )
-
-test_suite(
-    name = "tests",
-    tests = [
-    ],
-)
