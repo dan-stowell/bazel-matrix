@@ -217,6 +217,9 @@ def parse_query(output):
     return out
 
 
+_LABEL_LINE = re.compile(r"^(@[^/\s]*//[^:\s]*:\S+)$", re.M)
+
+
 def parse_exclusions(text):
     """Returns [(pattern, reason)]; every pattern needs a reason."""
     out = []
@@ -260,11 +263,21 @@ def is_test(kind):
     return kind.endswith("_test")
 
 
-def render_build(module, targets, patterns):
+def rdeps_expr(universe, patterns, labels):
+    """Query for everything in `universe` that depends on an excluded target.
+
+    Prefix patterns aren't query syntax, so they are expanded against `labels`.
+    """
+    terms = [p for p in patterns if not p.endswith("*")]
+    terms += sorted(l for l in labels if any(p.endswith("*") and l.startswith(p[:-1]) for p in patterns))
+    return "rdeps(%s, %s)" % (universe, " + ".join(terms))
+
+
+def render_build(module, targets, excluded):
     """targets: [(kind, label)] -> BUILD.bazel text for //<module>."""
     aliases, tests = {}, []
     for kind, label in sorted(set(targets), key=lambda t: t[1]):
-        if kind == "test_suite" or is_excluded(label, patterns):
+        if kind == "test_suite" or label in excluded:
             continue
         if is_test(kind):
             tests.append(label)
@@ -356,11 +369,20 @@ def sync_builds(projects, patterns):
     by_repo = parse_query(out)
     if not by_repo:
         sys.exit("query returned no targets (exit %d):\n%s" % (code, out[-3000:]))
+    labels = {l for targets in by_repo.values() for _, l in targets}
+    excluded = {l for l in labels if is_excluded(l, patterns)}
+    if patterns:
+        # Leave out whatever depends on an excluded target, too.
+        code, out = bb_remote(["query", rdeps_expr(universe, patterns, labels), "--output=label"])
+        dependents = set(_LABEL_LINE.findall(out)) & labels
+        if not dependents >= excluded:
+            sys.exit("rdeps query looks incomplete (exit %d):\n%s" % (code, out[-3000:]))
+        excluded |= dependents
     for name, _ in projects:
         targets = by_repo.get(name, [])
         if not targets:
             print("warning: no targets found for @%s" % name, file=sys.stderr)
-        write(os.path.join(name, "BUILD.bazel"), render_build(name, targets, patterns))
+        write(os.path.join(name, "BUILD.bazel"), render_build(name, targets, excluded))
 
 
 def sync_lockfile():

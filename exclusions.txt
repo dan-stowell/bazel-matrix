@@ -2,6 +2,7 @@
 # One per line: <pattern> <reason>. Patterns are an exact label
 # (@m//pkg:name), a label prefix (@m//pkg:v25*), a package subtree
 # (@m//pkg/...), or a whole repo (@m//...).
+# Anything depending on an excluded target is left out too.
 # `nopatch:<module> <reason>` keeps a module's dev dependencies dev-only.
 @protobuf//ruby/... needs rules_ruby, which protobuf pins with its own (ignored) override
 @protobuf//csharp/... needs dotnet, and csharp/protos refers to Google-internal //net/proto2/compiler/public
@@ -16,8 +17,6 @@
 @flatbuffers//tests/ts/... rules_nodejs in the graph uses CcInfo, which Bazel 9 removed
 @flatbuffers//reflection/ts/... rules_nodejs in the graph uses CcInfo, which Bazel 9 removed
 @flatbuffers//grpc/... flatbuffers' grpc dev dep can't load protobuf 36's upb rules
-@flatbuffers//tests:monster_test_grpc flatbuffers' grpc dev dep can't load protobuf 36's upb rules
-@flatbuffers//tests:test_builder flatbuffers' grpc dev dep can't load protobuf 36's upb rules
 @flatbuffers//swift/... no Swift toolchain on the Linux executors
 @glog//:stl_logging_test glog's BUILD uses @com_github_google_googletest, which its MODULE.bazel never declares
 @glog//:stacktrace_test glog's BUILD uses @com_github_google_googletest, which its MODULE.bazel never declares
@@ -27,11 +26,11 @@
 @glog//:utilities_test glog's BUILD uses @com_github_google_googletest, which its MODULE.bazel never declares
 @spdlog//:spdlog_test includes tests/test_systemd.cpp, which needs systemd headers the executor image lacks
 @google_benchmark//tools/... py tools need numpy/scipy wheels that don't match the default Python
-@protobuf//conformance:conformance_php_c depends on @protobuf//php (see above)
 @protobuf//:generated_protos genrule cmd uses root-relative src/ paths, so it only works with protobuf as the root module
-@protobuf//:generated_protos_py_genproto depends on @protobuf//:generated_protos (see above)
 @protobuf//java/core:v25* compatibility tests need @protobuf//compatibility, which the BCR archive lacks
 @protobuf//examples/... examples include addressbook.pb.h root-relative, so only work with protobuf as the root module
 @flatbuffers//tests:monster_test_cc_fbs_srcs flatc gets --bfbs-filenames=tests, a root-relative dir
 @flatbuffers//tests:include_test_fbs_srcs flatc gets --bfbs-filenames=tests, a root-relative dir
 @flatbuffers//tests:includer_test_fbs_srcs flatc gets --bfbs-filenames=tests, a root-relative dir
+@flatbuffers//tests:monster_test_grpc flatbuffers' grpc dev dep can't load protobuf 36's upb rules
+@flatbuffers//tests:test_builder flatbuffers' grpc dev dep can't load protobuf 36's upb rules

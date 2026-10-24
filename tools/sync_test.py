@@ -121,6 +121,14 @@ class ExclusionsTest(unittest.TestCase):
         self.assertFalse(sync.is_excluded("@c//:t2", pats))
 
 
+class RdepsExprTest(unittest.TestCase):
+    def test_expands_prefix_patterns(self):
+        self.assertEqual(
+            sync.rdeps_expr("@a//...", ["@a//x/...", "@a//:v*"], {"@a//:v1", "@a//:w"}),
+            "rdeps(@a//..., @a//x/... + @a//:v1)",
+        )
+
+
 class RenderBuildTest(unittest.TestCase):
     def test_aliases_and_suite(self):
         text = sync.render_build("m", [
@@ -131,7 +139,7 @@ class RenderBuildTest(unittest.TestCase):
             ("cc_test", "@m//a:t_test"),
             ("cc_test", "@m//a:skip_test"),
             ("test_suite", "@m//a:all_tests"),
-        ], ["@m//a:skip_test"])
+        ], {"@m//a:skip_test"})
         self.assertIn('name = "lib",\n    actual = "@m//:lib"', text)
         self.assertIn('name = "a_b__lib",\n    actual = "@m//a/b:lib"', text)
         self.assertIn('name = "a_b__lib_2",\n    actual = "@m//a_b:lib"', text)
