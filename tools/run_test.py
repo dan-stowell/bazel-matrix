@@ -45,8 +45,8 @@ class ParseLogTest(unittest.TestCase):
         _, _, status = run.parse_log("(command exited with code 0)", "build", ["zlib"])
         self.assertEqual(status, {"zlib": "PASSED"})
         # A failure that names no project: nothing is known.
-        _, _, status = run.parse_log("(command exited with code 1)", "build", ["zlib"])
-        self.assertEqual(status, {"zlib": "UNKNOWN"})
+        _, _, status = run.parse_log("(command exited with code 1)", "build", ["zlib", "re2"])
+        self.assertEqual(status, {"zlib": "UNKNOWN", "re2": "UNKNOWN"})
 
 
 if __name__ == "__main__":

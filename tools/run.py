@@ -31,6 +31,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import sync  # noqa: E402
 
 RESULTS_URL = "https://buildbuddy.buildbuddy.io/invocation/"
+# FLAKY: passed on a retry.
+PASSING = {"PASSED", "FLAKY"}
 _ANSI = re.compile(r"\x1b\[[0-9;]*[A-Za-z]|\[\d+(?:;\d+)*m")
 _EXIT = re.compile(r"\(command exited with code (\d+)\)")
 _STREAM = re.compile(r"Streaming build results to: (\S+/invocation/[0-9a-f-]+)")
@@ -82,12 +84,13 @@ def parse_log(text, command, names):
             if m:
                 status[m.group(1)] = "FAILED"
     status = {n: s for n, s in status.items() if n in names}
+    failed_found = bool(status)
     for n in names:
         if n in status:
             continue
         if command == "build" and code == 0:
             status[n] = "PASSED"
-        elif command == "build" and code == 1 and len(status) > 0:
+        elif command == "build" and code == 1 and failed_found:
             # --keep_going: the projects not reported as failed built.
             status[n] = "PASSED"
         else:
@@ -155,7 +158,7 @@ def main(argv=None):
         for f in concurrent.futures.as_completed(futures):
             r = f.result()
             results.append(r)
-            failed = sum(s != "PASSED" for s in r["status"].values())
+            failed = sum(s not in PASSING for s in r["status"].values())
             print("shard %d: exit %s, %d/%d passed, %dm%02ds  %s  outer %s" % (
                 r["shard"], r["code"] if r["code"] is not None else "?(bb %d)" % r["bb_exit"],
                 len(r["status"]) - failed, len(r["status"]), r["wall"] // 60, r["wall"] % 60,
@@ -172,7 +175,11 @@ def main(argv=None):
     wall = time.time() - start
     print("\n%s: %s; wall %dm%02ds" % (args.command, ", ".join(
         "%s %d" % kv for kv in sorted(totals.items())), wall // 60, wall % 60))
-    return 0 if set(totals) == {"PASSED"} else 1
+    # The runner's exit code too: a shard can fail after its targets passed.
+    ok = set(totals) <= PASSING and all(r["code"] == 0 for r in results)
+    if not ok and set(totals) <= PASSING:
+        print("a shard failed although every project passed; see its log")
+    return 0 if ok else 1
 
 
 if __name__ == "__main__":
