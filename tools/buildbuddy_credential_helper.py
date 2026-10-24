@@ -1,27 +1,22 @@
 #!/usr/bin/env python3
 """Bazel credential helper for BuildBuddy, used by the inner Bazels.
 
-Returns the x-buildbuddy-api-key header from BUILDBUDDY_API_KEY if set, else
-from the file tools/credentials.bzl writes; with neither, no credentials.
+Returns the x-buildbuddy-api-key header read from the file
+$BAZEL_MATRIX_KEY_FILE names (written by tools/credentials.bzl); with no such
+file, no credentials.
 """
 
 import json
 import os
 import sys
 
-# Keep in sync with tools/credentials.bzl.
-KEY_FILE = "/tmp/bazel-matrix/buildbuddy-api-key"
 
-
-def api_key(env=os.environ, key_file=KEY_FILE):
-    key = env.get("BUILDBUDDY_API_KEY", "")
-    if not key:
-        try:
-            with open(key_file) as f:
-                key = f.read().strip()
-        except OSError:
-            pass
-    return key
+def api_key(env=os.environ):
+    try:
+        with open(env.get("BAZEL_MATRIX_KEY_FILE", "")) as f:
+            return f.read().strip()
+    except OSError:
+        return ""
 
 
 def main(argv=sys.argv):

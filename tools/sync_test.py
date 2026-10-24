@@ -23,7 +23,6 @@ class ParseProjectsTxtTest(unittest.TestCase):
                                           ("//:bench", "slow")])
         self.assertEqual(re2["flags"], [("--copt=-w", "noisy warnings")])
         self.assertEqual(re2["bazel"], ("8.4.2", "needs Bazel 8"))
-        self.assertEqual(sync.targets(re2), ["//...", "-//python/...", "-//:bench"])
 
     def test_errors(self):
         for text in ["zlib\n  -//foo/...", "  -//x  why", "zlib\nzlib",
@@ -81,6 +80,13 @@ class SourceEntryTest(unittest.TestCase):
     def test_git_unsupported(self):
         with self.assertRaises(ValueError):
             sync.source_entry("m", "1", {"type": "git_repository", "remote": "x"}, b"")
+
+
+class VersionsTest(unittest.TestCase):
+    def test_default_inner_bazel(self):
+        self.assertEqual(sync.default_inner_bazel('x\nDEFAULT_INNER_BAZEL = "9.3.1"\n'), "9.3.1")
+        with self.assertRaises(ValueError):
+            sync.default_inner_bazel("")
 
 
 class RenderBuildTest(unittest.TestCase):

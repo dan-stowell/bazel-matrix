@@ -8,11 +8,14 @@ It keeps a sparse, shallow clone of the Bazel Central Registry
 (metadata.json, source.json and MODULE.bazel files only) in
 ~/.cache/bazel-matrix/bcr, checked out at the recorded commit, so re-running
 it changes nothing. For each project in projects.txt it picks the pinned
-version, or else the latest stable, non-yanked version whose
-bazel_compatibility admits the default inner Bazel; records its source
-(archive, integrity, strip_prefix, patches and overlay, as bcr.bazel.build
-URLs with their integrity) in projects.json; and writes //<module>:BUILD.bazel.
-Generated packages of projects no longer listed are deleted.
+version, or else the newest stable, non-yanked version whose
+bazel_compatibility admits its inner Bazel (DEFAULT_INNER_BAZEL in
+tools/versions.bzl unless pinned); records its source (archive, integrity,
+strip_prefix, patches, overlay and MODULE.bazel, as bcr.bazel.build URLs with
+their integrity) in projects.json; and writes //<module>:BUILD.bazel.
+Projects that can't be used (deprecated, no compatible version, an
+unsupported source type) are skipped with the reason, recorded in
+projects.json. Generated packages of projects not written are deleted.
 """
 
 import argparse
@@ -79,7 +82,7 @@ def parse_projects_txt(text):
 
 
 # ---------------------------------------------------------------------------
-# Version selection (after tools/add.py on the scale-tooling branch).
+# Version selection.
 
 
 def _ident(s):
@@ -182,10 +185,6 @@ def source_entry(name, version, source, module_file):
     return entry
 
 
-def targets(project):
-    return ["//..."] + ["-" + p for p, _ in project["exclude"]]
-
-
 def _q(s):
     return json.dumps(s)
 
@@ -211,8 +210,17 @@ def render_build(project):
     return "".join(out)
 
 
-def render_json(commit, entries):
-    return json.dumps({"bcr_commit": commit, "projects": entries}, indent=2) + "\n"
+def render_json(commit, entries, skipped):
+    """projects.json: what tools/sources.bzl fetches, plus the skipped projects."""
+    return json.dumps({"bcr_commit": commit, "projects": entries, "skipped": skipped},
+                      indent=2) + "\n"
+
+
+def default_inner_bazel(versions_bzl):
+    m = re.search(r'^DEFAULT_INNER_BAZEL = "([^"]+)"', versions_bzl, re.M)
+    if not m:
+        raise ValueError("tools/versions.bzl sets no DEFAULT_INNER_BAZEL")
+    return m.group(1)
 
 
 # ---------------------------------------------------------------------------
@@ -275,9 +283,9 @@ def main():
         old = json.loads(read("projects.json"))
     commit = checkout_bcr(None if args.update else old.get("bcr_commit"))
     modules = os.path.join(CACHE, "modules")
-    bazel = read(".bazelversion").strip()
+    bazel = default_inner_bazel(read("tools/versions.bzl"))
 
-    entries, errors = [], []
+    entries, skipped, errors = [], [], []
     for p in projects:
         mdir = os.path.join(modules, p["name"])
         if not os.path.isfile(os.path.join(mdir, "metadata.json")):
@@ -291,32 +299,31 @@ def main():
             version, why = pick(_read_json(os.path.join(mdir, "metadata.json")), text_for,
                                 p["bazel"][0] if p["bazel"] else bazel)
             if why:
-                errors.append("%s: %s" % (p["name"], why))
+                skipped.append({"name": p["name"], "reason": why})
                 continue
         try:
             with open(os.path.join(mdir, version, "MODULE.bazel"), "rb") as f:
                 module_file = f.read()
-            source = source_entry(p["name"], version,
-                                  _read_json(os.path.join(mdir, version, "source.json")), module_file)
-        except (OSError, ValueError) as e:
-            errors.append(str(e))
+            source = _read_json(os.path.join(mdir, version, "source.json"))
+        except OSError as e:
+            errors.append("%s@%s: %s" % (p["name"], version, e))
             continue
-        entries.append({
-            "name": p["name"],
-            "version": version,
-            "source": source,
-            "targets": targets(p),
-            "exclude": [{"pattern": x, "reason": r} for x, r in p["exclude"]],
-            "flags": [{"flag": f, "reason": r} for f, r in p["flags"]],
-            "bazel_version": p["bazel"][0] if p["bazel"] else None,
-        })
+        try:
+            entry = source_entry(p["name"], version, source, module_file)
+        except ValueError as e:
+            skipped.append({"name": p["name"], "reason": str(e)})
+            continue
+        entries.append({"name": p["name"], "version": version, "source": entry})
     if errors:
         sys.exit("sync failed:\n  " + "\n  ".join(errors))
+    for s in skipped:
+        print("skip %s: %s" % (s["name"], s["reason"]), file=sys.stderr)
 
-    write("projects.json", render_json(commit, entries))
+    write("projects.json", render_json(commit, entries, skipped))
+    names = {e["name"] for e in entries}
     for p in projects:
-        write(os.path.join(p["name"], "BUILD.bazel"), render_build(p))
-    names = {p["name"] for p in projects}
+        if p["name"] in names:
+            write(os.path.join(p["name"], "BUILD.bazel"), render_build(p))
     for d in sorted(os.listdir(ROOT)):
         build = os.path.join(ROOT, d, "BUILD.bazel")
         if d not in names and is_generated(build):

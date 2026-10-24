@@ -5,9 +5,13 @@ project, a repo `src_<module>` holding `source.tar`: the project's BCR
 source archive with the BCR's patches and overlay applied and the registry's
 MODULE.bazel in place of its own (as when Bazel fetches it from a registry),
 as one deterministic tar. A hub repo `projects` aliases them as
-`@projects//:<module>`, so MODULE.bazel needs a single use_repo. Repos are
+`@projects//:<module>`, so MODULE.bazel needs a single use_repo; it also
+has the pinned inner Bazels of tools/versions.bzl as `@projects//:bazel_<v>`. Repos are
 fetched lazily: only when a target that needs that project's source runs.
 """
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
+load(":versions.bzl", "INNER_BAZELS")
 
 def _bcr_source_impl(rctx):
     rctx.download_and_extract(
@@ -16,14 +20,16 @@ def _bcr_source_impl(rctx):
         stripPrefix = rctx.attr.strip_prefix,
         type = rctx.attr.archive_type,
     )
+    # The order of http_archive for a registry module: overlay, then the
+    # registry's patches, then the registry's MODULE.bazel.
+    for path, url_integrity in rctx.attr.overlay.items():
+        url, integrity = url_integrity.split(" ")
+        rctx.download(url = url, output = path, integrity = integrity)
     for i, (url, integrity) in enumerate(rctx.attr.patches.items()):
         patch = ".bazel_matrix_patch_%d" % i
         rctx.download(url = url, output = patch, integrity = integrity)
         rctx.patch(patch, strip = rctx.attr.patch_strip)
         rctx.delete(patch)
-    for path, url_integrity in rctx.attr.overlay.items():
-        url, integrity = url_integrity.split(" ")
-        rctx.download(url = url, output = path, integrity = integrity)
     rctx.delete("MODULE.bazel")
     rctx.download(url = rctx.attr.module_file[0], output = "MODULE.bazel", integrity = rctx.attr.module_file[1])
 
@@ -74,17 +80,23 @@ bcr_source = repository_rule(
     },
 )
 
+def _alias(name, actual):
+    return 'alias(\n    name = "%s",\n    actual = "%s",\n    visibility = ["//visibility:public"],\n)\n\n' % (name, actual)
+
 def _hub_impl(rctx):
     rctx.file("REPO.bazel", "")
-    rctx.file("BUILD.bazel", "".join([
-        'alias(\n    name = "%s",\n    actual = "@src_%s//:source.tar",\n    visibility = ["//visibility:public"],\n)\n\n' % (name, name)
-        for name in rctx.attr.names
-    ]))
+    rctx.file("BUILD.bazel", "".join(
+        [_alias(name, "@src_%s//:source.tar" % name) for name in rctx.attr.names] +
+        [_alias("bazel_" + v, "@%s//file" % _bazel_repo(v)) for v in INNER_BAZELS],
+    ))
 
 _hub = repository_rule(
     implementation = _hub_impl,
     attrs = {"names": attr.string_list()},
 )
+
+def _bazel_repo(version):
+    return "inner_bazel_" + version.replace(".", "_")
 
 def _projects_impl(mctx):
     data = json.decode(mctx.read(Label("//:projects.json")))
@@ -103,6 +115,14 @@ def _projects_impl(mctx):
             module_file = [s["module_file"]["url"], s["module_file"]["integrity"]],
         )
         names.append(p["name"])
+    for v, info in INNER_BAZELS.items():
+        http_file(
+            name = _bazel_repo(v),
+            downloaded_file_path = "bazel",
+            executable = True,
+            sha256 = info.sha256,
+            urls = ["https://github.com/bazelbuild/bazel/releases/download/%s/bazel-%s-linux-x86_64" % (v, v)],
+        )
     _hub(name = "projects", names = names)
     return mctx.extension_metadata(
         root_module_direct_deps = ["projects"],

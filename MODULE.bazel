@@ -10,22 +10,3 @@ use_repo(projects, "projects")
 buildbuddy_credentials = use_repo_rule("//tools:credentials.bzl", "buildbuddy_credentials")
 
 buildbuddy_credentials(name = "buildbuddy_credentials")
-
-# Pinned inner Bazels; keep in sync with INNER_BAZELS in tools/project.bzl.
-http_file = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
-
-http_file(
-    name = "inner_bazel_9_3_1",
-    downloaded_file_path = "bazel",
-    executable = True,
-    sha256 = "7f775b54bbec487efaf0f49ccda1d2ed02cd34f582edfdd6aeeec76e39ef585c",
-    urls = ["https://github.com/bazelbuild/bazel/releases/download/9.3.1/bazel-9.3.1-linux-x86_64"],
-)
-
-http_file(
-    name = "inner_bazel_8_4_2",
-    downloaded_file_path = "bazel",
-    executable = True,
-    sha256 = "4dc8e99dfa802e252dac176d08201fd15c542ae78c448c8a89974b6f387c282c",
-    urls = ["https://github.com/bazelbuild/bazel/releases/download/8.4.2/bazel-8.4.2-linux-x86_64"],
-)

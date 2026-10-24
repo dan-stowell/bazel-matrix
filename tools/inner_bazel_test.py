@@ -11,23 +11,29 @@ def ev(**kw):
     return json.dumps(kw)
 
 
+def tc(label, cfg="c1"):
+    return {"label": label, "configuration": {"id": cfg}}
+
+
 BEP = [
     ev(id={"started": {}}, started={"uuid": "abc"}),
     ev(id={"targetConfigured": {"label": "//:t1"}}, configured={"testSize": "SMALL"}),
     ev(id={"targetConfigured": {"label": "//:t2"}}, configured={"testSize": "SMALL"}),
     ev(id={"targetConfigured": {"label": "//:t3"}}, configured={"testSize": "SMALL"}),
+    ev(id={"targetConfigured": {"label": "//:t4"}}, configured={"testSize": "SMALL"}),
     ev(id={"targetConfigured": {"label": "//:skip"}}, configured={"testSize": "SMALL"}),
     ev(id={"targetConfigured": {"label": "//:lib"}}, configured={}),
     ev(id={"targetConfigured": {"label": "//:badlib"}}, configured={}),
-    ev(id={"targetCompleted": {"label": "//:lib"}}, completed={"success": True}),
-    ev(id={"targetCompleted": {"label": "//:badlib"}}, completed={}),
-    ev(id={"targetCompleted": {"label": "//:t3"}}, completed={}),
-    ev(id={"targetConfigured": {"label": "//:t4"}}, configured={"testSize": "SMALL"}),
-    ev(id={"targetCompleted": {"label": "//:t4"}}, completed={"success": True}),
-    ev(id={"targetCompleted": {"label": "//:skip"}}, aborted={"reason": "SKIPPED"}),
-    ev(id={"testSummary": {"label": "//:t1"}}, testSummary={"overallStatus": "PASSED", "totalRunDurationMillis": "1500"}),
-    ev(id={"testSummary": {"label": "//:t2"}}, testSummary={"overallStatus": "FAILED"}),
+    ev(id={"targetCompleted": tc("//:lib")}, completed={"success": True}),
+    ev(id={"targetCompleted": tc("//:badlib")}, completed={}),
+    ev(id={"targetCompleted": tc("//:t1")}, completed={"success": True}),
+    ev(id={"targetCompleted": tc("//:t3")}, completed={}),
+    ev(id={"targetCompleted": tc("//:t4")}, completed={"success": True}),
+    ev(id={"targetCompleted": tc("//:skip")}, aborted={"reason": "SKIPPED"}),
+    ev(id={"testSummary": tc("//:t1")}, testSummary={"overallStatus": "PASSED", "totalRunDurationMillis": "1500"}),
+    ev(id={"testSummary": tc("//:t2")}, testSummary={"overallStatus": "FAILED"}),
     "",
+    '{"id": {"testSummary": {"label": "//:trunc',
 ]
 
 
@@ -36,13 +42,28 @@ class LoadBepTest(unittest.TestCase):
         invocation, tests, failed = inner_bazel.load_bep(BEP)
         self.assertEqual(invocation, "abc")
         self.assertEqual(tests, {
-            "//:t1": ("PASSED", 1500),
-            "//:t2": ("FAILED", 0),
-            "//:t3": ("FAILED_TO_BUILD", 0),
-            "//:skip": ("SKIPPED", 0),
-            "//:t4": ("BUILT", 0),
+            ("//:t1", "c1"): ("PASSED", 1500),
+            ("//:t2", "c1"): ("FAILED", 0),
+            ("//:t3", "c1"): ("FAILED_TO_BUILD", 0),
+            ("//:t4", "c1"): ("BUILT", 0),
+            ("//:skip", ""): ("SKIPPED", 0),
         })
         self.assertEqual(failed, ["//:badlib"])
+
+    def test_configurations_kept_apart(self):
+        bep = [
+            ev(id={"testSummary": tc("//:t", "a")}, testSummary={"overallStatus": "FAILED"}),
+            ev(id={"testSummary": tc("//:t", "b")}, testSummary={"overallStatus": "PASSED"}),
+        ]
+        tests = inner_bazel.load_bep(bep)[1]
+        self.assertEqual(tests, {("//:t", "a"): ("FAILED", 0), ("//:t", "b"): ("PASSED", 0)})
+        root = ET.fromstring(inner_bazel.test_xml("p", tests, [], "L"))
+        names = sorted(c.get("name") for c in root.iter("testcase"))
+        self.assertEqual(names, ["//:t [a]", "//:t [b]"])
+        self.assertEqual(root.find("testsuite").get("failures"), "1")
+
+    def test_garbage_only(self):
+        self.assertEqual(inner_bazel.load_bep(["not json", "[1]", '{"x": 1}']), ("", {}, []))
 
 
 class TestXmlTest(unittest.TestCase):
@@ -60,44 +81,42 @@ class TestXmlTest(unittest.TestCase):
         self.assertEqual(cases["//:badlib"].get("classname"), "p.build")
         self.assertIn("https://x/abc", suite.find("system-out").text)
 
-
-class FailedInvocationTest(unittest.TestCase):
     def test_unexplained_failure(self):
-        root = ET.fromstring(inner_bazel.test_xml("p", {"//:t": ("PASSED", 0)}, [], "L", ok=False))
+        root = ET.fromstring(inner_bazel.test_xml("p", {("//:t", "c"): ("PASSED", 0)}, [], "L", ok=False))
         suite = root.find("testsuite")
         self.assertEqual((suite.get("tests"), suite.get("failures")), ("2", "1"))
-        names = [c.get("name") for c in suite.iter("testcase")]
-        self.assertIn("invocation", names)
+        self.assertIn("invocation", [c.get("name") for c in suite.iter("testcase")])
 
-    def test_multiple_configurations_keep_failure(self):
-        bep = [
-            ev(id={"testSummary": {"label": "//:t"}}, testSummary={"overallStatus": "FAILED"}),
-            ev(id={"testSummary": {"label": "//:t"}}, testSummary={"overallStatus": "PASSED"}),
-        ]
-        self.assertEqual(inner_bazel.load_bep(bep)[1], {"//:t": ("FAILED", 0)})
+    def test_explained_failure_adds_nothing(self):
+        root = ET.fromstring(inner_bazel.test_xml("p", {("//:t", "c"): ("FAILED", 0)}, [], "L", ok=False))
+        self.assertNotIn("invocation", [c.get("name") for c in root.iter("testcase")])
 
 
 class CommandTest(unittest.TestCase):
     def test_command(self):
         args = inner_bazel.parse_args([
             "--mode=test", "--project=p", "--source=s", "--bazel=/b", "--bazel_version=9.3.1",
-            "--rc=/r1", "--rc=/r2", "--credential_helper=/h",
+            "--rc=/r1", "--rc=/r2", "--credential_helper=/h", "--credentials=/k",
             "--startup_flag=--experimental_remote_repo_contents_cache",
             "--flag=--copt=-w", "--target=//...", "--target=-//x/...",
         ])
         cmd = inner_bazel.inner_command(args, "/out", "/bep")
         mode = cmd.index("test")
         self.assertEqual(cmd[:mode], ["/b", "--batch", "--nosystem_rc", "--nohome_rc",
-                                      "--output_user_root=/out", "--bazelrc=/r1", "--bazelrc=/r2",
+                                      "--output_user_root=/out", "--host_jvm_args=-Xmx2g",
+                                      "--bazelrc=/r1", "--bazelrc=/r2",
                                       "--experimental_remote_repo_contents_cache"])
         self.assertIn("--credential_helper=*.buildbuddy.io=/h", cmd)
         self.assertIn("--test_output=errors", cmd)
+        self.assertFalse(any(c.startswith("--repository_cache") for c in cmd))
         self.assertEqual(cmd[-4:], ["--copt=-w", "--", "//...", "-//x/..."])
         self.assertFalse(any("api-key" in c for c in cmd))
 
-    def test_results_url(self):
-        self.assertEqual(inner_bazel.results_url(["x", "common:c --bes_results_url=https://h/invocation"]),
-                         "https://h/invocation/")
+    def test_env_is_explicit(self):
+        env = inner_bazel.inner_env("/w", "/w/bin", "/k")
+        self.assertEqual(sorted(env), ["BAZEL_MATRIX_KEY_FILE", "HOME", "LANG", "PATH", "TMPDIR"])
+        self.assertTrue(env["PATH"].startswith("/w/bin:"))
+        self.assertEqual(env["BAZEL_MATRIX_KEY_FILE"], "/k")
 
 
 class RemoveStaleTest(unittest.TestCase):
@@ -108,9 +127,13 @@ class RemoveStaleTest(unittest.TestCase):
                 with open(os.path.join(root, name, "pid"), "w") as f:
                     f.write(str(pid))
                 os.chmod(os.path.join(root, name, "ro"), 0o500)
+            os.makedirs(os.path.join(root, "new"))  # no pid file yet
             inner_bazel.remove_stale(root)
-            self.assertEqual(os.listdir(root), ["live"])
+            self.assertEqual(sorted(os.listdir(root)), ["live", "new"])
             os.chmod(os.path.join(root, "live", "ro"), 0o700)
+
+    def test_missing_root(self):
+        inner_bazel.remove_stale("/nonexistent/bazel-matrix")
 
 
 if __name__ == "__main__":
