@@ -22,6 +22,8 @@ BEP = [
     ev(id={"targetCompleted": {"label": "//:lib"}}, completed={"success": True}),
     ev(id={"targetCompleted": {"label": "//:badlib"}}, completed={}),
     ev(id={"targetCompleted": {"label": "//:t3"}}, completed={}),
+    ev(id={"targetConfigured": {"label": "//:t4"}}, configured={"testSize": "SMALL"}),
+    ev(id={"targetCompleted": {"label": "//:t4"}}, completed={"success": True}),
     ev(id={"targetCompleted": {"label": "//:skip"}}, aborted={"reason": "SKIPPED"}),
     ev(id={"testSummary": {"label": "//:t1"}}, testSummary={"overallStatus": "PASSED", "totalRunDurationMillis": "1500"}),
     ev(id={"testSummary": {"label": "//:t2"}}, testSummary={"overallStatus": "FAILED"}),
@@ -38,6 +40,7 @@ class LoadBepTest(unittest.TestCase):
             "//:t2": ("FAILED", 0),
             "//:t3": ("FAILED_TO_BUILD", 0),
             "//:skip": ("SKIPPED", 0),
+            "//:t4": ("BUILT", 0),
         })
         self.assertEqual(failed, ["//:badlib"])
 
@@ -47,7 +50,7 @@ class TestXmlTest(unittest.TestCase):
         _, tests, failed = inner_bazel.load_bep(BEP)
         root = ET.fromstring(inner_bazel.test_xml("p", tests, failed, "https://x/abc"))
         suite = root.find("testsuite")
-        self.assertEqual((suite.get("tests"), suite.get("failures"), suite.get("skipped")), ("5", "3", "1"))
+        self.assertEqual((suite.get("tests"), suite.get("failures"), suite.get("skipped")), ("6", "4", "1"))
         cases = {c.get("name"): c for c in suite.iter("testcase")}
         self.assertIsNone(cases["//:t1"].find("failure"))
         self.assertEqual(cases["//:t1"].get("time"), "1.500")

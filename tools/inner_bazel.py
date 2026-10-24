@@ -110,6 +110,9 @@ def load_bep(lines):
             tests[label] = summaries[label]
         elif aborted.get(label) == "SKIPPED":
             tests[label] = ("SKIPPED", 0)
+        elif completed.get(label):
+            # Built, not run: `bazel build`.
+            tests[label] = ("BUILT", 0)
         else:
             tests[label] = ("FAILED_TO_BUILD", 0)
     failed_builds = sorted(
