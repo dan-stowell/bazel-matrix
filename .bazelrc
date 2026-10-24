@@ -20,3 +20,6 @@ common --nocheck_visibility
 # The executor image has no JDK; use a downloaded one.
 common --java_runtime_version=remotejdk_21
 common --tool_java_runtime_version=remotejdk_21
+
+# Declared bazel_dep versions must be the resolved ones.
+common --check_direct_dependencies=error

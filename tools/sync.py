@@ -222,6 +222,20 @@ def render_overrides(patched):
     return "".join(out)
 
 
+def parse_pattern(p):
+    """Splits an exclusion into (repo, package, target).
+
+    target is "..." for a subtree (@r//pkg/... or @r//...), else a target
+    name. Returns None for anything else, e.g. @r//pkg, @r//pkg:all, @r//x*.
+    """
+    m = re.match(r"^@([\w.+-]+)//(?:\.\.\.|([^:\s*.][^:\s*]*)/\.\.\.|([^:\s*]*):([^:\s*]+))$", p)
+    if not m or "..." in (m.group(3) or "") or m.group(4) in ("all", "all-targets", "..."):
+        return None
+    if m.group(4):
+        return m.group(1), m.group(3), m.group(4)
+    return m.group(1), m.group(2) or "", "..."
+
+
 def parse_exclusions(text):
     """Returns [(pattern, reason)]; every pattern needs a reason."""
     out = []
@@ -232,16 +246,21 @@ def parse_exclusions(text):
         parts = line.split(None, 1)
         if len(parts) < 2:
             raise ValueError("exclusions.txt:%d: %r has no reason" % (n, line))
-        if not re.match(r"^@[\w.+-]+//[^:\s*]*(:[^\s*]+)?$", parts[0]):
-            raise ValueError("exclusions.txt:%d: %r is not a label or pattern" % (n, parts[0]))
+        if not parse_pattern(parts[0]):
+            raise ValueError("exclusions.txt:%d: %r is not @repo//pkg:target, "
+                             "@repo//pkg/... or @repo//..." % (n, parts[0]))
         out.append((parts[0], parts[1]))
     return out
 
 
 def query_expr(repos, patterns):
-    """The one query: every non-manual rule, minus exclusions and their rdeps."""
+    """The one query: every non-manual rule, minus exclusions and their rdeps.
+
+    rdeps(U, x) searches U's whole transitive closure, so a project target
+    that reaches an excluded one through another repo is dropped too.
+    """
     u = " + ".join("@%s//..." % r for r in repos)
-    expr = "kind(rule, %s) except attr(tags, '\\bmanual\\b', %s)" % (u, u)
+    expr = "kind(rule, %s) except attr(tags, '[\\[ ]manual[,\\]]', %s)" % (u, u)
     if patterns:
         expr += " except rdeps(%s, %s)" % (u, " + ".join(patterns))
     return expr
@@ -262,49 +281,100 @@ def parse_query(output):
 
 
 _ANSI = re.compile(r"\x1b\[[0-9;]*m")
+_PATH = r"/external/([^/\s]+)/(?:(\S*?)/)?BUILD(?:\.bazel)?"
+# An error located in some BUILD or .bzl file, or naming the target it's about.
+_ATTRIBUTED = re.compile(r"^/\S*/external/[^/\s]+/\S*:\d+:\d+: | and referenced by '")
+_BUILD_TRACE = re.compile(r"^\s*File \"[^\"]*" + _PATH + r"\"")
+_SKIPPING = re.compile(r"^Skipping '(@[^']+)': (.*)")
 _LOAD_ERROR = re.compile(r"error loading package '@@([^/']+)//([^']*)'")
-_BUILD_TRACE = re.compile(r"^\s*File \"[^\"]*/external/([^/\s]+)/(?:(\S*?)/)?BUILD(?:\.bazel)?\"")
-_NO_TARGET = re.compile(r"no such target '@@?([^/']+)//([^:']*):([^']+)'")
-_NO_MATCH = re.compile(r"no targets found beneath '([^']*)'")
-
-
-def query_errors(output):
-    """Sorts a failed query's errors.
-
-    Returns (failed, missing): failed is {(canonical repo, package)} for
-    packages that failed to load (their targets are missing from the
-    output); missing is [(canonical repo or None, package, target or None)]
-    for labels or patterns that matched nothing. Errors about a target's
-    deps don't drop the target, so they're left to the build.
-    """
-    failed, missing = set(), []
-    for line in _ANSI.sub("", output).splitlines():
-        m = _LOAD_ERROR.search(line) or _BUILD_TRACE.search(line)
-        if m:
-            failed.add((m.group(1), m.group(2) or ""))
-            continue
-        if not line.startswith("ERROR:"):
-            continue
-        m = _NO_TARGET.search(line)
-        if m:
-            missing.append(m.groups())
-            continue
-        m = _NO_MATCH.search(line)
-        if m:
-            missing.append((None, m.group(1), None))
-    return failed, missing
+_CONTAINS_ERRORS = re.compile(r"^package contains errors: ([^:\s]*)")
+_NO_PACKAGE = re.compile(r"no such package '@@([^/']+)//([^']*)'")
+_NO_TARGET = re.compile(r"no such target '@@([^/']+)//([^:']*):([^']+)'")
+_NOISE = re.compile(r"^(Traceback \(most recent call last\):|Evaluation of query |"
+                    r"An error occurred during the fetch of repository )")
 
 
 def covered(repo, pkg, patterns):
     """Whether a subtree exclusion covers package @repo//pkg."""
     for p in patterns:
-        if p == "@%s//..." % repo:
+        r, prefix, target = parse_pattern(p)
+        if r == repo and target == "..." and (
+                not prefix or pkg == prefix or pkg.startswith(prefix + "/")):
             return True
-        if p.endswith("/...") and p.startswith("@%s//" % repo):
-            prefix = p[len(repo) + 3:-4]
-            if pkg == prefix or pkg.startswith(prefix + "/"):
-                return True
     return False
+
+
+def check_errors(output, canon, patterns):
+    """Vets the errors of a failed query; returns problems, empty if all is well.
+
+    canon maps the projects' canonical repo names (`zlib+`) to their apparent
+    ones (`zlib`). This fails closed: every ERROR line must be one of
+      - a package of a project that failed to load (its targets are missing
+        from the output), which a subtree exclusion must cover;
+      - an exclusion that matches nothing (stale), which is a problem;
+      - an error about some target's dependencies, which leaves the target
+        in the output for the build to deal with;
+      - a known header or summary line.
+    """
+    lines = [_ANSI.sub("", l) for l in output.splitlines()]
+    errors = [l[len("ERROR:"):].strip() for l in lines if l.startswith("ERROR:")]
+    traced = set()
+    for l in lines:
+        m = _BUILD_TRACE.search(l)
+        if m and m.group(1) in canon:
+            traced.add((canon[m.group(1)], m.group(2) or ""))
+    attributed = " ".join(e for e in errors if _ATTRIBUTED.search(e))
+
+    def repeated(e):
+        # Bazel repeats an attributed error without its location; compare
+        # the part before the details, which can differ (temp paths).
+        return e.split(": ", 1)[0] in attributed
+    exact = {parse_pattern(p) for p in patterns if parse_pattern(p)[2] != "..."}
+    failed, skipped, problems = set(traced), [], []
+    for e in errors:
+        m = _SKIPPING.match(e)
+        if m:
+            r, pkg, target = parse_pattern(m.group(1)) or (None, None, None)
+            if m.group(1) in patterns:
+                skipped.append((r, pkg))
+            elif target == "..." and not pkg and r in canon.values():
+                failed.add((r, ""))  # a whole project failed to load
+            else:
+                problems.append("unrecognised error: " + e)
+            continue
+        if _ATTRIBUTED.search(e) or _NOISE.match(e):
+            continue
+        m = _LOAD_ERROR.search(e)
+        if m:
+            if m.group(1) in canon:
+                failed.add((canon[m.group(1)], m.group(2)))
+            continue  # other repos: a dependency's package
+        m = _CONTAINS_ERRORS.match(e)
+        if m:
+            if not any(p == m.group(1) for _, p in traced):
+                problems.append("unrecognised error: " + e)
+            continue
+        m = _NO_TARGET.search(e) or _NO_PACKAGE.search(e)
+        if m:
+            r, pkg = canon.get(m.group(1)), m.group(2)
+            target = m.group(3) if m.re is _NO_TARGET else None
+            if any(x[:2] == (r, pkg) and (target is None or x[2] == target) for x in exact):
+                problems.append("stale exclusion: " + e)
+            elif not repeated(e):
+                problems.append("unrecognised error: " + e)
+            continue
+        if not repeated(e):
+            problems.append("unrecognised error: " + e)
+    for r, pkg in skipped:  # A subtree whose packages all fail to load is fine.
+        if not any(fr == r and (not pkg or fp == pkg or fp.startswith(pkg + "/"))
+                   for fr, fp in failed):
+            problems.append("stale exclusion: @%s//%s matches nothing" % (r, pkg + "/..." if pkg else "..."))
+    for r, pkg in sorted(failed):
+        if not covered(r, pkg, patterns):
+            problems.append("package failed to load and isn't excluded: @%s//%s" % (r, pkg))
+    if not errors:
+        problems.append("query failed without ERROR lines")
+    return problems
 
 
 def alias_name(label):
@@ -421,22 +491,25 @@ def sync_patches(projects):
 
 
 def sync_builds(projects, patterns):
-    repos = [repo for _, _, repo in projects]
-    write(QUERY_FILE, query_expr(repos, patterns) + "\n")
-    try:
-        code, out = bb_remote(["query", "--query_file=" + QUERY_FILE, "--output=label_kind"])
-    finally:
-        os.remove(os.path.join(ROOT, QUERY_FILE))
-    by_repo = parse_query(out)
-    if not by_repo:
-        sys.exit("query returned no targets (exit %d):\n%s" % (code, out[-3000:]))
-    if code:
-        check_query_errors(code, out, projects, patterns)
+    by_repo = {}
+    if projects:
+        repos = [repo for _, _, repo in projects]
+        write(QUERY_FILE, query_expr(repos, patterns) + "\n")
+        try:
+            code, out = bb_remote(["query", "--query_file=" + QUERY_FILE, "--output=label_kind"])
+        finally:
+            os.remove(os.path.join(ROOT, QUERY_FILE))
+        problems = []
+        if code:
+            problems = check_errors(out, {"%s+" % n: r for n, _, r in projects}, patterns)
+        by_repo = parse_query(out)
+        problems += ["@%s has no targets; exclude @%s//... if that's intended" % (r, r)
+                     for _, _, r in projects
+                     if not by_repo.get(r) and "@%s//..." % r not in patterns]
+        if problems:
+            sys.exit("query (exit %d) problems:\n  " % code + "\n  ".join(problems))
     for name, _, repo in projects:
-        targets = by_repo.get(repo, [])
-        if not targets:
-            print("warning: no targets found for @%s" % repo, file=sys.stderr)
-        write(os.path.join(name, "BUILD.bazel"), render_build(repo, targets))
+        write(os.path.join(name, "BUILD.bazel"), render_build(repo, by_repo.get(repo, [])))
     names = {name for name, _, _ in projects}
     for d in os.listdir(ROOT):
         build = os.path.join(ROOT, d, "BUILD.bazel")
@@ -444,23 +517,6 @@ def sync_builds(projects, patterns):
             os.remove(build)
             if not os.listdir(os.path.join(ROOT, d)):
                 shutil.rmtree(os.path.join(ROOT, d))
-
-
-def check_query_errors(code, out, projects, patterns):
-    """Fails unless every load failure is excluded and every exclusion exists."""
-    canon = {"%s+" % name: repo for name, _, repo in projects}
-    failed, missing = query_errors(out)
-    stale = sorted({"@%s//%s:%s" % (canon.get(c), p, t) for c, p, t in missing if c}
-                   & set(patterns))
-    # A subtree whose packages all fail to load also "matches nothing".
-    stale += sorted("pattern beneath %r" % p for c, p, t in missing if not c and not any(
-        fp == p or fp.startswith(p + "/") for _, fp in failed))
-    bad = sorted("@%s//%s" % (canon[c], p) for c, p in failed
-                 if c in canon and not covered(canon[c], p, patterns))
-    if stale or bad:
-        sys.exit("query failed (exit %d).\nExclusions matching nothing:\n  %s\n"
-                 "Packages that failed to load and aren't excluded:\n  %s"
-                 % (code, "\n  ".join(stale) or "none", "\n  ".join(bad) or "none"))
 
 
 def sync_lockfile():
