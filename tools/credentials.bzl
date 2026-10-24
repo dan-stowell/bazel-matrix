@@ -23,6 +23,9 @@ def _impl(rctx):
         )
         if result.return_code:
             fail("could not write %s: %s" % (KEY_FILE, result.stderr))
+    else:
+        # Don't leave an earlier run's key behind.
+        rctx.execute(["rm", "-f", KEY_FILE])
     rctx.file("marker", "")
     rctx.file("REPO.bazel", "")
     rctx.file("BUILD.bazel", 'exports_files(["marker"])\n')
