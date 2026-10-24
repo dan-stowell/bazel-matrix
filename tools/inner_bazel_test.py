@@ -157,6 +157,26 @@ class KillTest(unittest.TestCase):
         self.assertTrue(gone(child))
 
 
+class KillReapedTest(unittest.TestCase):
+    def test_reaped_leader_not_signalled(self):
+        proc = subprocess.Popen(["true"], start_new_session=True)
+        proc.wait()
+        calls = []
+        orig, inner_bazel.os.killpg = inner_bazel.os.killpg, lambda *a: calls.append(a)
+        try:
+            inner_bazel.kill(proc)
+        finally:
+            inner_bazel.os.killpg = orig
+        self.assertEqual(calls, [])
+
+    def test_wait_exit_does_not_reap(self):
+        proc = subprocess.Popen(["true"], start_new_session=True)
+        self.assertTrue(inner_bazel.wait_exit(proc, 10))
+        self.assertIsNone(proc.returncode)
+        inner_bazel.kill(proc)
+        self.assertEqual(proc.returncode, 0)
+
+
 class RemoveStaleTest(unittest.TestCase):
     def test_dead_pid_removed(self):
         with tempfile.TemporaryDirectory() as root:

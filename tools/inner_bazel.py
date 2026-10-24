@@ -273,19 +273,33 @@ def _killpg(pgid, sig):
         pass
 
 
+def wait_exit(proc, timeout):
+    """Waits up to timeout seconds for proc to exit, without reaping it.
+
+    An unreaped leader keeps its process group ID from being reused, so
+    signalling the group stays safe until kill() reaps it.
+    """
+    deadline = time.time() + timeout
+    while True:
+        if proc.returncode is not None or os.waitid(
+                os.P_PID, proc.pid, os.WEXITED | os.WNOHANG | os.WNOWAIT):
+            return True
+        if time.time() >= deadline:
+            return False
+        time.sleep(0.2)
+
+
 def kill(proc):
-    """Stops the inner Bazel's whole process group.
+    """Stops the inner Bazel's whole process group, then reaps the leader.
 
     SIGTERM first; after KILL_GRACE seconds (or as soon as the leader is
-    gone), SIGKILL whatever is left in the group, then reap the leader.
+    gone), SIGKILL whatever is left in the group. A leader already reaped is
+    never signalled: its group ID may belong to someone else by now.
     """
-    if proc is None:
+    if proc is None or proc.returncode is not None:
         return
     _killpg(proc.pid, signal.SIGTERM)
-    try:
-        proc.wait(KILL_GRACE)
-    except subprocess.TimeoutExpired:
-        pass
+    wait_exit(proc, KILL_GRACE)
     _killpg(proc.pid, signal.SIGKILL)
     proc.wait()
 
@@ -338,13 +352,13 @@ def main(argv=None):
         print("+ " + " ".join(cmd), file=log, flush=True)
         state["proc"] = subprocess.Popen(cmd, cwd=src, env=env, stdout=log,
                                          stderr=subprocess.STDOUT, start_new_session=True)
-        try:
-            code = state["proc"].wait(args.timeout)
-        except subprocess.TimeoutExpired:
-            code = 1
-            print("inner bazel timed out after %ds" % args.timeout, file=log, flush=True)
+        timed_out = not wait_exit(state["proc"], args.timeout)
         # Also on success: nothing of the inner Bazel may outlive it.
         kill(state["proc"])
+        code = 1 if timed_out else state["proc"].returncode
+        state["proc"] = None
+        if timed_out:
+            print("inner bazel timed out after %ds" % args.timeout, file=log, flush=True)
         try:
             with open(bep, errors="replace") as f:
                 invocation, tests, failed_builds = load_bep(f)
