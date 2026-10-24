@@ -1,0 +1,13 @@
+# Run everything on BuildBuddy RBE. Use with `bb remote`, which must also be
+# given --container_image (see README.md) so the runner's autodetected C++
+# toolchain matches the executors' image.
+common:remote-minimal --remote_executor=grpcs://buildbuddy.buildbuddy.io
+common:remote-minimal --remote_cache=grpcs://buildbuddy.buildbuddy.io
+common:remote-minimal --bes_backend=grpcs://buildbuddy.buildbuddy.io
+common:remote-minimal --bes_results_url=https://buildbuddy.buildbuddy.io/invocation/
+common:remote-minimal --remote_download_minimal
+common:remote-minimal --jobs=100
+common:remote-minimal --remote_default_exec_properties=container-image=docker://gcr.io/flame-public/rbe-ubuntu22-04:latest
+
+# Keep going so one broken project doesn't hide the rest.
+common --keep_going
