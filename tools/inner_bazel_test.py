@@ -50,12 +50,13 @@ class TestXmlTest(unittest.TestCase):
         _, tests, failed = inner_bazel.load_bep(BEP)
         root = ET.fromstring(inner_bazel.test_xml("p", tests, failed, "https://x/abc"))
         suite = root.find("testsuite")
-        self.assertEqual((suite.get("tests"), suite.get("failures"), suite.get("skipped")), ("6", "4", "1"))
+        self.assertEqual((suite.get("tests"), suite.get("failures"), suite.get("skipped")), ("6", "3", "2"))
         cases = {c.get("name"): c for c in suite.iter("testcase")}
         self.assertIsNone(cases["//:t1"].find("failure"))
         self.assertEqual(cases["//:t1"].get("time"), "1.500")
         self.assertEqual(cases["//:t2"].find("failure").get("message"), "FAILED")
         self.assertIsNotNone(cases["//:skip"].find("skipped"))
+        self.assertEqual(cases["//:t4"].find("skipped").get("message"), "BUILT")
         self.assertEqual(cases["//:badlib"].get("classname"), "p.build")
         self.assertIn("https://x/abc", suite.find("system-out").text)
 

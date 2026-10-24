@@ -68,9 +68,25 @@
         }
       },
       "targets": [
-        "//..."
+        "//...",
+        "-//absl/time:time_test",
+        "-//absl/time/internal/cctz:time_zone_format_test",
+        "-//absl/time/internal/cctz:time_zone_lookup_test"
       ],
-      "exclude": [],
+      "exclude": [
+        {
+          "pattern": "//absl/time:time_test",
+          "reason": "needs tzdata (/usr/share/zoneinfo), which the executor image lacks"
+        },
+        {
+          "pattern": "//absl/time/internal/cctz:time_zone_format_test",
+          "reason": "needs tzdata, which the executor image lacks"
+        },
+        {
+          "pattern": "//absl/time/internal/cctz:time_zone_lookup_test",
+          "reason": "needs tzdata, which the executor image lacks"
+        }
+      ],
       "flags": [],
       "bazel_version": null
     },
@@ -116,6 +132,8 @@
       },
       "targets": [
         "//...",
+        "-//build_defs:cc_proto_blacklist_test",
+        "-//python:well_known_types_test",
         "-//ruby/...",
         "-//conformance/ruby/...",
         "-//csharp/...",
@@ -128,6 +146,14 @@
         "-//java/core/..."
       ],
       "exclude": [
+        {
+          "pattern": "//build_defs:cc_proto_blacklist_test",
+          "reason": "fails: expects the well-known types' cc_proto targets to provide no files, gets 4 each"
+        },
+        {
+          "pattern": "//python:well_known_types_test",
+          "reason": "needs the tzdata Python module or system tzdata, which the executor image lacks"
+        },
         {
           "pattern": "//ruby/...",
           "reason": "rules_ruby needs a system ruby, which the runner image lacks"
@@ -193,10 +219,26 @@
         }
       },
       "targets": [
-        "//..."
+        "//...",
+        "-//tests/core/nogo/deps:deps_test",
+        "-//tests/core/nogo/nolint:nolint_test"
       ],
-      "exclude": [],
-      "flags": [],
+      "exclude": [
+        {
+          "pattern": "//tests/core/nogo/deps:deps_test",
+          "reason": "fails: expected nogo output (\"a c d\") missing from the nested build's output"
+        },
+        {
+          "pattern": "//tests/core/nogo/nolint:nolint_test",
+          "reason": "fails: expected nogo diagnostics missing from the nested build's output"
+        }
+      ],
+      "flags": [
+        {
+          "flag": "--local_test_jobs=2",
+          "reason": "its go_bazel_test integration tests each run a nested Bazel locally; keep the runner's memory in bounds"
+        }
+      ],
       "bazel_version": null
     }
   ]
