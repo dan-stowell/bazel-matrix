@@ -232,7 +232,7 @@ def parse_exclusions(text):
         parts = line.split(None, 1)
         if len(parts) < 2:
             raise ValueError("exclusions.txt:%d: %r has no reason" % (n, line))
-        if not re.match(r"^@[\w.+-]+//[^:\s]*(:\S+)?$", parts[0]):
+        if not re.match(r"^@[\w.+-]+//[^:\s*]*(:[^\s*]+)?$", parts[0]):
             raise ValueError("exclusions.txt:%d: %r is not a label or pattern" % (n, parts[0]))
         out.append((parts[0], parts[1]))
     return out
