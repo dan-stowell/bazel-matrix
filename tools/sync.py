@@ -83,7 +83,7 @@ def parse_projects(module_text):
 
 
 _DEV_DEP = re.compile(r",\s*dev_dependency\s*=\s*True\b")
-_CALL = re.compile(r"^(?:\w+\s*=\s*)?(\w+)\s*\(", re.M)
+_CALL = re.compile(r"^(?:(\w+)\s*=\s*)?(\w+)\s*\(", re.M)
 _OVERRIDE = re.compile(
     r"\b(?:archive|git|local_path|single_version|multiple_version)_override\s*\("
     r"[^)]*?module_name\s*=\s*\"([^\"]+)\"",
@@ -92,7 +92,7 @@ _OVERRIDE = re.compile(
 
 
 def _calls(text):
-    """Yields (start, end, func) for each top-level call statement."""
+    """Yields (start, end, func, var) for each top-level call statement."""
     for m in _CALL.finditer(text):
         depth, i, quote = 0, m.end() - 1, None
         while i < len(text):
@@ -113,7 +113,7 @@ def _calls(text):
             elif c == ")":
                 depth -= 1
                 if depth == 0:
-                    yield m.start(), i + 1, m.group(1)
+                    yield m.start(), i + 1, m.group(2), m.group(1)
                     break
             i += 1
 
@@ -127,25 +127,45 @@ def undev(module_text, available=lambda name, version: True):
     mentions such a dep's repo.
     """
     overridden = set(_OVERRIDE.findall(module_text))
-    calls = [c for c in _calls(module_text) if _DEV_DEP.search(module_text[c[0]:c[1]])]
-    kept = set()
-    for start, end, func in calls:
-        args = module_text[start:end]
-        if func != "bazel_dep":
-            continue
-        name, version = _kwarg(args, "name"), _kwarg(args, "version")
-        if name in overridden or not available(name, version):
-            kept.add(_kwarg(args, "repo_name") or name)
+    all_calls = list(_calls(module_text))
+    calls = [c for c in all_calls if _DEV_DEP.search(module_text[c[0]:c[1]])]
+
+    def mentions_kept(args):
+        return any(re.search(r"@" + re.escape(r) + r"\b", args) for r in kept)
+
+    kept, kept_vars, kept_calls = set(), set(), set()
+    changed = True
+    while changed:  # Repos from kept extensions can make more calls kept.
+        changed = False
+        for start, end, func, var in calls:
+            args = module_text[start:end]
+            if start in kept_calls:
+                continue
+            if func == "bazel_dep":
+                name, version = _kwarg(args, "name"), _kwarg(args, "version")
+                if name not in overridden and available(name, version):
+                    continue
+                kept.add(_kwarg(args, "repo_name") or name)
+            elif not mentions_kept(args):
+                continue
+            kept_calls.add(start)
+            if var:
+                kept_vars.add(var)
+            changed = True
+        for start, end, func, var in all_calls:
+            args = module_text[start:end]
+            m = re.match(r"use_repo\s*\(\s*(\w+)", args)
+            if m and m.group(1) in kept_vars:
+                repos = set(re.findall(r"\"([^\"]+)\"", args))
+                repos |= set(re.findall(r"(\w+)\s*=", args))
+                if not repos <= kept:
+                    kept |= repos
+                    changed = True
     out, last = [], 0
-    for start, end, func in calls:
-        args = module_text[start:end]
-        if func == "bazel_dep":
-            keep = (_kwarg(args, "repo_name") or _kwarg(args, "name")) in kept
-        else:
-            keep = any(re.search(r"@" + re.escape(r) + r"\b", args) for r in kept)
-        if not keep:
+    for start, end, func, var in calls:
+        if start not in kept_calls:
             out.append(module_text[last:start])
-            out.append(_DEV_DEP.sub("", args))
+            out.append(_DEV_DEP.sub("", module_text[start:end]))
             last = end
     out.append(module_text[last:])
     return "".join(out)

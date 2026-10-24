@@ -59,6 +59,9 @@ class UndevTest(unittest.TestCase):
             'bazel_dep(name = "c", version = "9", dev_dependency = True, repo_name = "cc")',
             'e = use_extension("@cc//:e.bzl", "e", dev_dependency = True)',
             'f = use_extension("@a//:f.bzl", "f", dev_dependency = True)  # (paren',
+            'use_repo(e, "e_repo", other = "e_other")',
+            'register_toolchains("@e_repo//:all", dev_dependency = True)',
+            'register_toolchains("@e_other//:all", dev_dependency = True)',
             '',
         ])
         got = sync.undev(text, lambda name, version: name != "c")
@@ -69,6 +72,9 @@ class UndevTest(unittest.TestCase):
             'bazel_dep(name = "c", version = "9", dev_dependency = True, repo_name = "cc")',
             'e = use_extension("@cc//:e.bzl", "e", dev_dependency = True)',
             'f = use_extension("@a//:f.bzl", "f")  # (paren',
+            'use_repo(e, "e_repo", other = "e_other")',
+            'register_toolchains("@e_repo//:all", dev_dependency = True)',
+            'register_toolchains("@e_other//:all", dev_dependency = True)',
             '',
         ]))
 
