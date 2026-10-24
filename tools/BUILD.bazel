@@ -28,6 +28,7 @@ py_test(
         "inner_bazel.py",
         "inner_bazel_test.py",
     ],
+    imports = ["."],
 )
 
 py_test(
@@ -36,6 +37,7 @@ py_test(
         "sync.py",
         "sync_test.py",
     ],
+    imports = ["."],
 )
 
 py_test(
@@ -44,4 +46,5 @@ py_test(
         "buildbuddy_credential_helper.py",
         "buildbuddy_credential_helper_test.py",
     ],
+    imports = ["."],
 )
