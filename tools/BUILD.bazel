@@ -48,3 +48,13 @@ py_test(
     ],
     imports = ["."],
 )
+
+py_test(
+    name = "run_test",
+    srcs = [
+        "run.py",
+        "run_test.py",
+        "sync.py",
+    ],
+    imports = ["."],
+)
