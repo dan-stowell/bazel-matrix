@@ -446,11 +446,6 @@ alias(
 )
 
 alias(
-    name = "c_sharp_features_proto",
-    actual = "@protobuf//:c_sharp_features_proto",
-)
-
-alias(
     name = "cc_toolchain",
     actual = "@protobuf//:cc_toolchain",
 )
@@ -501,16 +496,6 @@ alias(
 )
 
 alias(
-    name = "conformance__conformance_csharp",
-    actual = "@protobuf//conformance:conformance_csharp",
-)
-
-alias(
-    name = "conformance__conformance_csharp_genrule",
-    actual = "@protobuf//conformance:conformance_csharp_genrule",
-)
-
-alias(
     name = "conformance__conformance_csharp_proto",
     actual = "@protobuf//conformance:conformance_csharp_proto",
 )
@@ -538,16 +523,6 @@ alias(
 alias(
     name = "conformance__conformance_java_proto_lite",
     actual = "@protobuf//conformance:conformance_java_proto_lite",
-)
-
-alias(
-    name = "conformance__conformance_php",
-    actual = "@protobuf//conformance:conformance_php",
-)
-
-alias(
-    name = "conformance__conformance_php_c_genrule",
-    actual = "@protobuf//conformance:conformance_php_c_genrule",
 )
 
 alias(
@@ -1143,16 +1118,6 @@ alias(
 alias(
     name = "field_mask_util",
     actual = "@protobuf//:field_mask_util",
-)
-
-alias(
-    name = "generated_protos_proto",
-    actual = "@protobuf//:generated_protos_proto",
-)
-
-alias(
-    name = "generated_protos_py",
-    actual = "@protobuf//:generated_protos_py",
 )
 
 alias(
@@ -2666,16 +2631,6 @@ alias(
 )
 
 alias(
-    name = "pkg__gen_src_file_lists",
-    actual = "@protobuf//pkg:gen_src_file_lists",
-)
-
-alias(
-    name = "pkg__gen_src_file_lists_cmake",
-    actual = "@protobuf//pkg:gen_src_file_lists_cmake",
-)
-
-alias(
     name = "pkg__protobuf_pkg_naming",
     actual = "@protobuf//pkg:protobuf_pkg_naming",
 )
@@ -2688,16 +2643,6 @@ alias(
 alias(
     name = "pkg__protoc_readme",
     actual = "@protobuf//pkg:protoc_readme",
-)
-
-alias(
-    name = "pkg__protoc_release",
-    actual = "@protobuf//pkg:protoc_release",
-)
-
-alias(
-    name = "pkg__release_all_options_protos_files",
-    actual = "@protobuf//pkg:release_all_options_protos_files",
 )
 
 alias(
@@ -2758,11 +2703,6 @@ alias(
 alias(
     name = "protobuf_python",
     actual = "@protobuf//:protobuf_python",
-)
-
-alias(
-    name = "protobuf_rust",
-    actual = "@protobuf//:protobuf_rust",
 )
 
 alias(
@@ -3518,16 +3458,6 @@ alias(
 alias(
     name = "src_google_protobuf__protobuf_lite",
     actual = "@protobuf//src/google/protobuf:protobuf_lite",
-)
-
-alias(
-    name = "src_google_protobuf__release_all_options_proto_srcs",
-    actual = "@protobuf//src/google/protobuf:release_all_options_proto_srcs",
-)
-
-alias(
-    name = "src_google_protobuf__release_all_options_protos",
-    actual = "@protobuf//src/google/protobuf:release_all_options_protos",
 )
 
 alias(
@@ -6600,7 +6530,6 @@ test_suite(
         "@protobuf//src/google/protobuf/compiler/cpp:namespace_printer_unittest",
         "@protobuf//src/google/protobuf/compiler/cpp:plugin_unittest",
         "@protobuf//src/google/protobuf/compiler/cpp:unittest",
-        "@protobuf//src/google/protobuf/compiler/csharp:bootstrap_unittest",
         "@protobuf//src/google/protobuf/compiler/csharp:generator_unittest",
         "@protobuf//src/google/protobuf/compiler/java:doc_comment_unittest",
         "@protobuf//src/google/protobuf/compiler/java:generator_unittest",
