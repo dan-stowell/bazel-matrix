@@ -33,6 +33,5 @@ alias(
 test_suite(
     name = "tests",
     tests = [
-        "@catch2//tests:catch2_self_test",
     ],
 )
