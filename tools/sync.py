@@ -241,6 +241,9 @@ def is_excluded(label, patterns):
             pkg = label.split(":", 1)[0]
             if pkg == prefix or pkg.startswith(prefix + "/"):
                 return True
+        elif p.endswith("*"):
+            if label.startswith(p[:-1]):
+                return True
         elif label == p:
             return True
     return False

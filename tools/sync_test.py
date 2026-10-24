@@ -110,7 +110,9 @@ class ExclusionsTest(unittest.TestCase):
             sync.parse_exclusions("@a//:b\n")
 
     def test_patterns(self):
-        pats = ["@a//x/...", "@b//...", "@c//:t"]
+        pats = ["@a//x/...", "@b//...", "@c//:t", "@d//p:v25*"]
+        self.assertTrue(sync.is_excluded("@d//p:v25Test", pats))
+        self.assertFalse(sync.is_excluded("@d//p:v2", pats))
         self.assertTrue(sync.is_excluded("@a//x:t", pats))
         self.assertTrue(sync.is_excluded("@a//x/y:t", pats))
         self.assertFalse(sync.is_excluded("@a//xy:t", pats))
