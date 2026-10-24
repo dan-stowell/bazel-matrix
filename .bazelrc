@@ -11,3 +11,7 @@ common:remote-minimal --remote_default_exec_properties=container-image=docker://
 
 # Keep going so one broken project doesn't hide the rest.
 common --keep_going
+
+# The generated //<module> aliases and test_suites point at targets that are
+# mostly private to their module.
+common --nocheck_visibility
