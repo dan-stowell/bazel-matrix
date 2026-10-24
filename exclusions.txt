@@ -1,0 +1,4 @@
+# Targets tools/sync.py leaves out of the generated //<module> packages.
+# One per line: <pattern> <reason>. Patterns are an exact label
+# (@m//pkg:name), a package subtree (@m//pkg/...), or a whole repo (@m//...).
+# `nopatch:<module> <reason>` keeps a module's dev dependencies dev-only.

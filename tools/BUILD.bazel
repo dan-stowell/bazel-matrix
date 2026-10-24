@@ -1,0 +1,14 @@
+load("@rules_python//python:py_library.bzl", "py_library")
+load("@rules_python//python:py_test.bzl", "py_test")
+
+py_library(
+    name = "sync_lib",
+    srcs = ["sync.py"],
+    imports = ["."],
+)
+
+py_test(
+    name = "sync_test",
+    srcs = ["sync_test.py"],
+    deps = [":sync_lib"],
+)
