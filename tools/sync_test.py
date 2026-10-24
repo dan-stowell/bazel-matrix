@@ -202,8 +202,11 @@ class ExclusionsTest(unittest.TestCase):
         self.assertEqual(sync.parse_pattern("@a-b//x/y/..."), ("a-b", "x/y", "..."))
         self.assertEqual(sync.parse_pattern("@a//x/y:t.h"), ("a", "x/y", "t.h"))
         self.assertEqual(sync.parse_pattern("@a//:t"), ("a", "", "t"))
+        self.assertEqual(sync.parse_pattern("@p//.github/..."), ("p", ".github", "..."))
+        self.assertEqual(sync.parse_pattern("@p//.github:t"), ("p", ".github", "t"))
         for bad in ["@a//...:all", "@a//x", "@a//x:all", "@a//x:*", "@a//:v25*",
-                    "@a//x/...:t", "//x:t", "@a//x/..."[:-1]]:
+                    "@a//x/...:t", "//x:t", "@a//./...", "@a//x/../...",
+                    "@a//../y:t", "@a//x//y/...", "@a//x/..."[:-1]]:
             self.assertIsNone(sync.parse_pattern(bad), bad)
 
 

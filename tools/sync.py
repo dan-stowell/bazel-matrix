@@ -228,8 +228,11 @@ def parse_pattern(p):
     target is "..." for a subtree (@r//pkg/... or @r//...), else a target
     name. Returns None for anything else, e.g. @r//pkg, @r//pkg:all, @r//x*.
     """
-    m = re.match(r"^@([\w.+-]+)//(?:\.\.\.|([^:\s*.][^:\s*]*)/\.\.\.|([^:\s*]*):([^:\s*]+))$", p)
-    if not m or "..." in (m.group(3) or "") or m.group(4) in ("all", "all-targets", "..."):
+    m = re.match(r"^@([\w.+-]+)//(?:\.\.\.|([^:\s*]+)/\.\.\.|([^:\s*]*):([^:\s*]+))$", p)
+    if not m or m.group(4) in ("all", "all-targets", "..."):
+        return None
+    pkg = m.group(2) or m.group(3) or ""
+    if pkg and any(c in ("", ".", "..", "...") for c in pkg.split("/")):
         return None
     if m.group(4):
         return m.group(1), m.group(3), m.group(4)
