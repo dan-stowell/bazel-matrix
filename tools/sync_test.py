@@ -100,7 +100,8 @@ class QueryTest(unittest.TestCase):
     def test_expr_without_exclusions(self):
         expr = sync.query_expr(["a", "b"], [])
         self.assertNotIn("rdeps", expr)
-        self.assertTrue(expr.startswith("kind(rule, @a//... + @b//...) except attr("))
+        self.assertEqual(expr, "kind(rule, @a//... + @b//...) except "
+                         "attr(tags, '[\\[ ]manual[,\\]]', @a//... + @b//...)")
 
     def test_expr_with_exclusions(self):
         self.assertTrue(sync.query_expr(["a"], ["@a//x/...", "@a//:t"]).endswith(
@@ -120,25 +121,71 @@ class QueryTest(unittest.TestCase):
             "abseil-cpp": [("cc_library", "@abseil-cpp//absl/strings:strings")],
         })
 
-    def test_errors(self):
-        out = "\n".join([
+    CANON = {"re2+": "re2", "protobuf+": "protobuf", "foo+": "foo", "glog+": "glog"}
+
+    def problems(self, lines, patterns):
+        return sync.check_errors("\n".join(lines), self.CANON, patterns)
+
+    def test_covered_load_failures_and_dep_errors_pass(self):
+        self.assertEqual(self.problems([
             "\x1b[31;1mERROR: \x1b[mTraceback (most recent call last):",
             '\tFile "/w/output-base/external/re2+/app/BUILD.bazel", line 7, column 10, in <toplevel>',
-            '\tFile "/w/output-base/external/re2+/defs.bzl", line 1, in f',
+            "ERROR: package contains errors: app: Traceback (most recent call last):",
             "ERROR: error loading package '@@protobuf+//ruby': Unable to find package",
-            "ERROR: /w/external/glog+/BUILD.bazel:15:9: no such package '@@[unknown repo]//cpu'",
-            "ERROR: no such target '@@zlib+//:nope': target 'nope' not declared in package ''",
-            "ERROR: Skipping '@x//y/...': no targets found beneath 'y'",
+            "ERROR: Skipping '@protobuf//ruby/...': no targets found beneath 'ruby'",
+            "ERROR: /w/external/glog+/BUILD.bazel:15:9: no such package '@@[unknown repo]//cpu': x",
+            "ERROR: no such package '@@[unknown repo]//cpu': x",
+            "ERROR: error loading package '@@grpc+//': cannot load",
+            "ERROR: /w/external/rules_nodejs+/nodejs/toolchain.bzl:99:44: CcInfo was removed",
+            "ERROR: /w/external/glog+/BUILD.bazel:1:2: no such package "
+            "'@@[unknown repo 'x' requested from @@glog+]//': nope and referenced by '@@glog+//:t'",
+            "ERROR: no such package '@@[unknown repo 'x' requested from @@glog+]//': nope",
+            "ERROR: /w/external/glog+/BUILD.bazel:3:4: no such package '@@dl+//': tmp1 and "
+            "referenced by '@@glog+//:u'",
+            "ERROR: no such package '@@dl+//': tmp2",
+            "ERROR: Evaluation of query \"kind(rule, ...)\" failed",
+        ], ["@re2//app/...", "@protobuf//ruby/..."]), [])
+
+    def test_uncovered_load_failures(self):
+        self.assertEqual(self.problems([
+            "ERROR: error loading package '@@protobuf+//ruby': Unable to find package",
+            "ERROR: Skipping '@foo//...': error loading package under directory '': "
+            "no such package '@@foo+//': error downloading",
+        ], ["@re2//ruby/..."]), [
+            "package failed to load and isn't excluded: @foo//",
+            "package failed to load and isn't excluded: @protobuf//ruby",
         ])
-        failed, missing = sync.query_errors(out)
-        self.assertEqual(failed, {("re2+", "app"), ("protobuf+", "ruby")})
-        self.assertEqual(missing, [("zlib+", "", "nope"), (None, "y", None)])
+
+    def test_stale_exclusions(self):
+        got = self.problems([
+            "ERROR: no such package '@@protobuf+//java/core': BUILD file not found",
+            "ERROR: no such target '@@re2+//:gone': target 'gone' not declared in package ''",
+            "ERROR: Skipping '@glog//old/...': no targets found beneath 'old'",
+        ], ["@protobuf//java/core:t", "@re2//:gone", "@glog//old/..."])
+        self.assertEqual(len(got), 3)
+        self.assertTrue(all(p.startswith("stale exclusion") for p in got), got)
+
+    def test_repo_identity(self):
+        # re2//ruby failing to load doesn't make @protobuf//ruby/... non-stale.
+        got = self.problems([
+            "ERROR: error loading package '@@re2+//ruby': x",
+            "ERROR: Skipping '@protobuf//ruby/...': no targets found beneath 'ruby'",
+        ], ["@protobuf//ruby/...", "@re2//ruby/..."])
+        self.assertEqual(got, ["stale exclusion: @protobuf//ruby/... matches nothing"])
+
+    def test_fails_closed(self):
+        self.assertEqual(self.problems(["ERROR: something new"], []),
+                         ["unrecognised error: something new"])
+        self.assertEqual(self.problems(["ERROR: no such package '@@x+//y': z"], []),
+                         ["unrecognised error: no such package '@@x+//y': z"])
+        self.assertEqual(self.problems(["oops"], []), ["query failed without ERROR lines"])
 
     def test_covered(self):
         pats = ["@a//x/...", "@b//...", "@c//:t"]
         self.assertTrue(sync.covered("a", "x", pats))
         self.assertTrue(sync.covered("a", "x/y", pats))
         self.assertFalse(sync.covered("a", "xy", pats))
+        self.assertFalse(sync.covered("b2", "x", pats))
         self.assertTrue(sync.covered("b", "any", pats))
         self.assertFalse(sync.covered("c", "", pats))
 
@@ -149,8 +196,15 @@ class ExclusionsTest(unittest.TestCase):
                          [("@a//:b", "needs tzdata")])
         with self.assertRaises(ValueError):
             sync.parse_exclusions("@a//:b\n")
-        with self.assertRaises(ValueError):
-            sync.parse_exclusions("@a//:v25* prefixes are gone\n")
+
+    def test_forms(self):
+        self.assertEqual(sync.parse_pattern("@a//..."), ("a", "", "..."))
+        self.assertEqual(sync.parse_pattern("@a-b//x/y/..."), ("a-b", "x/y", "..."))
+        self.assertEqual(sync.parse_pattern("@a//x/y:t.h"), ("a", "x/y", "t.h"))
+        self.assertEqual(sync.parse_pattern("@a//:t"), ("a", "", "t"))
+        for bad in ["@a//...:all", "@a//x", "@a//x:all", "@a//x:*", "@a//:v25*",
+                    "@a//x/...:t", "//x:t", "@a//x/..."[:-1]]:
+            self.assertIsNone(sync.parse_pattern(bad), bad)
 
 
 class RenderBuildTest(unittest.TestCase):
