@@ -6,5 +6,17 @@ project(
     name = "protobuf",
     targets = [
         "//...",
+        # rules_ruby needs a system ruby, which the runner image lacks
+        "-//ruby/...",
+        # rules_ruby needs a system ruby, which the runner image lacks
+        "-//conformance/ruby/...",
+        # needs dotnet; unittest_deep_dependencies refers to Google-internal net/proto2
+        "-//csharp/...",
+        # a separate workspace (examples/MODULE.bazel) using protobuf as a dependency
+        "-//examples/...",
+        # the //php:extension genrule fails: its cp finds source and destination are the same file
+        "-//php/...",
+        # its v25 compatibility tests need //compatibility, which the release archive lacks
+        "-//java/core/...",
     ],
 )

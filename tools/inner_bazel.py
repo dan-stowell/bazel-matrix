@@ -216,6 +216,18 @@ def _du(path):
     return total
 
 
+def _big_dirs(work):
+    """The output base's subdirectories, to show where a work dir's space goes."""
+    out = []
+    root = os.path.join(work, "out")
+    for d in sorted(os.listdir(root)) if os.path.isdir(root) else []:
+        base = os.path.join(root, d)
+        if os.path.isdir(base):
+            out += [os.path.join("out", d, e) for e in sorted(os.listdir(base))
+                    if os.path.isdir(os.path.join(base, e)) and not os.path.islink(os.path.join(base, e))]
+    return out
+
+
 def _gb(n):
     return "%.2f GB" % (n / 1e9)
 
@@ -288,11 +300,12 @@ def main(argv=None):
             ("wall time", "%ds" % (time.time() - start)),
             ("peak RSS of one inner process", _gb(resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss * 1024)),
             ("work dir size before cleanup", _gb(_du(work))),
-        ]
+        ] + [("  " + rel, _gb(_du(os.path.join(work, rel)))) for rel in _big_dirs(work)]
     finally:
         if args.log:
             log.close()
         remove_tree(work)
+    stats.append(("shared repository cache", _gb(_du(REPOSITORY_CACHE))))
     stats.append(("disk free before/after", "%s / %s" % (
         _gb(free_before), _gb(shutil.disk_usage(WORK_ROOT).free))))
     rc_texts = []

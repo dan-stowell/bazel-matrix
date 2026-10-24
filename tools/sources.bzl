@@ -2,8 +2,9 @@
 
 It reads //:projects.json (written by tools/sync.py) and creates, for every
 project, a repo `src_<module>` holding `source.tar`: the project's BCR
-source archive with the BCR's patches and overlay applied, as one
-deterministic tar. A hub repo `projects` aliases them as
+source archive with the BCR's patches and overlay applied and the registry's
+MODULE.bazel in place of its own (as when Bazel fetches it from a registry),
+as one deterministic tar. A hub repo `projects` aliases them as
 `@projects//:<module>`, so MODULE.bazel needs a single use_repo. Repos are
 fetched lazily: only when a target that needs that project's source runs.
 """
@@ -23,6 +24,8 @@ def _bcr_source_impl(rctx):
     for path, url_integrity in rctx.attr.overlay.items():
         url, integrity = url_integrity.split(" ")
         rctx.download(url = url, output = path, integrity = integrity)
+    rctx.delete("MODULE.bazel")
+    rctx.download(url = rctx.attr.module_file[0], output = "MODULE.bazel", integrity = rctx.attr.module_file[1])
 
     # A deterministic tar of the patched tree, so the outer action key only
     # changes when the source does.
@@ -58,6 +61,8 @@ bcr_source = repository_rule(
     attrs = {
         "archive_type": attr.string(),
         "integrity": attr.string(mandatory = True),
+        # [url, integrity] of the registry's MODULE.bazel.
+        "module_file": attr.string_list(mandatory = True),
         # path -> "url integrity"
         "overlay": attr.string_dict(),
         "patch_strip": attr.int(),
@@ -94,6 +99,7 @@ def _projects_impl(mctx):
             patches = {x["url"]: x["integrity"] for x in s.get("patches", [])},
             patch_strip = s.get("patch_strip", 0),
             overlay = {x["path"]: x["url"] + " " + x["integrity"] for x in s.get("overlay", [])},
+            module_file = [s["module_file"]["url"], s["module_file"]["integrity"]],
         )
         names.append(p["name"])
     _hub(name = "projects", names = names)

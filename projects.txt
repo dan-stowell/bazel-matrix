@@ -12,4 +12,10 @@ zlib
 abseil-cpp
 re2
 protobuf
+  -//ruby/...  rules_ruby needs a system ruby, which the runner image lacks
+  -//conformance/ruby/...  rules_ruby needs a system ruby, which the runner image lacks
+  -//csharp/...  needs dotnet; unittest_deep_dependencies refers to Google-internal net/proto2
+  -//examples/...  a separate workspace (examples/MODULE.bazel) using protobuf as a dependency
+  -//php/...  the //php:extension genrule fails: its cp finds source and destination are the same file
+  -//java/core/...  its v25 compatibility tests need //compatibility, which the release archive lacks
 rules_go

@@ -40,7 +40,11 @@
             "url": "https://bcr.bazel.build/modules/zlib/1.3.2.bcr.2/overlay/zlib-1.3.2/BUILD.bazel",
             "integrity": "sha256-qiL2YEgx9fTrBt0w2VrcTMRgj7yVUayj8mpkuMZWWZc="
           }
-        ]
+        ],
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/zlib/1.3.2.bcr.2/MODULE.bazel",
+          "integrity": "sha256-Un9C4c8Rrmj+ca0pFcbZBkF94qzGtPVl+aSkl1DjvAM="
+        }
       },
       "targets": [
         "//..."
@@ -57,7 +61,11 @@
           "https://github.com/abseil/abseil-cpp/releases/download/20260817.0/abseil-cpp-20260817.0.tar.gz"
         ],
         "integrity": "sha256-9+BRed85xFQ0ytQz9Xg4QLs3iO8yKXb5E4vGtys6EH0=",
-        "strip_prefix": "abseil-cpp-20260817.0"
+        "strip_prefix": "abseil-cpp-20260817.0",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/abseil-cpp/20260817.0/MODULE.bazel",
+          "integrity": "sha256-Am15+UMTp7QeHRM4NLgCcTsthvruSs9gCK0dzl8MTeM="
+        }
       },
       "targets": [
         "//..."
@@ -74,7 +82,11 @@
           "https://github.com/google/re2/releases/download/2025-11-05/re2-2025-11-05.zip"
         ],
         "integrity": "sha256-x7Gnp8aNLXz400PcVmVcG1qMiq3twBfbRT1MHYkTuEQ=",
-        "strip_prefix": "re2-2025-11-05"
+        "strip_prefix": "re2-2025-11-05",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/re2/2025-11-05.bcr.1/MODULE.bazel",
+          "integrity": "sha256-PZ1JlYM/wDNPxciLVqBSiN0l1lFUTNeyIzu9Y1e766A="
+        }
       },
       "targets": [
         "//..."
@@ -91,12 +103,47 @@
           "https://github.com/protocolbuffers/protobuf/releases/download/v36.2/protobuf-36.2.bazel.tar.gz"
         ],
         "integrity": "sha256-nORMOJDuk/j0A9shmOvXEfz4vq49E/GKNvW8FFh0j0A=",
-        "strip_prefix": "protobuf-36.2"
+        "strip_prefix": "protobuf-36.2",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/protobuf/36.2/MODULE.bazel",
+          "integrity": "sha256-fCuQYPd3B3imBuIUfmmhdGXioIxhv7M36vLaYar2K18="
+        }
       },
       "targets": [
-        "//..."
+        "//...",
+        "-//ruby/...",
+        "-//conformance/ruby/...",
+        "-//csharp/...",
+        "-//examples/...",
+        "-//php/...",
+        "-//java/core/..."
       ],
-      "exclude": [],
+      "exclude": [
+        {
+          "pattern": "//ruby/...",
+          "reason": "rules_ruby needs a system ruby, which the runner image lacks"
+        },
+        {
+          "pattern": "//conformance/ruby/...",
+          "reason": "rules_ruby needs a system ruby, which the runner image lacks"
+        },
+        {
+          "pattern": "//csharp/...",
+          "reason": "needs dotnet; unittest_deep_dependencies refers to Google-internal net/proto2"
+        },
+        {
+          "pattern": "//examples/...",
+          "reason": "a separate workspace (examples/MODULE.bazel) using protobuf as a dependency"
+        },
+        {
+          "pattern": "//php/...",
+          "reason": "the //php:extension genrule fails: its cp finds source and destination are the same file"
+        },
+        {
+          "pattern": "//java/core/...",
+          "reason": "its v25 compatibility tests need //compatibility, which the release archive lacks"
+        }
+      ],
       "flags": [],
       "bazel_version": null
     },
@@ -114,7 +161,11 @@
             "integrity": "sha256-afin48Owvn7w6QuO9dmBLRZOQppX6MF6VKomPNA092g="
           }
         ],
-        "patch_strip": 1
+        "patch_strip": 1,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/rules_go/0.65.0/MODULE.bazel",
+          "integrity": "sha256-mu24zHGG2ZiBtDi1RTNObI6jhhmkO3m0JA0RgdXoir4="
+        }
       },
       "targets": [
         "//..."

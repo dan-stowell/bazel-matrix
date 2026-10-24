@@ -16,6 +16,8 @@ Generated packages of projects no longer listed are deleted.
 """
 
 import argparse
+import base64
+import hashlib
 import json
 import os
 import re
@@ -149,8 +151,16 @@ def pick(metadata, module_text_for, bazel):
 # projects.json and BUILD files.
 
 
-def source_entry(name, version, source):
-    """projects.json's `source` for a BCR source.json."""
+def integrity(data):
+    return "sha256-" + base64.b64encode(hashlib.sha256(data).digest()).decode()
+
+
+def source_entry(name, version, source, module_file):
+    """projects.json's `source` for a BCR source.json and MODULE.bazel (bytes).
+
+    Like Bazel fetching from a registry, the registry's MODULE.bazel replaces
+    the source's: a .bcr.N version may change only that file.
+    """
     kind = source.get("type", "archive")
     if kind != "archive":
         raise ValueError("%s@%s: %s sources aren't supported yet" % (name, version, kind))
@@ -169,6 +179,7 @@ def source_entry(name, version, source):
     if source.get("overlay"):
         entry["overlay"] = [{"path": p, "url": "%s/overlay/%s" % (base, p), "integrity": i}
                             for p, i in sorted(source["overlay"].items())]
+    entry["module_file"] = {"url": base + "/MODULE.bazel", "integrity": integrity(module_file)}
     return entry
 
 
@@ -284,7 +295,10 @@ def main():
                 errors.append("%s: %s" % (p["name"], why))
                 continue
         try:
-            source = source_entry(p["name"], version, _read_json(os.path.join(mdir, version, "source.json")))
+            with open(os.path.join(mdir, version, "MODULE.bazel"), "rb") as f:
+                module_file = f.read()
+            source = source_entry(p["name"], version,
+                                  _read_json(os.path.join(mdir, version, "source.json")), module_file)
         except (OSError, ValueError) as e:
             errors.append(str(e))
             continue
