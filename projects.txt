@@ -11,11 +11,16 @@
 zlib
 abseil-cpp
 re2
+  -//app/...  app/BUILD.bazel uses cc_binary without a load(), which Bazel 9 removed
 protobuf
   -//ruby/...  rules_ruby needs a system ruby, which the runner image lacks
   -//conformance/ruby/...  rules_ruby needs a system ruby, which the runner image lacks
   -//csharp/...  needs dotnet; unittest_deep_dependencies refers to Google-internal net/proto2
   -//examples/...  a separate workspace (examples/MODULE.bazel) using protobuf as a dependency
+  -//conformance:conformance_csharp  needs dotnet
+  -//conformance:conformance_csharp_genrule  needs dotnet
+  -//conformance:conformance_php_c  needs //php:extension (below)
+  -//conformance:conformance_php_c_genrule  needs //php:extension (below)
   -//php/...  the //php:extension genrule fails: its cp finds source and destination are the same file
   -//java/core/...  its v25 compatibility tests need //compatibility, which the release archive lacks
 rules_go

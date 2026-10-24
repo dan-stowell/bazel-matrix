@@ -14,6 +14,14 @@ project(
         "-//csharp/...",
         # a separate workspace (examples/MODULE.bazel) using protobuf as a dependency
         "-//examples/...",
+        # needs dotnet
+        "-//conformance:conformance_csharp",
+        # needs dotnet
+        "-//conformance:conformance_csharp_genrule",
+        # needs //php:extension (below)
+        "-//conformance:conformance_php_c",
+        # needs //php:extension (below)
+        "-//conformance:conformance_php_c_genrule",
         # the //php:extension genrule fails: its cp finds source and destination are the same file
         "-//php/...",
         # its v25 compatibility tests need //compatibility, which the release archive lacks
