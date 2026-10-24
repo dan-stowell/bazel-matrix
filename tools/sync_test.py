@@ -61,7 +61,7 @@ class SourceEntryTest(unittest.TestCase):
             "integrity": "sha256-x", "strip_prefix": "m-1.0",
             "patches": {"b.patch": "sha256-b", "a.patch": "sha256-a"}, "patch_strip": 1,
             "overlay": {"z/BUILD": "sha256-z", "BUILD": "sha256-o"},
-        })
+        }, b"module()")
         self.assertEqual(entry["urls"], ["https://a/m.zip", "https://b/m.zip"])
         self.assertEqual([p["url"] for p in entry["patches"]], [
             "https://bcr.bazel.build/modules/m/1.0/patches/b.patch",
@@ -69,10 +69,13 @@ class SourceEntryTest(unittest.TestCase):
         self.assertEqual(entry["patch_strip"], 1)
         self.assertEqual([o["path"] for o in entry["overlay"]], ["BUILD", "z/BUILD"])
         self.assertNotIn("archive_type", entry)
+        self.assertEqual(entry["module_file"], {
+            "url": "https://bcr.bazel.build/modules/m/1.0/MODULE.bazel",
+            "integrity": "sha256-GDnKZZcR0m/WJM8eh8ATv29Jxdy5Mg2ckuYNbDixJDk="})
 
     def test_git_unsupported(self):
         with self.assertRaises(ValueError):
-            sync.source_entry("m", "1", {"type": "git_repository", "remote": "x"})
+            sync.source_entry("m", "1", {"type": "git_repository", "remote": "x"}, b"")
 
 
 class RenderBuildTest(unittest.TestCase):
