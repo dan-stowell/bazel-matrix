@@ -9,21 +9,15 @@
     testcase per inner test target.
 Both pass the inner Bazel the same flags; anything that changes them
 (project flags, //:inner_flags, the inner Bazel version, the rc files)
-changes the outer action key.
+changes the outer action key. tools/remote.bazelrc, an input of both, pins
+the executor image by digest, the same image the runner must run (see
+tools/bb.sh), so the image is part of the key too.
 """
 
-# Pinned inner Bazel binaries (fetched in MODULE.bazel as
-# @inner_bazel_<version with _>//file), with startup flags only some
-# versions know.
-INNER_BAZELS = {
-    "9.3.1": ["--experimental_remote_repo_contents_cache"],
-    "8.4.2": [],
-}
-
-DEFAULT_INNER_BAZEL = "9.3.1"
+load(":versions.bzl", "INNER_BAZELS")
 
 def _repo(version):
-    return "@inner_bazel_%s//file" % version.replace(".", "_")
+    return "@projects//:bazel_" + version
 
 InnerSettingInfo = provider(fields = ["value"])
 
@@ -47,7 +41,7 @@ def _inputs(ctx):
         ctx.file._remote_rc,
         ctx.file._inner_rc,
         ctx.file._credential_helper,
-        ctx.file._credentials_marker,
+        ctx.file._credentials,
     ]
 
 def _args(ctx, mode, path):
@@ -64,13 +58,15 @@ def _args(ctx, mode, path):
         "--rc=" + path(ctx.file._remote_rc),
         "--rc=" + path(ctx.file._inner_rc),
         "--credential_helper=" + path(ctx.file._credential_helper),
-    ] + ["--startup_flag=" + f for f in INNER_BAZELS[version]] + [
+        "--credentials=" + path(ctx.file._credentials),
+    ] + ["--startup_flag=" + f for f in INNER_BAZELS[version].startup_flags] + [
         "--flag=" + f
         for f in flags
     ] + ["--target=" + t for t in ctx.attr.targets]
 
 def _resources(_os, _inputs_size):
-    # An inner Bazel server plus its client; see the tags in project().
+    # An inner Bazel JVM (capped at 2 GB heap by tools/inner_bazel.py) plus
+    # its client; see the tags in project().
     return {"cpu": 2, "memory": 2500}
 
 def _build_impl(ctx):
@@ -121,7 +117,7 @@ _ATTRS = {
     "source": attr.label(allow_single_file = True, mandatory = True),
     "targets": attr.string_list(mandatory = True),
     "_credential_helper": attr.label(allow_single_file = True, default = "//tools:buildbuddy_credential_helper.py"),
-    "_credentials_marker": attr.label(allow_single_file = True, default = "@buildbuddy_credentials//:marker"),
+    "_credentials": attr.label(allow_single_file = True, default = "@buildbuddy_credentials//:key_file"),
     "_inner_flags": attr.label(default = "//:inner_flags"),
     "_inner_rc": attr.label(allow_single_file = True, default = "//tools:inner.bazelrc"),
     "_remote_rc": attr.label(allow_single_file = True, default = "//tools:remote.bazelrc"),
@@ -173,6 +169,7 @@ def project(name, targets, flags = [], bazel_version = None):
     inner_test(
         name = "test",
         size = "enormous",
+        timeout = "eternal",
         tags = [
             "no-remote-exec",
             "no-sandbox",

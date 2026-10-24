@@ -2,32 +2,34 @@
 outer action's key.
 
 The repo rule reads the key from the outer client environment and writes it
-to KEY_FILE on the machine running the outer Bazel (mode 0600). The repo
-itself holds only a constant `marker` file: the inner build/test targets
-depend on it so the repo, and so the key file, exist before they run, but the
-key never becomes an action input or environment variable. The inner Bazels
-read the key through tools/buildbuddy_credential_helper.py. The repo is not
-marked reproducible, so the remote repo contents cache never serves it in
-place of running it.
+(mode 0600) to a file outside the repo, scoped to the outer workspace, or
+deletes that file when the variable is unset. The repo itself holds only
+`key_file`, naming that file: the inner build and test targets take it as an
+input, so the repo exists before they run, and pass the name on to the inner
+Bazels' credential helper (tools/buildbuddy_credential_helper.py). The key is
+never an action input or environment variable. The repo is not marked
+reproducible, so the remote repo contents cache never serves it in place of
+running it.
 """
 
-# Keep in sync with tools/buildbuddy_credential_helper.py.
-KEY_FILE = "/tmp/bazel-matrix/buildbuddy-api-key"
-
 def _impl(rctx):
+    scope = str(rctx.workspace_root).strip("/").replace("/", "_")
+    key_file = "/tmp/bazel-matrix/credentials/%s/api-key" % scope
     key = rctx.getenv("BUILDBUDDY_API_KEY", "")
     if key:
         result = rctx.execute(
-            ["sh", "-c", 'umask 077 && mkdir -p "$(dirname "$1")" && printf %s "$KEY" > "$1.tmp" && mv "$1.tmp" "$1"', "sh", KEY_FILE],
+            ["sh", "-c", 'umask 077 && mkdir -p "$(dirname "$1")" && printf %s "$KEY" > "$1.tmp" && mv "$1.tmp" "$1"', "sh", key_file],
             environment = {"KEY": key},
         )
         if result.return_code:
-            fail("could not write %s: %s" % (KEY_FILE, result.stderr))
+            fail("could not write %s: %s" % (key_file, result.stderr))
     else:
         # Don't leave an earlier run's key behind.
-        rctx.execute(["rm", "-f", KEY_FILE])
-    rctx.file("marker", "")
+        rctx.execute(["rm", "-f", key_file])
+    # Where an earlier version of this rule kept the key.
+    rctx.execute(["rm", "-f", "/tmp/bazel-matrix/buildbuddy-api-key"])
+    rctx.file("key_file", key_file + "\n")
     rctx.file("REPO.bazel", "")
-    rctx.file("BUILD.bazel", 'exports_files(["marker"])\n')
+    rctx.file("BUILD.bazel", 'exports_files(["key_file"])\n')
 
 buildbuddy_credentials = repository_rule(implementation = _impl, local = True)

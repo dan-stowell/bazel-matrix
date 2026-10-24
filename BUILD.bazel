@@ -1,6 +1,7 @@
 # Root package. Projects live in //<module>/; see README.md.
 
-load("//tools:project.bzl", "DEFAULT_INNER_BAZEL", "string_list_setting", "string_setting")
+load("//tools:project.bzl", "string_list_setting", "string_setting")
+load("//tools:versions.bzl", "DEFAULT_INNER_BAZEL")
 
 # Extra flags for every inner Bazel, e.g.
 # --//:inner_flags=--test_tag_filters=-slow (repeat it for more flags).
@@ -11,7 +12,7 @@ string_list_setting(
 )
 
 # The inner Bazel for projects that don't pin one; one of
-# tools/project.bzl's INNER_BAZELS.
+# tools/versions.bzl's INNER_BAZELS.
 string_setting(
     name = "inner_bazel_version",
     build_setting_default = DEFAULT_INNER_BAZEL,

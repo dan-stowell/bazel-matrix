@@ -3,14 +3,17 @@
 
 Called by the targets tools/project.bzl declares. It extracts the project's
 source.tar into a fresh work dir, runs the pinned inner Bazel there in
---batch mode with its own output user root, and deletes the work dir
-afterwards, so a runner's disk doesn't grow per run. Downloads go through a
-repository cache shared by every inner Bazel on the machine.
+--batch mode with its own output user root and a minimal, explicit
+environment, and deletes the work dir afterwards (also on SIGTERM, and stale
+ones left by killed runs), so a runner's disk doesn't grow per run. Fetches
+go through BuildBuddy's remote downloader and remote repo contents cache;
+nothing is cached on the runner between runs.
 
 build mode writes --summary (invocation link and counts) and --log (the
 inner output). test mode streams the inner output to the test log and writes
-$XML_OUTPUT_FILE with one testcase per inner test target, plus one per
-non-test target that failed to build.
+$XML_OUTPUT_FILE with one testcase per inner test target (per configuration),
+one per non-test target that failed to build, and an `invocation` failure
+when the inner Bazel failed for a reason no target explains.
 
 Exit status: 0 when the inner Bazel succeeded (for test, also when it found
 no tests), else 1.
@@ -19,8 +22,6 @@ no tests), else 1.
 import argparse
 import json
 import os
-import re
-import resource
 import shutil
 import signal
 import subprocess
@@ -30,8 +31,12 @@ import time
 import xml.etree.ElementTree as ET
 
 WORK_ROOT = "/tmp/bazel-matrix/work"
-REPOSITORY_CACHE = "/tmp/bazel-matrix/repository_cache"
-REPOSITORY_CACHE_LIMIT = 4e9
+RESULTS_URL = "https://buildbuddy.buildbuddy.io/invocation/"
+# Keep the inner JVM within the resources:memory reservation in project.bzl.
+JVM_HEAP = "-Xmx2g"
+# Seconds between SIGTERM and SIGKILL for the inner Bazel; well below
+# Bazel's default --local_termination_grace_seconds (15).
+KILL_GRACE = 5
 
 # Inner exit codes that count as success: 4 is "no test targets found".
 _OK = {"build": {0}, "test": {0, 4}}
@@ -47,6 +52,8 @@ def parse_args(argv):
     p.add_argument("--bazel_version", required=True)
     p.add_argument("--rc", action="append", default=[])
     p.add_argument("--credential_helper", required=True)
+    p.add_argument("--credentials", required=True,
+                   help="file naming the API key file; see tools/credentials.bzl")
     p.add_argument("--startup_flag", action="append", default=[])
     p.add_argument("--flag", action="append", default=[])
     p.add_argument("--target", action="append", default=[])
@@ -63,9 +70,9 @@ def inner_command(args, out_root, bep):
         "--nosystem_rc",
         "--nohome_rc",
         "--output_user_root=" + out_root,
+        "--host_jvm_args=" + JVM_HEAP,
     ] + ["--bazelrc=" + rc for rc in args.rc] + args.startup_flag
     flags = [
-        "--repository_cache=" + REPOSITORY_CACHE,
         "--credential_helper=*.buildbuddy.io=" + args.credential_helper,
         "--build_event_json_file=" + bep,
         "--build_metadata=PROJECT=" + args.project,
@@ -75,68 +82,88 @@ def inner_command(args, out_root, bep):
     return [args.bazel] + startup + [args.mode] + flags + args.flag + ["--"] + args.target
 
 
-def load_bep(lines):
-    """Per-target results from inner BEP JSON lines.
+def inner_env(work, bin_dir, key_file):
+    """The inner Bazel's whole environment, the same in build and test mode."""
+    return {
+        # Integration tests (rules_go's go_bazel_test, ...) run `bazel` from
+        # PATH: bin_dir makes that the inner Bazel itself.
+        "PATH": bin_dir + ":/usr/local/bin:/usr/bin:/bin",
+        "HOME": os.path.join(work, "home"),
+        "TMPDIR": os.path.join(work, "tmp"),
+        "LANG": "C.UTF-8",
+        "BAZEL_MATRIX_KEY_FILE": key_file,
+    }
 
-    Returns (invocation_id, tests, failed_builds): tests maps each configured
-    test target to (status, millis); failed_builds lists the non-test targets
-    that failed.
+
+def _config(eid_part):
+    return eid_part.get("configuration", {}).get("id", "")
+
+
+def load_bep(lines):
+    """Per-target results from inner BEP JSON lines; bad lines are skipped.
+
+    Returns (invocation_id, tests, failed_builds): tests maps each
+    (test label, configuration) to (status, millis); failed_builds lists the
+    non-test targets that failed.
     """
     invocation = ""
-    test_targets, summaries, completed, aborted = set(), {}, {}, {}
+    test_labels, summaries, completed, aborted = set(), {}, {}, {}
     for line in lines:
-        if not line.strip():
-            continue
-        event = json.loads(line)
-        eid = event.get("id", {})
+        try:
+            event = json.loads(line)
+            eid = event["id"]
+        except (ValueError, KeyError, TypeError):
+            continue  # blank, or truncated by a killed Bazel
         if "started" in eid:
             invocation = event.get("started", {}).get("uuid", "")
-        if "targetConfigured" in eid and "testSize" in event.get("configured", {}):
-            test_targets.add(eid["targetConfigured"]["label"])
-        if "testSummary" in eid:
-            s = event.get("testSummary", {})
-            label = eid["testSummary"]["label"]
-            # A label can be tested in several configurations; keep a failure.
-            if summaries.get(label, ("PASSED",))[0] in _PASSING:
-                summaries[label] = (
-                    s.get("overallStatus", "NO_STATUS"), int(s.get("totalRunDurationMillis", 0)))
-        if "targetCompleted" in eid:
-            label = eid["targetCompleted"]["label"]
+        if "targetConfigured" in eid:
+            label = eid["targetConfigured"].get("label", "")
             if "aborted" in event:
                 aborted[label] = event["aborted"].get("reason", "UNKNOWN")
+            elif "testSize" in event.get("configured", {}):
+                test_labels.add(label)
+        if "testSummary" in eid:
+            s = event.get("testSummary", {})
+            key = (eid["testSummary"].get("label", ""), _config(eid["testSummary"]))
+            summaries[key] = (s.get("overallStatus", "NO_STATUS"),
+                              int(s.get("totalRunDurationMillis", 0)))
+        if "targetCompleted" in eid:
+            key = (eid["targetCompleted"].get("label", ""), _config(eid["targetCompleted"]))
+            if "aborted" in event:
+                aborted[key[0]] = event["aborted"].get("reason", "UNKNOWN")
             else:
-                completed[label] = completed.get(label, True) and event.get("completed", {}).get("success", False)
-        elif "targetConfigured" in eid and "aborted" in event:
-            aborted[eid["targetConfigured"]["label"]] = event["aborted"].get("reason", "UNKNOWN")
-    tests = {}
-    for label in test_targets | set(summaries):
-        if label in summaries:
-            tests[label] = summaries[label]
-        elif aborted.get(label) == "SKIPPED":
-            tests[label] = ("SKIPPED", 0)
-        elif completed.get(label):
-            # Built, not run: `bazel build`.
-            tests[label] = ("BUILT", 0)
-        else:
-            tests[label] = ("FAILED_TO_BUILD", 0)
+                completed[key] = event.get("completed", {}).get("success", False)
+    tests = dict(summaries)
+    for key, ok in completed.items():
+        if key[0] in test_labels and key not in tests:
+            # Built (or not), never run.
+            tests[key] = ("BUILT" if ok else "FAILED_TO_BUILD", 0)
+    seen = {label for label, _ in tests}
+    for label in test_labels - seen:
+        tests[(label, "")] = ("SKIPPED" if aborted.get(label) == "SKIPPED" else "FAILED_TO_BUILD", 0)
     failed_builds = sorted(
-        ({l for l, ok in completed.items() if not ok} |
+        ({l for (l, _), ok in completed.items() if not ok} |
          {l for l, r in aborted.items() if r != "SKIPPED"})
-        - set(tests))
+        - test_labels)
     return invocation, tests, failed_builds
 
 
-def test_xml(project, tests, failed_builds, link, ok=True):
-    """A JUnit XML document: one testcase per inner test target.
+def _case_names(tests):
+    """Testcase names: the label, plus the configuration if it has several."""
+    count = {}
+    for label, _ in tests:
+        count[label] = count.get(label, 0) + 1
+    return {(l, c): l if count[l] == 1 else "%s [%s]" % (l, c[:12]) for l, c in tests}
 
-    A failed inner invocation that no target failure explains (a bad flag,
-    a target pattern error, a timeout) gets an `invocation` testcase.
-    """
+
+def test_xml(project, tests, failed_builds, link, ok=True):
+    """A JUnit XML document: one testcase per inner test target."""
     suite = ET.Element("testsuite", name=project)
     failures = skipped = 0
-    for label in sorted(tests):
-        status, millis = tests[label]
-        case = ET.SubElement(suite, "testcase", name=label, classname=project,
+    names = _case_names(tests)
+    for key in sorted(tests):
+        status, millis = tests[key]
+        case = ET.SubElement(suite, "testcase", name=names[key], classname=project,
                              time="%.3f" % (millis / 1000.0))
         if status in ("SKIPPED", "BUILT"):
             # BUILT: built but not run, e.g. a test_suite member under an
@@ -145,7 +172,8 @@ def test_xml(project, tests, failed_builds, link, ok=True):
             ET.SubElement(case, "skipped", message=status)
         elif status not in _PASSING:
             failures += 1
-            ET.SubElement(case, "failure", message=status).text = "%s %s; see %s" % (label, status, link)
+            ET.SubElement(case, "failure", message=status).text = "%s %s; see %s" % (
+                names[key], status, link)
     for label in failed_builds:
         failures += 1
         case = ET.SubElement(suite, "testcase", name=label, classname=project + ".build")
@@ -165,16 +193,7 @@ def test_xml(project, tests, failed_builds, link, ok=True):
     return ET.tostring(root, encoding="unicode") + "\n"
 
 
-def results_url(rc_texts):
-    """The --bes_results_url the rc files set, or BuildBuddy's default."""
-    url = "https://app.buildbuddy.io/invocation/"
-    for text in rc_texts:
-        for m in re.finditer(r"--bes_results_url=(\S+)", text):
-            url = m.group(1)
-    return url.rstrip("/") + "/"
-
-
-def summary_text(project, mode, version, code, link, tests, failed_builds, stats):
+def summary_text(project, mode, version, code, link, tests, failed_builds, wall):
     counts = {}
     for status, _ in tests.values():
         counts[status] = counts.get(status, 0) + 1
@@ -186,7 +205,7 @@ def summary_text(project, mode, version, code, link, tests, failed_builds, stats
         "inner invocation: " + link,
         "tests: " + (", ".join("%s %d" % kv for kv in sorted(counts.items())) or "none"),
         "failed to build: %d" % len(failed_builds),
-    ] + ["  " + l for l in failed_builds] + ["%s: %s" % kv for kv in stats]
+    ] + ["  " + l for l in failed_builds] + ["wall time: %ds" % wall]
     return "\n".join(lines) + "\n"
 
 
@@ -200,14 +219,6 @@ def _alive(pid):
     return True
 
 
-def bazel_path_dir(args):
-    """A dir holding only a `bazel` symlink to the inner Bazel."""
-    d = os.path.join(os.path.dirname(args.source_dir), "bin")
-    os.makedirs(d, exist_ok=True)
-    os.symlink(args.bazel, os.path.join(d, "bazel"))
-    return d
-
-
 def remove_tree(path):
     # Bazel makes parts of its output and install bases read-only.
     subprocess.run(["chmod", "-R", "u+rwx", path], stderr=subprocess.DEVNULL)
@@ -215,8 +226,16 @@ def remove_tree(path):
 
 
 def remove_stale(root):
-    """Removes work dirs left by killed runs (their pid file names a dead pid)."""
-    for d in os.listdir(root):
+    """Removes work dirs left by killed runs: their pid file names a dead pid.
+
+    A dir with no pid file yet is only removed once it's 10 minutes old, and
+    a dir that disappears meanwhile (another run cleaning up) is fine.
+    """
+    try:
+        entries = os.listdir(root)
+    except FileNotFoundError:
+        return
+    for d in entries:
         path = os.path.join(root, d)
         try:
             with open(os.path.join(path, "pid")) as f:
@@ -226,64 +245,46 @@ def remove_stale(root):
                 if time.time() - os.path.getmtime(path) < 600:
                     continue
             except OSError:
-                continue  # removed meanwhile
+                continue
             pid = 0
         if not pid or not _alive(pid):
             remove_tree(path)
 
 
-def _du(path):
-    total = 0
-    for dirpath, _, files in os.walk(path):
-        for f in files:
-            try:
-                total += os.lstat(os.path.join(dirpath, f)).st_blocks * 512
-            except OSError:
-                pass
-    return total
-
-
-def _big_dirs(work):
-    """The output base's subdirectories, to show where a work dir's space goes."""
-    out = []
-    root = os.path.join(work, "out")
-    for d in sorted(os.listdir(root)) if os.path.isdir(root) else []:
-        base = os.path.join(root, d)
-        if os.path.isdir(base):
-            out += [os.path.join("out", d, e) for e in sorted(os.listdir(base))
-                    if os.path.isdir(os.path.join(base, e)) and not os.path.islink(os.path.join(base, e))]
-    return out
-
-
-def _gb(n):
-    return "%.2f GB" % (n / 1e9)
+def kill(proc):
+    """SIGTERM the inner Bazel's process group, then SIGKILL after KILL_GRACE."""
+    if proc is None or proc.poll() is not None:
+        return
+    try:
+        os.killpg(proc.pid, signal.SIGTERM)
+        proc.wait(KILL_GRACE)
+    except subprocess.TimeoutExpired:
+        os.killpg(proc.pid, signal.SIGKILL)
+        proc.wait()
+    except ProcessLookupError:
+        pass
 
 
 def main(argv=None):
     args = parse_args(argv if argv is not None else sys.argv[1:])
-    for name in ("source", "bazel", "credential_helper"):
+    for name in ("source", "bazel", "credential_helper", "credentials"):
         setattr(args, name, os.path.abspath(getattr(args, name)))
     args.rc = [os.path.abspath(rc) for rc in args.rc]
+    if args.mode == "test" and os.environ.get("TEST_TIMEOUT"):
+        # Finish (and clean up) before the outer test times out.
+        args.timeout = min(args.timeout, int(os.environ["TEST_TIMEOUT"]) - 60)
+    with open(args.credentials) as f:
+        key_file = f.read().strip()
 
     os.makedirs(WORK_ROOT, exist_ok=True)
-    os.makedirs(REPOSITORY_CACHE, exist_ok=True)
     remove_stale(WORK_ROOT)
-    if _du(REPOSITORY_CACHE) > REPOSITORY_CACHE_LIMIT:
-        # Nothing evicts from a repository cache; start over when it's big.
-        remove_tree(REPOSITORY_CACHE)
-        os.makedirs(REPOSITORY_CACHE, exist_ok=True)
     work = tempfile.mkdtemp(prefix=args.project + "-", dir=WORK_ROOT)
     with open(os.path.join(work, "pid"), "w") as f:
         f.write(str(os.getpid()))
-    proc = None
+    state = {"proc": None}
 
     def on_signal(signum, _frame):
-        if proc and proc.poll() is None:
-            os.killpg(proc.pid, signal.SIGTERM)
-            try:
-                proc.wait(20)
-            except subprocess.TimeoutExpired:
-                os.killpg(proc.pid, signal.SIGKILL)
+        kill(state["proc"])
         remove_tree(work)
         sys.exit(128 + signum)
 
@@ -291,11 +292,15 @@ def main(argv=None):
     signal.signal(signal.SIGINT, on_signal)
 
     log = open(args.log, "w") if args.log else sys.stdout
-    free_before = shutil.disk_usage(WORK_ROOT).free
     start = time.time()
+    code, invocation, tests, failed_builds = 1, "", {}, []
     try:
-        src = args.source_dir = os.path.join(work, "src")
-        os.makedirs(src)
+        src = os.path.join(work, "src")
+        bin_dir = os.path.join(work, "bin")
+        env = inner_env(work, bin_dir, key_file)
+        for d in (src, bin_dir, env["HOME"], env["TMPDIR"]):
+            os.makedirs(d)
+        os.symlink(args.bazel, os.path.join(bin_dir, "bazel"))
         subprocess.run(["tar", "-xf", args.source, "-C", src], check=True)
         version_file = os.path.join(src, ".bazelversion")
         if os.path.exists(version_file):
@@ -305,51 +310,29 @@ def main(argv=None):
                 print("note: upstream .bazelversion is %s; using %s" % (upstream, args.bazel_version),
                       file=log, flush=True)
         bep = os.path.join(work, "bep.json")
-        env = dict(os.environ)
-        # Build actions get an empty environment; cc autoconfiguration
-        # needs a PATH to find the compiler.
-        env.setdefault("PATH", "/usr/local/bin:/usr/bin:/bin")
-        # Integration tests (rules_go's go_bazel_test, ...) run `bazel` from
-        # PATH: make that the inner Bazel itself.
-        env["PATH"] = bazel_path_dir(args) + os.pathsep + env["PATH"]
-        env.setdefault("HOME", work)
-        env["TMPDIR"] = os.path.join(work, "tmp")
-        os.makedirs(env["TMPDIR"])
         cmd = inner_command(args, os.path.join(work, "out"), bep)
         print("+ " + " ".join(cmd), file=log, flush=True)
-        proc = subprocess.Popen(cmd, cwd=src, env=env, stdout=log, stderr=subprocess.STDOUT,
-                                start_new_session=True)
+        state["proc"] = subprocess.Popen(cmd, cwd=src, env=env, stdout=log,
+                                         stderr=subprocess.STDOUT, start_new_session=True)
         try:
-            code = proc.wait(args.timeout)
+            code = state["proc"].wait(args.timeout)
         except subprocess.TimeoutExpired:
-            os.killpg(proc.pid, signal.SIGKILL)
-            code = proc.wait()
+            kill(state["proc"])
+            code = 1
             print("inner bazel timed out after %ds" % args.timeout, file=log, flush=True)
         try:
-            with open(bep) as f:
+            with open(bep, errors="replace") as f:
                 invocation, tests, failed_builds = load_bep(f)
         except OSError:
-            invocation, tests, failed_builds = "", {}, []
-        stats = [
-            ("wall time", "%ds" % (time.time() - start)),
-            ("peak RSS of one inner process", _gb(resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss * 1024)),
-            ("work dir size before cleanup", _gb(_du(work))),
-        ] + [("  " + rel, _gb(_du(os.path.join(work, rel)))) for rel in _big_dirs(work)]
+            pass
     finally:
         if args.log:
             log.close()
         remove_tree(work)
-    stats.append(("shared repository cache", _gb(_du(REPOSITORY_CACHE))))
-    stats.append(("disk free before/after", "%s / %s" % (
-        _gb(free_before), _gb(shutil.disk_usage(WORK_ROOT).free))))
-    rc_texts = []
-    for rc in args.rc:
-        with open(rc) as f:
-            rc_texts.append(f.read())
-    link = results_url(rc_texts) + invocation if invocation else "(none)"
     ok = code in _OK[args.mode]
+    link = RESULTS_URL + invocation if invocation else "(none)"
     summary = summary_text(args.project, args.mode, args.bazel_version, code, link, tests,
-                           failed_builds, stats)
+                           failed_builds, time.time() - start)
     if args.summary:
         with open(args.summary, "w") as f:
             f.write(summary)

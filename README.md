@@ -18,31 +18,28 @@ inputs (source, flags, inner Bazel, rc files, runner) haven't changed.
 
 ## Commands
 
-Everything runs on BuildBuddy RBE through `bb remote`, which must be told to
-use the same image as the executors, so the C++ toolchain the inner Bazels
-autodetect on the runner works on them:
+Everything runs on BuildBuddy RBE through `bb remote`; `tools/bb.sh` adds
+the runner image and `--config=remote-minimal`:
 
 ```sh
-BB="bb remote --container_image=$(grep -o 'container-image=[^ ]*' tools/remote.bazelrc | cut -d= -f2)"
-$BB build //... --config=remote-minimal     # every project's inner build
-$BB test //... --config=remote-minimal      # every project's inner test
-$BB test //zlib/... --config=remote-minimal # one project
-$BB test //tools/... --config=remote-minimal # this repo's unit tests
+tools/bb.sh build //...          # every project's inner build
+tools/bb.sh test //...           # every project's inner test
+tools/bb.sh test //zlib/...      # one project
+tools/bb.sh test //tools/...     # this repo's unit tests
+tools/bb.sh test //re2:test --//:inner_flags=--test_tag_filters=-slow  # extra inner flags (repeatable)
+tools/bb.sh test //zlib:test --//:inner_bazel_version=8.4.2            # another pinned inner Bazel
+tools/bb.sh test //... --test_output=all  # print every project's summary and inner link
 ```
 
-Extra flags for every inner Bazel, without editing files:
+Passing projects' logs (summary, inner invocation link) only print with
+`--test_output=all`; that flag isn't in the action key, so it replays cached
+results. Read inner logs with `bb view <inner invocation>`.
 
-```sh
-$BB test //re2/... --config=remote-minimal --//:inner_flags=--test_tag_filters=-slow --//:inner_flags=--copt=-O1
-$BB test //zlib/... --config=remote-minimal --//:inner_bazel_version=8.4.2
-```
-
-`bb remote` downloads the top-level outputs afterwards from its own cache
-endpoint, which may report `download blob ... NotFound` and exit 1 even
-though the outer Bazel succeeded; the runner log's `(command exited with
-code N)` is the real result. Read inner logs with `bb view <inner
-invocation>`; `bb remote`'s runner clones from GitHub and applies your local
-diff.
+Caveats: `bb remote` runs your local diff against the default branch on the
+runner (commits need not be pushed). Afterwards it downloads the top-level
+outputs from its own cache endpoint, which can fail with `download blob ...
+NotFound` and exit 1 although the outer Bazel succeeded; the runner log's
+`(command exited with code N)` is the real result.
 
 ## How an inner build runs
 
@@ -53,22 +50,24 @@ cached):
 1. extracts the project's `source.tar` into a fresh work dir under
    `/tmp/bazel-matrix/work`;
 2. runs the pinned inner Bazel there with `--batch`, its own output user
-   root, the project's own `.bazelrc` (but no system or home rc), then
+   root, a 2 GB JVM heap, a minimal explicit environment, the project's own
+   `.bazelrc` (but no system or home rc), then
    `--bazelrc=tools/remote.bazelrc --bazelrc=tools/inner.bazelrc` (RBE with
    `--config=remote-minimal`), the project's flags and `--//:inner_flags`;
-3. deletes the work dir (also on timeout or SIGTERM, and stale ones left by
-   killed runs), so a runner's disk doesn't grow per run. Downloads go to a
-   repository cache shared on the machine
-   (`/tmp/bazel-matrix/repository_cache`) and through BuildBuddy's remote
-   downloader; reproducible repos come from the remote repo contents cache.
+3. deletes the work dir, also on SIGTERM (it kills the inner Bazel first)
+   and when a killed run left one behind, so a runner's disk doesn't grow
+   per run. Nothing is cached on the runner between runs: fetches go
+   through BuildBuddy's remote downloader, and reproducible repos come from
+   the remote repo contents cache.
 
 Each inner run is tagged `resources:cpu:2`/`resources:memory:2500`, so a
 6-CPU, 7 GB runner runs two at a time.
 
 The BuildBuddy API key reaches the inner Bazels through a credential helper
-(`tools/buildbuddy_credential_helper.py`), which reads a file that the
+(`tools/buildbuddy_credential_helper.py`) reading a file that the
 `@buildbuddy_credentials` repo rule writes from the outer client
-environment (`tools/credentials.bzl`). The key is never an action input or
+environment, scoped to the outer workspace and deleted when the variable is
+unset (`tools/credentials.bzl`). The key is never an action input or
 environment variable, so it's in no action key.
 
 ## Layout
@@ -80,18 +79,21 @@ environment variable, so it's in no action key.
   `projects.txt`; re-running it changes nothing. It keeps a sparse clone of
   the BCR in `~/.cache/bazel-matrix/bcr` at the commit `projects.json`
   records (`--update` moves to the BCR's HEAD), picks each project's version
-  (pinned, else the latest stable, non-yanked one whose
-  `bazel_compatibility` admits `.bazelversion`), and writes
+  (pinned, else the newest stable, non-yanked one whose
+  `bazel_compatibility` admits `DEFAULT_INNER_BAZEL`), and writes
   - `projects.json`: the BCR commit and each project's version and source
-    (archive, integrity, patches, overlay and the registry's MODULE.bazel,
-    as `bcr.bazel.build` URLs with integrity);
+    (archive, integrity, overlay, patches and the registry's MODULE.bazel,
+    as `bcr.bazel.build` URLs with integrity), and the projects it skipped
+    (deprecated, no compatible version, unsupported source type) with why;
   - `<module>/BUILD.bazel`, deleting those of projects no longer listed.
 - `tools/sources.bzl`: the module extension reading `projects.json`; one
   lazily fetched repo per project (`@projects//:<module>` is its
-  `source.tar`: the archive with patches and overlay applied and the
-  registry's MODULE.bazel, as a deterministic tar).
-- `tools/project.bzl`: the `build` and `test` rules and the pinned inner
-  Bazel versions (`INNER_BAZELS`, fetched in `MODULE.bazel`).
+  `source.tar`: the archive with the overlay, then the patches, then the
+  registry's MODULE.bazel applied, as http_archive does for a registry
+  module, as a deterministic tar), and the inner Bazels.
+- `tools/project.bzl`: the `build` and `test` rules.
+- `tools/versions.bzl`: the pinned inner Bazels (version, sha256, startup
+  flags) and `DEFAULT_INNER_BAZEL`; the one place they're defined.
 - `tools/remote.bazelrc`: `--config=remote-minimal` (BuildBuddy endpoints,
   `--remote_download_minimal`, `--jobs=100`, the executor image pinned by
   digest, remote downloader, `--rewind_lost_inputs`, remote JDK), for the
@@ -105,8 +107,8 @@ build and test `//<module>/...`. Fix failures with an exclusion
 (`-//pattern`) or a flag (`--flag`), each with the reason, then sync again.
 A package that fails to load breaks `//...` even when excluded; delete it
 with `--deleted_packages=<pkg>` instead. A project that needs a different
-inner Bazel gets `bazel <version>` (add the version to `INNER_BAZELS` and
-`MODULE.bazel` first).
+inner Bazel gets `bazel <version>` (add the version to
+`tools/versions.bzl` first).
 
-Only `archive` BCR sources are supported so far; sync fails for
+Only `archive` BCR sources are supported so far; sync skips
 `git_repository` ones.
