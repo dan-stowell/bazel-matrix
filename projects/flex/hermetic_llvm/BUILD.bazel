@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
-load("//projects/flex:project.bzl", "FLEX_PROJECT")
-
-hermetic_llvm_project_modification(project = FLEX_PROJECT)

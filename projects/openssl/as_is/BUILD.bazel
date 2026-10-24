@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "bcr_project_from_spec")
-load("//projects/openssl:project.bzl", "OPENSSL_PROJECT")
-
-bcr_project_from_spec(project = OPENSSL_PROJECT)

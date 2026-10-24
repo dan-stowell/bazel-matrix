@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
-load("//projects/cityhash:project.bzl", "CITYHASH_PROJECT")
-
-hermetic_llvm_project_modification(project = CITYHASH_PROJECT)

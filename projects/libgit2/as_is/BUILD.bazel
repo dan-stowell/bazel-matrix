@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "bcr_project_from_spec")
-load("//projects/libgit2:project.bzl", "LIBGIT2_PROJECT")
-
-bcr_project_from_spec(project = LIBGIT2_PROJECT)

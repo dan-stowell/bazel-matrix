@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "matrix_project")
-load("//projects/pcre2:project.bzl", "PCRE2_PROJECT")
-
-matrix_project(project = PCRE2_PROJECT)

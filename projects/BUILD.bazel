@@ -1,9 +1,0 @@
-# Project-specific packages live under:
-#
-#   //projects/<project_name>/<modification_name>
-#
-# `as_is` is the unmodified upstream source/module. Other directories, such as
-# `hermetic_llvm`, are explicit matrix modifications layered on top of that
-# project's shared //projects/<project_name>:project.bzl spec.
-# The runner_project macro lives in defs.bzl.
-exports_files(["run.sh"])

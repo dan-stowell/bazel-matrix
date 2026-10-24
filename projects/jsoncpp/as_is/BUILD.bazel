@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "matrix_project")
-load("//projects/jsoncpp:project.bzl", "JSONCPP_PROJECT")
-
-matrix_project(project = JSONCPP_PROJECT)

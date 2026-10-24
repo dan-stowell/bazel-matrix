@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "bcr_project_from_spec")
-load("//projects/ccronexpr:project.bzl", "CCRONEXPR_PROJECT")
-
-bcr_project_from_spec(project = CCRONEXPR_PROJECT)

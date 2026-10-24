@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "matrix_project")
-load("//projects/cpu_features:project.bzl", "CPU_FEATURES_PROJECT")
-
-matrix_project(project = CPU_FEATURES_PROJECT)

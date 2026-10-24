@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "bcr_project_from_spec")
-load("//projects/ogg:project.bzl", "OGG_PROJECT")
-
-bcr_project_from_spec(project = OGG_PROJECT)

@@ -1,6 +1,0 @@
-# Activate after the source archive is pinned in //bazel_runner:extension.bzl.
-#
-# load("//bazel_runner:defs.bzl", "buildbuddy_toolchain_project_modification")
-# load("//projects/grpc-java:project.bzl", "GRPC_JAVA_PROJECT")
-#
-# buildbuddy_toolchain_project_modification(project = GRPC_JAVA_PROJECT)

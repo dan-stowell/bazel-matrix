@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
-load("//projects/tinyxml2:project.bzl", "TINYXML2_PROJECT")
-
-hermetic_llvm_project_modification(project = TINYXML2_PROJECT)

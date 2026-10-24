@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "matrix_project")
-load("//projects/abseil_py:project.bzl", "ABSEIL_PY_PROJECT")
-
-matrix_project(project = ABSEIL_PY_PROJECT)

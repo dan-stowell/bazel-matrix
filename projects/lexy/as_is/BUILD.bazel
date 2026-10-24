@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "bcr_project_from_spec")
-load("//projects/lexy:project.bzl", "LEXY_PROJECT")
-
-bcr_project_from_spec(project = LEXY_PROJECT)

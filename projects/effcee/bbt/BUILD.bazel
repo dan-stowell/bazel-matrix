@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "buildbuddy_toolchain_project_modification")
-load("//projects/effcee:project.bzl", "EFFCEE_PROJECT")
-
-buildbuddy_toolchain_project_modification(project = EFFCEE_PROJECT)

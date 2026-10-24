@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "bcr_project_from_spec")
-load("//projects/libwebsockets:project.bzl", "LIBWEBSOCKETS_PROJECT")
-
-bcr_project_from_spec(project = LIBWEBSOCKETS_PROJECT)

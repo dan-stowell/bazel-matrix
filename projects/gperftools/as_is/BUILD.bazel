@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "matrix_project")
-load("//projects/gperftools:project.bzl", "GPERFTOOLS_PROJECT")
-
-matrix_project(project = GPERFTOOLS_PROJECT)

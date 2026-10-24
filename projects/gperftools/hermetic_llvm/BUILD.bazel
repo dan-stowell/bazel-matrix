@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
-load("//projects/gperftools:project.bzl", "GPERFTOOLS_PROJECT")
-
-hermetic_llvm_project_modification(project = GPERFTOOLS_PROJECT)

@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "matrix_project")
-load("//projects/prometheus_cpp:project.bzl", "PROMETHEUS_CPP_PROJECT")
-
-matrix_project(project = PROMETHEUS_CPP_PROJECT)

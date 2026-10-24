@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "bcr_project_from_spec")
-load("//projects/cpp-httplib:project.bzl", "CPP_HTTPLIB_PROJECT")
-
-bcr_project_from_spec(project = CPP_HTTPLIB_PROJECT)

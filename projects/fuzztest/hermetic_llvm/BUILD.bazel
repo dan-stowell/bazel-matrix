@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
-load("//projects/fuzztest:project.bzl", "FUZZTEST_PROJECT")
-
-hermetic_llvm_project_modification(project = FUZZTEST_PROJECT)

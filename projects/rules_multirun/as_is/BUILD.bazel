@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "bcr_project_from_spec")
-load("//projects/rules_multirun:project.bzl", "RULES_MULTIRUN_PROJECT")
-
-bcr_project_from_spec(project = RULES_MULTIRUN_PROJECT)

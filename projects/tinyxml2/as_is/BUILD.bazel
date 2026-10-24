@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "bcr_project_from_spec")
-load("//projects/tinyxml2:project.bzl", "TINYXML2_PROJECT")
-
-bcr_project_from_spec(project = TINYXML2_PROJECT)

@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "matrix_project")
-load("//projects/iceoryx2:project.bzl", "ICEORYX2_PROJECT")
-
-matrix_project(project = ICEORYX2_PROJECT)

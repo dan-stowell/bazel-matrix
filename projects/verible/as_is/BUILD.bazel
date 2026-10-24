@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "matrix_project")
-load("//projects/verible:project.bzl", "VERIBLE_PROJECT")
-
-matrix_project(project = VERIBLE_PROJECT)

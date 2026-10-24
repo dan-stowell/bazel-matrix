@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "matrix_project")
-load("//projects/grpc_gateway:project.bzl", "GRPC_GATEWAY_PROJECT")
-
-matrix_project(project = GRPC_GATEWAY_PROJECT)

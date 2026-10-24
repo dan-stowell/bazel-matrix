@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "buildbuddy_toolchain_project_modification")
-load("//projects/universal-robots-client-library:project.bzl", "UNIVERSAL_ROBOTS_CLIENT_LIBRARY_PROJECT")
-
-buildbuddy_toolchain_project_modification(project = UNIVERSAL_ROBOTS_CLIENT_LIBRARY_PROJECT)

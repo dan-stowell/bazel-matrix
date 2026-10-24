@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "bcr_project_from_spec")
-load("//projects/flex:project.bzl", "FLEX_PROJECT")
-
-bcr_project_from_spec(project = FLEX_PROJECT)

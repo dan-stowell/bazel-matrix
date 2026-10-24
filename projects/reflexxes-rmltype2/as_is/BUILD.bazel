@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "bcr_project_from_spec")
-load("//projects/reflexxes-rmltype2:project.bzl", "REFLEXXES_RMLTYPE2_PROJECT")
-
-bcr_project_from_spec(project = REFLEXXES_RMLTYPE2_PROJECT)

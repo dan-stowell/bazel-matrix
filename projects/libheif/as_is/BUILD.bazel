@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "bcr_project_from_spec")
-load("//projects/libheif:project.bzl", "LIBHEIF_PROJECT")
-
-bcr_project_from_spec(project = LIBHEIF_PROJECT)

@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
-load("//projects/ftxui:project.bzl", "FTXUI_PROJECT")
-
-hermetic_llvm_project_modification(project = FTXUI_PROJECT)

@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "matrix_project")
-load("//projects/cpptrace:project.bzl", "CPPTRACE_PROJECT")
-
-matrix_project(project = CPPTRACE_PROJECT)

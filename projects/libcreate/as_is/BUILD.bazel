@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "bcr_project_from_spec")
-load("//projects/libcreate:project.bzl", "LIBCREATE_PROJECT")
-
-bcr_project_from_spec(project = LIBCREATE_PROJECT)

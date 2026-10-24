@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
-load("//projects/s2geometry:project.bzl", "S2GEOMETRY_PROJECT")
-
-hermetic_llvm_project_modification(project = S2GEOMETRY_PROJECT)

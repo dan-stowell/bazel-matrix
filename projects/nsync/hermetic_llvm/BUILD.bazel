@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "hermetic_llvm_project_modification")
-load("//projects/nsync:project.bzl", "NSYNC_PROJECT")
-
-hermetic_llvm_project_modification(project = NSYNC_PROJECT)

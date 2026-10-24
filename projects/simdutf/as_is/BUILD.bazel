@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "bcr_project_from_spec")
-load("//projects/simdutf:project.bzl", "SIMDUTF_PROJECT")
-
-bcr_project_from_spec(project = SIMDUTF_PROJECT)

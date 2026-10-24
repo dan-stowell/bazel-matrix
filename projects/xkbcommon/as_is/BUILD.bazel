@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "bcr_project_from_spec")
-load("//projects/xkbcommon:project.bzl", "XKBCOMMON_PROJECT")
-
-bcr_project_from_spec(project = XKBCOMMON_PROJECT)

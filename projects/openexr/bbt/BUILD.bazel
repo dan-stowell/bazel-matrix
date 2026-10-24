@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "buildbuddy_toolchain_project_modification")
-load("//projects/openexr:project.bzl", "OPENEXR_PROJECT")
-
-buildbuddy_toolchain_project_modification(project = OPENEXR_PROJECT)

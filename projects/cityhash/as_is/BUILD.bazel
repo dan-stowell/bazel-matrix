@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "bcr_project_from_spec")
-load("//projects/cityhash:project.bzl", "CITYHASH_PROJECT")
-
-bcr_project_from_spec(project = CITYHASH_PROJECT)

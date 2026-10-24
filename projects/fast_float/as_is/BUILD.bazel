@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "matrix_project")
-load("//projects/fast_float:project.bzl", "FAST_FLOAT_PROJECT")
-
-matrix_project(project = FAST_FLOAT_PROJECT)

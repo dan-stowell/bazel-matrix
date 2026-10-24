@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "bcr_project_from_spec")
-load("//projects/icu:project.bzl", "ICU_PROJECT")
-
-bcr_project_from_spec(project = ICU_PROJECT)

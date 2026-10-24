@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "bcr_project_from_spec")
-load("//projects/llvm-project:project.bzl", "LLVM_PROJECT_PROJECT")
-
-bcr_project_from_spec(project = LLVM_PROJECT_PROJECT)

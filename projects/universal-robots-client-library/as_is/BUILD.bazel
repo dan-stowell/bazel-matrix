@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "bcr_project_from_spec")
-load("//projects/universal-robots-client-library:project.bzl", "UNIVERSAL_ROBOTS_CLIENT_LIBRARY_PROJECT")
-
-bcr_project_from_spec(project = UNIVERSAL_ROBOTS_CLIENT_LIBRARY_PROJECT)

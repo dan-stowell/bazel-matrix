@@ -1,7 +1,0 @@
-# Appended to jsoncpp's MODULE.bazel. jsoncpp doesn't declare a direct dependency
-# on `platforms`, so @platforms isn't visible to its root module — but the
-# matrix's injected BuildBuddy RBE platform package, whose platform() uses
-# @platforms//os + @platforms//cpu constraints) needs it. A direct bazel_dep
-# makes @platforms resolve. Local builds don't inject that package, so this only
-# matters for RBE goals.
-bazel_dep(name = "platforms", version = "1.0.0")

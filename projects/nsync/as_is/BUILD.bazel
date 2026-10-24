@@ -1,4 +1,0 @@
-load("//bazel_runner:defs.bzl", "matrix_project")
-load("//projects/nsync:project.bzl", "NSYNC_PROJECT")
-
-matrix_project(project = NSYNC_PROJECT)
