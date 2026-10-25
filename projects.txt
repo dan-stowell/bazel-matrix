@@ -950,7 +950,7 @@ stdexec
   --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel calls native cc rules without a load()
   --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
 sqlite_orm
-  -//examples/...  the BCR test module (examples/MODULE.bazel): its BUILD.bazel lists srcs as examples/in_memory.cpp, relative to its own root, so from sqlite_orm's root the file (examples/examples/in_memory.cpp) is missing
+  -//examples/...  examples/BUILD.bazel (the BCR example module, with its own examples/MODULE.bazel) lists srcs = ["examples/in_memory.cpp"], which resolves to examples/examples/in_memory.cpp, but the file is examples/in_memory.cpp ("missing input file")
 spirv_headers
 spirv_tools
 tl-expected

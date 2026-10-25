@@ -6,7 +6,7 @@ project(
     name = "sqlite_orm",
     targets = [
         "//...",
-        # the BCR test module (examples/MODULE.bazel): its BUILD.bazel lists srcs as examples/in_memory.cpp, relative to its own root, so from sqlite_orm's root the file (examples/examples/in_memory.cpp) is missing
+        # examples/BUILD.bazel (the BCR example module, with its own examples/MODULE.bazel) lists srcs = ["examples/in_memory.cpp"], which resolves to examples/examples/in_memory.cpp, but the file is examples/in_memory.cpp ("missing input file")
         "-//examples/...",
     ],
 )
