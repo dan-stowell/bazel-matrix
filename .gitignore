@@ -1,4 +1,5 @@
 /bazel-*
+!/bazel-diff/
 __pycache__/
 *.pyc
 user.bazelrc

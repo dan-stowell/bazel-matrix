@@ -6,15 +6,11 @@ project(
     name = "cel-cpp",
     targets = [
         "//...",
-        # its 64 non-dashboard conformance tests fail only with "Invalid timezone": they need tzdata, which the executor image lacks (the 24 dashboard variants left out with them ignore failures; //conformance/policy is kept)
-        "-//conformance:all",
-        # TestTimestampFunctionsWithTimeZone needs tzdata, which the executor image lacks
-        "-//eval/public:builtin_func_test",
-        # aborts (exit 134) in TestGetDate and TestGetTimeOfDay (it passes with those filtered out): they evaluate in America/Los_Angeles, which needs tzdata, then call TimestampOrDie()/MessageOrDie() on the error result
-        "-//eval/public:extension_func_test",
     ],
     flags = [
         # its dep cel-spec's proto/cel/expr/conformance/test/BUILD.bazel calls native proto_library/cc_proto_library/java_proto_library, which Bazel 9 removed; autoload them
         "--incompatible_autoload_externally=+@rules_cc,+@com_google_protobuf",
+        # these gtest cases need tzdata, which the executor image lacks: cel-spec's timestamp_selectors_tz conformance section (named zones such as Australia/Sydney fail with "Invalid timezone"), the builtin TestTimestampFunctionsWithTimeZone, and ExtensionTest's America/Los_Angeles cases, which abort (exit 134) on the error result via TimestampOrDie()/MessageOrDie()
+        "--test_filter=-timestamps.timestamp_selectors_tz/*:BuiltinsTest.TestTimestampFunctionsWithTimeZone:ExtensionTest.TestGetDate:ExtensionTest.TestGetTimeOfDay",
     ],
 )
