@@ -2801,3 +2801,57 @@ rules_flutter
   -//tools/dev_tool:flutter_bazel  depends on @pip//lzfse, whose sdist wheel build runs clang, which the image lacks ("No such file or directory: 'clang'")
   -//tools/ios_screenshot:screenshot  depends on @pip//lzfse, whose sdist wheel build runs clang, which the image lacks ("No such file or directory: 'clang'")
   -//tools/ios_screenshot:tunneld  depends on @pip//lzfse, whose sdist wheel build runs clang, which the image lacks ("No such file or directory: 'clang'")
+
+# Chunk i-2: BCR modules (rules_proto_grpc_grpc_gateway-rules_spring).
+rules_proto_grpc_grpc_gateway
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed
+  override grpc_ecosystem_grpc_gateway 2.29.0.bcr.3  the 2.26.3 it declares does go_sdk.download(version = "1.24.0"), too old for the resolved gazelle's go_repository tools ("go.work requires go >= 1.24.12 (running go 1.24.0; GOTOOLCHAIN=local)"); 2.29.0.bcr.3 downloads Go 1.26.0
+rules_proto_grpc_js
+  override rules_nodejs 6.7.7  the resolved rules_nodejs's generated @nodejs_toolchains defs.bzl calls rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
+rules_proto_grpc_objc
+  --incompatible_autoload_externally=+@rules_cc,+@com_google_protobuf  the grpc it resolves has BUILD files calling native cc and proto rules, which Bazel 9 removed; autoload them
+  override rules_foreign_cc 0.16.0  the resolved rules_foreign_cc calls rule(incompatible_use_toolchain_transition=...), which Bazel 9 removed
+rules_proto_grpc_scala
+rules_proto_grpc_swift
+  known-failing build  rules_swift_package_manager runs `swift package dump-package` while fetching, and the images lack swift (exit 1)
+rules_pycross_backend_maturin
+  known-failing build  its MODULE.bazel has local_path_override(rules_pycross, path = "../.."): the module is modules/backend_maturin of the rules_pycross repo, and its archive has no rules_pycross at ../.. ("No MODULE.bazel, REPO.bazel, or WORKSPACE file found in .../external/rules_pycross+")
+rules_pydeps
+  --strategy=TestRunner=local  //:buildifier.test (buildifier_prebuilt's runner) does `$(readlink <buildifier runfile>)` under set -e, and RBE stages runfiles as regular files, so readlink exits 1 silently (the test fails in 0.1 s with no output); run tests on the runner, where runfiles are symlinks
+rules_pylyglot
+  --lockfile_mode=off  its .bazelrc sets --lockfile_mode=error, and its MODULE.bazel.lock lacks entries the resolution here needs ("Missing checksum for registry file .../apple_support/2.5.2/MODULE.bazel")
+rules_pyrefly
+rules_qemu
+rules_qt
+rules_req_compile
+rules_riviera
+rules_robolectric
+rules_rs_mutants
+rules_runfile_codegen_go
+  known-failing build  its MODULE.bazel has a local_path_override for rules_runfile_codegen_core at ../core, a sibling directory of the monorepo that its archive doesn't contain ("The repository's path is \"../core\" ... does not exist")
+rules_runfile_codegen_kotlin
+  known-failing build  its MODULE.bazel has a local_path_override for rules_runfile_codegen_core at ../core, a sibling directory of the monorepo that its archive doesn't contain ("The repository's path is \"../core\" ... does not exist")
+rules_runfiles_group
+rules_rust_mutants
+rules_s3
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed
+  override toolchains_protoc 0.6.1  the toolchains_protoc 0.3.7 it declares (dev dep) generates a protoc hub whose BUILD.bazel calls native proto_library, which Bazel 9 removed ("name 'proto_library' is not defined")
+  -//docs:extensions  its stardoc run builds the well-known types' descriptor sets with the prebuilt protoc v27.0 its MODULE.bazel pins (protoc.toolchain), which rejects the --option_dependencies flag the resolved protobuf's proto rules pass ("Unknown flag: --option_dependencies")
+  -//docs:repo_rules  same protoc v27.0 failure as //docs:extensions
+rules_s5
+rules_scala_native
+  --deleted_packages=examples/01-basics/02-transitive-dependencies/core,examples/01-basics/02-transitive-dependencies/services  its .bazelrc deletes each examples/* workspace's root package but not this one's core/ and services/ subpackages, so the outer build loads services (whose //core label then misses: "no such package 'core'") and the e2e test's glob of the example skips both ("no such package 'services'" in the nested build)
+rules_shtk
+  --deleted_packages=examples/bzlmod/test,examples/workspace/test  example workspaces (examples/bzlmod/test has its own MODULE.bazel) whose BUILD.bazel calls native cc_binary without a load(), which Bazel 9 removed; the packages fail to load
+  -//examples/...  the other example workspaces register their shtk toolchain in their own MODULE.bazel/WORKSPACE, so from the root no toolchain matches //:toolchain_type ("No matching toolchains found")
+rules_signing
+rules_spring
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: springboot/deps_filter_rules/*.bzl use the native JavaInfo without a load()
+  --incompatible_autoload_externally=+@rules_java  autoload the java rules and providers Bazel 9 removed
+  -//springboot/import_bundles:springboot_required_deps  a java_import with jars = [] (only exports), which the resolved rules_java rejects ("empty java_import.jars is not supported"); Bazel 9 no longer has --incompatible_disallow_java_import_empty_jars to allow it
+  -//springboot/deps_filter_rules:TransitiveDepsFilterCaseA  hardcodes Bazel 7 canonical repo names ("rules_jvm_external~~maven~maven/..."); Bazel 9 names them rules_jvm_external++maven+maven, so its expected-classpath assertion fails
+  -//springboot/deps_filter_rules:TransitiveDepsFilterCaseB  same Bazel 7 canonical repo names as TransitiveDepsFilterCaseA
+  -//springboot/deps_filter_rules:TransitiveDepsFilterCaseC  same Bazel 7 canonical repo names as TransitiveDepsFilterCaseA
+  -//springboot/deps_filter_rules:TransitiveDepsFilterCaseD  same Bazel 7 canonical repo names as TransitiveDepsFilterCaseA
+  -//springboot/deps_filter_rules:DepsFilterWithTransitivesExclusionTest  same Bazel 7 canonical repo names as TransitiveDepsFilterCaseA
+  -//springboot/deps_filter_rules:DepsFilterWithoutTransitivesExclusionTest  same Bazel 7 canonical repo names as TransitiveDepsFilterCaseA
