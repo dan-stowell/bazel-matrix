@@ -1796,3 +1796,61 @@ fftw
   -//:simd_support_neon_double  ARM NEON kernels: on x86-64 gcc has no arm_neon.h
   -//:simd_support_neon_float  ARM NEON kernels: on x86-64 gcc has no arm_neon.h
   override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+
+
+# Chunk f-4: the rest of the g-l BCR modules.
+gason
+  -//:benchmark  with the registry's zero-context diff.patch applied, src/benchmark.cpp doesn't compile ("'COMPILER' was not declared in this scope" at 234:79)
+  -//:all_tests  a test_suite of //:benchmark (excluded above) and //:test-suite, which //... still runs
+  --incompatible_autoload_externally=+@rules_cc  its dep rapidjson calls native cc_library, which Bazel 9 removed; autoload it from rules_cc
+gateweavers_rules_vhdl
+  -//examples/transpile/...  every target runs the hermetic ghdl 6.0/7.0 (mcode) binaries, which need GLIBC_2.38; the executor image's glibc is older ("version `GLIBC_2.38' not found")
+  -//examples/basic/...  the hermetic ghdl binaries these tests run need GLIBC_2.38, which the executor image's glibc lacks ("version `GLIBC_2.38' not found")
+  -//examples/cocotb/...  same: their testbenches run ghdl, which needs GLIBC_2.38
+  -//examples/uart/...  same: their testbenches run ghdl, which needs GLIBC_2.38
+  -//examples/gazelle_vhdl/...  same: their testbenches run ghdl, which needs GLIBC_2.38
+gavel_tools
+  -//lint/archtest:archtest_test  its *WriteError/*FileOpenError cases chmod a directory 0555 and expect the write to fail, but RBE runs tests as root, which can write there ("An error is expected but got nil")
+  -//lint/lang/go/archtest/wrapper:wrapper_test  same: a write-error case relies on a 0555 directory, which root can write
+  -//lint/lang/java/archtest/wrapper:wrapper_test  same: a write-error case relies on a 0555 directory, which root can write
+  -//lint/lang/java/cpd/wrapper:wrapper_test  same: a write-error case relies on a 0555 directory, which root can write
+  -//lint/lang/java/pmd/wrapper:wrapper_test  same: a write-error case relies on a 0555 directory, which root can write
+  -//lint/lang/python/archtest/wrapper:wrapper_test  same: a write-error case relies on a 0555 directory, which root can write
+  -//lint/lang/rust/archtest/wrapper:wrapper_test  same: a write-error case relies on a 0555 directory, which root can write
+  -//lint/lang/typescript/archtest/wrapper:wrapper_test  same: a write-error case relies on a 0555 directory, which root can write
+gazelle_css
+gazelle_d
+  -//tools:preset.update_test  the checked-in tools/preset.bazelrc differs from the preset the resolved bazel_lib generates (it adds startup --host_jvm_args=-DBAZEL_TRACK_SOURCE_DIRECTORIES=1 and more)
+gazelle_fold
+gazelle_orbit
+gazelle_rust
+gonzojive_protobuf_javascript
+  known-failing build  its root package loads protobuf_javascript_release.bzl, which loads @rules_pkg//:providers.bzl; it declares rules_pkg 0.7.0 but resolves 1.0.1, which no longer has that file ("cannot load '@@rules_pkg+//:providers.bzl': no such file")
+gzgz_rules_sass
+  --lockfile_mode=off  its .bazelrc sets --lockfile_mode=error, and its MODULE.bazel.lock lacks registry checksums ("Missing checksum for registry file .../apple_support/2.5.2/MODULE.bazel")
+hermetic_android_toolchains
+hugooole_muda
+  --deleted_packages=example,test  (not an exclusion: //... fails on a broken package even when subtracted) example and test load @rules_cuda//cuda:defs.bzl, which its MODULE.bazel doesn't declare
+inno-lidar-sdk
+intrinsic-clips
+jeffmanzione_intern
+  --incompatible_autoload_externally=+@rules_cc  its dep googletest calls native cc_library, which Bazel 9 removed; autoload it from rules_cc
+jeffmanzione_rzalloc
+julia_depot
+jvm_image
+kdtreepp
+keynub_licdongle
+libc_replacer
+  override toolchains_musl 0.1.29  the toolchains_musl 0.1.27 it declares generates musl_cc_toolchain_config.bzl repos that fail to load under Bazel 9 (line 543: "at index 0 of provides, got element of type NoneType, want Provider")
+  override buildifier_prebuilt 10.1.0  the buildifier_prebuilt 8.2.0 it declares loads @local_config_platform//:constraints.bzl, which Bazel 9 removed
+libcreate
+libfn
+  -//test_package/...  a separate consumer workspace (test_package/MODULE.bazel); built from the root, its main.cpp gets no -std flag, and gcc's default C++17 lacks std::remove_cvref_t
+libsl3
+libsocketcan
+libxml2-go
+  override rules_foreign_cc 0.16.0  the resolved rules_foreign_cc uses the native CcInfo, which Bazel 9 removed
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed
+lit2md
+livox_sdk2
+logfmt_cpp
