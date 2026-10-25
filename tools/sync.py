@@ -229,11 +229,11 @@ def module_append(overrides, module_text, has_version=None):
     remove = []
     for call in _OVERRIDE_CALL.finditer(text):
         kind, args = call.group(1), call.group(2)
-        name = re.search(r"module_name\s*=\s*[\"']([^\"']+)", args)
+        name = re.search(r"module_name\s*=\s*([\"'])([^\"']+)\1\s*(,|$)", args)
         if not name:
             raise ValueError("its MODULE.bazel has a %s_override whose module_name isn't a "
                              "string literal; sync can't check it" % kind)
-        name = name.group(1)
+        name = name.group(2)
         if name not in modules:
             continue
         if kind != "local_path":

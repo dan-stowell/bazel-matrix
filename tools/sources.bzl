@@ -106,26 +106,34 @@ def _rc_drop(rctx, drops):
     A `--flag` drop removes the tokens `--flag`, `--flag=<any>` and
     `--noflag` from their lines (a line left with only its command goes);
     an `import:<path>` drop removes the `import <path>` or `try-import <path>`
-    lines, <path> as written. Fails when a drop matches nothing, or when a
-    matched token may be followed by its value or sits on a line with quotes,
-    backslashes or comments, which this doesn't parse.
+    lines, <path> as written. Fails when a drop matches nothing, when a
+    matched flag may take the next word as its value, when a line naming a
+    dropped flag has quotes, a backslash, a comment or continues another
+    (none of which this parses), or when an rc file resolves outside the tree.
     """
     flags = [d for d in drops if d.startswith("--")]
     matched = {}
-    queue, seen = [".bazelrc"], {}
-    for _ in range(1000):
+    root = str(rctx.path(".").realpath) + "/"
+    queue, seen = [".bazelrc"], {".bazelrc": True}
+    for _ in range(100):
         if not queue:
             break
         rc = queue.pop(0)
-        if rc in seen or not rctx.path(rc).exists:
+        if not rctx.path(rc).exists:
             continue
-        seen[rc] = True
-        lines, changed = [], False
+        if not str(rctx.path(rc).realpath).startswith(root):
+            fail("%s: rc-drop: %s resolves outside the source tree" % (rctx.name, rc))
+        lines, changed, continued = [], False, False
         for line in rctx.read(rc).split("\n"):
             words = [w for w in line.replace("\t", " ").replace("\r", " ").split(" ") if w]
+            unparsed = continued or any([c in line for c in ["\"", "'", "\\", "#"]])
+            continued = line.rstrip().endswith("\\")
             if not words or words[0].startswith("#"):
                 lines.append(line)
                 continue
+            if unparsed and [f for f in flags if f[2:] in line]:
+                # Quotes, comments and continuations aren't parsed here.
+                fail("%s: rc-drop: can't parse %s safely: %s" % (rctx.name, rc, line))
             if words[0] in ("import", "try-import") and len(words) == 2:
                 if "import:" + words[1] in drops:
                     matched["import:" + words[1]] = True
@@ -133,7 +141,8 @@ def _rc_drop(rctx, drops):
                     continue
                 if words[1].startswith("%workspace%/"):
                     path = _normalize(words[1][len("%workspace%/"):])
-                    if path != None:
+                    if path != None and path not in seen:
+                        seen[path] = True
                         queue.append(path)
                 lines.append(line)
                 continue
@@ -145,9 +154,15 @@ def _rc_drop(rctx, drops):
                     kept.append(w)
                     continue
                 rest = words[2 + i:]
-                takes_next = "=" not in w and rest and not rest[0].startswith("-")
-                if takes_next or any([c in line for c in ["\"", "'", "\\", "#"]]):
-                    fail("%s: rc-drop %s: can't drop %s safely from %s: %s" % (rctx.name, drop[0], w, rc, line))
+                if "=" not in w and rest and not rest[0].startswith("--"):
+                    # Maybe its value (`--jobs 4`, `--jobs -1`).
+                    fail("%s: rc-drop %s: can't tell whether %s takes the next word as its value in %s: %s" % (
+                        rctx.name,
+                        drop[0],
+                        w,
+                        rc,
+                        line,
+                    ))
                 matched[drop[0]] = True
             if len(kept) == len(words):
                 lines.append(line)
@@ -157,6 +172,8 @@ def _rc_drop(rctx, drops):
                     lines.append(" ".join(kept))
         if changed:
             rctx.file(rc, "\n".join(lines), executable = False)
+    if queue:
+        fail("%s: rc-drop: more than 100 rc files" % rctx.name)
     unmatched = [d for d in drops if d not in matched]
     if unmatched:
         fail("%s: rc-drop matched nothing in %s: %s" % (rctx.name, sorted(seen), ", ".join(unmatched)))

@@ -85,6 +85,8 @@ class ParseProjectsTxtTest(unittest.TestCase):
                 sync.module_append(o, text)
         with self.assertRaisesRegex(ValueError, "isn't a string literal"):
             sync.module_append(o, '[local_path_override(module_name = m, path = "..") for m in ["core"]]\n')
+        with self.assertRaisesRegex(ValueError, "isn't a string literal"):
+            sync.module_append(o, 'local_path_override(module_name = "core" + "_x", path = "..")\n')
         with self.assertRaisesRegex(ValueError, "include"):
             sync.module_append(o, 'include("//:deps.MODULE.bazel")\n')
 
