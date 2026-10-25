@@ -30831,6 +30831,396 @@
           "integrity": "sha256-Sn55bu/bnUerolHG8sw42nBb6XT/TFSgeZYFhVP/CF4="
         }
       }
+    },
+    {
+      "name": "bazel_cc_meta",
+      "version": "0.2.1",
+      "source": {
+        "urls": [
+          "https://github.com/mikael-s-persson/bazel_cc_meta/releases/download/v0.2.1/bazel_cc_meta-0.2.1.tar.gz"
+        ],
+        "integrity": "sha256-6uRSre5tO+Q4y5a8XevwMSHD3wGUgAUu3LZDvnVpSiU=",
+        "strip_prefix": "bazel_cc_meta-0.2.1",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/bazel_cc_meta/0.2.1/patches/module_dot_bazel.patch",
+            "integrity": "sha256-/rm35Kr1Lk88uYS3aa9OiTFgUDBdNT3jbY/3i9jIUUE="
+          }
+        ],
+        "patch_strip": 0,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/bazel_cc_meta/0.2.1/MODULE.bazel",
+          "integrity": "sha256-anqW5doIpyYrFDZj0mottW6XbOOI29u6uPWusTrKDV8="
+        }
+      }
+    },
+    {
+      "name": "bazel_ci_rules",
+      "version": "2.1.2",
+      "source": {
+        "urls": [
+          "https://github.com/bazelbuild/continuous-integration/releases/download/rules-2.1.2/bazel_ci_rules-2.1.2.tar.gz"
+        ],
+        "integrity": "sha256-s6w81LH3H+f27zjDeVIda6YTvQkcsn7asfBNiXdy3jc=",
+        "strip_prefix": "bazel_ci_rules-2.1.2",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/bazel_ci_rules/2.1.2/MODULE.bazel",
+          "integrity": "sha256-TuUb8/ZX/y4LYS0UGRNwRneENLofl+B/GvaoxJttzDQ="
+        }
+      }
+    },
+    {
+      "name": "bazel_difftools",
+      "version": "0.3.0",
+      "source": {
+        "urls": [
+          "https://github.com/stackb/bazel_difftools/releases/download/v0.3.0/bazel_difftools-v0.3.0.tar.gz"
+        ],
+        "integrity": "sha256-20Qa+KbLIFxd1+Zc9X2hFHpjMXnngZKkBY1JUZVtPlU=",
+        "strip_prefix": "bazel_difftools-v0.3.0",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/bazel_difftools/0.3.0/patches/module_dot_bazel_version.patch",
+            "integrity": "sha256-t3kadLbRIf1pryrb4c0QMTCkYG8hrJcawjBMxRmCf5A="
+          }
+        ],
+        "patch_strip": 1,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/bazel_difftools/0.3.0/MODULE.bazel",
+          "integrity": "sha256-TTtiq27E8GPRpYmEgAzE+1C6uyPBd38TlaVTLeLmIeY="
+        },
+        "module_append": "\n# bazel-matrix: the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed\nsingle_version_override(module_name = \"rules_go\", version = \"0.65.0\")\n\n# bazel-matrix: the resolved rules_nodejs's generated @nodejs_toolchains defs.bzl calls rule() with incompatible_use_toolchain_transition, which Bazel 9 removed\nsingle_version_override(module_name = \"rules_nodejs\", version = \"6.7.7\")\n\n# bazel-matrix: the resolved rules_scala uses the native JavaInfo symbol (scala/private/toolchain_deps/toolchain_deps.bzl), which Bazel 9 removed\nsingle_version_override(module_name = \"rules_scala\", version = \"7.4.0\")\n"
+      }
+    },
+    {
+      "name": "bazel_iwyu",
+      "version": "0.0.4",
+      "source": {
+        "urls": [
+          "https://github.com/RealtimeRoboticsGroup/bazel_iwyu/releases/download/v0.0.4/bazel_iwyu-0.0.4.tar.zst"
+        ],
+        "integrity": "sha256-23bWqjIfwRkfKz/DQ+4ndsu1beceXIemssdNbVP1i/k=",
+        "strip_prefix": "bazel_iwyu-0.0.4",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/bazel_iwyu/0.0.4/MODULE.bazel",
+          "integrity": "sha256-BL9PsUOrBx+EgEvsdNhBTKyKES04V3jzptu+wBenT2k="
+        }
+      }
+    },
+    {
+      "name": "bazel_linux_packages",
+      "version": "0.4.1",
+      "source": {
+        "urls": [
+          "https://github.com/lukasoyen/bazel_linux_packages/releases/download/v0.4.1/bazel_linux_packages-v0.4.1.tar.gz"
+        ],
+        "integrity": "sha256-WTMuqwLac8dMuWSz9MDgi+d7vdT2DeQo/Eboo2SWglc=",
+        "strip_prefix": "bazel_linux_packages-v0.4.1",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/bazel_linux_packages/0.4.1/patches/module_dot_bazel_version.patch",
+            "integrity": "sha256-AewflYfJQMcu55fognHOhlBfnS0ww5exwvqgeSQP/1s="
+          }
+        ],
+        "patch_strip": 1,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/bazel_linux_packages/0.4.1/MODULE.bazel",
+          "integrity": "sha256-m81hK3iqmNsH8Byn7cMSkUis7STTcmiEu6HzIQMeck0="
+        }
+      }
+    },
+    {
+      "name": "bazel_paq",
+      "version": "2.0.0",
+      "source": {
+        "urls": [
+          "https://github.com/gregl83/bazel-paq/releases/download/v2.0.0/bazel-paq-2.0.0.tar.gz"
+        ],
+        "integrity": "sha256-KIzLFViNH2TbkF3MMyjAlvJedJSlpfOLj2v61DakLs4=",
+        "strip_prefix": "bazel-paq-2.0.0",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/bazel_paq/2.0.0/MODULE.bazel",
+          "integrity": "sha256-Lwnvsd+CQo8bfevCi7f7cUam/x+wpeHMeQNsF7MMZIU="
+        }
+      }
+    },
+    {
+      "name": "bazel_skylib_gazelle_plugin",
+      "version": "1.9.2",
+      "source": {
+        "urls": [
+          "https://github.com/bazelbuild/bazel-skylib/releases/download/1.9.2/bazel-skylib-gazelle-plugin-1.9.2.tar.gz"
+        ],
+        "integrity": "sha256-68v3vEkbKDMsQLLbUk0KN+Lo/uu/CZrVFWFTHB77ukc=",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/bazel_skylib_gazelle_plugin/1.9.2/MODULE.bazel",
+          "integrity": "sha256-Z1lr3vGYGhd9lAjBWrt4zKln825HtF1v2k+HFDM9L6g="
+        }
+      }
+    },
+    {
+      "name": "bazel_sonarqube",
+      "version": "1.0.6",
+      "source": {
+        "urls": [
+          "https://github.com/Zetten/bazel-sonarqube/releases/download/1.0.6/bazel_sonarqube.1.0.6.tar.gz"
+        ],
+        "integrity": "sha256-xuv6YVWe6lTljdZzsiGYKd+WiZKli7RWsIt4MmfMOBA=",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/bazel_sonarqube/1.0.6/patches/module_dot_bazel_version.patch",
+            "integrity": "sha256-TIaMzo9ZIPEztN7LDd719s0zX/5IqKzr7o0YArbUNbs="
+          }
+        ],
+        "patch_strip": 1,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/bazel_sonarqube/1.0.6/MODULE.bazel",
+          "integrity": "sha256-doKMEOFImgL83qT5bZTi2ziqspkU/2DYefywWlJeVCo="
+        }
+      }
+    },
+    {
+      "name": "bazelpods",
+      "version": "1.12.5",
+      "source": {
+        "urls": [
+          "https://github.com/sergeykhliustin/BazelPods/releases/download/1.12.5/release.tar.gz"
+        ],
+        "integrity": "sha256-eI+PnSgJIZf+bcwhNjXL9quNi9B50CsLmqpcfarLXyQ=",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/bazelpods/1.12.5/patches/module_dot_bazel_version.patch",
+            "integrity": "sha256-QdfKmK7uIM+aMPKzRnl0Bh5FD149Hk7uL4H2md71ZZg="
+          }
+        ],
+        "patch_strip": 1,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/bazelpods/1.12.5/MODULE.bazel",
+          "integrity": "sha256-eXy2o8/Q+dxnbqAixsCwc33T9QL2fintYizzZtZFx4U="
+        }
+      }
+    },
+    {
+      "name": "behaviortree_ros2",
+      "version": "0.0.0-20250313-7a6ace6.bcr.1",
+      "source": {
+        "urls": [
+          "https://github.com/BehaviorTree/BehaviorTree.ROS2/archive/7a6ace6424adaa81737b95d20d81e1e8c0782ed7.tar.gz"
+        ],
+        "integrity": "sha256-PsDquNm9G4XiOwjzli73Yy/D/rKfwLpJ97Rerf9gEXk=",
+        "strip_prefix": "BehaviorTree.ROS2-7a6ace6424adaa81737b95d20d81e1e8c0782ed7",
+        "overlay": [
+          {
+            "path": "BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/behaviortree_ros2/0.0.0-20250313-7a6ace6.bcr.1/overlay/BUILD.bazel",
+            "integrity": "sha256-Ts3x4NABn9OJcEwPrtN+IL6TAr8ZwqZ7ZV2pnjlIBC8="
+          }
+        ],
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/behaviortree_ros2/0.0.0-20250313-7a6ace6.bcr.1/MODULE.bazel",
+          "integrity": "sha256-FOjr16pgn7CGrINH6WY6tXVBc80i9zNy2h7S/mFepmk="
+        }
+      }
+    },
+    {
+      "name": "build_stack_scala_gazelle",
+      "version": "0.1.1",
+      "source": {
+        "urls": [
+          "https://github.com/stackb/scala-gazelle/releases/download/v0.1.1/scala-gazelle-v0.1.1.tar.gz"
+        ],
+        "integrity": "sha256-fGoRNrWmD7QLBkLlXL5+bsSrpmCiCUGPVWhl7g93AOo=",
+        "strip_prefix": "scala-gazelle-v0.1.1",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/build_stack_scala_gazelle/0.1.1/patches/module_dot_bazel_version.patch",
+            "integrity": "sha256-4wApDx3QQMhAHxeuO22pdWXDJbvSxRBE4MU/srnQZ+s="
+          }
+        ],
+        "patch_strip": 1,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/build_stack_scala_gazelle/0.1.1/MODULE.bazel",
+          "integrity": "sha256-wS6yJpDvBEd9mmM/7agMPrwCrUEhgGEc6ph68ljzifA="
+        },
+        "module_append": "\n# bazel-matrix: the resolved rules_nodejs's generated @nodejs_toolchains defs.bzl calls rule() with incompatible_use_toolchain_transition, which Bazel 9 removed\nsingle_version_override(module_name = \"rules_nodejs\", version = \"6.7.7\")\n"
+      }
+    },
+    {
+      "name": "byte_track_eigen",
+      "version": "2.1.0.bcr.2",
+      "source": {
+        "urls": [
+          "https://github.com/cj-mills/byte-track-eigen/archive/refs/tags/2.1.0.tar.gz"
+        ],
+        "integrity": "sha256-JSe5BbrKb8JoWmsZpXKE4jfS7dG4TOC+9uI5FUJjOBQ=",
+        "strip_prefix": "byte-track-eigen-2.1.0",
+        "overlay": [
+          {
+            "path": "BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/byte_track_eigen/2.1.0.bcr.2/overlay/BUILD.bazel",
+            "integrity": "sha256-EO76VzxLTF5ccR9D9AFAVFpB5CyPBhRU32Jr5RjYO84="
+          },
+          {
+            "path": "MODULE.bazel",
+            "url": "https://bcr.bazel.build/modules/byte_track_eigen/2.1.0.bcr.2/overlay/MODULE.bazel",
+            "integrity": "sha256-C1gOcIt+AzLrnftWN47GKOy6QZhgpsfE9NeUnSjJc94="
+          }
+        ],
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/byte_track_eigen/2.1.0.bcr.2/MODULE.bazel",
+          "integrity": "sha256-C1gOcIt+AzLrnftWN47GKOy6QZhgpsfE9NeUnSjJc94="
+        }
+      }
+    },
+    {
+      "name": "bzlparty_rules_quickjs",
+      "version": "0.1.0",
+      "source": {
+        "urls": [
+          "https://github.com/bzlparty/rules_quickjs/releases/download/v0.1.0/rules_quickjs-v0.1.0.tar.gz"
+        ],
+        "integrity": "sha256-weEMpHkdc4XqqEY8AL2Rv1i0Oc2lLDr8dC27ctt4k44=",
+        "strip_prefix": "rules_quickjs-0.1.0",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/bzlparty_rules_quickjs/0.1.0/patches/module_dot_bazel.patch",
+            "integrity": "sha256-sBq56SJPbY8kGkS6Lq6vIDG1DjOtzsmO7P35bNZW6pA="
+          }
+        ],
+        "patch_strip": 1,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/bzlparty_rules_quickjs/0.1.0/MODULE.bazel",
+          "integrity": "sha256-qYLCw6UXx6EvOMx+4rnFkLMrkaKEqlNlK07OZSVvgOY="
+        },
+        "module_append": "\n# bazel-matrix: the resolved aspect_bazel_lib's toolchain repos call rule() with incompatible_use_toolchain_transition, which Bazel 9 removed\nsingle_version_override(module_name = \"aspect_bazel_lib\", version = \"2.22.5\")\n\n# bazel-matrix: the resolved rules_nodejs's generated @nodejs_toolchains defs.bzl calls rule() with incompatible_use_toolchain_transition, which Bazel 9 removed\nsingle_version_override(module_name = \"rules_nodejs\", version = \"6.7.7\")\n"
+      }
+    },
+    {
+      "name": "bzlparty_tools",
+      "version": "0.4.0",
+      "source": {
+        "urls": [
+          "https://github.com/bzlparty/tools/releases/download/v0.4.0/tools-v0.4.0.tar.gz"
+        ],
+        "integrity": "sha256-LPIAMnu5ebDhUP/d1Iy0s++zoHUdA5ya1Xw3mcsR4kU=",
+        "strip_prefix": "tools-0.4.0",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/bzlparty_tools/0.4.0/MODULE.bazel",
+          "integrity": "sha256-drUJxISHhKsHsExL5GQ/SS5Cqn6XDpdImAmfQ8dXgFk="
+        }
+      }
+    },
+    {
+      "name": "bzlws",
+      "version": "0.2.0",
+      "source": {
+        "urls": [
+          "https://github.com/zaucy/bzlws/releases/download/0.2.0/bzlws-0.2.0.tar.gz"
+        ],
+        "integrity": "sha256-jl+BOXQ4QpE2DpndYZ6tN2TSMPvrL023GjfMtL9JjhQ=",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/bzlws/0.2.0/MODULE.bazel",
+          "integrity": "sha256-wuWjgr0CkpedlG6Cn3Ym5uDtB54keWTVlrfB9JV2OsA="
+        }
+      }
+    },
+    {
+      "name": "cargo_env.bzl",
+      "version": "0.3.3",
+      "source": {
+        "urls": [
+          "https://github.com/ZiplineTeam/cargo_env.bzl/releases/download/v0.3.3/cargo_env.bzl-v0.3.3.tar.gz"
+        ],
+        "integrity": "sha256-IrqK9uWXQ6eVjWd1bhwFQtlJa/LqUb7WpTF1Mu8Siyk=",
+        "strip_prefix": "cargo_env.bzl-0.3.3",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/cargo_env.bzl/0.3.3/patches/module_dot_bazel_version.patch",
+            "integrity": "sha256-kndcZkolYziYSVGhvqIhIt1DDhOpt9liEXwkmzEsRbg="
+          }
+        ],
+        "patch_strip": 1,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/cargo_env.bzl/0.3.3/MODULE.bazel",
+          "integrity": "sha256-tF1TXmqdC9tNhA5JmJEHHg0ITUjr9bpAHFc9cbFcV4M="
+        }
+      }
+    },
+    {
+      "name": "caseyduquettesc_rules_python_pytest",
+      "version": "1.1.1",
+      "source": {
+        "urls": [
+          "https://github.com/caseyduquettesc/rules_python_pytest/releases/download/v1.1.1/rules_python_pytest-v1.1.1.tar.gz"
+        ],
+        "integrity": "sha256-4lVkBO9W6j7JOFl2Fq/FHXjhgyz+URsZbp8rj9f48Uk=",
+        "strip_prefix": "rules_python_pytest-1.1.1",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/caseyduquettesc_rules_python_pytest/1.1.1/patches/module_dot_bazel_version.patch",
+            "integrity": "sha256-9ZcnV0Tl4ZsCpNC8nbQqGLngxgYCBJ8wrPIHrnJWY7I="
+          }
+        ],
+        "patch_strip": 1,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/caseyduquettesc_rules_python_pytest/1.1.1/MODULE.bazel",
+          "integrity": "sha256-blODrV8LSiiCn4EWg6PdZKZVIJufZiCg/mjNYyG34XQ="
+        },
+        "module_append": "\n# bazel-matrix: the resolved aspect_bazel_lib's toolchain repos call rule() with incompatible_use_toolchain_transition, which Bazel 9 removed\nsingle_version_override(module_name = \"aspect_bazel_lib\", version = \"2.22.5\")\n\n# bazel-matrix: the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed\nsingle_version_override(module_name = \"rules_go\", version = \"0.65.0\")\n"
+      }
+    },
+    {
+      "name": "cel-c",
+      "version": "0.0.0-20261021-024a0e4",
+      "source": {
+        "urls": [
+          "https://github.com/cel-expr/cel-c/archive/024a0e44ed4aa1b2c7270604e0f2c3b612ac0fd9.tar.gz"
+        ],
+        "integrity": "sha256-oONTK2dvtVJz3HF+qch/6ycT5OEaCb8vJzWA/TlPUug=",
+        "strip_prefix": "cel-c-024a0e44ed4aa1b2c7270604e0f2c3b612ac0fd9",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/cel-c/0.0.0-20261021-024a0e4/patches/cel-c.patch",
+            "integrity": "sha256-z6rxkOwbsrDUtvNWAXdvmyY1WgfnipWM1Efxs7nOgII="
+          }
+        ],
+        "patch_strip": 1,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/cel-c/0.0.0-20261021-024a0e4/MODULE.bazel",
+          "integrity": "sha256-m0VT6GfTlD++k+S4qVOSb0yEYJyBzJtVTVlxvBato08="
+        },
+        "module_append": "\n# bazel-matrix: the resolved aspect_bazel_lib's toolchain repos call rule() with incompatible_use_toolchain_transition, which Bazel 9 removed\nsingle_version_override(module_name = \"aspect_bazel_lib\", version = \"2.22.5\")\n\n# bazel-matrix: the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed\nsingle_version_override(module_name = \"rules_go\", version = \"0.65.0\")\n\n# bazel-matrix: the resolved aspect_rules_esbuild's esbuild/private/resolved_toolchain.bzl calls rule() with incompatible_use_toolchain_transition, which Bazel 9 removed\nsingle_version_override(module_name = \"aspect_rules_esbuild\", version = \"0.27.1\")\n"
+      }
+    },
+    {
+      "name": "circe",
+      "version": "1.0.1",
+      "source": {
+        "urls": [
+          "https://github.com/xiemotongye/circe/releases/download/1.0.1/circe-1.0.1.tar.gz"
+        ],
+        "integrity": "sha256-Lnmera1b0ZmaW+KGFo87hdTA0TFxxQ+77gR8u4UnSBI=",
+        "strip_prefix": "circe-1.0.1",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/circe/1.0.1/MODULE.bazel",
+          "integrity": "sha256-h8PqhDeD5n77iGggZuOsbPvRJnBYYYdvMs6H+c0dCZE="
+        }
+      }
+    },
+    {
+      "name": "claro-lang",
+      "version": "0.1.409",
+      "source": {
+        "urls": [
+          "https://github.com/JasonSteving99/claro-lang/releases/download/v0.1.409/claro-source-archive-v0.1.409.zip"
+        ],
+        "integrity": "sha256-h/rhNXwW5LNHG6N+yYdcnxd5hCP7G4UMMURfFdEREE0=",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/claro-lang/0.1.409/MODULE.bazel",
+          "integrity": "sha256-TX3p1BcMmdAKC/Tu84Yoq1bdjyb6/+bsGfVtFWIYZWs="
+        },
+        "module_append": "\n# bazel-matrix: the resolved aspect_bazel_lib's toolchain repos call rule() with incompatible_use_toolchain_transition, which Bazel 9 removed\nsingle_version_override(module_name = \"aspect_bazel_lib\", version = \"2.22.5\")\n"
+      }
     }
   ],
   "skipped": []
