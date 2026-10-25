@@ -7,6 +7,6 @@ project(
     targets = [
         "//...",
     ],
-    # its MODULE.bazel has local_path_override(rules_webtesting, path = ".."): BCR's strip_prefix extracts only this submodule of the rules_webtesting repo, so .. is outside the extracted workspace
+    # its rules_go 0.51.0-rc1 uses CcInfo, which Bazel 9 removed ("The CcInfo symbol has been removed" in go/private/rules/cross.bzl); also //web:go.bzl isn't in the release archive
     known_failing = "build",
 )

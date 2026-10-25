@@ -7,6 +7,4 @@ project(
     targets = [
         "//...",
     ],
-    # its .bazelrc does 'import %workspace%/../.bazelrc.remote-cache', a file in the rules_nixpkgs monorepo that the module's archive (core/ only) doesn't contain
-    known_failing = "build",
 )

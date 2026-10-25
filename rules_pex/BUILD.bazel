@@ -7,6 +7,6 @@ project(
     targets = [
         "//...",
     ],
-    # its .bazelrc sets --incompatible_merge_fixed_and_default_shell_env, which Bazel 9 no longer recognizes ("Unrecognized option")
+    # its pex actions fail on the executors: FileNotFoundError for the runfiles path of the entry point (/tmp/bzl-pex-*/runfiles/_main/tests/basic/basic.py)
     known_failing = "build",
 )

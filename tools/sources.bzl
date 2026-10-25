@@ -36,6 +36,15 @@ def _bcr_source_impl(rctx):
         rctx.delete(patch)
     rctx.delete("MODULE.bazel")
     rctx.download(url = rctx.attr.module_file[0], output = "MODULE.bazel", integrity = rctx.attr.module_file[1])
+    # Exact lines removed: from MODULE.bazel the local_path_override()s that
+    # projects.txt `override` lines replace, from rc files `rc-drop` lines.
+    for path, texts in rctx.attr.remove.items():
+        if not rctx.path(path).exists:
+            fail("%s: %s doesn't exist" % (rctx.name, path))
+        content = rctx.read(path)
+        for text in texts:
+            content = _remove_lines(rctx.name, path, content, text)
+        rctx.file(path, content, executable = False)
     if rctx.attr.module_append:
         # projects.txt `override` lines, as single_version_override()s.
         rctx.file("MODULE.bazel", rctx.read("MODULE.bazel") + rctx.attr.module_append)
@@ -78,6 +87,22 @@ def _bcr_source_impl(rctx):
     # run then needs only source.tar's digest, not the download.
     return rctx.repo_metadata(reproducible = True)
 
+def _remove_lines(name, path, text, lines):
+    """text without the whole lines `lines` (compared with surrounding
+    whitespace stripped), which must occur exactly once. The same as
+    tools/sync.py's remove_lines."""
+    have = text.split("\n")
+    want = [w.strip() for w in lines.split("\n")]
+    n = len(want)
+    hits = [
+        i
+        for i in range(len(have) - n + 1)
+        if [h.strip() for h in have[i:i + n]] == want
+    ]
+    if len(hits) != 1:
+        fail("%s: %s doesn't have these lines exactly once (%d times): %s" % (name, path, len(hits), lines))
+    return "\n".join(have[:hits[0]] + have[hits[0] + n:])
+
 bcr_source = repository_rule(
     implementation = _bcr_source_impl,
     attrs = {
@@ -92,6 +117,8 @@ bcr_source = repository_rule(
         "patch_strip": attr.int(),
         # url -> integrity, applied in order.
         "patches": attr.string_dict(),
+        # path -> exact lines removed, before module_append; see _remove_lines.
+        "remove": attr.string_list_dict(),
         "strip_prefix": attr.string(),
         "urls": attr.string_list(mandatory = True),
     },
@@ -147,6 +174,7 @@ def _projects_impl(mctx):
             overlay = {x["path"]: x["url"] + " " + x["integrity"] for x in s.get("overlay", [])},
             module_file = [s["module_file"]["url"], s["module_file"]["integrity"]],
             module_append = s.get("module_append", ""),
+            remove = s.get("remove", {}),
         )
         names.append(p["name"])
     for v, info in INNER_BAZELS.items():

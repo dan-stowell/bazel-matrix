@@ -7,6 +7,4 @@ project(
     targets = [
         "//...",
     ],
-    # its MODULE.bazel has local_path_override(rules_pycross, path = "../.."): BCR's strip_prefix extracts only modules/backend_maturin of the rules_pycross archive, so ../.. is outside the extracted workspace ("No MODULE.bazel, REPO.bazel, or WORKSPACE file found in .../external/rules_pycross+")
-    known_failing = "build",
 )
