@@ -6,7 +6,9 @@ project(
     name = "boost.mysql",
     targets = [
         "//...",
-        # linking fails: undefined reference to boost::asio::error::get_ssl_category() and boost::asio::ssl::error::get_stream_category(), which boost.mysql's objects need and nothing in the link provides
-        "-//example:1_sync",
+    ],
+    flags = [
+        # boost.asio's //:ssl flag defaults to no_ssl, which leaves asio's SSL implementation (boost/asio/ssl/impl/src.hpp) out of @boost.asio, while boost.mysql (whose own //:ssl defaults to boringssl) uses it: //example:1_sync fails to link (undefined boost::asio::error::get_ssl_category())
+        "--@boost.asio//:ssl=boringssl",
     ],
 )

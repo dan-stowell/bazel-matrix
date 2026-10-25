@@ -1896,7 +1896,7 @@ boost.mqtt5
 boost.msm
   -//test/...  uses @platforms, which its MODULE.bazel doesn't declare
 boost.mysql
-  -//example:1_sync  linking fails: undefined reference to boost::asio::error::get_ssl_category() and boost::asio::ssl::error::get_stream_category(), which boost.mysql's objects need and nothing in the link provides
+  --@boost.asio//:ssl=boringssl  boost.asio's //:ssl flag defaults to no_ssl, which leaves asio's SSL implementation (boost/asio/ssl/impl/src.hpp) out of @boost.asio, while boost.mysql (whose own //:ssl defaults to boringssl) uses it: //example:1_sync fails to link (undefined boost::asio::error::get_ssl_category())
 boost.nowide
   -//test:test_fs  uses @boost.filesystem, which its MODULE.bazel doesn't declare
   -//test:upstream_tests  the test_suite that includes //test:test_fs (excluded above)
@@ -1905,3 +1905,67 @@ boost.numeric_odeint
 boost.openmethod
   -//test/...  uses @boost.test, @boost.utility, which its MODULE.bazel doesn't declare
 boost.outcome
+
+# Chunk f-6: the rest of boost, and more b/c modules.
+boost.parameter_python
+boost.parser
+  -//test/...  uses @boost.core, @boost.optional, @boost.variant, @boost.variant2, which its MODULE.bazel doesn't declare
+boost.pin_version
+boost.poly_collection
+boost.process
+boost.redis
+  -//test/...  uses @boost.test, which its MODULE.bazel doesn't declare
+boost.safe_numerics
+  -//test/...  uses @platforms, which its MODULE.bazel doesn't declare
+boost.stacktrace
+  override libbacktrace 1.0.0-20250926-7939218.bcr.2  it resolves libbacktrace 1.0.0-20250926-7939218.bcr.1, which the BCR yanked ("Omits simple.c, leaving the public backtrace_simple ..."), and Bazel refuses yanked versions
+boost.statechart
+  -//test/...  uses @boost.test, which its MODULE.bazel doesn't declare
+boost.stl_interfaces
+boost.url
+  -//test:boost.url_test  uses @boost.url.extra, which its MODULE.bazel doesn't declare
+boost.wave
+boost.yap
+  -//test/...  uses @boost.core, @boost.mpl, @platforms, which its MODULE.bazel doesn't declare
+binutils
+  -//binutils:dlltool  binutils builds this program only for Windows targets: its srcs select() has no branch for Linux ("doesn't match this configuration: binutils does not build this program for the target platform")
+  -//binutils:dllwrap  same: Windows-only
+  -//binutils:windmc  same: Windows-only
+  -//binutils:windres  same: Windows-only
+  -//:dlltool  same: Windows-only
+  -//:dllwrap  same: Windows-only
+  -//:windmc  same: Windows-only
+  -//:windres  same: Windows-only
+bliss
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects //:bliss's `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+briansmith_ring
+brotli_go
+  --incompatible_autoload_externally=+@rules_cc  its dep brotli calls native cc_library, which Bazel 9 removed; autoload it from rules_cc
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed
+cachelib
+  known-failing build  it resolves libaio 0.3.113.bcr.0, which the BCR yanked ("The tarball link for 0.3.113.bcr.0 is broken"), and 0.3.113.bcr.1's archive returns 404 too
+cgrapht
+  -//test:cgrapht_unit_tests  test/test_edge_manipulation_happy_case.cc:86 doesn't compile under the images' gcc: no operator| for its std::vector<cgrapht::Result<...>> and std::views::transform
+chicory
+  override javaparser 3.27.0  javaparser 3.26.2, which it declares, makes javaparser-core incompatible unless --java_runtime_version is remotejdk_11/17 ("JavaParser is incompatible with JDK versions 21 and later"), and remote-minimal uses JDK 21; 3.27.0 transitions javaparser-core to remotejdk_17 itself
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its BUILD files (wasm, wasi, host-module, ...) call native java_library without a load()
+  --incompatible_autoload_externally=+@rules_java  autoload the java rules Bazel 9 removed
+# circl@1.3.7: 1.3.8's archive contains a bazel-bin symlink, and tools/sources.bzl's tar of the source fails on them ("tar: bazel-bin: Cannot open: Permission denied").
+circl@1.3.7
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its math/fp25519 and math/fp448 BUILD files call native cc_library without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed
+clarabel
+  -//tests:clarabel_cpp_tests  uses @googletest, which its MODULE.bazel doesn't declare
+coal
+codec2
+coin-or-lemon
+cpio
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects //:gnulib's `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+cppoptlib
+cudd
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects //:cudd's `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+cxxtest
+  -//sample/...  the sample runners include the sample test headers (e.g. simple_test.h), which their cc_tests don't make available ("fatal error: simple_test.h: No such file or directory")
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects //:cxxtest's `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+cyclonedds
