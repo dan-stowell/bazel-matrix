@@ -7,6 +7,6 @@ project(
     targets = [
         "//...",
     ],
-    # its toolchains/cc_toolchain_config.bzl uses the native CcToolchainConfigInfo, and its root BUILD.bazel calls native cc rules, both removed in Bazel 9
+    # needs Erlang/OTP via rules_erlang (see rules_erlang); its root BUILD.bazel calls native cc rules without a load() (main-repo autoloads fix that), and rules_erlang's erlang_app globs src/**/*.hrl, which matches nothing
     known_failing = "build",
 )

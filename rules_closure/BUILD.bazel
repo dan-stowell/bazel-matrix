@@ -7,6 +7,6 @@ project(
     targets = [
         "//...",
     ],
-    # closure/compiler/test and third_party/phantomjs call native sh_test/sh_binary, which Bazel 9 removed (other packages depend on them), and its resolved rules_go uses the removed native CcInfo
+    # closure/compiler/test and third_party/phantomjs call native sh_test/sh_binary without a load() (main-repo autoloads fix those), but @maven fails: rules_jvm_external's coursier needs a host java ("exec: java: not found"); its resolved rules_go uses the removed native CcInfo
     known_failing = "build",
 )

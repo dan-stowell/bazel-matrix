@@ -7,6 +7,6 @@ project(
     targets = [
         "//...",
     ],
-    # dozens of packages call rules Bazel 9 removed (native cc_binary in examples/cpp/*, objc_library in third_party/objective_c, rule() configs in third_party/toolchains)
+    # dozens of packages call native cc_*/objc_library without a load() (--noincompatible_disable_autoloads_in_main_repo with +@rules_cc fixes those), but its own bazel/generate_objc.bzl and the resolved aspect_bazel_lib's toolchain repos call rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
     known_failing = "build",
 )

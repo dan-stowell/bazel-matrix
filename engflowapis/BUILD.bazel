@@ -7,6 +7,10 @@ project(
     targets = [
         "//...",
     ],
-    # its BUILD files call native proto_library without a load(), which Bazel 9 removed; autoloading doesn't apply to the main repo
-    known_failing = "build",
+    flags = [
+        # Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its BUILD files call native proto_library without a load()
+        "--noincompatible_disable_autoloads_in_main_repo",
+        # autoload the proto rules Bazel 9 removed from protobuf, and py_test, which the googleapis it resolves calls natively, from rules_python
+        "--incompatible_autoload_externally=+@com_google_protobuf,+@rules_python",
+    ],
 )

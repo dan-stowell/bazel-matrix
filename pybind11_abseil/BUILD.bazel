@@ -7,6 +7,10 @@ project(
     targets = [
         "//...",
     ],
-    # its own packages (pybind11_abseil, compat, cpp_capsule_tools, tests) call native cc_library/py_library/py_test, which Bazel 9 removed
-    known_failing = "build",
+    flags = [
+        # Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its own packages (pybind11_abseil, compat, cpp_capsule_tools, tests) call native cc_library/py_library/py_test without a load()
+        "--noincompatible_disable_autoloads_in_main_repo",
+        # autoload the cc and py rules Bazel 9 removed from rules_cc and rules_python
+        "--incompatible_autoload_externally=+@rules_cc,+@rules_python",
+    ],
 )
