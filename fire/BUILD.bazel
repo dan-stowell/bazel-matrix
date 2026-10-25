@@ -6,7 +6,7 @@ project(
     name = "fire",
     targets = [
         "//...",
-        # its validator reads examples/vehicle_params.yaml (or a _validated.yaml next to it) from the execroot without declaring it as an input, so on RBE the file is absent ("Parameter file does not exist")
+        # its validator resolves parameter links against the execroot root: it looks for examples/vehicle_params.yaml or examples/vehicle_params_validated.yaml there, but its declared input (:vehicle_params's _validated.yaml) is under bazel-out/.../bin/examples, so on RBE neither path exists ("Parameter file does not exist")
         "-//examples:vehicle_requirements_validation",
         # depends on //examples:vehicle_requirements_validation (above)
         "-//examples:vehicle_requirements",

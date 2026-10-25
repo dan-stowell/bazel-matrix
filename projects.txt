@@ -1986,7 +1986,7 @@ array_record
 asio-grpc
   override grpc 1.84.0  grpc 1.69.0, which it declares, has a bazel/generate_cc.bzl that fails to load under Bazel 9 (label(providers=...) gets a string)
   --incompatible_autoload_externally=+@rules_cc  the c-ares, doctest, googletest and re2 it resolves call native cc_library, which Bazel 9 removed; autoload them from rules_cc
-  --test_arg=--test-case-exclude=*Traits?can?specify?zero?max?latency  skips "agrpc::run Traits can specify zero max latency" (doctest wildcards, no spaces): the case runs agrpc::run for 15 polls with zero max latency and checks a handler posted to the grpc_context ran; here it hadn't (CHECK(invoked) false). Both its tests are doctest binaries, so the flag only skips this case
+  --test_arg=--test-case-exclude=*Traits?can?specify?zero?max?latency  skips "agrpc::run Traits can specify zero max latency" (doctest wildcards, no spaces): it assumes a handler posted to the grpc_context (delivered asynchronously via a gRPC alarm) runs within the first 14 zero-wait polls of agrpc::run, a timing assumption that failed here (CHECK(invoked) false). Both its tests are doctest binaries, so the flag only skips this case
 aspect_rules_oxc
 aspect_rules_rollup
   override aspect_bazel_lib 2.22.5  the resolved aspect_bazel_lib's toolchain repos call rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
@@ -2049,7 +2049,7 @@ fastjson
 fasttext
   --incompatible_autoload_externally=+@rules_cc  the pybind11_bazel it resolves (build_defs.bzl's pybind_extension) calls native cc rules, which Bazel 9 removed; autoload them from rules_cc
 fire
-  -//examples:vehicle_requirements_validation  its validator reads examples/vehicle_params.yaml (or a _validated.yaml next to it) from the execroot without declaring it as an input, so on RBE the file is absent ("Parameter file does not exist")
+  -//examples:vehicle_requirements_validation  its validator resolves parameter links against the execroot root: it looks for examples/vehicle_params.yaml or examples/vehicle_params_validated.yaml there, but its declared input (:vehicle_params's _validated.yaml) is under bazel-out/.../bin/examples, so on RBE neither path exists ("Parameter file does not exist")
   -//examples:vehicle_requirements  depends on //examples:vehicle_requirements_validation (above)
   -//examples:component_requirements  depends on //examples:vehicle_requirements_validation (above)
   -//examples:component_requirements_validation  depends on //examples:vehicle_requirements_validation (above)
@@ -2061,12 +2061,12 @@ flip
   --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel calls native cc_library without a load()
   --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
 freertos
-  -//:arm_cm0_port  an ARM Cortex-M port: its portmacro.h needs config values (configENABLE_MPU, configMAX_SYSCALL_INTERRUPT_PRIORITY) that the default FreeRTOSConfig.h here doesn't define
-  -//:arm_cm3_port  an ARM Cortex-M port: its portmacro.h needs config values (configENABLE_MPU, configMAX_SYSCALL_INTERRUPT_PRIORITY) that the default FreeRTOSConfig.h here doesn't define
-  -//:arm_cm33_ntz_port  an ARM Cortex-M port: its portmacro.h needs config values (configENABLE_MPU, configMAX_SYSCALL_INTERRUPT_PRIORITY) that the default FreeRTOSConfig.h here doesn't define
-  -//:arm_cm4f_port  an ARM Cortex-M port: its portmacro.h needs config values (configENABLE_MPU, configMAX_SYSCALL_INTERRUPT_PRIORITY) that the default FreeRTOSConfig.h here doesn't define
-  -//:arm_cm7_port  an ARM Cortex-M port: its portmacro.h needs config values (configENABLE_MPU, configMAX_SYSCALL_INTERRUPT_PRIORITY) that the default FreeRTOSConfig.h here doesn't define
-  -//:xtensa_port  an Xtensa port: it needs the Xtensa toolchain's xtensa/config/core.h
+  -//:arm_cm0_port  an ARM Cortex-M port, which needs an ARM cross-toolchain; with the host x86-64 gcc it fails at its portmacro.h (first: configENABLE_MPU / configMAX_SYSCALL_INTERRUPT_PRIORITY undefined)
+  -//:arm_cm3_port  an ARM Cortex-M port, which needs an ARM cross-toolchain; with the host x86-64 gcc it fails at its portmacro.h (first: configENABLE_MPU / configMAX_SYSCALL_INTERRUPT_PRIORITY undefined)
+  -//:arm_cm33_ntz_port  an ARM Cortex-M port, which needs an ARM cross-toolchain; with the host x86-64 gcc it fails at its portmacro.h (first: configENABLE_MPU / configMAX_SYSCALL_INTERRUPT_PRIORITY undefined)
+  -//:arm_cm4f_port  an ARM Cortex-M port, which needs an ARM cross-toolchain; with the host x86-64 gcc it fails at its portmacro.h (first: configENABLE_MPU / configMAX_SYSCALL_INTERRUPT_PRIORITY undefined)
+  -//:arm_cm7_port  an ARM Cortex-M port, which needs an ARM cross-toolchain; with the host x86-64 gcc it fails at its portmacro.h (first: configENABLE_MPU / configMAX_SYSCALL_INTERRUPT_PRIORITY undefined)
+  -//:xtensa_port  an Xtensa port, which needs the Xtensa cross-toolchain (its xtensa/config/core.h); the host x86-64 gcc lacks it
 
 # Chunk b-10: more libraries and rulesets (m-r).
 opencv
@@ -2267,3 +2267,62 @@ nogo_analyzer_bzlmod
 nvc
   override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
 occt
+# Chunk e-4: more BCR modules (a, d-f).
+abc
+ahab
+  --lockfile_mode=off  its .bazelrc sets --lockfile_mode=error, and its MODULE.bazel.lock lacks registry checksums for the versions resolved here (apple_support 2.5.2)
+apilark
+ar_hosek_sky_model
+aravis
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: src/BUILD.bazel and tests/BUILD.bazel call native cc_library/cc_test without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc (also for the glib it resolves, which calls them too)
+  override libffi 3.4.7.bcr.5  libffi 3.4.7.bcr.2, which its glib declares, builds with rules_foreign_cc configure_make, whose make step runs makeinfo for doc/libffi.info, which the image lacks (exit 127); 3.4.7.bcr.5 builds with native cc rules
+aspect_rules_aws
+  override aspect_rules_py 1.13.0  the resolved aspect_rules_py's py/private/py_library.bzl uses the native CcInfo symbol, which Bazel 9 removed
+  -//examples/cli/...  //examples/cli:help's genrule runs the AWS CLI by an absolute path into the local output base (external/+aws+aws_linux-x86_64/.../dist/aws), which doesn't exist on the RBE executor (exit 127)
+  -//examples/python_lambda/test:integration_test  it starts the lambda image through the Docker daemon (docker-sdk-python over /var/run/docker.sock), which the executors don't have
+aspect_rules_cypress
+  -//tools:preset.update_test  tools/preset.bazelrc is out of date for Bazel 9.3.1 (missing lines the preset generates for it, e.g. its copy_directory and host_jvm_args notes)
+aspect_rules_lint_rust
+aspect_rules_lint_scala
+at-spi2-core
+aw-backtrace
+awk.bzl
+aws-in-a-box
+aws_sdk
+azure-core-test-cpp
+  --incompatible_autoload_externally=+@rules_cc  the azure-core-cpp and googletest it resolves call native cc rules, which Bazel 9 removed; autoload them from rules_cc
+  --@@curl+//:ssl_lib=openssl  azure-core-cpp's curl transport fails analysis ("must be built with --@curl//:ssl_lib=openssl") under curl's default TLS backend
+azure-storage-common-cpp
+  --incompatible_autoload_externally=+@rules_cc  the azure-core-cpp it resolves and its tests call native cc rules, which Bazel 9 removed; autoload them from rules_cc
+  --@@curl+//:ssl_lib=openssl  azure-core-cpp's curl transport fails analysis ("must be built with --@curl//:ssl_lib=openssl") under curl's default TLS backend
+daqp
+dartsim
+diff.bzl
+  -//diff/tests/diff3/...  every diff3 action fails: the prebuilt diffutils diff3 runs a subsidiary `diff`, which exits 2 on "unrecognized option '---no-directory'" (diff3 and that diff disagree on options)
+directxmath
+distributed_point_functions
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed (go/private/rules/cgo.bzl)
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its BUILD files (dpf, dcf, pir, experiments) call native cc_library/cc_binary/cc_proto_library without a load()
+  --incompatible_autoload_externally=+@rules_cc,+@com_google_protobuf  autoload the cc and proto rules Bazel 9 removed (also for its iree http_archive, whose build_defs.bzl calls native.cc_library)
+  override rules_foreign_cc 0.16.0  the resolved rules_foreign_cc passes rule(incompatible_use_toolchain_transition) and uses the native CcInfo, both removed in Bazel 9
+  known-failing build  the abseil-cpp resolved here is too new for its deps: it makes absl/base:endian private, which its farmhash http_archive and tink_cc depend on ("Visibility error"), and with --nocheck_visibility tink_cc's tink/internal/proto_parser_state.h fails to compile (expected ',' or '...' before '<', at an absl CRC type)
+docoptexpr
+  known-failing build  docoptexpr/docoptexpr.hh includes <expected> (C++23), which the image's libstdc++ 11 lacks
+download_archives
+dumb-init
+elemental2
+  override rules_go 0.65.0  the resolved rules_go's go/private/actions/archive.bzl fails to load under Bazel 9 (native CcInfo removed), breaking its registered @go_toolchains
+  --incompatible_autoload_externally=+@com_google_protobuf  the bazel_worker_api it resolves calls native proto_library, which Bazel 9 removed; autoload it from protobuf
+  known-failing build  with rules_go and bazel_worker_api fixed, its deps j2cl, jsinterop_base and bazel_worker_java reference @maven artifacts (args4j_args4j, org_jspecify_jspecify, com_google_escapevelocity_escapevelocity) that the resolved maven repo doesn't define
+exempi
+  --incompatible_autoload_externally=+@rules_cc  the libexpat it resolves call native cc rules, which Bazel 9 removed; autoload them from rules_cc
+extra_rules_java
+fastdds
+ffmpeg
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+  --dynamic_mode=off  its with_defaults/* tests (built in a transitioned configuration) exit 127: they dynamically link libST-<hash>_libavutil.so etc., which isn't in their runfiles on RBE ("cannot open shared object file"); linked statically they run
+fildesh
+  override rules_foreign_cc 0.16.0  the resolved rules_foreign_cc passes rule(incompatible_use_toolchain_transition) and uses the native CcInfo, both removed in Bazel 9
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: test/builtin/BUILD.bazel calls native sh_test without a load()
+  --incompatible_autoload_externally=+@rules_cc,+@rules_shell  autoload sh_test from rules_shell, and the cc rules that the google_benchmark it resolves calls natively from rules_cc
