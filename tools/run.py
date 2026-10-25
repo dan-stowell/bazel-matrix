@@ -81,7 +81,7 @@ def select_projects(projects, command, names, known_failing):
         kf = (p.get("known_failing") or ("",))[0]
         if names or known_failing or not kf:
             out[p["name"]] = command
-        elif kf == "test" and command == "test":
+        elif kf == "test":
             out[p["name"]] = "build"
     return out
 

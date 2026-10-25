@@ -26,8 +26,8 @@ class SelectTest(unittest.TestCase):
         self.assertEqual(run.shard(["a"], 4), [["a"]])
 
 
-OUTER = "INFO: Streaming build results to: https://x.io/invocation/0000-outer"
-INNER = "INFO: Streaming build results to: https://x.io/invocation/1111-inner"
+OUTER = "INFO: Streaming build results to: https://x.io/invocation/0000-aaaa"
+INNER = "INFO: Streaming build results to: https://x.io/invocation/1111-bbbb"
 
 
 class ParseLogTest(unittest.TestCase):
@@ -47,7 +47,7 @@ class ParseLogTest(unittest.TestCase):
         ])
         code, link, status = run.parse_log(log, "test", {"zlib": "test", "re2": "test", "fmt": "test"})
         self.assertEqual(code, 3)
-        self.assertEqual(link, "https://x.io/invocation/0000-outer")
+        self.assertEqual(link, "https://x.io/invocation/0000-aaaa")
         self.assertEqual(status, {"zlib": "PASSED", "re2": "FAILED", "fmt": "UNKNOWN"})
 
     def test_inner_output_is_not_a_result(self):
