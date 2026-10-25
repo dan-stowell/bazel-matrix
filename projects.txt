@@ -2266,6 +2266,7 @@ nogo_analyzer_bzlmod
 nvc
   override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
 occt
+
 # Chunk e-4: more BCR modules (a, d-f).
 abc
 ahab
@@ -2313,7 +2314,7 @@ dumb-init
 elemental2
   override rules_go 0.65.0  the resolved rules_go's go/private/actions/archive.bzl fails to load under Bazel 9 (native CcInfo removed), breaking its registered @go_toolchains
   --incompatible_autoload_externally=+@com_google_protobuf  the bazel_worker_api it resolves calls native proto_library, which Bazel 9 removed; autoload it from protobuf
-  known-failing build  with rules_go and bazel_worker_api fixed, its deps j2cl, jsinterop_base and bazel_worker_java reference @maven artifacts (args4j_args4j, org_jspecify_jspecify, com_google_escapevelocity_escapevelocity) that the resolved maven repo doesn't define
+  known-failing build  its MODULE.bazel archive_overrides j2cl, jsinterop_generator and jsinterop_base to their unpinned GitHub master.zip archives (no integrity), so it builds against whatever master is now; with rules_go and bazel_worker_api fixed, those deps reference @maven artifacts (args4j_args4j, org_jspecify_jspecify, com_google_escapevelocity_escapevelocity) that the resolved maven repo doesn't define
 exempi
   --incompatible_autoload_externally=+@rules_cc  the libexpat it resolves call native cc rules, which Bazel 9 removed; autoload them from rules_cc
 extra_rules_java
@@ -2440,3 +2441,44 @@ sourcekit_bazel_bsp
   known-failing build  its //Sources:sourcekit-bazel-bsp builds with SwiftPM (build_spm.sh runs swift), and the images lack swift ("swift: command not found")
 safedi
   known-failing build  a Swift project: rules_swift finds no Swift toolchain on the Linux executor (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift
+# Chunk e-5: the rest of the a, d-f modules.
+apple_mig
+apple_rules_lint
+asc_swift
+  --repo_env=CC=gcc  its .bazelrc sets common:linux --repo_env=CC=clang, and the executor image has only gcc ("Cannot find gcc or CC (clang)")
+  known-failing build  needs a Swift toolchain: rules_swift's local config defines no linux-toolchain without swiftc, which the image lacks; also its dev dep app-store-connect-openapi-specification.zip from developer.apple.com no longer matches its pinned checksum
+aspect_gazelle_js
+  known-failing build  its MODULE.bazel has local_path_override(aspect_gazelle, path = "../.."), which applies as the root module: the module is a subdirectory of the aspect-build/aspect-gazelle repo, and its archive has nothing at ../.. ("No MODULE.bazel ... found in external/aspect_gazelle+")
+aspect_gazelle_prebuilt
+  known-failing build  its MODULE.bazel has local_path_override(aspect_go_treesitter_grammars, path = "../treesitter"), which applies as the root module, and its archive has no ../treesitter ("does not exist or is not a directory")
+aspect_rules_js_rust_wasm_bindgen
+autosharding
+azure-storage-files-datalake-cpp
+  --incompatible_autoload_externally=+@rules_cc  the azure-core-cpp and googletest it resolves call native cc rules, which Bazel 9 removed; autoload them from rules_cc
+  --@@curl+//:ssl_lib=openssl  azure-core-cpp's curl transport fails analysis ("must be built with --@curl//:ssl_lib=openssl") under curl's default TLS backend
+debian_dependency_bazelizer
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel calls native py_binary without a load()
+  --incompatible_autoload_externally=+@rules_python  autoload the python rules Bazel 9 removed (also for the poetry repo its ofiuco extension generates, which calls native py_library)
+  known-failing build  the poetry repo its ofiuco extension generates loads @ofiuco+//python:poetry_deps.bzl, a canonical repo name used as an apparent one, which doesn't resolve ("unknown repo 'ofiuco+'")
+dnsmasq
+emdawnwebgpu
+  --deleted_packages=tests  tests/BUILD.bazel loads @emsdk, which its MODULE.bazel doesn't declare
+engflowapis-go
+  known-failing build  its MODULE.bazel has local_path_override(engflowapis, path = ".."), which applies as the root module: the module is the go/ directory of the EngFlow/engflowapis repo, and its archive has nothing at .. ("No MODULE.bazel ... found in external/engflowapis+")
+engflowapis-java
+  known-failing build  its MODULE.bazel has local_path_override(engflowapis, path = ".."), which applies as the root module: the module is the java/ directory of the EngFlow/engflowapis repo, and its archive has nothing at .. ("No MODULE.bazel ... found in external/engflowapis+")
+envoy_toolshed
+  known-failing build  rules_foreign_cc's make tool fails to build with its registered toolchains_llvm clang and sysroot_linux_amd64: make's configure reports "C compiler cannot create executables"
+etherlab-ethercat
+evidence_store_bazel
+federated_language
+  -//examples/...  examples/ uses @examples_pypi, which its MODULE.bazel doesn't declare, and an `executor` package the archive lacks
+foxglove_schemas_protobuf
+foxglove_websocket
+  --incompatible_autoload_externally=+@rules_cc  the asio and nlohmann_json it resolves call native cc_library, which Bazel 9 removed; autoload them from rules_cc
+foxglove_ws_protocol
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel calls native cc_library without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+fremtind_rules_vitest
+  known-failing build  its .bazelrc imports .aspect/bazelrc/performance.bazelrc, which sets --incompatible_remote_results_ignore_disk, which Bazel 9 no longer recognizes ("Unrecognized option")
+fshlib
