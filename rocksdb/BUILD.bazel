@@ -6,7 +6,7 @@ project(
     name = "rocksdb",
     targets = [
         "//...",
-        # aborts in EnvPosixTestWithParam: "failed to find an ioctl-friendly temporary directory" (no candidate tmp dir on the executor supports the file ioctls it needs)
+        # aborts in EnvPosixTestWithParam: "failed to find an ioctl-friendly temporary directory": its FS_IOC_GETVERSION ioctl probe fails on a fresh mkdtemp dir in both /var/tmp and /tmp (mkdtemp succeeded; it printed no error), and with no /.dockerenv it aborts instead of skipping
         "-//:env_env_test",
     ],
 )

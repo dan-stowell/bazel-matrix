@@ -1008,7 +1008,7 @@ rapidcheck
   --noincompatible_disallow_empty_glob  its root BUILD.bazel globs include/**/*.cpp, which matches nothing
 rocksdb
   override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
-  -//:env_env_test  aborts in EnvPosixTestWithParam: "failed to find an ioctl-friendly temporary directory" (no candidate tmp dir on the executor supports the file ioctls it needs)
+  -//:env_env_test  aborts in EnvPosixTestWithParam: "failed to find an ioctl-friendly temporary directory": its FS_IOC_GETVERSION ioctl probe fails on a fresh mkdtemp dir in both /var/tmp and /tmp (mkdtemp succeeded; it printed no error), and with no /.dockerenv it aborts instead of skipping
 upb
   --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its BUILD files call native proto_library/cc_proto_library/sh_test and its bazel/*.bzl use the native CcInfo/ProtoInfo symbols without a load()
   --incompatible_autoload_externally=+@rules_cc,+@com_google_protobuf,+@rules_python,+@rules_shell  autoload the cc, proto, python and sh rules and symbols Bazel 9 removed
@@ -1127,3 +1127,59 @@ lmdb
   --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
 luajit
 lzo
+
+# Chunk b-7: more well-known libraries and rulesets (m-r).
+mcap
+meshoptimizer
+minitrace
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+msgpack-c
+  --deleted_packages=test  (not an exclusion: //... fails on a broken package even when subtracted) test/BUILD.bazel uses @boost.test and @zlib, which its MODULE.bazel doesn't declare
+mp-units
+  --cxxopt=-std=c++20  it is a C++20 library and its overlay sets no -std; the toolchain default is -std=c++17 ("'consteval' does not name a type")
+  known-failing build  with -std=c++20, its overlay hardcodes MP_UNITS_API_STD_FORMAT=1, and the executor GCC's libstdc++ has no std::format (compat_macros.h: #error "std::formatting facility not supported")
+nanomsg
+nlopt
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects the resolved pcre2's root-package `includes = ["."]` ("resolves to the workspace root")
+  --incompatible_autoload_externally=+@rules_cc  the pcre2 it resolves has a BUILD.bazel calling native cc rules, which Bazel 9 removed; autoload them from rules_cc
+nsync
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD calls native cc_* rules without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+opencc
+  --deleted_packages=deps/googletest-1.15.0,deps/googletest-1.15.0/googlemock/test,deps/googletest-1.15.0/googletest/test  (not an exclusion: //... fails on a broken package even when subtracted) a vendored googletest copy whose BUILD files call native cc rules and use labels (//:gtest, googletest/include globs) that only resolve with googletest at the workspace root; the module uses googletest from the BCR
+openjpeg
+opus
+osqp-cpp
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel calls native cc_* rules without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+paho.mqtt.c
+pcg
+pigz
+pixman
+poco
+popt
+proj
+  --deleted_packages=test  (not an exclusion: //... fails on a broken package even when subtracted) test/BUILD.bazel uses @googletest, which its MODULE.bazel doesn't declare
+protobuf-matchers
+pthreadpool
+pybind11_protobuf
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: pybind11_protobuf/BUILD calls native py_library (and the pybind_library macro of the resolved pybind11_bazel calls native cc rules) without a load()
+  --incompatible_autoload_externally=+@rules_cc,+@rules_python  autoload the cc and python rules Bazel 9 removed
+  --deleted_packages=pybind11_protobuf/tests  (not an exclusion: //... fails on a broken package even when subtracted) it loads the resolved grpc's bazel/python_rules.bzl, which fails under Bazel 9 ("Error in label: at index 0 of providers, got element of type string, want sequence")
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed (go/private/rules/cgo.bzl)
+  known-failing build  with those fixes, its core libraries (//pybind11_protobuf:proto_cast_util and the casters using it) depend on @protobuf//python targets that need @system_python, which isn't visible from the resolved protobuf ("No repository visible as '@system_python' from repository '@@protobuf+'")
+qoi
+quickjs-ng
+quill
+rapidyaml
+  --deleted_packages=ext/c4core/src/c4/ext/fast_float,ext/c4core/src/c4/ext/fast_float/tests  (not an exclusion: //... fails on a broken package even when subtracted) a vendored fast_float copy whose BUILD files call native cc rules and use //:fast_float and @doctest, which only resolve in fast_float's own workspace
+roaring
+ruy
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: ruy/BUILD and ruy/profiler/BUILD call native cc_* rules without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+  known-failing build  with those autoloads, ruy/block_map.cc (which nearly every target depends on) fails to compile: "'numeric_limits' is not a member of 'std'" (it doesn't include <limits>)
+rules_jsonnet
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed (go/private/rules/binary.bzl)
+  known-failing build  with rules_go 0.65.0, gazelle's go_repository_tools fails: "go.work requires go >= 1.24.12 (running go 1.23.7; GOTOOLCHAIN=local)" (its Go SDK is too old)
+rules_haskell
+  known-failing build  its resolved rules_nixpkgs_core's util.bzl loads get_cpu_value from @bazel_tools//tools/cpp:lib_cc_configure.bzl, which Bazel 9 no longer has; its own haskell/*.bzl also use the removed native CcInfo/CcSharedLibraryInfo
