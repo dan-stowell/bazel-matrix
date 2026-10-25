@@ -224,7 +224,7 @@ rules_cc_autoconf
   -//gnulib/tests/compat/vsprintf-posix:vsprintf-posix_test_gnu_conformance  GNU autoconf and Bazel disagree on config.h/subst.h on the executors
   --output_groups=-py_ruff_checks  its .bazelrc adds a ruff aspect on every py target and EXE002 (executable without a shebang) fails on dozens (//autoconf/tests:diff_tester, //tools/convert:*_test, ...); excluding them would drop their tests, this drops only ruff
 rules_multitool
-  -//:buildifier.test  buildifier_prebuilt's runner does `$(readlink <buildifier runfile>)` under set -e; RBE stages runfiles as regular files, so readlink exits 1 silently
+  --strategy=TestRunner=local  //:buildifier.test (buildifier_prebuilt's runner) does `$(readlink <buildifier runfile>)` under set -e, and RBE stages runfiles as regular files, so readlink exits 1 silently; run tests on the runner, where runfiles are symlinks
 rules_python
   -//tests/integration:bzlmod_lockfile_test_bazel_9.1.0  MODULE.bazel.lock is out of date
   -//tests/integration:runtime_manifests_test_bazel_7.7.0  the nested Bazel's //:basic_test fails in 0.3s (exit 1) and the nested Bazel prints none of its output
@@ -232,10 +232,8 @@ rules_python
   -//tests/integration:runtime_manifests_test_bazel_9.1.0  the nested Bazel's //:basic_test fails in 0.3s (exit 1) and the nested Bazel prints none of its output
   -//tests/integration:runtime_manifests_test_bazel_self  the nested Bazel's //:basic_test fails in 0.3s (exit 1) and the nested Bazel prints none of its output
 tar.bzl
-  -//tar/tests:test_17_after_processing  symlinks reach the tar action as regular files under RBE: the listing has -rwx where the expected one has a symlink
-  -//tar/tests:test23_symlink_out_to_external_repo  symlinks reach the tar action as regular files under RBE: the listing has -rwx where the expected one has a symlink
-  -//tar/tests:test24_symlink_within_external_repo  symlinks reach the tar action as regular files under RBE: the listing has -rwx where the expected one has a symlink
-  -//tar/tests:test25_source_tree_symlink  symlinks reach the tar action as regular files under RBE: the listing has -rwx where the expected one has a symlink
+  --spawn_strategy=local  test_17_after_processing and test23-25 need symlinks kept in action inputs (preserve_symlinks readlinks them): they fail under RBE (symlinks staged as regular files) and under linux-sandbox, pass with local
+  --noremote_accept_cached  with --spawn_strategy=local: don't reuse outputs that remote execution produced for the same action keys
 toolchains_llvm
   -//utils:extra_distributions_test  utils/extra_distributions.sh needs jq, which the executor image lacks
 
@@ -280,7 +278,7 @@ glib
   -//glib/tests:gdatetime  test_GDateTime_equal: 'tz' should not be NULL (needs tzdata, which the executor image lacks)
   -//glib/tests:utils-isolated  test_cleanup_handles_errors chmods the runtime dir to 0 so cleanup can't delete it, but the executors run tests as root: cleanup deletes it and g_chmod (runtime_dir, 0755) fails with ENOENT
 gz-utils
-  -//:buildifier.test  buildifier_prebuilt's runner does `$(readlink <buildifier runfile>)` under set -e; RBE stages runfiles as regular files, so readlink exits 1 silently
+  --strategy=TestRunner=local  //:buildifier.test (buildifier_prebuilt's runner) does `$(readlink <buildifier runfile>)` under set -e, and RBE stages runfiles as regular files, so readlink exits 1 silently; run tests on the runner, where runfiles are symlinks
 jq.bzl
 hermetic_launcher
   known-failing build  its MODULE.bazel overrides xz with patch //patches:xz-s390x-support.patch, but the release archive has no patches package
@@ -311,3 +309,32 @@ harfbuzz
 libxext
   override libx11 1.8.12.bcr.5  its //:xext uses @libx11//:libx11, which the libx11 it declares (1.8.12.bcr.3) doesn't define
 bazelrc-preset.bzl
+
+# Chunk A3: high reverse-dep modules (a-l).
+boost.serialization
+  -//test/...  its select() uses @platforms, which its MODULE.bazel doesn't declare
+boost.thread
+  -//test/...  uses @boost.test and @boost.variant, which its MODULE.bazel doesn't declare
+boost.asio
+  -//test/...  test/BUILD.bazel refers to package //archetypes, which has no BUILD file in the release archive
+boost.regex
+boost.math
+boost.io
+boost.intrusive
+boost.array
+boost.numeric_conversion
+boost.variant
+boost.type_index
+boost.function_types
+gz-math
+  -//:buildifier.test  buildifier -mode=diff flags MODULE.bazel: the registry's copy (which replaces the archive's) puts compatibility_level before version
+googleapis-rules-registry
+boost.multi_index
+libxfixes
+  override libx11 1.8.12.bcr.5  its //:xfixes uses @libx11//:libx11, which the libx11 it declares (1.8.12.bcr.3) doesn't define
+gz-common
+  -//:buildifier.test  buildifier -mode=diff flags MODULE.bazel: the registry's copy (which replaces the archive's) puts compatibility_level before version
+libzmq
+libwebp
+libexpat
+  -//:expat_tests  tests/basic_tests.c: 'g_bytesScanned' undeclared; tests/runtests.c: assignment of read-only variable 'g_reparseDeferralEnabledDefault'
