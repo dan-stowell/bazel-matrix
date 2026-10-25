@@ -122,7 +122,7 @@ def _rc_drop(rctx, drops):
         seen[rc] = True
         lines, changed = [], False
         for line in rctx.read(rc).split("\n"):
-            words = line.split()
+            words = [w for w in line.replace("\t", " ").replace("\r", " ").split(" ") if w]
             if not words or words[0].startswith("#"):
                 lines.append(line)
                 continue
