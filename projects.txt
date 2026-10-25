@@ -365,3 +365,29 @@ fontconfig
 google_bazel_common
   --deleted_packages=tools/jarjar  tools/jarjar/BUILD calls native sh_binary/sh_test, which Bazel 9 removed
 cairo
+
+# Chunk A5: high reverse-dep modules (a-l).
+boost
+boost.interprocess
+boost.proto
+boost.property_tree
+boost.align
+boost.tokenizer
+boost.format
+boost.dynamic_bitset
+boost.circular_buffer
+boost.atomic
+boost.property_map
+boost.pool
+boost.phoenix
+boost.date_time
+libxrandr
+  override libx11 1.8.12.bcr.5  it uses @libx11//:libx11, which the libx11 it declares (1.8.12.bcr.3) doesn't define
+libxi
+  override libx11 1.8.12.bcr.5  it uses @libx11//:libx11, which the libx11 it declares (1.8.12.bcr.3) doesn't define
+libxcursor
+  override libx11 1.8.12.bcr.5  it uses @libx11//:libx11, which the libx11 it declares (1.8.12.bcr.3) doesn't define
+libxrender
+  override libx11 1.8.12.bcr.5  it uses @libx11//:libx11, which the libx11 it declares (1.8.12.bcr.3) doesn't define
+egl-registry
+download_utils
