@@ -140,7 +140,11 @@ with the first error as the reason: those targets are tagged `manual`, so
 `//...` skips them, but `tools/bb.sh test //<module>:test` still runs them. Prefer exclusions when
 only a few targets fail. A project that needs a different
 inner Bazel gets `bazel <version>` (add the version to
-`tools/versions.bzl` first).
+`tools/versions.bzl` first). A project whose resolved dependency is too
+old for it as the root module gets `override <module> <version>`: sync
+records it in `projects.json` and `tools/sources.bzl` appends a
+`single_version_override()` to its MODULE.bazel (e.g. rules_cc before
+0.2.25 rejects `includes = ["."]` in the main repo's root package).
 
 Only `archive` BCR sources are supported so far; sync skips
 `git_repository` ones.

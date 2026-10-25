@@ -9,6 +9,7 @@
 #   bazel 8.4.2           reason   pin the inner Bazel (see tools/project.bzl)
 #   known-failing build   reason   tag :build and :test manual (the inner build fails)
 #   known-failing test    reason   tag :test manual (only the inner test fails)
+#   override rules_cc 0.2.27  reason  add single_version_override() to its MODULE.bazel
 # A reason is the concrete first error, on one line.
 
 zlib
@@ -68,8 +69,54 @@ glog
   -//:stl_logging_test  uses @com_github_google_googletest, which its MODULE.bazel doesn't declare
   -//:utilities_test  uses @com_github_google_googletest, which its MODULE.bazel doesn't declare
 sqlite3
-  known-failing build  rules_cc rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root"); fine as a dependency
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
 bzip2
-  known-failing build  rules_cc rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root"); fine as a dependency
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
 rules_apple
   known-failing build  needs macOS: its tests compile with /usr/bin/xcrun and need a macOS execution platform
+
+# Chunk 2: more libraries and tooling.
+asio
+aspect_rules_ts
+bazel_worker_api
+boost.assert
+boost.config
+  -//test/...  uses @platforms, which its MODULE.bazel doesn't declare
+boost.core
+boost.type_traits
+brotli
+  -//:dictionary  c/common/dictionary.bin isn't in the release archive
+buildifier_prebuilt
+buildozer
+cmake_configure_file
+cpuinfo
+curl
+fast_float
+  --deleted_packages=tests  tests/BUILD.bazel calls native cc_test, which Bazel 9 removed
+freetype
+  -//bazel_test/...  uses @emoji_font, which its MODULE.bazel doesn't declare
+jsoncpp
+libjpeg_turbo
+libxml2
+libyaml
+magic_enum
+abseil-py
+  -//absl/flags:tests/flags_test  test_method_flagfiles_no_permissions: CantOpenFlagFileError not raised (the executors run tests as root)
+catch2
+  -//tests:catch2_self_test  SelfTest assertions fail on the executors (first: TextFlow.tests.cpp:156; also Generators.tests.cpp:321 "failure to init")
+pybind11_bazel
+  -//examples/basic:basic_pybind_data_test  ModuleNotFoundError: No module named 'basic'
+  -//examples/basic:basic_pybind_deps_test  ModuleNotFoundError: No module named 'basic'
+libuv
+  known-failing test  //:tests: "The libuv test suite cannot be run as root" (the executors run tests as root); //:benchmarks times out (300s)
+xxhash
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = [""]` when it is the main repo ("resolves to the workspace root")
+eigen
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+c-ares
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+libffi
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+highway
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+  -//:topology_test  aborts on the executors: topology.cc:590 "Assert lp <= max_lp" (3 logical CPUs on a 128-core EPYC host)

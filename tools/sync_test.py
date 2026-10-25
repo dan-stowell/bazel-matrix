@@ -24,6 +24,15 @@ class ParseProjectsTxtTest(unittest.TestCase):
         self.assertEqual(re2["flags"], [("--copt=-w", "noisy warnings")])
         self.assertEqual(re2["bazel"], ("8.4.2", "needs Bazel 8"))
 
+    def test_override(self):
+        p = sync.parse_projects_txt("m\n  override rules_cc 0.2.27  drops the root includes check\n")[0]
+        self.assertEqual(p["overrides"], [("rules_cc", "0.2.27", "drops the root includes check")])
+        self.assertEqual(sync.module_append(p["overrides"]),
+                         '\n# bazel-matrix: drops the root includes check\n'
+                         'single_version_override(module_name = "rules_cc", version = "0.2.27")\n')
+        with self.assertRaises(ValueError):
+            sync.parse_projects_txt("m\n  override rules_cc 0.2.27\n")
+
     def test_known_failing(self):
         projects = sync.parse_projects_txt(
             "a\n  known-failing build  no Bazel 9: native.cc_library\nb\n  known-failing test  x y\nc\n")
