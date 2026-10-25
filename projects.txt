@@ -1585,3 +1585,77 @@ rules_sh
 rules_shellspec
   --lockfile_mode=off  its MODULE.bazel.lock has a version Bazel 9.3.1 doesn't support ("The version of MODULE.bazel.lock is not supported")
   known-failing build  its resolved gazelle and aspect_rules_lint load toolchain code calling rule(incompatible_use_toolchain_transition=...), which Bazel 9 removed, and its rules_go uses the removed native CcInfo
+# Chunk e-1: well-known BCR modules (a-f).
+ada-url
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+  --cxxopt=-std=c++20  ada.h uses std::endian (C++20), and the default is C++17
+  --host_cxxopt=-std=c++20  ada.h uses std::endian (C++20), and the default is C++17
+  known-failing build  ada.h's constexpr url::get_pathname() converts std::string to string_view in a constant expression, which needs constexpr std::string (libstdc++ 12+); the image's gcc uses libstdc++ 11 (3.4.4 fails the same way)
+argparse
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: BUILD.bazel and test/BUILD.bazel call native cc_library without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+au
+  known-failing build  its registered gcc_12 toolchain fails to load: gcc_toolchain 0.9.0's toolchain/cc_toolchain_config.bzl passes None in rule(provides=...) under Bazel 9, and au pins and patches gcc_toolchain (and toolchains_llvm 1.5.0, whose llvm repos call native cc_import) with its own single_version_override, so neither can be overridden here
+aws-lc
+  --deleted_packages=third_party/googletest/test  the vendored googletest's own test package loads @rules_python, which aws-lc's MODULE.bazel doesn't declare
+backward-cpp
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+c4core
+  --deleted_packages=src/c4/ext/fast_float/tests  the vendored fast_float's own tests use //:fast_float and @doctest, which c4core doesn't define or declare
+cctz
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD calls native cc_library without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+  override rules_foreign_cc 0.16.0  the resolved rules_foreign_cc passes rule(incompatible_use_toolchain_transition) and uses the native CcInfo, both removed in Bazel 9
+  -//:time_zone_lookup_test  needs tzdata (/usr/share/zoneinfo), which the executor image lacks: America/New_York loads as UTC
+  -//:time_zone_format_test  needs tzdata, which the executor image lacks
+cel-cpp
+  override aspect_bazel_lib 2.22.5  the resolved aspect_bazel_lib's toolchain repos call rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
+  override aspect_rules_esbuild 0.27.1  the resolved aspect_rules_esbuild's esbuild/private/resolved_toolchain.bzl calls rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
+  --incompatible_autoload_externally=+@rules_cc,+@com_google_protobuf  its dep cel-spec's proto/cel/expr/conformance/test/BUILD.bazel calls native proto_library/cc_proto_library/java_proto_library, which Bazel 9 removed; autoload them
+  -//conformance:all  its 64 non-dashboard conformance tests fail only with "Invalid timezone": they need tzdata, which the executor image lacks (the 24 dashboard variants left out with them ignore failures; //conformance/policy is kept)
+  -//eval/public:builtin_func_test  TestTimestampFunctionsWithTimeZone needs tzdata, which the executor image lacks
+  -//eval/public:extension_func_test  aborts (exit 134) in TestGetDate and TestGetTimeOfDay (it passes with those filtered out): they evaluate in America/Los_Angeles, which needs tzdata, then call TimestampOrDie()/MessageOrDie() on the error result
+cereal
+ceres-solver
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD (via bazel/ceres.bzl) and examples/BUILD call native cc_library/cc_binary without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+  override rules_foreign_cc 0.16.0  the resolved rules_foreign_cc passes rule(incompatible_use_toolchain_transition) and uses the native CcInfo, both removed in Bazel 9
+  override eigen 3.4.0.bcr.3  eigen 3.4.0's gitlab.com archive no longer matches its BCR integrity ("Checksum was ..."); 3.4.0.bcr.3 fetches the same release from github.com/eigen-mirror
+check
+cjson
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+civetweb
+cli11
+concurrentqueue
+cpp-peglib
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+cppunit
+cpptrace
+  --deleted_packages=test  test/ is a separate workspace (test/MODULE.bazel, the BCR presubmit module) using @cpptrace and @googletest, which the root MODULE.bazel doesn't declare
+  --incompatible_autoload_externally=+@rules_cc  its deps libdwarf and libunwind call native cc_test, which Bazel 9 removed; autoload them from rules_cc
+cpr
+crc32c
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel calls native cc_library without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+crowcpp
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: BUILD.bazel and tests/ssl/BUILD.bazel call native cc_library/cc_test without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+csv-parser
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: BUILD.bazel and single_include_test/BUILD.bazel call native cc_library/cc_binary without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+dav1d
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+double-conversion
+emboss
+exprtk
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel calls native cc_test without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = [""]` when it is the main repo ("resolves to the workspace root")
+fast_double_parser
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel calls native cc_library without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+fkyaml
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel calls native cc_library without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+ftxui
+fzf
