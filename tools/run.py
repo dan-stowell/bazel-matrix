@@ -11,7 +11,7 @@ Each shard is one `tools/bb.sh <command> //<m>:<command> ...` on its own
 runner (concurrent remote runs get separate runners). Projects are dealt to
 shards round-robin in name order. It prints each shard's invocation links as
 it finishes, then one row per project and the totals; the logs are in
-bb-out/run/. Exit status 0 when every project passed.
+bb-out/run/<command>-<time>-<pid>/. Exit status 0 when every project passed.
 
 Without project names it skips the projects that projects.txt marks
 known-failing for the command (known-failing build: both; known-failing
@@ -39,7 +39,8 @@ _STREAM = re.compile(r"Streaming build results to: (\S+/invocation/[0-9a-f-]+)")
 _TEST = re.compile(r"^(//[^:\s]+:test)\s+(?:\(cached\)\s+)?"
                    r"(PASSED|FAILED TO BUILD|FAILED|TIMEOUT|FLAKY|NO STATUS|INCOMPLETE|"
                    r"REMOTE FAILURE|SKIPPED)\b")
-_BUILD_ERROR = re.compile(r"^ERROR: (?:\S*/)?([^/\s]+)/BUILD\.bazel:\d+:\d+: ")
+# With --show_result (see run_shard), Bazel reports every top-level target.
+_BUILD_RESULT = re.compile(r"^Target //([^:\s]+):build (up-to-date|failed to build)")
 
 
 def select_projects(projects, command, names, known_failing):
@@ -83,21 +84,12 @@ def parse_log(text, command, names):
             if m:
                 status[m.group(1)[2:].split(":")[0]] = m.group(2)
         else:
-            m = _BUILD_ERROR.match(line)
+            m = _BUILD_RESULT.match(line)
             if m:
-                status[m.group(1)] = "FAILED"
+                status[m.group(1)] = "PASSED" if m.group(2) == "up-to-date" else "FAILED"
     status = {n: s for n, s in status.items() if n in names}
-    failed_found = bool(status)
     for n in names:
-        if n in status:
-            continue
-        if command == "build" and code == 0:
-            status[n] = "PASSED"
-        elif command == "build" and code == 1 and failed_found:
-            # --keep_going: the projects not reported as failed built.
-            status[n] = "PASSED"
-        else:
-            status[n] = "UNKNOWN"
+        status.setdefault(n, "UNKNOWN")
     return code, links[0] if links else "", status
 
 
@@ -105,10 +97,11 @@ def run_shard(i, command, names, extra, out_dir):
     targets = ["//%s:%s" % (n, command) for n in names]
     if not targets:
         raise ValueError("shard %d is empty" % i)
-    log_path = os.path.join(out_dir, "%s-%d.log" % (command, i))
-    id_path = os.path.join(out_dir, "%s-%d.id" % (command, i))
-    if os.path.exists(id_path):
-        os.remove(id_path)
+    log_path = os.path.join(out_dir, "%d.log" % i)
+    id_path = os.path.join(out_dir, "%d.id" % i)
+    if command == "build":
+        # A result line per target, so passes are reported, not inferred.
+        extra = ["--show_result=1000000"] + extra
     start = time.time()
     with open(log_path, "w") as log:
         proc = subprocess.run([os.path.join(ROOT, "tools", "bb.sh"), "--invocation_id_file=" + id_path,
@@ -149,11 +142,10 @@ def main(argv=None):
     if not names:
         sys.exit("no projects to run")
     shards = shard(names, args.shards)
-    out_dir = os.path.join(ROOT, "bb-out", "run")
-    os.makedirs(out_dir, exist_ok=True)
-    for f in os.listdir(out_dir):
-        if f.startswith(args.command + "-"):
-            os.remove(os.path.join(out_dir, f))  # a previous run's shards
+    # Its own dir, so concurrent runs don't share logs.
+    out_dir = os.path.join(ROOT, "bb-out", "run", "%s-%s-%d" % (
+        args.command, time.strftime("%Y%m%d-%H%M%S"), os.getpid()))
+    os.makedirs(out_dir)
     print("%s: %d projects in %d shards; logs in %s" % (args.command, len(names), len(shards),
                                                         os.path.relpath(out_dir)), flush=True)
     start = time.time()

@@ -37,17 +37,16 @@ class ParseLogTest(unittest.TestCase):
 
     def test_build(self):
         log = "\n".join([
-            "ERROR: /root/workspace/repo-root/re2/BUILD.bazel:5:8: Building re2 with inner Bazel 9.3.1 failed: (Exit 1)",
+            "Target //zlib:build up-to-date:",
+            "  bazel-bin/zlib/build.txt",
+            "\x1b[31mTarget //re2:build failed to build\x1b[0m",
             "(command exited with code 1)",
         ])
-        _, _, status = run.parse_log(log, "build", ["zlib", "re2"])
-        self.assertEqual(status, {"zlib": "PASSED", "re2": "FAILED"})
+        _, _, status = run.parse_log(log, "build", ["zlib", "re2", "fmt"])
+        self.assertEqual(status, {"zlib": "PASSED", "re2": "FAILED", "fmt": "UNKNOWN"})
+        # No result line: nothing is known, whatever the exit code.
         _, _, status = run.parse_log("(command exited with code 0)", "build", ["zlib"])
-        self.assertEqual(status, {"zlib": "PASSED"})
-        # A failure that names no project: nothing is known.
-        _, _, status = run.parse_log("(command exited with code 1)", "build", ["zlib", "re2"])
-        self.assertEqual(status, {"zlib": "UNKNOWN", "re2": "UNKNOWN"})
-
+        self.assertEqual(status, {"zlib": "UNKNOWN"})
 
 if __name__ == "__main__":
     unittest.main()
