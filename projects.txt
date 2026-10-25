@@ -713,7 +713,7 @@ cxxopts
 fuzztest
   known-failing build  needs clang: its .bazelrc passes --cxxopt=-Wc++17-compat-pedantic and centipede's build_defs pass -gline-tables-only, which gcc (the images' only compiler) rejects
 gdk-pixbuf
-  -//tests:pixbuf-fail  the executor OOM-kills it: it grew past 62 GB (observed 66.9 GB) decoding its malformed test images
+  -//tests:pixbuf-fail  one test binary feeds every image in tests/test-images/fail to the loaders, and one decoder allocates past the executor's 62 GB limit (observed 66.9 GB, EXECUTOR_OOM_KILL); the killed run leaves no log naming the image
 ghdl
 giflib
   override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
@@ -766,3 +766,49 @@ robin-map
 opentelemetry-proto
   override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed (go/private/rules/cgo.bzl)
   known-failing build  its root package loads @grpc//bazel:cc_grpc_library.bzl, and the resolved grpc's bzl files use the native PyInfo symbol and pass strings as label providers, which Bazel 9 rejects
+
+# Chunk A13: more BCR modules (a-l).
+libfuse
+  known-failing build  the BCR overlay's //:libfuse links liblibfuse.so without lib/fuse_versionscript, so lib/'s .symver aliases have no version node ("version node not found for symbol fuse_new@FUSE_3.1")
+libgd
+libgpiod
+libheif
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+libjxl
+  -//lib:extras/codec_test  reads testdata/ (the libjxl/testdata git submodule), which the release archive lacks
+  -//lib:extras/compressed_icc_test  reads testdata/ (the libjxl/testdata git submodule), which the release archive lacks
+  -//lib:extras/gain_map_test  reads testdata/ (the libjxl/testdata git submodule), which the release archive lacks
+  -//lib:jxl/blending_test  reads testdata/ (the libjxl/testdata git submodule), which the release archive lacks
+  -//lib:jxl/color_management_test  reads testdata/ (the libjxl/testdata git submodule), which the release archive lacks
+  -//lib:jxl/decode_test  reads testdata/ (the libjxl/testdata git submodule), which the release archive lacks
+  -//lib:jxl/encode_test  reads testdata/ (the libjxl/testdata git submodule), which the release archive lacks
+  -//lib:jxl/jxl_test  reads testdata/ (the libjxl/testdata git submodule), which the release archive lacks
+  -//lib:jxl/modular_test  reads testdata/ (the libjxl/testdata git submodule), which the release archive lacks
+  -//lib:jxl/passes_test  reads testdata/ (the libjxl/testdata git submodule), which the release archive lacks
+  -//lib:jxl/patch_dictionary_test  reads testdata/ (the libjxl/testdata git submodule), which the release archive lacks
+  -//lib:jxl/preview_test  reads testdata/ (the libjxl/testdata git submodule), which the release archive lacks
+  -//lib:jxl/render_pipeline/render_pipeline_test  reads testdata/ (the libjxl/testdata git submodule), which the release archive lacks
+  -//lib:jxl/roundtrip_test  reads testdata/ (the libjxl/testdata git submodule), which the release archive lacks
+  -//lib:jxl/speed_tier_test  reads testdata/ (the libjxl/testdata git submodule), which the release archive lacks
+  -//lib:jxl/splines_test  reads testdata/ (the libjxl/testdata git submodule), which the release archive lacks
+libmdnsd
+libmicrohttpd
+libpaper
+libparserutils
+  known-failing build  its root BUILD.bazel calls native cc_library without a load(), which Bazel 9 removed
+libprotobuf-mutator
+librdkafka
+libsvtav1
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects `includes = ["."]` (//:SvtAv1EncApp) when it is the main repo ("resolves to the workspace root")
+  --deleted_packages=third_party/googletest/test  (not an exclusion: //... fails on a broken package even when subtracted) it loads @rules_python, which its MODULE.bazel doesn't declare
+  -//:libsvtav1_neon  compiles Source/Lib/ASM_NEON, which includes arm_neon.h, on the x86_64 executors
+libthai
+libunibreak
+libusb
+  -//tests:stress_mt_test  enumeration finds the executor's 2 USB devices (via sysfs), but libusb_open on them fails with LIBUSB_ERROR_NO_DEVICE: the sandbox has no /dev/bus/usb nodes for them
+libxcrypt
+libxdamage
+libxtrans
+lunasvg
+lz4-erlang
+  known-failing build  its toolchains/cc_toolchain_config.bzl uses the native CcToolchainConfigInfo, and its root BUILD.bazel calls native cc rules, both removed in Bazel 9
