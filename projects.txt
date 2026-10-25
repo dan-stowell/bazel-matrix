@@ -162,6 +162,9 @@ flatbuffers
   --incompatible_autoload_externally=+@rules_cc  its dev deps (an old re2, via grpc) call native cc_library/cc_test, which Bazel 9 removed; autoload them from rules_cc
   -//reflection/ts/...  flatc's TypeScript genrules exit 1 after warning that --ts-flat-files is deprecated
   -//tests/ts/...  flatc's TypeScript genrules exit 1 after warning that --ts-flat-files is deprecated
+  -//tests:monster_test_grpc  tests/monster_test.grpc.fb.h doesn't compile against the resolved grpc: MonsterStorage::CallbackService 'does not name a class'
+  -//tests:test_builder  needs //tests:monster_test_grpc (above)
+  -//grpc/tests/...  tests/monster_test.grpc.fb.h doesn't compile against the resolved grpc: MonsterStorage::CallbackService 'does not name a class'
 abseil-py
 c-ares
   known-failing build  rules_cc rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root"); fine as a dependency
