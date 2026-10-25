@@ -7,10 +7,6 @@ project(
     targets = [
         "//...",
     ],
-    flags = [
-        # they call native cc_binary/cc_library/sh_test, which Bazel 9 removed
-        "--deleted_packages=src/python/grpcio_observability/grpc_observability,test/distrib/bazel/cpp,test/cpp/interop,tools/artifact_gen,tools/distrib/python/grpcio_tools,third_party/toolchains/rbe_ubuntu2004_bazel7/cc,examples/cpp/error_handling,examples/cpp/orca,examples/cpp/retry,examples/cpp/compression,examples/cpp/generic_api,examples/cpp/csm,examples/cpp/csm/observability,examples/cpp/multiplex,examples/cpp/cancellation,examples/cpp/otel,examples/cpp/otel/codelab,examples/cpp/otel/ostream,examples/cpp/error_details,examples/cpp/unix_abstract_sockets,examples/cpp/metadata,examples/cpp/load_balancing,examples/cpp/interceptors,examples/cpp/wait_for_ready,examples/cpp/keepalive,examples/cpp/systemd_socket_activation,examples/cpp/flow_control,examples/cpp/helloworld,examples/cpp/health,examples/cpp/deadline,examples/cpp/debugging,examples/cpp/default_event_engine,examples/cpp/auth,examples/cpp/xds,examples/cpp/reflection,examples/cpp/route_guide,examples/cpp/gcp_observability/helloworld",
-        # its dev deps (opentelemetry-cpp) call native cc_library/cc_test, which Bazel 9 removed; autoload them from rules_cc
-        "--incompatible_autoload_externally=+@rules_cc",
-    ],
+    # dozens of packages call rules Bazel 9 removed (native cc_binary in examples/cpp/*, objc_library in third_party/objective_c, rule() configs in third_party/toolchains)
+    known_failing = "build",
 )

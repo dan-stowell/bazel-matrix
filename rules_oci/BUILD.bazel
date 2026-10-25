@@ -7,8 +7,6 @@ project(
     targets = [
         "//...",
     ],
-    flags = [
-        # they call native sh_test, which Bazel 9 removed
-        "--deleted_packages=examples/push,examples/attest,examples/sign,examples/assertion,examples/assertion/sign_external,examples/assertion/attest_external",
-    ],
+    # its rules_go dependency uses the native CcInfo symbol, which Bazel 9 removed
+    known_failing = "build",
 )

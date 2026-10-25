@@ -56,6 +56,7 @@ rules_rust
 rules_swift
   -//test/...  test/fixtures/module_interface (used across //test) needs swiftc, which can't load libswiftCore.so on the executors
 rules_jvm_external
+  known-failing build  needs an Android SDK: @androidsdk//:aapt2 and friends are undeclared without one
 aspect_rules_js
 buildifier_prebuilt
 rules_nodejs
@@ -90,8 +91,9 @@ rules_scala
   --lockfile_mode=off  its MODULE.bazel.lock has a version Bazel 9 can't read
   -//test/...  tests take //:.bazelversion as data, which the release archive lacks
   -//manual_test/...  tests take //:.bazelversion as data, which the release archive lacks
+  -//test_thirdparty_version/...  tests take //:.bazelversion as data, which the release archive lacks
 rules_oci
-  --deleted_packages=examples/push,examples/attest,examples/sign,examples/assertion,examples/assertion/sign_external,examples/assertion/attest_external  they call native sh_test, which Bazel 9 removed
+  known-failing build  its rules_go dependency uses the native CcInfo symbol, which Bazel 9 removed
 rules_testing
 toolchains_llvm
 rules_fuzzing
@@ -112,8 +114,7 @@ googletest
 openssl
 boringssl
 grpc
-  --deleted_packages=src/python/grpcio_observability/grpc_observability,test/distrib/bazel/cpp,test/cpp/interop,tools/artifact_gen,tools/distrib/python/grpcio_tools,third_party/toolchains/rbe_ubuntu2004_bazel7/cc,examples/cpp/error_handling,examples/cpp/orca,examples/cpp/retry,examples/cpp/compression,examples/cpp/generic_api,examples/cpp/csm,examples/cpp/csm/observability,examples/cpp/multiplex,examples/cpp/cancellation,examples/cpp/otel,examples/cpp/otel/codelab,examples/cpp/otel/ostream,examples/cpp/error_details,examples/cpp/unix_abstract_sockets,examples/cpp/metadata,examples/cpp/load_balancing,examples/cpp/interceptors,examples/cpp/wait_for_ready,examples/cpp/keepalive,examples/cpp/systemd_socket_activation,examples/cpp/flow_control,examples/cpp/helloworld,examples/cpp/health,examples/cpp/deadline,examples/cpp/debugging,examples/cpp/default_event_engine,examples/cpp/auth,examples/cpp/xds,examples/cpp/reflection,examples/cpp/route_guide,examples/cpp/gcp_observability/helloworld  they call native cc_binary/cc_library/sh_test, which Bazel 9 removed
-  --incompatible_autoload_externally=+@rules_cc  its dev deps (opentelemetry-cpp) call native cc_library/cc_test, which Bazel 9 removed; autoload them from rules_cc
+  known-failing build  dozens of packages call rules Bazel 9 removed (native cc_binary in examples/cpp/*, objc_library in third_party/objective_c, rule() configs in third_party/toolchains)
 eigen
   known-failing build  rules_cc rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root"); fine as a dependency
 zstd
@@ -159,6 +160,8 @@ spdlog
 flatbuffers
   -//swift/...  no Swift toolchain on Linux here
   --incompatible_autoload_externally=+@rules_cc  its dev deps (an old re2, via grpc) call native cc_library/cc_test, which Bazel 9 removed; autoload them from rules_cc
+  -//reflection/ts/...  flatc's TypeScript genrules exit 1 after warning that --ts-flat-files is deprecated
+  -//tests/ts/...  flatc's TypeScript genrules exit 1 after warning that --ts-flat-files is deprecated
 abseil-py
 c-ares
   known-failing build  rules_cc rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root"); fine as a dependency
@@ -178,9 +181,9 @@ magic_enum
 cpuinfo
 libuv
 opentelemetry-cpp
-  -//opentracing-shim/...  its dependency opentracing-cpp calls native cc_library, which Bazel 9 removed
+  known-failing build  its deps opentracing-cpp and prometheus-cpp call native cc_library, which Bazel 9 removed
 protoc-gen-validate
-  --deleted_packages=tests/harness/executor,example-workspace,example-workspace/foo  they call native sh_test/cc_binary/cc_test, which Bazel 9 removed (example-workspace is a separate workspace)
+  known-failing build  its re2 dependency calls native cc_library (removed in Bazel 9), and java targets need WORKSPACE repos (@com_google_guava)
 fast_float
   --deleted_packages=tests  tests/BUILD.bazel calls native cc_test, which Bazel 9 removed
 onetbb

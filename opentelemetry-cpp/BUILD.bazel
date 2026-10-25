@@ -6,7 +6,7 @@ project(
     name = "opentelemetry-cpp",
     targets = [
         "//...",
-        # its dependency opentracing-cpp calls native cc_library, which Bazel 9 removed
-        "-//opentracing-shim/...",
     ],
+    # its deps opentracing-cpp and prometheus-cpp call native cc_library, which Bazel 9 removed
+    known_failing = "build",
 )

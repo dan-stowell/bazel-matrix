@@ -10,6 +10,8 @@ project(
         "-//test/...",
         # tests take //:.bazelversion as data, which the release archive lacks
         "-//manual_test/...",
+        # tests take //:.bazelversion as data, which the release archive lacks
+        "-//test_thirdparty_version/...",
     ],
     flags = [
         # its MODULE.bazel.lock has a version Bazel 9 can't read

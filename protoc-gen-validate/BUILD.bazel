@@ -7,8 +7,6 @@ project(
     targets = [
         "//...",
     ],
-    flags = [
-        # they call native sh_test/cc_binary/cc_test, which Bazel 9 removed (example-workspace is a separate workspace)
-        "--deleted_packages=tests/harness/executor,example-workspace,example-workspace/foo",
-    ],
+    # its re2 dependency calls native cc_library (removed in Bazel 9), and java targets need WORKSPACE repos (@com_google_guava)
+    known_failing = "build",
 )

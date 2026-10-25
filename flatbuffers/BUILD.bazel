@@ -8,6 +8,10 @@ project(
         "//...",
         # no Swift toolchain on Linux here
         "-//swift/...",
+        # flatc's TypeScript genrules exit 1 after warning that --ts-flat-files is deprecated
+        "-//reflection/ts/...",
+        # flatc's TypeScript genrules exit 1 after warning that --ts-flat-files is deprecated
+        "-//tests/ts/...",
     ],
     flags = [
         # its dev deps (an old re2, via grpc) call native cc_library/cc_test, which Bazel 9 removed; autoload them from rules_cc
