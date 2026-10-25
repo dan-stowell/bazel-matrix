@@ -1273,7 +1273,7 @@ open62541
 opencensus-proto
   --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its opencensus/proto/... BUILD files call native cc_proto_library without a load()
   --incompatible_autoload_externally=+@rules_cc,+@com_google_protobuf  autoload the cc and proto rules Bazel 9 removed
-  known-failing build  with those autoloads, its packages load the resolved grpc's bazel/cc_grpc_library.bzl, whose generate_cc.bzl fails under Bazel 9 ("Error in label: at index 0 of providers, got element of type string, want sequence"), and its go_proto_library targets use @com_github_golang_protobuf, which its MODULE.bazel doesn't declare
+  known-failing build  with those autoloads, its packages load the resolved grpc's bazel/cc_grpc_library.bzl, whose generate_cc.bzl passes a string where attr.label(providers=...) needs a list of providers, which Bazel 9 rejects ("Error in label: at index 0 of providers, got element of type string, want sequence"): its proto packages (e.g. opencensus/proto/agent/trace/v1) load it, and its go_proto_library targets use @com_github_golang_protobuf, which its MODULE.bazel doesn't declare
 opentracing-cpp
   -//mocktracer/test:json_test  its vendored Catch2 (3rd_party/include/opentracing/catch2/catch.hpp) sizes a static array with MINSIGSTKSZ, which glibc 2.34+ no longer defines as a constant ("size of array 'altStackMem' is not an integral constant-expression")
   -//mocktracer/test:propagation_test  its vendored Catch2 (3rd_party/include/opentracing/catch2/catch.hpp) sizes a static array with MINSIGSTKSZ, which glibc 2.34+ no longer defines as a constant ("size of array 'altStackMem' is not an integral constant-expression")
@@ -1311,4 +1311,4 @@ rules_mypy
 rules_tar
   override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed
   override aspect_bazel_lib 2.22.5  the resolved aspect_bazel_lib's toolchain repos call rule(incompatible_use_toolchain_transition=...), which Bazel 9 removed; registering them breaks toolchain resolution for every target
-  override hermetic_cc_toolchain 4.3.0  the resolved hermetic_cc_toolchain's toolchain/private/cc_toolchains.bzl fails to load under Bazel 9 ("at index 0 of provides, got element of type NoneType": a removed native provider)
+  override hermetic_cc_toolchain 4.3.0  the resolved hermetic_cc_toolchain's toolchain/private/cc_toolchains.bzl fails to load under Bazel 9: a rule() there gets None in provides ("at index 0 of provides, got element of type NoneType, want Provider")
