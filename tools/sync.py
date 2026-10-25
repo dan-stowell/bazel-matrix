@@ -172,8 +172,29 @@ def integrity(data):
     return "sha256-" + base64.b64encode(hashlib.sha256(data).digest()).decode()
 
 
-def module_append(overrides):
-    """Lines appended to a project's MODULE.bazel for its `override` lines."""
+_OVERRIDE_CALL = re.compile(
+    r"\b(single_version|multiple_version|archive|git|local_path)_override\s*\(([^)]*)\)", re.S)
+
+
+def module_append(overrides, module_text):
+    """Lines appended to a project's MODULE.bazel for its `override` lines.
+
+    Raises ValueError when projects.txt overrides a module twice, or when
+    the registry's MODULE.bazel already overrides it (a second override is
+    an error in Bazel) or include()s files sync can't see.
+    """
+    modules = [m for m, _, _ in overrides]
+    twice = sorted({m for m in modules if modules.count(m) > 1})
+    if twice:
+        raise ValueError("override listed twice for " + ", ".join(twice))
+    text = re.sub(r"#[^\n]*", "", module_text)
+    if re.search(r"\binclude\s*\(", text):
+        raise ValueError("its MODULE.bazel include()s other files, which may already "
+                         "override; sync can't check them")
+    for kind, args in _OVERRIDE_CALL.findall(text):
+        name = re.search(r"module_name\s*=\s*[\"']([^\"']+)", args)
+        if name and name.group(1) in modules:
+            raise ValueError("its MODULE.bazel already has %s_override for %s" % (kind, name.group(1)))
     return "".join("\n# bazel-matrix: %s\nsingle_version_override(module_name = %s, version = %s)\n"
                    % (reason, _q(m), _q(v)) for m, v, reason in overrides)
 
@@ -354,11 +375,16 @@ def main():
             continue
         try:
             entry = source_entry(p["name"], version, source, module_file)
-            if p["overrides"]:
-                entry["module_append"] = module_append(p["overrides"])
         except ValueError as e:
             skipped.append({"name": p["name"], "reason": str(e)})
             continue
+        if p["overrides"]:
+            try:
+                entry["module_append"] = module_append(
+                    p["overrides"], module_file.decode("utf-8", "replace"))
+            except ValueError as e:
+                errors.append("%s: override: %s" % (p["name"], e))
+                continue
         entries.append({"name": p["name"], "version": version, "source": entry})
     if errors:
         sys.exit("sync failed:\n  " + "\n  ".join(errors))
