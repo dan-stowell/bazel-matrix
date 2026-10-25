@@ -6,15 +6,7 @@ project(
     name = "opencv",
     targets = [
         "//...",
-        # its failing cases need OpenCV's separate opencv_extra test data, which the module doesn't provide ("Can't find required data file", then assertions on empty images)
-        "-//:dnn_test",
-        # its failing cases need OpenCV's separate opencv_extra test data, which the module doesn't provide ("Can't find required data file", then assertions on empty images)
-        "-//:stereo_test",
-        # its failing cases need OpenCV's separate opencv_extra test data, which the module doesn't provide ("Can't find required data file", then assertions on empty images)
-        "-//:stitching_test",
-        # its failing cases need OpenCV's separate opencv_extra test data, which the module doesn't provide ("Can't find required data file", then assertions on empty images)
-        "-//:video_test",
     ],
-    # its remaining tests are killed by SIGSEGV on the executors (imgcodecs_test in 2 runs, then photo_test once it was excluded: "Remote Execution Failure: ... terminated by SIGSEGV, likely due to a memory issue"), and each crash aborts the whole inner test run; not yet diagnosed
+    # its test suites read OpenCV's separate opencv_extra test data, which the module doesn't provide: dnn, stereo, stitching, video, core, features, geometry, imgproc and objdetect tests fail with "Can't find required data file" (e.g. shared/lena.png), and imgcodecs_test and photo_test are killed by SIGSEGV on the executors, aborting the inner run
     known_failing = "test",
 )
