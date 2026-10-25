@@ -2162,3 +2162,61 @@ rules_syft
   override aspect_bazel_lib 2.22.5  the resolved aspect_bazel_lib's toolchain repos call rule(incompatible_use_toolchain_transition=...), which Bazel 9 removed; registering them breaks toolchain resolution for every target
   known-failing build  with that override, its own syft/private/resolved_toolchain.bzl calls rule(incompatible_use_toolchain_transition=...), which Bazel 9 removed
 rules_shar
+
+# Chunk f-7: more b/c modules.
+bazel_cc_meta
+bazel_ci_rules
+bazel_difftools
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed
+  override rules_nodejs 6.7.7  the resolved rules_nodejs's generated @nodejs_toolchains defs.bzl calls rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
+  override rules_scala 7.4.0  the resolved rules_scala uses the native JavaInfo symbol (scala/private/toolchain_deps/toolchain_deps.bzl), which Bazel 9 removed
+  known-failing build  with these overrides, gazelle's go_repository_tools fails to build: "go: go.work requires go >= 1.24" (the Go SDK it resolves is older)
+bazel_iwyu
+bazel_linux_packages
+  -//e2e/...  the e2e packages use @systemd, @busybox_amd64 and @busybox_arm64, which its MODULE.bazel doesn't declare
+bazel_paq
+bazel_skylib_gazelle_plugin
+  -//bzl:bzl_test  TestGazelleBinary fails with "no tests found": none of the runfiles bazel.ListRunfiles() returns has the short-path prefix bzl/testdata/ it looks for (also when run on the runner, not just on RBE)
+bazel_sonarqube
+  -//examples/...  the examples use @build_bazel_rules_apple and @rules_xcodeproj, which its MODULE.bazel doesn't declare
+  --deleted_packages=examples/java,examples/java/subproject/src/main/java/com/example,examples/java/subproject/src/test/java/com/example,examples/java/subproject-with-separate-sonarqube/src/main/java/com/separate,examples/java/subproject-with-separate-sonarqube/src/test/java/com/separate,examples/java/subproject-with-separate-sonarqube/subsubproject/src/main/java/com/separate/subsubproject,examples/java/subproject-with-separate-sonarqube/subsubproject/src/test/java/com/separate/subsubproject,examples/swift,examples/swift/app,examples/swift/modules/API,examples/swift/modules/Models  (not an exclusion: //... fails on a broken package even when subtracted) examples/java globs '.git/**', which isn't in the archive; the example java_library/java_test targets pass attributes Bazel 9's rules_java rejects (timeout = '', "no such attribute"); examples/swift loads @rules_xcodeproj and @build_bazel_rules_apple, which its MODULE.bazel doesn't declare
+  -//docs/...  //docs:docs.extract needs bzl_library targets for @rules_java//java:defs.bzl, which nothing provides ("missing bzl_library targets for Starlark module(s) @rules_java//java:defs.bzl")
+bazelpods
+  known-failing build  its targets go through rules_apple's transition, whose inputs include //command_line_option:apple_crosstool_top, which Bazel 9 removed ("do not correspond to valid settings")
+behaviortree_ros2
+  known-failing build  the com_github_mvukov_rules_ros2 it resolves uses the native CcInfo symbol (ros2/interfaces.bzl), which Bazel 9 removed
+build_stack_scala_gazelle
+  override rules_nodejs 6.7.7  the resolved rules_nodejs's generated @nodejs_toolchains defs.bzl calls rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
+  -//docs/architecture/...  plantuml fails without fonts on the executor ("Fontconfig head is null, check your fonts or fonts configuration")
+  -//:filegroup  includes the //docs/architecture diagrams (excluded above)
+  -//blaze/worker:worker_protocol_go_compiled_sources_test  compares the checked-in .pb.go files with freshly generated ones, whose header names the resolved protoc (v6.33.4) instead of the v6.32.1 they were generated with ("gencopy mismatch")
+  -//build/stack/gazelle/scala/autokeep:autokeep_go_compiled_sources_test  same: checked-in .pb.go header names protoc v6.32.1, the resolved protoc is v6.33.4
+  -//build/stack/gazelle/scala/cache:cache_go_compiled_sources_test  same: checked-in .pb.go header names protoc v6.32.1, the resolved protoc is v6.33.4
+  -//build/stack/gazelle/scala/jarindex:jarindex_go_compiled_sources_test  same: checked-in .pb.go header names protoc v6.32.1, the resolved protoc is v6.33.4
+  -//build/stack/gazelle/scala/parse:parse_go_compiled_sources_test  same: checked-in .pb.go header names protoc v6.32.1, the resolved protoc is v6.33.4
+  -//scala/meta/semanticdb:semanticdb_go_compiled_sources_test  same: checked-in .pb.go header names protoc v6.32.1, the resolved protoc is v6.33.4
+  -//scalapb:scalapb_go_compiled_sources_test  same: checked-in .pb.go header names protoc v6.32.1, the resolved protoc is v6.33.4
+byte_track_eigen
+bzlparty_rules_quickjs
+  known-failing build  its root BUILD.bazel loads @buildifier_prebuilt//:rules.bzl, which its MODULE.bazel doesn't declare ("No repository visible as '@buildifier_prebuilt'")
+  override aspect_bazel_lib 2.22.5  the resolved aspect_bazel_lib's toolchain repos call rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
+  override rules_nodejs 6.7.7  the resolved rules_nodejs's generated @nodejs_toolchains defs.bzl calls rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
+bzlparty_tools
+  known-failing build  its own toolchains/toolchains.bzl:7 calls rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
+bzlws
+  known-failing build  its .bazelrc passes --noincompatible_remove_rule_name_parameter, which Bazel 9 doesn't recognize ("Unrecognized option")
+cargo_env.bzl
+caseyduquettesc_rules_python_pytest
+  override aspect_bazel_lib 2.22.5  the resolved aspect_bazel_lib's toolchain repos call rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed
+  -//docs/...  //docs:rules.extract needs bzl_library targets for @rules_python's py_binary.bzl etc., which nothing provides ("missing bzl_library targets for Starlark module(s)")
+cel-c
+  override aspect_bazel_lib 2.22.5  the resolved aspect_bazel_lib's toolchain repos call rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed
+  override aspect_rules_esbuild 0.27.1  the resolved aspect_rules_esbuild's esbuild/private/resolved_toolchain.bzl calls rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
+  known-failing build  with these overrides, most of //cel-c and //cel-c/internal (84 targets) depend on protobuf targets the resolved protobuf doesn't have ("no such target '@@protobuf+//upb/message:message_unknowns_testonly'", field_mask_upb_reflection_proto)
+circe
+  known-failing build  rules_swift finds no Swift toolchain (no such target '@build_bazel_rules_swift_local_config//:linux-toolchain'): the executor image has no Swift
+claro-lang
+  override aspect_bazel_lib 2.22.5  the resolved aspect_bazel_lib's toolchain repos call rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
+  known-failing build  with that override, its @maven repo (rules_jvm_external) loads @rules_license//rules:package_info.bzl, which isn't visible from it
