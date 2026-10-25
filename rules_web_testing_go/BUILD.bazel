@@ -7,4 +7,6 @@ project(
     targets = [
         "//...",
     ],
+    # its rules_go 0.51.0-rc1 uses CcInfo, which Bazel 9 removed ("The CcInfo symbol has been removed" in go/private/rules/cross.bzl); also //web:go.bzl isn't in the release archive
+    known_failing = "build",
 )

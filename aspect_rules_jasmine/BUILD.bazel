@@ -7,4 +7,6 @@ project(
     targets = [
         "//...",
     ],
+    # its aspect_bazel_lib needs @local_config_platform and calls rule(incompatible_use_toolchain_transition = ...), which Bazel 9 removed; tools/BUILD.bazel calls native sh_binary
+    known_failing = "build",
 )

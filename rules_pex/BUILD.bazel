@@ -7,4 +7,6 @@ project(
     targets = [
         "//...",
     ],
+    # its pex actions fail on the executors: FileNotFoundError for the runfiles path of the entry point (/tmp/bzl-pex-*/runfiles/_main/tests/basic/basic.py)
+    known_failing = "build",
 )

@@ -1620,6 +1620,7 @@ rules_jni
   -//docs/...  //docs:rules.extract (stardoc) fails analysis: missing bzl_library targets for @rules_cc's compatibility proxy modules
 rules_pex
   rc-drop --incompatible_merge_fixed_and_default_shell_env  its .bazelrc sets it, which Bazel 9 no longer recognizes ("Unrecognized option")
+  known-failing build  its pex actions fail on the executors: FileNotFoundError for the runfiles path of the entry point (/tmp/bzl-pex-*/runfiles/_main/tests/basic/basic.py)
 rules_cue
   known-failing build  its CUE actions' runner script joins $PWD with input paths that are already absolute ("stat <execroot>/var/tmp/.../src/test/testdata/injection/injection.cue: no such file", and /buildbuddy-execroot twice on RBE), so every cue_export/cue_def action fails
 rules_kustomize
@@ -1764,6 +1765,7 @@ antlr4-cpp-runtime
 apache_arrow
 aspect_rules_jasmine
   rc-drop --incompatible_remote_results_ignore_disk  .aspect/bazelrc/performance.bazelrc sets it, which Bazel 9 no longer recognizes ("Unrecognized option")
+  known-failing build  its aspect_bazel_lib needs @local_config_platform and calls rule(incompatible_use_toolchain_transition = ...), which Bazel 9 removed; tools/BUILD.bazel calls native sh_binary
 aspect_rules_jest
   -//tools:preset.update_test  tools/preset.bazelrc is out of date for Bazel 9.3.1 (missing its new coverage --build_runfile_links and --experimental_remote_cache_eviction_retries lines)
 aspect_rules_swc
@@ -2747,6 +2749,7 @@ pypackaging.bzl
 # Chunk g-2: BCR modules (r).
 rules_cc_hdrs_map
   rc-drop --incompatible_merge_fixed_and_default_shell_env  .bazelrcs/common.bazelrc sets it, which Bazel 9 no longer recognizes ("Unrecognized option")
+  known-failing build  its aspect_bazel_lib toolchains call rule(incompatible_use_toolchain_transition = ...), which Bazel 9 rejects; cc_hdrs_map/actions/link_to_binary.bzl uses the removed CcSharedLibraryInfo
 rules_cc_resources
   -//example/...  a separate workspace (example/MODULE.bazel, with its own .bazelrc): as a package of the root, main.cpp's #include "example_my_resource.h" doesn't find the header cc_resources generates in bazel-bin/example ("No such file or directory")
 rules_chisel
@@ -2953,6 +2956,7 @@ rules_vunit
 rules_web_e2e
 rules_web_testing_go
   override rules_webtesting 0.4.1  its MODULE.bazel has local_path_override(rules_webtesting, path = ".."), outside the archive's web_testing_go/ (BCR's strip_prefix); use the BCR release instead
+  known-failing build  its rules_go 0.51.0-rc1 uses CcInfo, which Bazel 9 removed ("The CcInfo symbol has been removed" in go/private/rules/cross.bzl); also //web:go.bzl isn't in the release archive
 rules_web_testing_java
   known-failing build  its MODULE.bazel has local_path_override(rules_webtesting, path = ".."): BCR's strip_prefix extracts only this submodule of the rules_webtesting repo, so .. is outside the extracted workspace
 rules_web_testing_python

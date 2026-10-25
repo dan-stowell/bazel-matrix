@@ -7,4 +7,6 @@ project(
     targets = [
         "//...",
     ],
+    # its aspect_bazel_lib toolchains call rule(incompatible_use_toolchain_transition = ...), which Bazel 9 rejects; cc_hdrs_map/actions/link_to_binary.bzl uses the removed CcSharedLibraryInfo
+    known_failing = "build",
 )
