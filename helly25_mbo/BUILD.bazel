@@ -6,7 +6,49 @@ project(
     name = "helly25_mbo",
     targets = [
         "//...",
+        # the images' gcc 13 rejects mbo/types/optional_data_or_ref.h:152/200's `typename = std::enable_if_t<ConstructibleFrom<T, Args...>>` ("type/value mismatch ... expected a constant of type 'bool', got 'T'"), so OptionalDataOrRef has no emplace()/as_data() (its .bazelrc's config:clang builds with LLVM)
+        "-//mbo/types:stringify_cc",
+        # same: uses OptionalDataOrRef (via stringify/extend), which gcc 13 can't compile here
+        "-//mbo/types:stringify_ostream_cc",
+        # same: uses OptionalDataOrRef (via stringify/extend), which gcc 13 can't compile here
+        "-//mbo/types:stringify_test",
+        # same: uses OptionalDataOrRef (via stringify/extend), which gcc 13 can't compile here
+        "-//mbo/types:stringify_ostream_test",
+        # same: uses OptionalDataOrRef (via stringify/extend), which gcc 13 can't compile here
+        "-//mbo/types:optional_data_or_ref_test",
+        # same: uses OptionalDataOrRef (via stringify/extend), which gcc 13 can't compile here
+        "-//mbo/types:no_destruct_test",
+        # same: uses OptionalDataOrRef (via stringify/extend), which gcc 13 can't compile here
+        "-//mbo/types:extend_cc",
+        # same: uses OptionalDataOrRef (via stringify/extend), which gcc 13 can't compile here
+        "-//mbo/types:extender_cc",
+        # same: uses OptionalDataOrRef (via stringify/extend), which gcc 13 can't compile here
+        "-//mbo/types:extend_test",
+        # same: uses OptionalDataOrRef (via stringify/extend), which gcc 13 can't compile here
+        "-//mbo/types:extend_stringify_test",
+        # same: uses OptionalDataOrRef (via stringify/extend), which gcc 13 can't compile here
+        "-//mbo/types/internal:extend_cc",
+        # same: runs the mope tool, which uses OptionalDataOrRef (via stringify)
+        "-//mbo/types/internal:decompose_count_mope",
+        # same: compares the output of the mope tool, which uses OptionalDataOrRef (via stringify)
+        "-//mbo/types/internal:decompose_count_diff_test",
+        # the mope_test macro's test_suite around decompose_count_diff_test (excluded above)
+        "-//mbo/types/internal:decompose_count_test",
+        # same: uses OptionalDataOrRef (via stringify/extend), which gcc 13 can't compile here
+        "-//mbo/file:glob_cc",
+        # same: uses OptionalDataOrRef (via stringify/extend), which gcc 13 can't compile here
+        "-//mbo/file:glob",
+        # same: uses OptionalDataOrRef (via stringify/extend), which gcc 13 can't compile here
+        "-//mbo/file:glob_test",
+        # runs //mbo/file:glob (excluded above)
+        "-//mbo/file:glob_sh_test",
+        # same: uses OptionalDataOrRef (via stringify/extend), which gcc 13 can't compile here
+        "-//mbo/json:json_cc",
+        # same: uses OptionalDataOrRef (via stringify/extend), which gcc 13 can't compile here
+        "-//mbo/json:json",
+        # same: uses OptionalDataOrRef (via stringify/extend), which gcc 13 can't compile here
+        "-//mbo/json:json_test",
+        # mope_cc uses OptionalDataOrRef (as above), and its mope rules default to //:clang-format, which its root BUILD.bazel doesn't define
+        "-//mbo/mope/...",
     ],
-    # the images' gcc 13 rejects mbo/types/optional_data_or_ref.h:152/200's `typename = std::enable_if_t<ConstructibleFrom<T, Args...>>` ("type/value mismatch ... expected a constant of type 'bool', got 'T'"), so emplace()/as_data() don't exist and stringify, extend, file, json and mope (29 targets plus their tests) fail; its .bazelrc's config:clang builds with LLVM. Separately, its mope rules default to //:clang-format, which its root BUILD.bazel doesn't define
-    known_failing = "build",
 )

@@ -1388,12 +1388,22 @@ greatest
   override rules_cc 0.2.27  rules_cc before 0.2.25 rejects //:greatest's `includes = ["."]` when it is the main repo ("resolves to the workspace root")
 grpc-httpjson-transcoding
   override rules_foreign_cc 0.16.0  the resolved rules_foreign_cc 0.9.0 passes rule(incompatible_use_toolchain_transition), which Bazel 9 removed
-  --deleted_packages=perf_benchmark  (not an exclusion: //... fails on a broken package even when subtracted) perf_benchmark/BUILD loads @io_bazel_rules_docker, which its MODULE.bazel doesn't declare
+  --deleted_packages=perf_benchmark,test  (not an exclusion: //... fails on a broken package even when subtracted) perf_benchmark/BUILD loads @io_bazel_rules_docker, which its MODULE.bazel doesn't declare; test/BUILD loads py_proto_library from @com_google_protobuf//:protobuf.bzl, which the resolved protobuf no longer has
   --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its src and test BUILD files call native cc_library/proto_library/cc_proto_library without a load()
   --incompatible_autoload_externally=+@rules_cc,+@com_google_protobuf,+@rules_java  autoload the cc and proto rules Bazel 9 removed, and JavaInfo, which its dep rules_fuzzing's fuzzing/private/engine.bzl uses natively
   --cxxopt=-std=c++17  its .bazelrc sets --cxxopt=-std=c++14, but the resolved abseil-cpp requires C++17 ("C++ versions less than C++17 are not supported")
   --host_cxxopt=-std=c++17  same for the exec configuration: its .bazelrc sets --host_cxxopt=-std=c++14
-  known-failing build  with these, src/message_reader.cc uses google::protobuf::int64 (via its pb alias), which the resolved protobuf no longer defines ("'int64' in namespace 'google::grpc::transcoding::pb' does not name a type")
+  -//src:message_reader  src/message_reader.cc uses google::protobuf::int64 (via its pb alias), which the resolved protobuf no longer defines ("'int64' in namespace 'google::grpc::transcoding::pb' does not name a type")
+  -//src:json_request_translator  depends on //src:message_reader (excluded above)
+  -//src:prefix_writer  depends on //src:message_reader (excluded above)
+  -//src:protobuf  depends on //src:message_reader (excluded above)
+  -//src:request_message_translator  depends on //src:message_reader (excluded above)
+  -//src:request_stream_translator  depends on //src:message_reader (excluded above)
+  -//src:request_weaver  depends on //src:message_reader (excluded above)
+  -//src:response_to_json_translator  depends on //src:message_reader (excluded above)
+  -//src:status_error_listener  depends on //src:message_reader (excluded above)
+  -//src:transcoding  depends on //src:message_reader (excluded above)
+  -//src:type_helper  depends on //src:message_reader (excluded above)
 grpc_kotlin
   override rules_foreign_cc 0.16.0  the resolved rules_foreign_cc passes rule(incompatible_use_toolchain_transition) and uses the native CcInfo, both removed in Bazel 9
   override aspect_bazel_lib 2.22.5  the resolved aspect_bazel_lib's toolchain repos call rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
@@ -1422,7 +1432,28 @@ hashes.bzl
   -//private/utf8:test_utf8  same: starlark_pytest, pytest can't import its plugin bazel.python.starlark_finder
 helly25_bzl
 helly25_mbo
-  known-failing build  the images' gcc 13 rejects mbo/types/optional_data_or_ref.h:152/200's `typename = std::enable_if_t<ConstructibleFrom<T, Args...>>` ("type/value mismatch ... expected a constant of type 'bool', got 'T'"), so emplace()/as_data() don't exist and stringify, extend, file, json and mope (29 targets plus their tests) fail; its .bazelrc's config:clang builds with LLVM. Separately, its mope rules default to //:clang-format, which its root BUILD.bazel doesn't define
+  -//mbo/types:stringify_cc  the images' gcc 13 rejects mbo/types/optional_data_or_ref.h:152/200's `typename = std::enable_if_t<ConstructibleFrom<T, Args...>>` ("type/value mismatch ... expected a constant of type 'bool', got 'T'"), so OptionalDataOrRef has no emplace()/as_data() (its .bazelrc's config:clang builds with LLVM)
+  -//mbo/types:stringify_ostream_cc  same: uses OptionalDataOrRef (via stringify/extend), which gcc 13 can't compile here
+  -//mbo/types:stringify_test  same: uses OptionalDataOrRef (via stringify/extend), which gcc 13 can't compile here
+  -//mbo/types:stringify_ostream_test  same: uses OptionalDataOrRef (via stringify/extend), which gcc 13 can't compile here
+  -//mbo/types:optional_data_or_ref_test  same: uses OptionalDataOrRef (via stringify/extend), which gcc 13 can't compile here
+  -//mbo/types:no_destruct_test  same: uses OptionalDataOrRef (via stringify/extend), which gcc 13 can't compile here
+  -//mbo/types:extend_cc  same: uses OptionalDataOrRef (via stringify/extend), which gcc 13 can't compile here
+  -//mbo/types:extender_cc  same: uses OptionalDataOrRef (via stringify/extend), which gcc 13 can't compile here
+  -//mbo/types:extend_test  same: uses OptionalDataOrRef (via stringify/extend), which gcc 13 can't compile here
+  -//mbo/types:extend_stringify_test  same: uses OptionalDataOrRef (via stringify/extend), which gcc 13 can't compile here
+  -//mbo/types/internal:extend_cc  same: uses OptionalDataOrRef (via stringify/extend), which gcc 13 can't compile here
+  -//mbo/types/internal:decompose_count_mope  same: runs the mope tool, which uses OptionalDataOrRef (via stringify)
+  -//mbo/types/internal:decompose_count_diff_test  same: compares the output of the mope tool, which uses OptionalDataOrRef (via stringify)
+  -//mbo/types/internal:decompose_count_test  the mope_test macro's test_suite around decompose_count_diff_test (excluded above)
+  -//mbo/file:glob_cc  same: uses OptionalDataOrRef (via stringify/extend), which gcc 13 can't compile here
+  -//mbo/file:glob  same: uses OptionalDataOrRef (via stringify/extend), which gcc 13 can't compile here
+  -//mbo/file:glob_test  same: uses OptionalDataOrRef (via stringify/extend), which gcc 13 can't compile here
+  -//mbo/file:glob_sh_test  runs //mbo/file:glob (excluded above)
+  -//mbo/json:json_cc  same: uses OptionalDataOrRef (via stringify/extend), which gcc 13 can't compile here
+  -//mbo/json:json  same: uses OptionalDataOrRef (via stringify/extend), which gcc 13 can't compile here
+  -//mbo/json:json_test  same: uses OptionalDataOrRef (via stringify/extend), which gcc 13 can't compile here
+  -//mbo/mope/...  mope_cc uses OptionalDataOrRef (as above), and its mope rules default to //:clang-format, which its root BUILD.bazel doesn't define
 helly25_proto
 hermetic_clang_toolchain
 hfsm2
@@ -1659,3 +1690,60 @@ fkyaml
   --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
 ftxui
 fzf
+
+# Chunk f-3: more BCR modules (g-l).
+gtk
+gz-sim
+  -//:buildifier.test  buildifier -mode=diff flags MODULE.bazel: the registry's copy (which replaces the archive's) puts compatibility_level before version
+hypothesis
+iceoryx2
+  --incompatible_autoload_externally=+@rules_cc  its dep googletest calls native cc_library, which Bazel 9 removed; autoload it from rules_cc
+  --cxxopt=-std=c++17  its .bazelrc sets build:linux --cxxopt=-std=c++14, but the googletest it resolves requires C++17 ("C++ versions less than C++17 are not supported")
+icestorm
+implot3d
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its BUILD files (root, example) call native cc_library/cc_binary without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed
+  -//example:example  its glfw backend compiles glfw's X11 platform, which needs X11/Xlib.h; the executor image has no X11 headers and no declared dep provides them
+iperf
+jwt_verify_lib
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its BUILD files (root, test/fuzz) call native cc_library/cc_proto_library without a load()
+  --incompatible_autoload_externally=+@rules_cc,+@com_google_protobuf,+@rules_java,+@rules_shell  autoload the cc and proto rules Bazel 9 removed, plus JavaInfo and sh_binary, which its dep rules_fuzzing (fuzzing/private/engine.bzl, fuzzing/tools/BUILD) uses natively
+  -//test/fuzz:all  its fuzz test needs libprotobuf-mutator, whose src/field_instance.h doesn't compile against the resolved protobuf (FieldDescriptor::name() no longer converts to std::string: "could not convert ... FieldDescriptor::name")
+kleidiai
+  known-failing build  its kernels are Arm-only: the x86-64 executors' gcc rejects their -march=armv8-a/armv8.2-a+... flags ("bad value ('armv8.2-a+sve+sve2') for '-march=' switch")
+lanelet2
+  override eigen 3.4.0.bcr.3  the eigen 3.4.0.bcr.1 it declares downloads gitlab.com's 3.4.0 archive, whose checksum no longer matches; 3.4.0.bcr.3 fetches the same release from the GitHub mirror
+  --incompatible_autoload_externally=+@rules_cc  its dep googletest calls native cc_library, which Bazel 9 removed; autoload it from rules_cc
+libass
+libcircllhist
+libevdev
+libhubbub
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel calls native cc_library without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed, also for its dep gperf, whose BUILD.bazel calls native cc_binary
+libigl
+libmodbus
+librealsense
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects //:image_avx's `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+librsvg
+  -//bazel_test/...  a separate workspace (bazel_test/MODULE.bazel) using librsvg as a dependency; run from the root, //bazel_test:svg exits 1 (gdk_pixbuf_loader_new_with_type("svg") finds no svg loader)
+libsais
+libstemmer
+libudev-zero
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects //:libudev-zero's `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+libxcb-keysyms
+libxev
+libyang
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects //:internal_hdrs's `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+  -//:config_headers  its hdrs include the compat_h genrule output compat/compat.h, which lies outside its strip_include_prefix = "src" ("header 'compat/compat.h' is not under the specified strip prefix 'src'")
+linux.bzl
+linuxptp
+lobster
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its BUILD files (support/gtest/include, tests_integration/projects/*, sphinx_lobster) call native cc_library/cc_test/py_library without a load()
+  --incompatible_autoload_externally=+@rules_cc,+@rules_python  autoload the cc and python rules Bazel 9 removed
+  -//tests_integration/projects/cpp_focus:fruit_test  BasketTest.ClearBasket fails by design: this demo's fruit_test.cpp has the clearing loop commented out, then expects fruits_size_ == 0
+  -//tests_integration/projects/basic:traceability  a lobster_test over the basic demo, whose requirements are deliberately incompletely traced (ci_report.reference_output.log expects lobster errors), so it reports missing references and exits 1
+lttng-ust
+lvm2
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects //:devmapper's `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+lzip
