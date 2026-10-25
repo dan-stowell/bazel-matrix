@@ -668,3 +668,36 @@ fizz
   override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
   --cxxopt=-std=c++20  its dep folly needs C++20 (consteval, requires), and the default is C++17
   --host_cxxopt=-std=c++20  its dep folly needs C++20 (consteval, requires), and the default is C++17
+
+# Chunk A11: more high reverse-dep modules (a-l).
+aexml
+  known-failing build  its only target is a swift_library, and rules_swift finds no Swift toolchain on the Linux executors
+aom
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+aspect_rules_esbuild
+azure-identity-cpp
+  --incompatible_autoload_externally=+@rules_cc  its deps googletest and azure-core-cpp call native cc_library/cc_test, which Bazel 9 removed; autoload them from rules_cc
+  --@@curl+//:ssl_lib=openssl  azure-core-cpp's curl transport fails analysis ("must be built with --@curl//:ssl_lib=openssl") under curl's default TLS backend
+azure-storage-blobs-cpp
+  --incompatible_autoload_externally=+@rules_cc  its deps googletest and azure-core-cpp call native cc_library/cc_test, which Bazel 9 removed; autoload them from rules_cc
+  --@@curl+//:ssl_lib=openssl  azure-core-cpp's curl transport fails analysis ("must be built with --@curl//:ssl_lib=openssl") under curl's default TLS backend
+blake3
+  -//c:blake3_internal_neon  compiles blake3_neon.c, which includes arm_neon.h, on the x86_64 executors
+boost.beast
+boost.callable_traits
+boost.compat
+boost.compute
+boost.dll
+boost.geometry
+boost.heap
+  -//test/...  uses @platforms, @boost.container, @boost.foreach and @boost.test, which its MODULE.bazel doesn't declare
+boost.lockfree
+  -//test/...  uses @boost.interprocess, @boost.test and @boost.thread, which its MODULE.bazel doesn't declare
+boost.numeric_interval
+boost.pfr
+boost.qvm
+boost.ratio
+engflowapis
+  known-failing build  its BUILD files call native proto_library without a load(), which Bazel 9 removed; autoloading doesn't apply to the main repo
+envoy_api
+  known-failing build  bazel/cc_proto_descriptor_library/builddefs.bzl, loaded by every API package, loads @protobuf, but its MODULE.bazel names protobuf com_google_protobuf (the BCR patch misses that file)
