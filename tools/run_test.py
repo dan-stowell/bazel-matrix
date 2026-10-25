@@ -121,6 +121,56 @@ class ParseLogTest(unittest.TestCase):
                          {"a": "PASSED", "c": "BUILT"})
 
 
+class ClassifyTest(unittest.TestCase):
+    def test_not_known_failing(self):
+        self.assertEqual(run.classify("PASSED", "test", None), ("PASSED", "pass"))
+        self.assertEqual(run.classify("FAILED", "test", None), ("FAILED", "fail"))
+
+    def test_known_failing_build_excuses_build_and_test(self):
+        for target in ("build", "test"):
+            self.assertEqual(run.classify("FAILED", target, "build"),
+                             ("FAILED (known-failing build)", "expected"))
+        self.assertEqual(run.classify("FAILED TO BUILD", "test", "build"),
+                         ("FAILED TO BUILD (known-failing build)", "expected"))
+        self.assertEqual(run.classify("PASSED", "test", "build"),
+                         ("PASSED (known-failing build: candidate to un-mark)", "candidate"))
+
+    def test_known_failing_test_excuses_only_test(self):
+        self.assertEqual(run.classify("FAILED", "test", "test"),
+                         ("FAILED (known-failing test)", "expected"))
+        self.assertEqual(run.classify("TIMEOUT", "test", "test"),
+                         ("TIMEOUT (known-failing test)", "expected"))
+        self.assertEqual(run.classify("FAILED TO BUILD", "test", "test"),
+                         ("FAILED TO BUILD", "fail"))
+        # Its :build, run instead of :test or by `run.py build`, must pass.
+        self.assertEqual(run.classify("FAILED", "build", "test"), ("FAILED", "fail"))
+        self.assertEqual(run.classify("BUILT", "build", "test"), ("BUILT", "pass"))
+        self.assertEqual(run.classify("PASSED", "build", "test"), ("PASSED", "pass"))
+        self.assertEqual(run.classify("PASSED", "test", "test"),
+                         ("PASSED (known-failing test: candidate to un-mark)", "candidate"))
+
+    def test_infrastructure_failures_stay_fatal(self):
+        for status in ("ERROR", "UNKNOWN", "NO STATUS", "REMOTE FAILURE", "INCOMPLETE"):
+            self.assertEqual(run.classify(status, "test", "build"), (status, "fail"))
+
+    def test_shard_ok(self):
+        def shard(code, **status):
+            return {"code": code, "status": status}
+        targets = {"a": "test", "b": "test", "c": "test", "d": "test", "e": "build"}
+        kinds = {"a": "pass", "b": "expected", "c": "fail", "d": "candidate", "e": "expected"}
+        self.assertTrue(run.shard_ok(shard(0, a="PASSED"), targets, kinds))
+        self.assertTrue(run.shard_ok(shard(3, a="PASSED", b="FAILED", d="PASSED"), targets, kinds))
+        self.assertTrue(run.shard_ok(shard(1, b="FAILED TO BUILD"), targets, kinds))
+        self.assertTrue(run.shard_ok(shard(1, e="FAILED"), targets, kinds))
+        # Unexplained nonzero exits stay fatal.
+        self.assertFalse(run.shard_ok(shard(3, a="PASSED"), targets, kinds))
+        self.assertFalse(run.shard_ok(shard(3, b="FAILED", c="FAILED"), targets, kinds))
+        self.assertFalse(run.shard_ok(shard(1, b="FAILED"), targets, kinds))  # tests fail with 3
+        self.assertFalse(run.shard_ok(shard(3, e="FAILED"), targets, kinds))
+        self.assertFalse(run.shard_ok(shard(37, b="FAILED"), targets, kinds))
+        self.assertFalse(run.shard_ok(shard(None, b="FAILED"), targets, kinds))
+
+
 class ShardResultTest(unittest.TestCase):
     def test_exception_is_a_failed_shard(self):
         class Boom:

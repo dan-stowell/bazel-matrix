@@ -12,12 +12,19 @@ Each shard is one `tools/bb.sh <command> <targets>` on its own runner
 round-robin in name order. It prints each shard's invocation links as it
 finishes, then one row per project and the totals; the logs are in
 bb-out/run/<command>-<time>-<pid>/. Exit status 0 when every project passed
-and every shard's runner Bazel exited 0.
+or failed as expected (see below) and every shard's runner Bazel exited 0,
+or the exit its expected failures explain (3 tests, 1 builds).
 
 Without project names it leaves out what `//...` leaves out: a
 `known-failing build` project entirely; for a `known-failing test` project,
 `test` runs its :build instead of its :test (row BUILT), so a regression of
 its inner build still shows.
+
+A known-failing project that runs (named, or with --known-failing) shows
+its result with its mark: `FAILED (known-failing build)` is expected and
+not a regression; `PASSED (known-failing build: candidate to un-mark)` is
+listed as a candidate. `known-failing build` excuses build and test
+failures, `known-failing test` only test failures.
 
 A shard's result is its runner's Bazel exit code, not `bb remote`'s: after
 the run, `bb remote` downloads the top-level outputs, which can fail
@@ -45,6 +52,10 @@ import sync  # noqa: E402
 RESULTS_URL = "https://buildbuddy.buildbuddy.io/invocation/"
 # FLAKY: passed on a retry. BUILT: the :build of a known-failing test project.
 PASSING = {"PASSED", "FLAKY", "BUILT"}
+# Results a known-failing mark excuses. Anything else (UNKNOWN, ERROR, NO
+# STATUS, REMOTE FAILURE, ...) says the run itself went wrong. FAILED TO BUILD
+# means the outer target's build failed, which only `build` excuses.
+_EXCUSABLE = {"build": {"FAILED", "FAILED TO BUILD", "TIMEOUT"}, "test": {"FAILED", "TIMEOUT"}}
 _ANSI = re.compile(r"\x1b\[[0-9;]*[A-Za-z]|\[\d+(?:;\d+)*m")
 _EXIT = re.compile(r"\(command exited with code (\d+)\)")
 _STREAM = re.compile(r"Streaming build results to: (\S+/invocation/[0-9a-f-]+)")
@@ -84,6 +95,43 @@ def select_projects(projects, command, names, known_failing):
         elif kf == "test":
             out[p["name"]] = "build"
     return out
+
+
+def classify(status, target, known_failing):
+    """(row text, kind) for a project's status, kind one of "pass",
+    "expected" (a failure its known-failing mark excuses), "candidate" (a
+    known-failing project that passed) or "fail".
+
+    target is what ran ("build" or "test"), known_failing the project's mark
+    ("build", "test" or None). `known-failing build` excuses build and test
+    failures (test needs build); `known-failing test` only test failures.
+    """
+    excused = known_failing == "build" or (known_failing == "test" and target == "test")
+    note = "known-failing %s" % known_failing
+    if status in PASSING:
+        if excused:
+            return "%s (%s: candidate to un-mark)" % (status, note), "candidate"
+        return status, "pass"
+    if excused and status in _EXCUSABLE[known_failing]:
+        return "%s (%s)" % (status, note), "expected"
+    return status, "fail"
+
+
+def shard_ok(result, targets, kinds):
+    """Whether a shard's runner exit is fine: 0, or the exit Bazel gives for
+    its failures when they're all expected: 3 for failed tests, 1 for
+    failed builds (a failed :build, or a :test that FAILED TO BUILD)."""
+    if result["code"] == 0:
+        return True
+    names = result["status"]
+    if any(kinds[n] == "fail" for n in names):
+        return False
+    allowed = set()
+    for n, s in names.items():
+        if kinds[n] == "expected":
+            built = targets[n] == "build" or s == "FAILED TO BUILD"
+            allowed.add(1 if built else 3)
+    return result["code"] in allowed
 
 
 def shard(names, k):
@@ -231,6 +279,7 @@ def main(argv=None):
     # Only the projects sync wrote a package for.
     projects = [p for p in projects if os.path.exists(os.path.join(ROOT, p["name"], "BUILD.bazel"))]
     targets = select_projects(projects, args.command, args.projects, args.known_failing)
+    kf = {p["name"]: p["known_failing"][0] for p in projects if p.get("known_failing")}
     if not targets:
         sys.exit("no projects to run")
     shards = [{n: targets[n] for n in s} for s in shard(targets, args.shards)]
@@ -263,18 +312,28 @@ def main(argv=None):
                 print("shard %d: WARNING: bb remote exited %s but the runner's Bazel exited %s; "
                       "see %s" % (i, r["bb_exit"], r["code"], os.path.relpath(r["log"])), flush=True)
     rows = sorted((n, s, r["shard"]) for r in results for n, s in r["status"].items())
-    width = max(len(n) for n, _, _ in rows)
+    rows = [(n, s, i) + classify(s, targets[n], kf.get(n)) for n, s, i in rows]
+    width = max(len(n) for n, *_ in rows)
+    text_width = max(len(t) for *_, t, _ in rows)
     print()
-    for n, s, i in rows:
-        print("%-*s  %-15s shard %d" % (width, n, s, i))
-    totals = collections.Counter(s for _, s, _ in rows)
+    for n, _, i, text, _ in rows:
+        print("%-*s  %-*s  shard %d" % (width, n, text_width, text, i))
+    totals = collections.Counter(s for _, s, *_ in rows)
+    kinds = {n: kind for n, _, _, _, kind in rows}
     wall = time.time() - start
     print("\n%s: %s; wall %dm%02ds" % (args.command, ", ".join(
         "%s %d" % kv for kv in sorted(totals.items())), wall // 60, wall % 60))
+    expected = [n for n, k in kinds.items() if k == "expected"]
+    candidates = [n for n, k in kinds.items() if k == "candidate"]
+    if expected:
+        print("expected failures (known-failing): %s" % " ".join(expected))
+    if candidates:
+        print("known-failing but passed, candidates to un-mark: %s" % " ".join(candidates))
     # The runner's exit code too: a shard can fail after its targets passed.
-    ok = set(totals) <= PASSING and all(r["code"] == 0 for r in results)
-    if not ok and set(totals) <= PASSING:
-        print("a shard failed although every project passed; see its log")
+    no_regressions = "fail" not in kinds.values()
+    ok = no_regressions and all(shard_ok(r, targets, kinds) for r in results)
+    if not ok and no_regressions:
+        print("a shard failed although no project regressed; see its log")
     return 0 if ok else 1
 
 
