@@ -453,3 +453,34 @@ rules_cuda
   -//tests/flag:cuda_library_sysroot_from_copt_flag_test  @rules_cuda_examples//basic:kernel finds no C++ toolchain in the test's configuration
   -//tests/flag:cuda_library_sysroot_flag_test  @rules_cuda_examples//basic:kernel finds no C++ toolchain in the test's configuration
 rules_batch
+
+# Chunk b-2: high reverse-dep modules (m-z).
+p4runtime
+sdformat
+  -//:buildifier.test  exits 1 in 0.1s with no output on the executors
+websocketpp
+  override asio 1.34.2.bcr.1  the asio 1.28.2 it declares has a BUILD.bazel calling native cc_library, which Bazel 9 removed
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+sed
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+ogg
+qhull
+openconfig_gnmi
+  known-failing build  its own bazel/generate_cc.bzl fails to load under Bazel 9 (rule() got unexpected keyword argument 'incompatible_use_toolchain_transition'); its resolved rules_go and rules_foreign_cc use the removed native CcInfo
+rules_libusb
+rules_buf
+  -//:buildifier_check  its script runs xargs on an empty buildifier path ("xargs: : No such file or directory")
+xkbcommon
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+opengl-registry
+wayland
+rules_dotnet
+  -//dotnet/private/tests/publish/cross_publish/...  all 14 cross_publish_test_<rid> tests run `file` on an empty path ("Wrong file type: cannot open `'")
+rules_img
+sdl2
+yq.bzl
+pico-sdk
+yams
+  known-failing build  its rules_apple fails analysis under Bazel 9: transition inputs [//command_line_option:apple_crosstool_top] do not correspond to valid settings
+verilator
+tcl_lang
