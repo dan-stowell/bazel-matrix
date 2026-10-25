@@ -30,7 +30,10 @@ import tempfile
 import time
 import xml.etree.ElementTree as ET
 
-WORK_ROOT = "/tmp/bazel-matrix/work"
+# Not under /tmp: Bazel 9's hermetic /tmp (no longer optional) mounts a
+# tmpfs there in locally sandboxed actions, which then can't run below an
+# output base in /tmp.
+WORK_ROOT = "/var/tmp/bazel-matrix/work"
 # Where tools/credentials.bzl writes the API key, relative to the outer
 # output base.
 KEY_FILE = "bazel-matrix/api-key"

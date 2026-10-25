@@ -7,8 +7,6 @@ project(
     targets = [
         "//...",
     ],
-    flags = [
-        # its .bazelrc sets --repo_env=CC=clang; the runner image has no clang
-        "--repo_env=CC=gcc",
-    ],
+    # needs clang: its .bazelrc sets CC=clang and //fuzzing/private/runtime copies libclang_rt sanitizer runtimes; the images have only gcc
+    known_failing = "build",
 )

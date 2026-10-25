@@ -43,20 +43,19 @@ rules_shell
 gazelle
 bazel_features
 bazel_lib
-  --ignore_dev_dependency  its dev dep local_repository ./lib/tests/external_test_repo isn't in the release archive
+  known-failing build  its dev dep local_repository ./lib/tests/external_test_repo isn't in the release archive; without dev deps, tools/* can't load @io_bazel_rules_go
 rules_java
   known-failing build  its MODULE.bazel patches protobuf with //third_party:protobuf_load-cc-rules.patch, but the release archive has no third_party package
 rules_proto
 apple_support
   known-failing build  needs macOS: //toolchain:xcode_env fails analysis without Xcode
 aspect_bazel_lib
-  --ignore_dev_dependency  its dev dep local_repository ./lib/tests/external_test_repo isn't in the release archive
+  known-failing build  its dev dep local_repository ./lib/tests/external_test_repo isn't in the release archive; without dev deps, tools/* can't load @io_bazel_rules_go
 rules_rust
   -//cargo/private/cargo_toml_variable_extractor/testdata/...  its genrules run cargo, whose rustc panics linking (link.rs: unwrap on None)
 rules_swift
-  -//test/fixtures/module_interface/...  the Linux swift toolchain's swiftc can't load libswiftCore.so on the executors
+  -//test/...  test/fixtures/module_interface (used across //test) needs swiftc, which can't load libswiftCore.so on the executors
 rules_jvm_external
-  --noincompatible_sandbox_hermetic_tmp  locally sandboxed CopyFile actions fail: the inner output base is under /tmp, where hermetic tmp mounts a tmpfs
 aspect_rules_js
 buildifier_prebuilt
 rules_nodejs
@@ -67,7 +66,7 @@ rules_apple
 rules_proto_grpc
   -//tools/fixer/...  clippy (enabled by its .bazelrc) fails on //tools/fixer:fixer
 rules_android
-  --noincompatible_disallow_empty_glob  third_party/libxml2/BUILD.bazel globs include/private/*.h, which matches nothing
+  known-failing build  needs an Android SDK: @androidsdk//:core-for-system-modules-jar is undeclared without one
 rules_foreign_cc
 rules_perl
 stardoc
@@ -78,9 +77,9 @@ aspect_rules_ts
 rules_multitool
 tar.bzl
 toolchain_utils
+  known-failing build  fetching https://cosmo.zip/pub/cosmos/v/4.0.2/bin/ape-x86_64.elf times out (Connect timed out) from RBE
 rules_cc_autoconf
-  -//autoconf/tests:diff_tester  ruff EXE002: executable file without a shebang
-  -//tools/convert:bcr_test  ruff EXE002: executable file without a shebang
+  --output_groups=-py_ruff_checks  its .bazelrc runs ruff on every py target; many fail EXE002 (executable file without a shebang)
 package_metadata
 rules_m4
   --incompatible_autoload_externally=+@rules_cc  its dev deps (googletest 1.11) call native cc_library/cc_test, which Bazel 9 removed; autoload them from rules_cc
@@ -89,12 +88,14 @@ rules_bison
 rules_flex
 rules_scala
   --lockfile_mode=off  its MODULE.bazel.lock has a version Bazel 9 can't read
+  -//test/...  tests take //:.bazelversion as data, which the release archive lacks
+  -//manual_test/...  tests take //:.bazelversion as data, which the release archive lacks
 rules_oci
-  --incompatible_autoload_externally=+@rules_shell  examples/attest/BUILD.bazel calls native sh_test, which Bazel 9 removed; autoload it from rules_shell
+  --deleted_packages=examples/push,examples/attest,examples/sign,examples/assertion,examples/assertion/sign_external,examples/assertion/attest_external  they call native sh_test, which Bazel 9 removed
 rules_testing
 toolchains_llvm
 rules_fuzzing
-  --repo_env=CC=gcc  its .bazelrc sets --repo_env=CC=clang; the runner image has no clang
+  known-failing build  needs clang: its .bazelrc sets CC=clang and //fuzzing/private/runtime copies libclang_rt sanitizer runtimes; the images have only gcc
 aspect_rules_py
 bazel_worker_api
 buildozer
@@ -111,6 +112,7 @@ googletest
 openssl
 boringssl
 grpc
+  --deleted_packages=src/python/grpcio_observability/grpc_observability,test/distrib/bazel/cpp,test/cpp/interop,tools/artifact_gen,tools/distrib/python/grpcio_tools,third_party/toolchains/rbe_ubuntu2004_bazel7/cc,examples/cpp/error_handling,examples/cpp/orca,examples/cpp/retry,examples/cpp/compression,examples/cpp/generic_api,examples/cpp/csm,examples/cpp/csm/observability,examples/cpp/multiplex,examples/cpp/cancellation,examples/cpp/otel,examples/cpp/otel/codelab,examples/cpp/otel/ostream,examples/cpp/error_details,examples/cpp/unix_abstract_sockets,examples/cpp/metadata,examples/cpp/load_balancing,examples/cpp/interceptors,examples/cpp/wait_for_ready,examples/cpp/keepalive,examples/cpp/systemd_socket_activation,examples/cpp/flow_control,examples/cpp/helloworld,examples/cpp/health,examples/cpp/deadline,examples/cpp/debugging,examples/cpp/default_event_engine,examples/cpp/auth,examples/cpp/xds,examples/cpp/reflection,examples/cpp/route_guide,examples/cpp/gcp_observability/helloworld  they call native cc_binary/cc_library/sh_test, which Bazel 9 removed
   --incompatible_autoload_externally=+@rules_cc  its dev deps (opentelemetry-cpp) call native cc_library/cc_test, which Bazel 9 removed; autoload them from rules_cc
 eigen
   known-failing build  rules_cc rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root"); fine as a dependency
@@ -155,6 +157,7 @@ libffi
 spdlog
   -//:spdlog_test  tests/test_systemd.cpp needs systemd/sd-journal.h, which the executor image lacks
 flatbuffers
+  -//swift/...  no Swift toolchain on Linux here
   --incompatible_autoload_externally=+@rules_cc  its dev deps (an old re2, via grpc) call native cc_library/cc_test, which Bazel 9 removed; autoload them from rules_cc
 abseil-py
 c-ares
@@ -175,9 +178,9 @@ magic_enum
 cpuinfo
 libuv
 opentelemetry-cpp
-  --incompatible_autoload_externally=+@rules_cc  its dev deps (opentracing-cpp) call native cc_library/cc_test, which Bazel 9 removed; autoload them from rules_cc
+  -//opentracing-shim/...  its dependency opentracing-cpp calls native cc_library, which Bazel 9 removed
 protoc-gen-validate
-  --incompatible_autoload_externally=+@rules_shell  tests/harness/executor/BUILD calls native sh_test, which Bazel 9 removed; autoload it from rules_shell
+  --deleted_packages=tests/harness/executor,example-workspace,example-workspace/foo  they call native sh_test/cc_binary/cc_test, which Bazel 9 removed (example-workspace is a separate workspace)
 fast_float
-  --incompatible_autoload_externally=+@rules_cc  tests/BUILD.bazel calls native cc_test, which Bazel 9 removed; autoload it from rules_cc
+  --deleted_packages=tests  tests/BUILD.bazel calls native cc_test, which Bazel 9 removed
 onetbb

@@ -8,7 +8,7 @@ project(
         "//...",
     ],
     flags = [
-        # tests/harness/executor/BUILD calls native sh_test, which Bazel 9 removed; autoload it from rules_shell
-        "--incompatible_autoload_externally=+@rules_shell",
+        # they call native sh_test/cc_binary/cc_test, which Bazel 9 removed (example-workspace is a separate workspace)
+        "--deleted_packages=tests/harness/executor,example-workspace,example-workspace/foo",
     ],
 )

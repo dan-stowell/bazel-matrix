@@ -7,4 +7,6 @@ project(
     targets = [
         "//...",
     ],
+    # fetching https://cosmo.zip/pub/cosmos/v/4.0.2/bin/ape-x86_64.elf times out (Connect timed out) from RBE
+    known_failing = "build",
 )

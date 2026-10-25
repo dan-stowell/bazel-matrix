@@ -8,7 +8,7 @@ project(
         "//...",
     ],
     flags = [
-        # examples/attest/BUILD.bazel calls native sh_test, which Bazel 9 removed; autoload it from rules_shell
-        "--incompatible_autoload_externally=+@rules_shell",
+        # they call native sh_test, which Bazel 9 removed
+        "--deleted_packages=examples/push,examples/attest,examples/sign,examples/assertion,examples/assertion/sign_external,examples/assertion/attest_external",
     ],
 )

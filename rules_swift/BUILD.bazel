@@ -6,7 +6,7 @@ project(
     name = "rules_swift",
     targets = [
         "//...",
-        # the Linux swift toolchain's swiftc can't load libswiftCore.so on the executors
-        "-//test/fixtures/module_interface/...",
+        # test/fixtures/module_interface (used across //test) needs swiftc, which can't load libswiftCore.so on the executors
+        "-//test/...",
     ],
 )

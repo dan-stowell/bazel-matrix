@@ -6,9 +6,9 @@ project(
     name = "rules_cc_autoconf",
     targets = [
         "//...",
-        # ruff EXE002: executable file without a shebang
-        "-//autoconf/tests:diff_tester",
-        # ruff EXE002: executable file without a shebang
-        "-//tools/convert:bcr_test",
+    ],
+    flags = [
+        # its .bazelrc runs ruff on every py target; many fail EXE002 (executable file without a shebang)
+        "--output_groups=-py_ruff_checks",
     ],
 )

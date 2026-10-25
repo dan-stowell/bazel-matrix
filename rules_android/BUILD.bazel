@@ -7,8 +7,6 @@ project(
     targets = [
         "//...",
     ],
-    flags = [
-        # third_party/libxml2/BUILD.bazel globs include/private/*.h, which matches nothing
-        "--noincompatible_disallow_empty_glob",
-    ],
+    # needs an Android SDK: @androidsdk//:core-for-system-modules-jar is undeclared without one
+    known_failing = "build",
 )

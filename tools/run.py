@@ -151,6 +151,9 @@ def main(argv=None):
     shards = shard(names, args.shards)
     out_dir = os.path.join(ROOT, "bb-out", "run")
     os.makedirs(out_dir, exist_ok=True)
+    for f in os.listdir(out_dir):
+        if f.startswith(args.command + "-"):
+            os.remove(os.path.join(out_dir, f))  # a previous run's shards
     print("%s: %d projects in %d shards; logs in %s" % (args.command, len(names), len(shards),
                                                         os.path.relpath(out_dir)), flush=True)
     start = time.time()

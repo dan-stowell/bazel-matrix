@@ -6,9 +6,7 @@ project(
     name = "opentelemetry-cpp",
     targets = [
         "//...",
-    ],
-    flags = [
-        # its dev deps (opentracing-cpp) call native cc_library/cc_test, which Bazel 9 removed; autoload them from rules_cc
-        "--incompatible_autoload_externally=+@rules_cc",
+        # its dependency opentracing-cpp calls native cc_library, which Bazel 9 removed
+        "-//opentracing-shim/...",
     ],
 )
