@@ -6,7 +6,8 @@ source archive with the BCR's patches and overlay applied and the registry's
 MODULE.bazel in place of its own (as when Bazel fetches it from a registry),
 as one deterministic tar. A hub repo `projects` aliases them as
 `@projects//:<module>`, so MODULE.bazel needs a single use_repo; it also
-has the pinned inner Bazels of tools/versions.bzl as `@projects//:bazel_<v>`. Repos are
+has the pinned inner Bazels of tools/versions.bzl as `@projects//:bazel_<v>`
+and the modules' names as MODULES in `@projects//:modules.bzl`. Repos are
 fetched lazily: only when a target that needs that project's source runs.
 """
 
@@ -104,6 +105,8 @@ def _hub_impl(rctx):
         [_alias(name, "@src_%s//:source.tar" % name) for name in rctx.attr.names] +
         [_alias("bazel_" + v, "@%s//file" % _bazel_repo(v)) for v in INNER_BAZELS],
     ))
+    # For tools/BUILD.bazel's generated_test, which checks their BUILD files.
+    rctx.file("modules.bzl", "MODULES = %s\n" % json.encode(rctx.attr.names))
 
 _hub = repository_rule(
     implementation = _hub_impl,

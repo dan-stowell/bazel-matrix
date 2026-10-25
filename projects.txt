@@ -2554,7 +2554,6 @@ peregrine
 periphery
   known-failing build  rules_swift finds no Swift toolchain (no such target '@build_bazel_rules_swift_local_config//:linux-toolchain'): the executor image has no Swift
 phaser_zc_protobuf
-
   known-failing build  a Swift project: rules_swift finds no Swift toolchain on the Linux executor (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift
 
 

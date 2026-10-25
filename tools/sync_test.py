@@ -55,6 +55,14 @@ class ParseProjectsTxtTest(unittest.TestCase):
         self.assertEqual([p["known_failing"] for p in projects],
                          [("build", "no Bazel 9: native.cc_library"), ("test", "x y"), None])
 
+    def test_blank_line_ends_project(self):
+        with self.assertRaisesRegex(ValueError, "line 3: indented line after a blank line"):
+            sync.parse_projects_txt("a\n\n  known-failing build  why\n")
+        # Comments may sit between, and blank lines between projects.
+        projects = sync.parse_projects_txt("a\n# c\n  -//x  why\n\nb\n")
+        self.assertEqual([(p["name"], p["exclude"]) for p in projects],
+                         [("a", [("//x", "why")]), ("b", [])])
+
     def test_errors(self):
         for text in ["zlib\n  -//foo/...", "  -//x  why", "zlib\nzlib",
                      "zlib\n  //foo  why", "zlib\n  -//foo/*  why", "Bad Name",
@@ -120,6 +128,28 @@ class VersionsTest(unittest.TestCase):
         self.assertEqual(sync.default_inner_bazel('x\nDEFAULT_INNER_BAZEL = "9.3.1"\n'), "9.3.1")
         with self.assertRaises(ValueError):
             sync.default_inner_bazel("")
+
+
+class GeneratedTest(unittest.TestCase):
+    PROJECTS = sync.parse_projects_txt("a\n  known-failing build  why\nb\nc\n")
+
+    def test_build_files(self):
+        files = sync.build_files(self.PROJECTS, {"projects": [{"name": "a"}, {"name": "c"}]})
+        self.assertEqual(sorted(files), ["a/BUILD.bazel", "c/BUILD.bazel"])
+        self.assertIn('known_failing = "build"', files["a/BUILD.bazel"])
+
+    def test_module_mismatch(self):
+        def check(fetched, skipped):
+            return sync.module_mismatch(self.PROJECTS, {
+                "projects": [{"name": n} for n in fetched],
+                "skipped": [{"name": n} for n in skipped]})
+        self.assertEqual(check(["a", "c"], ["b"]), [])
+        self.assertEqual(check(["a"], ["b"]), ["in projects.txt but not projects.json: c"])
+        self.assertEqual(check(["a", "c", "d"], ["b"]), ["in projects.json but not projects.txt: d"])
+        self.assertEqual(check(["a", "b", "c"], ["b"]), ["both fetched and skipped: b"])
+        self.assertEqual(check(["a", "c", "c"], ["b"]), ["recorded twice: c"])
+        self.assertEqual(check(["c", "a"], ["b"]),
+                         ["projects.json's projects are not in projects.txt's order"])
 
 
 class RenderBuildTest(unittest.TestCase):

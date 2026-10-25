@@ -3,6 +3,14 @@
 load("//tools:project.bzl", "string_list_setting", "string_setting")
 load("//tools:versions.bzl", "DEFAULT_INNER_BAZEL")
 
+exports_files(
+    [
+        "projects.json",
+        "projects.txt",
+    ],
+    visibility = ["//tools:__pkg__"],
+)
+
 # Extra flags for every inner Bazel, e.g.
 # --//:inner_flags=--test_tag_filters=-slow (repeat it for more flags).
 string_list_setting(

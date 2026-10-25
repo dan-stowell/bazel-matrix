@@ -49,13 +49,18 @@ def parse_projects_txt(text):
     A project line is `module` or `module@version`. Indented lines below it
     are `-//pattern reason`, `--flag reason`, `bazel <version> reason`,
     `known-failing build|test reason` or `override <module> <version>
-    reason`; every one needs a reason.
+    reason`; every one needs a reason. A blank line ends a project: an
+    indented line after one is an error, not part of the project above.
     """
     projects, errors = [], []
+    blank = False
     for n, raw in enumerate(text.splitlines(), 1):
         line = raw.strip()
+        if not line:
+            blank = True
         if not line or line.startswith("#"):
             continue
+        after_blank, blank = blank, False
         if not raw[0].isspace():
             name, _, version = line.partition("@")
             if not re.fullmatch(r"[a-z][a-z0-9._-]*", name) or " " in line:
@@ -69,6 +74,10 @@ def parse_projects_txt(text):
             continue
         if not projects:
             errors.append("line %d: indented line before any project" % n)
+            continue
+        if after_blank:
+            errors.append("line %d: indented line after a blank line; remove the blank line "
+                          "if it belongs to %s" % (n, projects[-1]["name"]))
             continue
         words = {"bazel": 2, "known-failing": 2, "override": 3}.get(line.split()[0], 1)
         parts = line.split(None, words)
@@ -258,6 +267,40 @@ def render_build(project):
     return "".join(out)
 
 
+def build_files(projects, data):
+    """{<module>/BUILD.bazel: its text} for the projects projects.json fetches.
+
+    Depends only on projects.txt (parsed) and projects.json (data), so
+    tools/generated_test.py can check the committed files without the BCR.
+    """
+    names = {e["name"] for e in data["projects"]}
+    return {p["name"] + "/BUILD.bazel": render_build(p) for p in projects if p["name"] in names}
+
+
+def module_mismatch(projects, data):
+    """Problems with projects.json's modules against projects.txt's projects."""
+    listed = [p["name"] for p in projects]
+    fetched = [e["name"] for e in data["projects"]]
+    skipped = [s["name"] for s in data["skipped"]]
+    errors = []
+    both = sorted(set(fetched) & set(skipped))
+    if both:
+        errors.append("both fetched and skipped: " + ", ".join(both))
+    recorded = fetched + skipped
+    twice = sorted({m for m in recorded if recorded.count(m) > 1} - set(both))
+    if twice:
+        errors.append("recorded twice: " + ", ".join(twice))
+    missing = sorted(set(listed) - set(recorded))
+    if missing:
+        errors.append("in projects.txt but not projects.json: " + ", ".join(missing))
+    extra = sorted(set(recorded) - set(listed))
+    if extra:
+        errors.append("in projects.json but not projects.txt: " + ", ".join(extra))
+    if [m for m in fetched if m in listed] != [m for m in listed if m in fetched]:
+        errors.append("projects.json's projects are not in projects.txt's order")
+    return errors
+
+
 def render_json(commit, entries, skipped):
     """projects.json: what tools/sources.bzl fetches, plus the skipped projects."""
     return json.dumps({"bcr_commit": commit, "projects": entries, "skipped": skipped},
@@ -396,9 +439,8 @@ def main():
 
     write("projects.json", render_json(commit, entries, skipped))
     names = {e["name"] for e in entries}
-    for p in projects:
-        if p["name"] in names:
-            write(os.path.join(p["name"], "BUILD.bazel"), render_build(p))
+    for path, text in build_files(projects, {"projects": entries}).items():
+        write(path, text)
     for d in sorted(os.listdir(ROOT)):
         build = os.path.join(ROOT, d, "BUILD.bazel")
         if d not in names and is_generated(build):
