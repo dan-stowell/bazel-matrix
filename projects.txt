@@ -723,7 +723,7 @@ cxxopts
 fuzztest
   known-failing build  needs clang: its .bazelrc passes --cxxopt=-Wc++17-compat-pedantic and centipede's build_defs pass -gline-tables-only, which gcc (the images' only compiler) rejects
 gdk-pixbuf
-  -//tests:pixbuf-fail  loading tests/test-images/fail/bug793470-crasher.png, gdk-pixbuf's PNG loader allocates past the executor's limit (EXECUTOR_OOM_KILL at 47-62 GB estimated); bisected on RBE, its other 40 images pass, but --test_arg=-s=... to skip it would reach every test in the project and pixbuf-lowmem reads its args as image files
+  -//tests:pixbuf-fail  tests/test-images/fail/bug793470-crasher.png declares 935820x854554 pixels (~2.4 TB as RGB), and the PNG loader allocates for it instead of rejecting it until the executor OOM-kills the test (observed 55-67 GB); bisected on RBE, the other 40 images pass, but a --test_arg=-s=... skip would reach every test in the project, and pixbuf-lowmem reads its args as image files
 ghdl
 giflib
   override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
@@ -879,7 +879,7 @@ javaparser
 lame
 lexy
   --incompatible_autoload_externally=+@rules_cc  its dep doctest calls native cc_library, which Bazel 9 removed; autoload it from rules_cc
-  known-failing test  //:lexy_test, its only test: 39 of 329 doctest cases (dsl::ascii, char_class, unicode) fail because doctest::toString(cp) of their code points prints "{?}" (doctest finds no operator<< for them) under the images' gcc; --test_arg=--test-case-exclude=<those cases> was passed but excluded none
+  --test_arg=--dt-test-case-exclude=character?class?alternative,character?class?complement,character?class?intersection,character?class?minus,dsl::ascii::alpha,dsl::ascii::alpha_digit,dsl::ascii::alpha_underscore,dsl::ascii::blank,dsl::ascii::character,dsl::ascii::control,dsl::ascii::digit,dsl::ascii::graph,dsl::ascii::lower,dsl::ascii::newline,dsl::ascii::one_of,dsl::ascii::other_space,dsl::ascii::print,dsl::ascii::punct,dsl::ascii::space,dsl::ascii::upper,dsl::ascii::word,dsl::unicode::alpha,dsl::unicode::alpha_digit,dsl::unicode::blank,dsl::unicode::character,*dsl::unicode::control,dsl::unicode::digit,dsl::unicode::graph,dsl::unicode::lower,dsl::unicode::newline,dsl::unicode::other_space,dsl::unicode::print,dsl::unicode::space,dsl::unicode::upper,dsl::unicode::word,dsl::unicode::xid_continue,dsl::unicode::xid_start,dsl::unicode::xid_start_underscore  these 39 doctest cases (in dsl/ascii.cpp, char_class.cpp, unicode.cpp) fail: doctest::toString(cp) of their code points prints "{?}" (doctest finds no operator<< for them) under the images' gcc; the other 290 cases pass
 libavif
 libbacktrace
   override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
