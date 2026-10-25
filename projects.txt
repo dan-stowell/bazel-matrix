@@ -35,3 +35,41 @@ rules_go
   --test_tag_filters=-local  skips its go_bazel_test integration tests (tagged local): each runs a third-level Bazel on the runner; all 71 took 25 min and 12 GB of runner disk, and 40 still failed
   -//tests/core/nogo/deps:deps_test  fails: expected nogo output ("a c d") missing from the nested build's output
   -//tests/core/nogo/nolint:nolint_test  fails: expected nogo diagnostics missing from the nested build's output
+
+# Chunk 1: core rulesets and widely used libraries.
+bazel_skylib
+platforms
+rules_license
+rules_shell
+bazel_features
+rules_proto
+rules_pkg
+  -//toolchains/git:is_git_available  no git toolchain registered here
+stardoc
+  -//:stardoc_rule_doc  docs/stardoc_rule.md isn't in the release archive
+googletest
+google_benchmark
+  --incompatible_autoload_externally=+@rules_cc  its dev deps (an old googletest) call native cc_library/cc_test, which Bazel 9 removed; autoload them from rules_cc
+fmt
+spdlog
+  -//:spdlog_test  tests/test_systemd.cpp needs systemd/sd-journal.h, which the executor image lacks
+nlohmann_json
+boringssl
+openssl
+zstd
+lz4
+libpng
+gflags
+glog
+  -//:cleanup_immediately_test  uses @com_github_google_googletest, which its MODULE.bazel doesn't declare
+  -//:cleanup_with_absolute_prefix_test  uses @com_github_google_googletest, which its MODULE.bazel doesn't declare
+  -//:cleanup_with_relative_prefix_test  uses @com_github_google_googletest, which its MODULE.bazel doesn't declare
+  -//:stacktrace_test  uses @com_github_google_googletest, which its MODULE.bazel doesn't declare
+  -//:stl_logging_test  uses @com_github_google_googletest, which its MODULE.bazel doesn't declare
+  -//:utilities_test  uses @com_github_google_googletest, which its MODULE.bazel doesn't declare
+sqlite3
+  known-failing build  rules_cc rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root"); fine as a dependency
+bzip2
+  known-failing build  rules_cc rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root"); fine as a dependency
+rules_apple
+  known-failing build  needs macOS: its tests compile with /usr/bin/xcrun and need a macOS execution platform
