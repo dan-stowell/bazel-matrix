@@ -6,7 +6,7 @@ project(
     name = "cgrapht",
     targets = [
         "//...",
-        # test/test_edge_manipulation_happy_case.cc:86 doesn't compile under the images' gcc: no operator| for its std::vector<cgrapht::Result<...>> and std::views::transform
+        # test/test_edge_manipulation_happy_case.cc:85 pipes a prvalue std::vector<cgrapht::Result<...>> into std::views::transform, and the images' gcc 13 libstdc++ finds no viable operator| for it ("no match for 'operator|'")
         "-//test:cgrapht_unit_tests",
     ],
 )

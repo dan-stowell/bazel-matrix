@@ -1954,12 +1954,12 @@ brotli_go
 cachelib
   known-failing build  it resolves libaio 0.3.113.bcr.0, which the BCR yanked ("The tarball link for 0.3.113.bcr.0 is broken"), and 0.3.113.bcr.1's archive returns 404 too
 cgrapht
-  -//test:cgrapht_unit_tests  test/test_edge_manipulation_happy_case.cc:86 doesn't compile under the images' gcc: no operator| for its std::vector<cgrapht::Result<...>> and std::views::transform
+  -//test:cgrapht_unit_tests  test/test_edge_manipulation_happy_case.cc:85 pipes a prvalue std::vector<cgrapht::Result<...>> into std::views::transform, and the images' gcc 13 libstdc++ finds no viable operator| for it ("no match for 'operator|'")
 chicory
   override javaparser 3.27.0  javaparser 3.26.2, which it declares, makes javaparser-core incompatible unless --java_runtime_version is remotejdk_11/17 ("JavaParser is incompatible with JDK versions 21 and later"), and remote-minimal uses JDK 21; 3.27.0 transitions javaparser-core to remotejdk_17 itself
   --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its BUILD files (wasm, wasi, host-module, ...) call native java_library without a load()
   --incompatible_autoload_externally=+@rules_java  autoload the java rules Bazel 9 removed
-# circl@1.3.7: 1.3.8's archive contains a bazel-bin symlink, and tools/sources.bzl's tar of the source fails on them ("tar: bazel-bin: Cannot open: Permission denied").
+# circl@1.3.7: 1.3.8's registry patch 0002 adds its author's bazel-bin/bazel-circl/bazel-out/bazel-testlogs convenience symlinks (mode 120000, pointing into /home/matt-clarkson/.cache/bazel), and tools/sources.bzl's tar of the patched tree fails on them ("tar: bazel-bin: Cannot open: Permission denied").
 circl@1.3.7
   override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed
   --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its math/fp25519 and math/fp448 BUILD files call native cc_library without a load()
@@ -2216,7 +2216,7 @@ cel-c
   override aspect_rules_esbuild 0.27.1  the resolved aspect_rules_esbuild's esbuild/private/resolved_toolchain.bzl calls rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
   known-failing build  with these overrides, most of //cel-c and //cel-c/internal (84 targets) depend on protobuf targets the resolved protobuf doesn't have ("no such target '@@protobuf+//upb/message:message_unknowns_testonly'", field_mask_upb_reflection_proto)
 circe
-  known-failing build  rules_swift finds no Swift toolchain (no such target '@build_bazel_rules_swift_local_config//:linux-toolchain'): the executor image has no Swift
+  known-failing build  rules_swift's autoconfiguration, which runs on the runner while fetching repos, finds no Swift there, so its local config has no linux-toolchain ("no such target '@build_bazel_rules_swift_local_config//:linux-toolchain'")
 claro-lang
   override aspect_bazel_lib 2.22.5  the resolved aspect_bazel_lib's toolchain repos call rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
   known-failing build  with that override, its @maven repo (rules_jvm_external) loads @rules_license//rules:package_info.bzl, which isn't visible from it
@@ -2326,3 +2326,49 @@ fildesh
   override rules_foreign_cc 0.16.0  the resolved rules_foreign_cc passes rule(incompatible_use_toolchain_transition) and uses the native CcInfo, both removed in Bazel 9
   --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: test/builtin/BUILD.bazel calls native sh_test without a load()
   --incompatible_autoload_externally=+@rules_cc,+@rules_shell  autoload sh_test from rules_shell, and the cc rules that the google_benchmark it resolves calls natively from rules_cc
+
+
+# Chunk f-8: the rest of the b/c modules.
+closure-templates
+  --javacopt=-Xep:CheckReturnValue:WARN  the resolved java toolchain's Error Prone fails the build on CheckReturnValue in its generated SoyFileParser.java ("The result of `skipToTemplateToken(...)` must be used")
+  --javacopt=-Xep:ReturnValueIgnored:WARN  same, for ReturnValueIgnored in java/tests/.../CopyPolicyTest.java ("Return value of 'getDeclaredMethod' must be used")
+coacd
+  --incompatible_autoload_externally=+@rules_cc  its dep cdt calls native cc_library, which Bazel 9 removed; autoload it from rules_cc
+codescythe
+  known-failing build  its .bazelrc sets @rules_go//go/config:gc_linkopts, but no @rules_go is visible from its main repo ("No repository visible as '@rules_go'")
+codesign.bzl
+codspeed_core
+codspeed_google_benchmark_compat
+  --incompatible_autoload_externally=+@rules_cc  its dep googletest calls native cc_library, which Bazel 9 removed; autoload it from rules_cc
+  -//tools:compare  its @tools_pip_deps lock has scipy/numpy wheels only for CPython 3.9 (//_config:is_cp39), not for the configured Python ("doesn't match any of the Python wheels available")
+  -//tools:gbench  same: needs scipy/numpy from @tools_pip_deps, which has only cp39 wheels
+  -//bindings/python/google_benchmark:example  example.py does `import google_benchmark`, the package at bindings/python/google_benchmark, but bindings/python isn't on the test's sys.path ("No module named 'google_benchmark'")
+com_clementguillot_rules_quarkus
+  --lockfile_mode=off  its MODULE.bazel.lock is in a format Bazel 9 doesn't support ("The version of MODULE.bazel.lock is not supported")
+com_github_benchsci_rules_nodejs_gazelle
+com_github_mvukov_rules_ros2
+  -//repositories/rust:bindgen_toolchain_impl  needs @rules_ros2_config_clang, whose repository rule finds no clang on the runner ("Failed to find clang executable")
+  -//ros2/test/rust/...  the rust tests use the bindgen toolchain (excluded above), which needs clang
+com_github_rabbitmq_looking_glass
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed
+  --noincompatible_disallow_empty_glob  its root BUILD.bazel globs c_src/**/*.h, which matches nothing in the archive
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel calls native cc_binary without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed
+  known-failing build  needs Erlang/OTP: rules_erlang's validation of the otp at /usr fails (exit 127), the images have no erl
+copybara
+  override rules_foreign_cc 0.16.0  the resolved rules_foreign_cc passes rule(incompatible_use_toolchain_transition) and uses the native CcInfo, both removed in Bazel 9
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its third_party/BUILD calls native java_library without a load()
+  --incompatible_autoload_externally=+@rules_java  autoload the java rules Bazel 9 removed
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed
+  known-failing build  with these, fetching @maven and @copybara_maven fails: rules_jvm_external's coursier needs a host java ("exec: java: not found")
+cpp_fpm
+cppregpattern
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel calls native cc_library without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed
+crispy-doom
+cucumberswift_expressions
+  known-failing build  rules_swift's autoconfiguration, which runs on the runner while fetching repos, finds no Swift there, so its local config has no linux-toolchain ("no such target '...rules_swift_local_config//:linux-toolchain'")
+cuda_toolchain_types
+cuda_toolkit
+cudnn_frontend
+cutlass
