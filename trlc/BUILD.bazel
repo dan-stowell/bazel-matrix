@@ -12,8 +12,6 @@ project(
         "-//:requirements_3_11.test",
         # as requirements_3_10.test: its lock file is out of date against live PyPI
         "-//:requirements_3_12.test",
-        # the same pip-compile check for requirements_dev; it times out at 60 s
-        "-//:requirements_dev.test",
         # an example check that fails by design ("check error: is not a file" for example.png and bad.png); the package's test_suite of passing tests leaves it out
         "-//api-examples/filename-check:filename_check",
     ],
@@ -22,5 +20,7 @@ project(
         "--noincompatible_disable_autoloads_in_main_repo",
         # autoload the python rules Bazel 9 removed from rules_python
         "--incompatible_autoload_externally=+@rules_python",
+        # //:requirements_dev.test (size small, so 60 s) runs pip-compile against live PyPI, which took 45 s on one run and timed out at 60 s on another
+        "--test_timeout=300",
     ],
 )
