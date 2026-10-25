@@ -7,6 +7,6 @@ project(
     targets = [
         "//...",
     ],
-    # dozens of its packages (transpiler/.../backend/libraryinfo, backend/wasm, tools/rta...) call native proto_library/java_proto_library, which Bazel 9 removed, and junit/.../j2cl_junit_integration_test.bzl uses an undefined kotlin_and_j2cl_library
+    # dozens of its packages call native proto_library/java_proto_library without a load() (main-repo autoloads would fix those), but junit/.../j2cl_junit_integration_test.bzl uses an undefined kotlin_and_j2cl_library and rules_jvm_external's coursier needs a host java ("exec: java: not found")
     known_failing = "build",
 )

@@ -8,7 +8,9 @@ project(
         "//...",
     ],
     flags = [
-        # they call native proto_library/cc_proto_library/java_proto_library, which Bazel 9 removed
-        "--deleted_packages=proto/cel/expr/conformance,proto/cel/expr/conformance/test",
+        # Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: proto/cel/expr/conformance{,/test} call native proto_library/cc_proto_library/java_proto_library without a load()
+        "--noincompatible_disable_autoloads_in_main_repo",
+        # autoload the proto rules Bazel 9 removed from protobuf
+        "--incompatible_autoload_externally=+@com_google_protobuf",
     ],
 )

@@ -7,6 +7,6 @@ project(
     targets = [
         "//...",
     ],
-    # open-ended under Bazel 9: python/BUILD calls native sh_binary; its resolved rules_foreign_cc, rules_go and highwayhash use removed natives; with those fixed, its TensorFlow ops need @local_config_tf and its xz dep's glob src/liblzma/*.h matches nothing
+    # open-ended under Bazel 9: python/BUILD calls native sh_binary without a load() (main-repo autoloads fix that); its resolved rules_foreign_cc calls rule() with incompatible_use_toolchain_transition, and rules_go and highwayhash use removed natives; with those fixed, its TensorFlow ops need @local_config_tf and its xz dep's glob src/liblzma/*.h matches nothing
     known_failing = "build",
 )

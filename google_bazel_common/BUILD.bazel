@@ -8,7 +8,9 @@ project(
         "//...",
     ],
     flags = [
-        # tools/jarjar/BUILD calls native sh_binary/sh_test, which Bazel 9 removed
-        "--deleted_packages=tools/jarjar",
+        # Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: tools/jarjar/BUILD calls native sh_binary/sh_test without a load()
+        "--noincompatible_disable_autoloads_in_main_repo",
+        # autoload the sh rules Bazel 9 removed from rules_shell
+        "--incompatible_autoload_externally=+@rules_shell",
     ],
 )
