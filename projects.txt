@@ -1073,3 +1073,57 @@ zchunk
 tree-sitter-c-bazel
   --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: src/BUILD calls native sh_binary without a load()
   --incompatible_autoload_externally=+@rules_cc,+@rules_shell  autoload the cc and shell rules Bazel 9 removed from rules_cc and rules_shell
+
+
+# Chunk f-1: well-known BCR modules (g-l).
+gazelle_cc
+  override rules_foreign_cc 0.16.0  the resolved rules_foreign_cc passes rule(incompatible_use_toolchain_transition) and uses the native CcInfo, both removed in Bazel 9
+  -//language/cc/testdata:cc_grpc_library_compilation  this test_suite's generated compilation-test repo loads its dev dep grpc 1.70.1's bazel/generate_cc.bzl, whose attr.label(providers = [...]) passes strings, which Bazel 9 rejects ("got element of type string, want sequence")
+  -//language/cc/testdata:cc_grpc_library_index_only_compilation  same: its compilation-test repo loads grpc 1.70.1's bazel/generate_cc.bzl, which Bazel 9 rejects
+gcem
+git
+  -//t:all  every t/tNNNN-* sh_test fails "file 't/bazel-test-wrapper.sh' is not executable": the registry overlay file is downloaded without the executable bit (as http_archive does)
+glew
+  known-failing build  glu's GL/glu.h includes GL/gl.h, which no declared dep provides and the executor image lacks (no OpenGL/Mesa headers)
+gperftools
+  -//vendor/aw-backtrace/...  the vendored aw-backtrace BUILD files reference @abseil-cpp and @lua, which gperftools' MODULE.bazel doesn't declare, and //:aw-backtrace/aw-fastpath, which its root BUILD.bazel doesn't define
+  --deleted_packages=vendor/googletest/googlemock/test,vendor/googletest/googletest/test  (not an exclusion: //... fails on a broken package even when subtracted) the vendored googletest's test packages load @rules_python, which gperftools' MODULE.bazel doesn't declare
+graphviz
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects //:version_hdrs's `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+grep
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects //:lib/grep_private_headers's `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+gsl-lite
+gzip
+hdrhistogram_c
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel calls native cc_library without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+hermetic_cc_toolchain
+hiredis
+  --incompatible_autoload_externally=+@rules_cc  its deps libuv and glib call native cc_library, which Bazel 9 removed; autoload them from rules_cc
+howardhinnant_date
+jsmn
+json11
+jsoncons
+jwt-cpp
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its BUILD files (include/jwt-cpp, example) calls native cc_library/cc_binary without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+lcms2
+lcov
+libarchive
+libconfig
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel calls native cc_library without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+libev
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects //:libev's `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+libgit2
+libmagic
+libmaxminddb
+libwebsockets
+libxslt
+  --incompatible_autoload_externally=+@rules_cc  its deps rules_autoconf and libxml2 call native cc_binary/cc_library, which Bazel 9 removed; autoload them from rules_cc
+linenoise
+lmdb
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel calls native cc_library without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+luajit
+lzo
