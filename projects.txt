@@ -1008,7 +1008,7 @@ rapidcheck
   --noincompatible_disallow_empty_glob  its root BUILD.bazel globs include/**/*.cpp, which matches nothing
 rocksdb
   override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
-  -//:env_env_test  aborts in EnvPosixTestWithParam: "failed to find an ioctl-friendly temporary directory": its FS_IOC_GETVERSION ioctl probe fails on a fresh mkdtemp dir in both /var/tmp and /tmp (mkdtemp succeeded; it printed no error), and with no /.dockerenv it aborts instead of skipping
+  -//:env_env_test  aborts in EnvPosixTestWithParam: "failed to find an ioctl-friendly temporary directory": its probe (create a file in a fresh mkdtemp dir and issue FS_IOC_GETVERSION on it) fails in both /var/tmp and /tmp, and its stat("/.dockerenv") check, which would skip the test instead, fails too
 upb
   --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its BUILD files call native proto_library/cc_proto_library/sh_test and its bazel/*.bzl use the native CcInfo/ProtoInfo symbols without a load()
   --incompatible_autoload_externally=+@rules_cc,+@com_google_protobuf,+@rules_python,+@rules_shell  autoload the cc, proto, python and sh rules and symbols Bazel 9 removed
@@ -1140,7 +1140,7 @@ mp-units
   known-failing build  with -std=c++20, its overlay hardcodes MP_UNITS_API_STD_FORMAT=1, and the executor GCC's libstdc++ has no std::format (compat_macros.h: #error "std::formatting facility not supported")
 nanomsg
 nlopt
-  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects the resolved pcre2's root-package `includes = ["."]` ("resolves to the workspace root")
+  override rules_cc 0.2.27  rules_cc before 0.2.25 also rejects an external repo's root-package `includes = ["."]`: the resolved pcre2's @pcre2//:pcre2 fails analysis ("resolves to the workspace root")
   --incompatible_autoload_externally=+@rules_cc  the pcre2 it resolves has a BUILD.bazel calling native cc rules, which Bazel 9 removed; autoload them from rules_cc
 nsync
   --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD calls native cc_* rules without a load()

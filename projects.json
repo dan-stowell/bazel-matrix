@@ -18490,7 +18490,7 @@
           "url": "https://bcr.bazel.build/modules/nlopt/2.10.1.bcr1/MODULE.bazel",
           "integrity": "sha256-r3zZ8zmaZE19h3d23Qqh2bJ0uLFHGHpc1mb5i6DZICI="
         },
-        "module_append": "\n# bazel-matrix: rules_cc before 0.2.25 rejects the resolved pcre2's root-package `includes = [\".\"]` (\"resolves to the workspace root\")\nsingle_version_override(module_name = \"rules_cc\", version = \"0.2.27\")\n"
+        "module_append": "\n# bazel-matrix: rules_cc before 0.2.25 also rejects an external repo's root-package `includes = [\".\"]`: the resolved pcre2's @pcre2//:pcre2 fails analysis (\"resolves to the workspace root\")\nsingle_version_override(module_name = \"rules_cc\", version = \"0.2.27\")\n"
       }
     },
     {
