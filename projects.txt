@@ -942,6 +942,7 @@ tomlplusplus
 thrift
 tink_cc
 tcmalloc
+  --incompatible_autoload_externally=+@rules_cc  its fuzz targets' deps (highwayhash, snappy via riegeli) call native cc_library, which Bazel 9 removed; autoload it from rules_cc
   override aspect_bazel_lib 2.22.5  the resolved aspect_bazel_lib's toolchain repos call rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
   override aspect_rules_esbuild 0.27.1  the resolved aspect_rules_esbuild calls rule() with incompatible_use_toolchain_transition (esbuild/private/resolved_toolchain.bzl), which Bazel 9 removed
 utf8proc

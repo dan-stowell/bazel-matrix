@@ -7,4 +7,8 @@ project(
     targets = [
         "//...",
     ],
+    flags = [
+        # its fuzz targets' deps (highwayhash, snappy via riegeli) call native cc_library, which Bazel 9 removed; autoload it from rules_cc
+        "--incompatible_autoload_externally=+@rules_cc",
+    ],
 )
