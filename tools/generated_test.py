@@ -30,11 +30,10 @@ class GeneratedTest(unittest.TestCase):
 
     def test_no_orphans(self):
         # tools/BUILD.bazel passes the packages with a generated BUILD.bazel.
-        generated = os.environ["GENERATED"].split()
-        self.assertEqual(sorted(generated), sorted(self.fetched),
-                         "generated packages but not fetched: %s; fetched but no generated "
-                         "package: %s%s" % (sorted(set(generated) - set(self.fetched)),
-                                             sorted(set(self.fetched) - set(generated)), FIX))
+        generated = set(os.environ["GENERATED"].split())
+        orphans, missing = sorted(generated - set(self.fetched)), sorted(set(self.fetched) - generated)
+        self.assertFalse(orphans or missing, "generated packages but not fetched: %s; fetched "
+                         "but no generated package: %s%s" % (orphans, missing, FIX))
 
     def test_projects_json(self):
         errors = sync.module_mismatch(self.projects, self.data)
