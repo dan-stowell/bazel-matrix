@@ -1364,3 +1364,83 @@ toybox
 theora
 tinyply
 sphinxdocs
+
+# Chunk f-2: more BCR modules (g-l).
+gazelle_py
+gazelle_rs
+gazelle_ts
+gcc_toolchain
+  -//docs/...  its stardoc targets and their diff test: its MODULE.bazel pins stardoc 0.5.6, whose extractor rejects Bazel 9's canonical repo names ("invalid repository name '@bazel_lib+'")
+geometry-central
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its BUILD files (root, deps/nanort, test) calls native cc_library/cc_test without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed
+gifsicle
+  --strategy=CcConfigureMakeRule=local  on RBE, make finds Makefile.in out of date and runs automake-1.17, which the image lacks; run the configure_make action on the runner
+glucose
+gotopt2
+  -//cmd/gotopt2:gotopt2_test  its bats runner execs runfiles/libexec/bats-core/bats, which isn't in its runfiles ("No such file or directory", exit 127)
+graaf
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects //:graaf's `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel calls native cc_library without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed
+graphite2
+greatest
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects //:greatest's `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+grpc-httpjson-transcoding
+  override rules_foreign_cc 0.16.0  the resolved rules_foreign_cc 0.9.0 passes rule(incompatible_use_toolchain_transition), which Bazel 9 removed
+  --deleted_packages=perf_benchmark  (not an exclusion: //... fails on a broken package even when subtracted) perf_benchmark/BUILD loads @io_bazel_rules_docker, which its MODULE.bazel doesn't declare
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its src and test BUILD files call native cc_library/proto_library/cc_proto_library without a load()
+  --incompatible_autoload_externally=+@rules_cc,+@com_google_protobuf,+@rules_java  autoload the cc and proto rules Bazel 9 removed, and JavaInfo, which its dep rules_fuzzing's fuzzing/private/engine.bzl uses natively
+  --cxxopt=-std=c++17  its .bazelrc sets --cxxopt=-std=c++14, but the resolved abseil-cpp requires C++17 ("C++ versions less than C++17 are not supported")
+  --host_cxxopt=-std=c++17  same for the exec configuration: its .bazelrc sets --host_cxxopt=-std=c++14
+  known-failing build  with these, src/message_reader.cc uses google::protobuf::int64 (via its pb alias), which the resolved protobuf no longer defines ("'int64' in namespace 'google::grpc::transcoding::pb' does not name a type")
+grpc_kotlin
+  override rules_foreign_cc 0.16.0  the resolved rules_foreign_cc passes rule(incompatible_use_toolchain_transition) and uses the native CcInfo, both removed in Bazel 9
+  override aspect_bazel_lib 2.22.5  the resolved aspect_bazel_lib's toolchain repos call rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed
+  --incompatible_autoload_externally=+@com_google_protobuf,+@rules_java  its dep grpc-java 1.71.0's java_grpc_library.bzl uses the native ProtoInfo and its BUILD files call native java_library, both removed in Bazel 9; autoload them from protobuf and rules_java
+  override rules_nodejs 6.7.7  the resolved rules_nodejs's generated @nodejs_toolchains defs.bzl calls rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
+  known-failing build  with these, grpc-java's targets reference @maven artifacts (junit_junit, io_netty_netty_transport, io_perfmark_perfmark_api, ...) that the @maven repo resolved for grpc_kotlin doesn't declare ("no such target '@@rules_jvm_external++maven+maven//:junit_junit'")
+gtsam
+hashes.bzl
+  -//private/blake3:test_blake3  a starlark_pytest: pytest fails at startup, 'Error importing plugin "bazel.python.starlark_finder": No module named 'bazel'' (on RBE and on the runner alike); its *_kat_test and buildifier tests pass
+  -//private/crc32:test_crc32  same: starlark_pytest, pytest can't import its plugin bazel.python.starlark_finder
+  -//private/md5:test_md5  same: starlark_pytest, pytest can't import its plugin bazel.python.starlark_finder
+  -//private/sha1:test_sha1  same: starlark_pytest, pytest can't import its plugin bazel.python.starlark_finder
+  -//private/sha224:test_sha224  same: starlark_pytest, pytest can't import its plugin bazel.python.starlark_finder
+  -//private/sha256:test_sha256  same: starlark_pytest, pytest can't import its plugin bazel.python.starlark_finder
+  -//private/sha3_224:test_sha3_224  same: starlark_pytest, pytest can't import its plugin bazel.python.starlark_finder
+  -//private/sha3_256:test_sha3_256  same: starlark_pytest, pytest can't import its plugin bazel.python.starlark_finder
+  -//private/sha3_384:test_sha3_384  same: starlark_pytest, pytest can't import its plugin bazel.python.starlark_finder
+  -//private/sha3_512:test_sha3_512  same: starlark_pytest, pytest can't import its plugin bazel.python.starlark_finder
+  -//private/sha384:test_sha384  same: starlark_pytest, pytest can't import its plugin bazel.python.starlark_finder
+  -//private/sha512_224:test_sha512_224  same: starlark_pytest, pytest can't import its plugin bazel.python.starlark_finder
+  -//private/sha512_256:test_sha512_256  same: starlark_pytest, pytest can't import its plugin bazel.python.starlark_finder
+  -//private/sha512:test_sha512  same: starlark_pytest, pytest can't import its plugin bazel.python.starlark_finder
+  -//private:test_bytes  same: starlark_pytest, pytest can't import its plugin bazel.python.starlark_finder
+  -//private:test_hashes  same: starlark_pytest, pytest can't import its plugin bazel.python.starlark_finder
+  -//private/utf8:test_utf8  same: starlark_pytest, pytest can't import its plugin bazel.python.starlark_finder
+helly25_bzl
+helly25_mbo
+  known-failing build  the images' gcc 13 rejects mbo/types/optional_data_or_ref.h:152/200's `typename = std::enable_if_t<ConstructibleFrom<T, Args...>>` ("type/value mismatch ... expected a constant of type 'bool', got 'T'"), so emplace()/as_data() don't exist and stringify, extend, file, json and mope (29 targets plus their tests) fail; its .bazelrc's config:clang builds with LLVM. Separately, its mope rules default to //:clang-format, which its root BUILD.bazel doesn't define
+helly25_proto
+hermetic_clang_toolchain
+hfsm2
+iceoryx
+  known-failing build  iceoryx_platform/generic/include/iceoryx_platform/generic/acl.hpp includes sys/acl.h, which no declared dep provides and the executor image lacks (no libacl headers)
+isl
+jsinterop_generator
+  known-failing build  fetching @maven fails: rules_jvm_external's coursier needs a host java ("exec: java: not found"); (its resolved rules_go also uses the native CcInfo, which Bazel 9 removed: override rules_go 0.65.0 fixes that)
+json_spirit
+kissat
+lcm
+  --incompatible_autoload_externally=+@rules_cc  its dep googletest calls native cc_library, which Bazel 9 removed; autoload it from rules_cc
+lexbor
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its gen_test_targets.bzl (loaded by its root BUILD.bazel) calls native.cc_test
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed
+libcpuid
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel calls native cc_library without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed
+libedlib
+libgps
+libiberty
