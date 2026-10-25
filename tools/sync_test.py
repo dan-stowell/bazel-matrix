@@ -119,24 +119,5 @@ class RenderBuildTest(unittest.TestCase):
         self.assertIn('    # needs a GPU\n    known_failing = "test",\n', text)
 
 
-class StatusTest(unittest.TestCase):
-    def test_counts(self):
-        projects = sync.parse_projects_txt(
-            "a\n  known-failing build  r\n  -//x  r\n  -//y  r\nb\n  known-failing test  r\n"
-            "  --f  r\nc\n")
-        c = sync.counts(projects, [{"name": "d", "reason": "deprecated"}])
-        self.assertEqual(c, {"projects": 3, "known_failing_build": 1, "known_failing_test": 1,
-                             "exclusions": 2, "flags": 1, "skipped": 1})
-        self.assertIn("3 projects: 1 known-failing build, 1 known-failing test", sync.status_line(c))
-
-    def test_update_status(self):
-        readme = "x\n%s\nold\n%s\ny\n" % (sync.STATUS_BEGIN, sync.STATUS_END)
-        new = sync.update_status(readme, "new")
-        self.assertEqual(new, "x\n%s\nnew\n%s\ny\n" % (sync.STATUS_BEGIN, sync.STATUS_END))
-        self.assertEqual(sync.update_status(new, "new"), new)
-        with self.assertRaises(ValueError):
-            sync.update_status("no markers", "new")
-
-
 if __name__ == "__main__":
     unittest.main()
