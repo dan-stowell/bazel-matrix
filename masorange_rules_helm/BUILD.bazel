@@ -6,7 +6,9 @@ project(
     name = "masorange_rules_helm",
     targets = [
         "//...",
-        # its stamp test expects the values of its stamp.sh, which its .bazelrc passes only under test:ci ($GITHUB_WORKSPACE/stamp.sh); --workspace_status_command=./stamp.sh exits 127 here (cause not identified)
-        "-//helm/tests/helm_chart:chart_a_stamp_test_values_test_diff_diff",
+    ],
+    flags = [
+        # its stamp test expects the values its stamp.sh prints, which its .bazelrc passes only under test:ci (as $GITHUB_WORKSPACE/stamp.sh); Bazel runs the command with bash -c in the workspace, so $PWD finds it
+        "--workspace_status_command=$PWD/stamp.sh",
     ],
 )
