@@ -13,9 +13,9 @@ shards round-robin in name order. It prints each shard's invocation links as
 it finishes, then one row per project and the totals; the logs are in
 bb-out/run/. Exit status 0 when every project passed.
 
-By default it skips the projects that projects.txt marks known-failing for
-the command (known-failing build: both; known-failing test: test only), as
-`//...` does.
+Without project names it skips the projects that projects.txt marks
+known-failing for the command (known-failing build: both; known-failing
+test: test only), as `//...` does.
 """
 
 import argparse
@@ -43,7 +43,10 @@ _BUILD_ERROR = re.compile(r"^ERROR: (?:\S*/)?([^/\s]+)/BUILD\.bazel:\d+:\d+: ")
 
 
 def select_projects(projects, command, names, known_failing):
-    """The projects (in projects.txt order) the command runs."""
+    """The projects (in projects.txt order) the command runs.
+
+    Known-failing ones only when named or with known_failing set.
+    """
     known = {p["name"] for p in projects}
     unknown = [n for n in names if n not in known]
     if unknown:
@@ -53,7 +56,7 @@ def select_projects(projects, command, names, known_failing):
         if names and p["name"] not in names:
             continue
         kf = p.get("known_failing")
-        if kf and not known_failing and (command == "test" or kf[0] == "build"):
+        if kf and not (names or known_failing) and (command == "test" or kf[0] == "build"):
             continue
         out.append(p["name"])
     return out
@@ -136,7 +139,7 @@ def main(argv=None):
     if "--" in argv:
         extra = argv[argv.index("--") + 1:]
         argv = argv[:argv.index("--")]
-    args = ap.parse_args(argv)
+    args = ap.parse_intermixed_args(argv)
 
     projects = sync.parse_projects_txt(sync.read("projects.txt"))
     # Only the projects sync wrote a package for.

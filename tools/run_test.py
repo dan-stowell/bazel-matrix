@@ -12,7 +12,7 @@ class SelectTest(unittest.TestCase):
         self.assertEqual(run.select_projects(self.PROJECTS, "build", [], False), ["a", "c"])
         self.assertEqual(run.select_projects(self.PROJECTS, "test", [], False), ["a"])
         self.assertEqual(run.select_projects(self.PROJECTS, "test", [], True), ["a", "b", "c"])
-        self.assertEqual(run.select_projects(self.PROJECTS, "test", ["a", "c"], False), ["a"])
+        self.assertEqual(run.select_projects(self.PROJECTS, "test", ["a", "c"], False), ["a", "c"])
         with self.assertRaises(ValueError):
             run.select_projects(self.PROJECTS, "test", ["z"], False)
 
