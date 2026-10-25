@@ -6,7 +6,7 @@ project(
     name = "p4c",
     targets = [
         "//...",
-        # reads p4include/core.p4 through the source-relative path test/gtest/../../p4include in its runfiles, where it isn't ("Couldn't read standard header ..."); whether it is missing from data is not confirmed
+        # test/gtest/helpers.cpp reads p4include/core.p4 from <source dir>/../../p4include, but the cc_test has no data, so p4include isn't in its runfiles ("Couldn't read standard header ...")
         "-//backends/p4tools:p4testgen_api_test",
     ],
     flags = [
