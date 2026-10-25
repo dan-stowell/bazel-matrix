@@ -1958,8 +1958,7 @@ chicory
   override javaparser 3.27.0  javaparser 3.26.2, which it declares, makes javaparser-core incompatible unless --java_runtime_version is remotejdk_11/17 ("JavaParser is incompatible with JDK versions 21 and later"), and remote-minimal uses JDK 21; 3.27.0 transitions javaparser-core to remotejdk_17 itself
   --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its BUILD files (wasm, wasi, host-module, ...) call native java_library without a load()
   --incompatible_autoload_externally=+@rules_java  autoload the java rules Bazel 9 removed
-# circl@1.3.7: 1.3.8's registry patch 0002 adds its author's bazel-bin/bazel-circl/bazel-out/bazel-testlogs convenience symlinks (mode 120000, pointing into /home/matt-clarkson/.cache/bazel), and tools/sources.bzl's tar of the patched tree fails on them ("tar: bazel-bin: Cannot open: Permission denied").
-circl@1.3.7
+circl
   override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed
   --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its math/fp25519 and math/fp448 BUILD files call native cc_library without a load()
   --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed
