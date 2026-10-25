@@ -6,7 +6,7 @@ project(
     name = "gdk-pixbuf",
     targets = [
         "//...",
-        # the executor OOM-kills it: it grew past 62 GB (observed 66.9 GB) decoding its malformed test images
+        # one test binary feeds every image in tests/test-images/fail to the loaders, and one decoder allocates past the executor's 62 GB limit (observed 66.9 GB, EXECUTOR_OOM_KILL); the killed run leaves no log naming the image
         "-//tests:pixbuf-fail",
     ],
 )
