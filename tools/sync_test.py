@@ -78,7 +78,7 @@ class ParseProjectsTxtTest(unittest.TestCase):
             "more after it": 'local_path_override(module_name = "core", path = "..") + 1\n',
             "nested call": 'local_path_override(module_name = "core", path = str(".."))\n',
             "twice": 'local_path_override(module_name = "core", path = "..")\n'
-                     '# local_path_override(module_name = "core", path = "..")\n',
+                     'local_path_override(module_name = "core", path = "..")\n',
         }
         for what, text in bad.items():
             with self.assertRaisesRegex(ValueError, "isn't whole lines found once", msg=what):
