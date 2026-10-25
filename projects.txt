@@ -2644,7 +2644,7 @@ rules_ml_toolchain
   known-failing build  with those autoloads, 70 targets still fail: its CUDA, SYCL, darwin and aarch64 toolchain packages need repos that are empty or undeclared here ("glob pattern 'bin/**' didn't match anything" in @cuda_nvcc, "unknown repo 'oneapi'"), and //cc/config:empty fails analysis ("type 'NoneType' has no operator [](Provider)" on ctx.attr.toolchain_import)
 rules_mojo
 rules_nccl
-  known-failing build  needs a local NCCL install: its MODULE.bazel configures local_nccl with nccl_path = "", which finds none here, so @local_nccl has no BUILD file ("no such package '@@+nccl_dependencie+local_nccl//'") and every target depends on it
+  known-failing build  needs a local NCCL install, which the images lack: without one, nccl/private/repositories.bzl symlinks //nccl:templates/BUILD.local_nccl_disabled as @local_nccl's BUILD, but that file is at nccl/private/templates/, so @local_nccl has no BUILD file ("no such package '@@+nccl_dependencie+local_nccl//'") and every target depends on it
 rules_nixpkgs_nodejs
   known-failing build  its .bazelrc does 'import %workspace%/../../.bazelrc.remote-cache', a file in the rules_nixpkgs monorepo that the module's archive (toolchains/nodejs only) doesn't contain
 rules_node_addon
