@@ -2704,7 +2704,7 @@ ppp
   override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
 pre-commit
 pre-commit-hooks
-  known-failing build  as the root module its MODULE.bazel registers only a Python 3.13 toolchain (python.toolchain is a dev dependency) but pip.parse()s hubs for 3.10-3.13 ("Unable to find interpreter for pip hub 'clang-format-3.10'"), and its dev dep hermetic_cc_toolchain 3.1.0 fails to load under Bazel 9 (zig_toolchain.bzl: "at index 0 of provides, got element of type NoneType")
+  known-failing build  as the root module its MODULE.bazel registers only a Python 3.13 toolchain (python.toolchain is a dev dependency) but pip.parse()s hubs for 3.10-3.13 ("Unable to find interpreter for pip hub 'clang-format-3.10'"), and its dev dep hermetic_cc_toolchain 3.1.0 fails to load under Bazel 9 (toolchain/zig_toolchain.bzl uses the native CcToolchainConfigInfo without a load(), which is None in Bazel 9: "at index 0 of provides, got element of type NoneType")
 prismo
   override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed (go/private/rules/cgo.bzl)
   override rules_nodejs 6.7.7  the resolved rules_nodejs's nodejs/toolchain.bzl uses the native CcInfo symbol, which Bazel 9 removed
