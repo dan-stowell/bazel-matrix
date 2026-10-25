@@ -1334,7 +1334,7 @@ trlc
   -//:requirements_3_10.test  pip-compile against live PyPI resolves newer versions (cvc5 1.4.2, pyvcg 1.0.12) than requirements_lock_3_10.txt pins ("Lock file out of date")
   -//:requirements_3_11.test  as requirements_3_10.test: its lock file is out of date against live PyPI
   -//:requirements_3_12.test  as requirements_3_10.test: its lock file is out of date against live PyPI
-  -//:requirements_dev.test  the same pip-compile check for requirements_dev; it times out at 60 s
+  --test_timeout=300  //:requirements_dev.test (size small, so 60 s) runs pip-compile against live PyPI, which took 45 s on one run and timed out at 60 s on another
   -//api-examples/filename-check:filename_check  an example check that fails by design ("check error: is not a file" for example.png and bad.png); the package's test_suite of passing tests leaves it out
 teckit
 systemc
@@ -1444,3 +1444,61 @@ libcpuid
 libedlib
 libgps
 libiberty
+# Chunk D4: more BCR modules (s-z).
+systemd
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+zsync3
+zpaq
+yosys-slang
+xacro
+wget2
+wget
+videoproto
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel calls native cc_library without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+versor
+  known-failing build  include/vsr/space/vsr_cga3D_op.h defines non-inline namespace-scope variables (auto pointOnLine = [](...){...} and others), so linking its library //:vsr fails with multiple definitions of vsr::cga::pointOnLine etc.
+ultrajson
+  -//deps/double-conversion:cctest  the vendored double-conversion's test includes double-conversion/bignum.h, a path no dep of that target provides
+ujson4c
+tweag-credential-helper
+  known-failing build  its MODULE.bazel pins go_sdk.download(version = "1.24.2"), but the resolved gazelle's go.work requires go >= 1.24.12 (GOTOOLCHAIN=local), so building gazelle's go_repository tools fails and no Go dependency fetches
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo (go/private/rules/cgo.bzl), which Bazel 9 removed
+trec_eval
+  --deleted_packages=test  a separate workspace (test/MODULE.bazel, the BCR test module) whose bazel_skylib dep the root module doesn't declare
+tools_android
+toolchains_musl
+  --deleted_packages=bcr_test  a separate workspace (bcr_test/MODULE.bazel, the BCR test module) whose aspect_bazel_lib dep the root module doesn't declare
+toolchains_arm_gnu
+  known-failing build  its own toolchain/config.bzl, loaded by its module extension, calls rule(provides = [CcToolchainConfigInfo]), which is None in Bazel 9 ("got element of type NoneType, want Provider")
+toolchains_buildbuddy
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo (go/private/rules/cgo.bzl), which Bazel 9 removed
+  override aspect_bazel_lib 2.22.5  the resolved aspect_bazel_lib's toolchain repos call rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
+  -//:buildifier.test  a no_sandbox buildifier_test over the workspace's sources; it exits 1 with no output on RBE and 123 (xargs: a buildifier run failed) with no output when run on the runner; cause not established
+  -//examples:rbe_bzlmod_test  runs a nested Bazel against BuildBuddy RBE and needs BUILDBUDDY_API_KEY in the test environment ("BUILDBUDDY_API_KEY: unbound variable")
+  -//examples:rbe_workspace_test  as rbe_bzlmod_test: needs BUILDBUDDY_API_KEY in the test environment
+thorvg
+tcpdump
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+tclreadline
+subspace
+squashfuse
+sqids_bazel
+simplehttp
+  -//test/...  its tests depend on @curl, which its MODULE.bazel doesn't declare
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its BUILD files call native cc_library/cc_test without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+sign-here
+  known-failing build  a Swift project: rules_swift finds no Swift toolchain on the Linux executor (no target linux-toolchain in build_bazel_rules_swift_local_config), and its Swift targets need one (the flags below get past the native sh_binary errors before it)
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: tools/coverage and tools/readme call native sh_binary without a load()
+  --incompatible_autoload_externally=+@rules_shell  autoload the shell rules Bazel 9 removed from rules_shell
+saru
+sajson
+safeint
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+su-exec
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel calls native cc_binary without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+textforge
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel calls native py_library/py_test without a load()
+  --incompatible_autoload_externally=+@rules_python  autoload the python rules Bazel 9 removed from rules_python
