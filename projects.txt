@@ -1537,8 +1537,17 @@ textforge
 modern-cpp-kafka
   --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel, examples, tests and tools/console_clients call native cc_* rules without a load()
   --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
-  --per_file_copt=.*\.c$@-Wno-error  its .bazelrc sets --copt='-std=c++17', which also reaches C files, and the boringssl it resolves compiles C with -Werror, so GCC's "'-std=c++17' is valid for C++/ObjC++ but not for C" warning fails them; keep it a warning for .c files
-  known-failing build  with those fixes, every binary (examples, tests, tools/console_clients) links both the boringssl and the openssl in its dependency graph, and ld.gold rejects their duplicate symbols ("multiple definition")
+  --per_file_copt=external/boringssl\+/.*\.c$@-Wno-error  its .bazelrc sets --copt='-std=c++17', which also reaches C files, and the boringssl it resolves compiles C with -Werror, so GCC's "'-std=c++17' is valid for C++/ObjC++ but not for C" warning fails them; keep it a warning for boringssl's .c files
+  -//examples:kafka_async_producer_copy_payload  links both the boringssl and the openssl in its dependency graph, and ld.gold rejects their duplicate symbols ("multiple definition")
+  -//examples:kafka_async_producer_not_copy_payload  links both the boringssl and the openssl in its dependency graph, and ld.gold rejects their duplicate symbols ("multiple definition")
+  -//examples:kafka_auto_commit_consumer  links both the boringssl and the openssl in its dependency graph, and ld.gold rejects their duplicate symbols ("multiple definition")
+  -//examples:kafka_manual_commit_consumer  links both the boringssl and the openssl in its dependency graph, and ld.gold rejects their duplicate symbols ("multiple definition")
+  -//examples:kafka_sync_producer  links both the boringssl and the openssl in its dependency graph, and ld.gold rejects their duplicate symbols ("multiple definition")
+  -//tests:kafka-integration-test  links both the boringssl and the openssl in its dependency graph, and ld.gold rejects their duplicate symbols ("multiple definition")
+  -//tests:kafka-robustness-test  links both the boringssl and the openssl in its dependency graph, and ld.gold rejects their duplicate symbols ("multiple definition")
+  -//tools/console_clients:kafka-console-consumer  links both the boringssl and the openssl in its dependency graph, and ld.gold rejects their duplicate symbols ("multiple definition")
+  -//tools/console_clients:kafka-console-producer  links both the boringssl and the openssl in its dependency graph, and ld.gold rejects their duplicate symbols ("multiple definition")
+  -//tools/console_clients:kafka-topics  links both the boringssl and the openssl in its dependency graph, and ld.gold rejects their duplicate symbols ("multiple definition")
 mujoco
   -//test/user:user_cache_test  test/user/user_cache_test.cc declares constexpr std::string constants, which the executor's GCC (older than 12) rejects ("the type 'const string' of 'constexpr' variable ... is not literal")
   -//test/sample:compile_test  its script runs third_party/mujoco/sample/compile, a path that isn't in its runfiles ("No such file or directory")
@@ -1570,31 +1579,31 @@ patch
 pict
 pinocchio
   --incompatible_autoload_externally=+@rules_cc  the sdformat it resolves has a BUILD.bazel calling native cc rules, which Bazel 9 removed; autoload them from rules_cc
-  -//:all-joints_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
-  -//:cartesian-product-liegroups_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
-  -//:constraint_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
-  -//:eigen-basic-op_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
-  -//:eigen-tensor_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
-  -//:explog_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
-  -//:joint-free-flyer_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
-  -//:joint-generic_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
-  -//:joint-mimic_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
-  -//:joint-prismatic_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
-  -//:liegroups_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
-  -//:macros_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
-  -//:quaternion_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
-  -//:rotation_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
-  -//:rpy_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
-  -//:symmetric_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
-  -//:vector_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
-  -//:version_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+  -//:all-joints_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
+  -//:cartesian-product-liegroups_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
+  -//:constraint_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
+  -//:eigen-basic-op_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
+  -//:eigen-tensor_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
+  -//:explog_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
+  -//:joint-free-flyer_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
+  -//:joint-generic_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
+  -//:joint-mimic_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
+  -//:joint-prismatic_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
+  -//:liegroups_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
+  -//:macros_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
+  -//:quaternion_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
+  -//:rotation_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
+  -//:rpy_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
+  -//:symmetric_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
+  -//:vector_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
+  -//:version_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
 plthook
   override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
 poppler
 portaudio
 postgres
 proxy-wasm-cpp-sdk
-  override emsdk 6.0.13  the emsdk 4.0.13 it declares fails to load under Bazel 9: rule() gets None in provides ("at index 0 of provides, got element of type NoneType") and rule(incompatible_use_toolchain_transition=...)
+  override emsdk 6.0.13  the emsdk 4.0.13 it declares fails to load under Bazel 9: emscripten_toolchain/toolchain.bzl does rule(provides = [CcToolchainConfigInfo]) with the native CcToolchainConfigInfo, which is None ("at index 0 of provides, got element of type NoneType"), and the aspect_bazel_lib it brings calls rule(incompatible_use_toolchain_transition=...); 6.0.13 loads
   --incompatible_autoload_externally=+@rules_cc  the re2 it resolves has a BUILD.bazel calling native cc rules, which Bazel 9 removed; autoload them from rules_cc
 remotery
 rsync
@@ -2058,3 +2067,98 @@ freertos
   -//:arm_cm4f_port  an ARM Cortex-M port: its portmacro.h needs config values (configENABLE_MPU, configMAX_SYSCALL_INTERRUPT_PRIORITY) that the default FreeRTOSConfig.h here doesn't define
   -//:arm_cm7_port  an ARM Cortex-M port: its portmacro.h needs config values (configENABLE_MPU, configMAX_SYSCALL_INTERRUPT_PRIORITY) that the default FreeRTOSConfig.h here doesn't define
   -//:xtensa_port  an Xtensa port: it needs the Xtensa toolchain's xtensa/config/core.h
+
+# Chunk b-10: more libraries and rulesets (m-r).
+opencv
+  -//:dnn_test  its failing cases need OpenCV's separate opencv_extra test data, which the module doesn't provide ("Can't find required data file", then assertions on empty images)
+  -//:stereo_test  its failing cases need OpenCV's separate opencv_extra test data, which the module doesn't provide ("Can't find required data file", then assertions on empty images)
+  -//:stitching_test  its failing cases need OpenCV's separate opencv_extra test data, which the module doesn't provide ("Can't find required data file", then assertions on empty images)
+  -//:video_test  its failing cases need OpenCV's separate opencv_extra test data, which the module doesn't provide ("Can't find required data file", then assertions on empty images)
+  known-failing test  its remaining tests are killed by SIGSEGV on the executors (imgcodecs_test in 2 runs, then photo_test once it was excluded: "Remote Execution Failure: ... terminated by SIGSEGV, likely due to a memory issue"), and each crash aborts the whole inner test run; not yet diagnosed
+openusd
+pcl
+  -//test/...  test/BUILD.bazel uses @googletest, which its MODULE.bazel doesn't declare
+proxygen
+  override rules_cc 0.2.27  rules_cc before 0.2.25 also rejects an external repo's root-package `includes = ["."]`: the resolved folly fails analysis ("resolves to the workspace root")
+  --cxxopt=-std=c++20  the folly it resolves uses consteval, and the toolchain default is -std=c++17 ("'consteval' does not name a type")
+protovalidate-cc
+rules_proto_grpc_cpp
+  --incompatible_autoload_externally=+@rules_cc,+@com_google_protobuf  the grpc it resolves has BUILD files calling native cc and proto rules, which Bazel 9 removed; autoload them
+  known-failing build  with those autoloads, the rules_foreign_cc it resolves (toolchains/native_tools/native_tools_toolchain.bzl) calls rule(incompatible_use_toolchain_transition=...), which Bazel 9 removed
+rules_proto_grpc_python
+  known-failing build  the grpc it resolves has BUILD files calling native cc rules (no grpc_python_plugin), its rules_foreign_cc uses the removed native CcInfo, and its toolchains call rule(incompatible_use_toolchain_transition=...), all removed in Bazel 9
+rules_proto_grpc_go
+  override rules_go 0.65.0  the resolved rules_go's go/private/extensions.bzl calls module_ctx facts .clear(), which Bazel 9's Facts value lacks ("'Facts' value has no field or method 'clear'")
+rules_proto_grpc_java
+rules_python_gazelle_plugin
+  known-failing build  its MODULE.bazel has local_path_override(rules_python, path = ".."): the module is the gazelle/ directory of the rules_python repo, and its archive has no rules_python at .. ("No MODULE.bazel ... found in external/rules_python+")
+rules_rust_protobuf
+  known-failing build  //:default_proto_toolchain_impl (rust_proto_toolchain) asks for the @rules_proto//proto:toolchain_type toolchain, which its rule doesn't declare ("toolchain type ... was requested but only types [] are configured"); it is the module's default toolchain
+rules_rust_pyo3
+rules_rust_mdbook
+rules_nixpkgs_core
+  known-failing build  its .bazelrc does 'import %workspace%/../.bazelrc.remote-cache', a file in the rules_nixpkgs monorepo that the module's archive (core/ only) doesn't contain
+rules_helm
+rules_terraform
+rules_elixir
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed (go/private/rules/cgo.bzl)
+  known-failing build  needs Erlang/OTP: validating @erlang_config's otp at /usr fails (exit 127), the images have no erl
+rules_doxygen
+  --deleted_packages=examples,examples/awesome,examples/base,examples/custom,examples/dependencies,examples/doxyfile,examples/doxylink,examples/executable,examples/graphviz,examples/kwargs,examples/latex,examples/nested,examples/plantuml,examples/submodules/root,examples/submodules/submodule1,examples/submodules/submodule2,examples/substitutions,examples/third_party/greet_gen  (not an exclusion: //... fails on a broken package even when subtracted) examples/ is a separate workspace (examples/MODULE.bazel): its BUILD files load @doxygen, which only that MODULE.bazel's doxygen_extension defines
+  -//doxygen:executable  its //doxygen:linux/doxygen input is a doxygen binary that the release archive doesn't contain ("missing input file '//doxygen:linux/doxygen'")
+rules_graalvm
+  known-failing build  its .bazelrc sets --incompatible_remote_results_ignore_disk, which Bazel 9 no longer recognizes ("Unrecognized option")
+rules_jupyter
+  -//tests/non_jupytext:report_full  renders with the hermetic chromium-headless-shell from playwright, which needs libnspr4.so, missing from the executor image ("error while loading shared libraries: libnspr4.so")
+  -//tests/non_jupytext:report_webpdf  renders with the hermetic chromium-headless-shell from playwright, which needs libnspr4.so, missing from the executor image ("error while loading shared libraries: libnspr4.so")
+  -//tests/reports_ipynb:report_full  renders with the hermetic chromium-headless-shell from playwright, which needs libnspr4.so, missing from the executor image ("error while loading shared libraries: libnspr4.so")
+  -//tests/reports_ipynb:report_webpdf  renders with the hermetic chromium-headless-shell from playwright, which needs libnspr4.so, missing from the executor image ("error while loading shared libraries: libnspr4.so")
+  -//tests/reports_py:report_full  renders with the hermetic chromium-headless-shell from playwright, which needs libnspr4.so, missing from the executor image ("error while loading shared libraries: libnspr4.so")
+  -//tests/reports_py:report_webpdf  renders with the hermetic chromium-headless-shell from playwright, which needs libnspr4.so, missing from the executor image ("error while loading shared libraries: libnspr4.so")
+  -//tests/with_graphs:report  renders with the hermetic chromium-headless-shell from playwright, which needs libnspr4.so, missing from the executor image ("error while loading shared libraries: libnspr4.so")
+  -//tests/with_graphs:validate_report_test  checks the output of //tests/with_graphs:report (above)
+  -//tests/jupyter_notebook_test:passing_test  launches playwright's hermetic chromium, which needs libnspr4.so, missing from the executor image ("error while loading shared libraries: libnspr4.so")
+  -//tests/jupyter_notebook_test:passing_test_with_kernel  launches playwright's hermetic chromium, which needs libnspr4.so, missing from the executor image ("error while loading shared libraries: libnspr4.so")
+  -//tests/jupyter_notebook_test:passing_test_with_webpdf_report  launches playwright's hermetic chromium, which needs libnspr4.so, missing from the executor image ("error while loading shared libraries: libnspr4.so")
+  -//tests/with_args:test_with_args_ipynb  launches playwright's hermetic chromium, which needs libnspr4.so, missing from the executor image ("error while loading shared libraries: libnspr4.so")
+  -//tests/with_args:test_with_args_py  launches playwright's hermetic chromium, which needs libnspr4.so, missing from the executor image ("error while loading shared libraries: libnspr4.so")
+  -//tests/with_args:test_without_args  launches playwright's hermetic chromium, which needs libnspr4.so, missing from the executor image ("error while loading shared libraries: libnspr4.so")
+  -//tests/with_data:test_with_data_ipynb  launches playwright's hermetic chromium, which needs libnspr4.so, missing from the executor image ("error while loading shared libraries: libnspr4.so")
+  -//tests/with_data:test_with_data_py  launches playwright's hermetic chromium, which needs libnspr4.so, missing from the executor image ("error while loading shared libraries: libnspr4.so")
+  -//tests/with_dep_ext:test_ipynb  launches playwright's hermetic chromium, which needs libnspr4.so, missing from the executor image ("error while loading shared libraries: libnspr4.so")
+  -//tests/with_dep_ext:test_py  launches playwright's hermetic chromium, which needs libnspr4.so, missing from the executor image ("error while loading shared libraries: libnspr4.so")
+  -//tests/with_deps/notebook:test_ipynb  launches playwright's hermetic chromium, which needs libnspr4.so, missing from the executor image ("error while loading shared libraries: libnspr4.so")
+  -//tests/with_deps/notebook:test_py  launches playwright's hermetic chromium, which needs libnspr4.so, missing from the executor image ("error while loading shared libraries: libnspr4.so")
+  -//tests/with_env:test_with_env_ipynb  launches playwright's hermetic chromium, which needs libnspr4.so, missing from the executor image ("error while loading shared libraries: libnspr4.so")
+  -//tests/with_env:test_with_env_py  launches playwright's hermetic chromium, which needs libnspr4.so, missing from the executor image ("error while loading shared libraries: libnspr4.so")
+rules_minijinja
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed (go/private/rules/cgo.bzl)
+rules_playwright
+  override aspect_bazel_lib 2.22.5  the resolved aspect_bazel_lib's toolchain repos call rule(incompatible_use_toolchain_transition=...), which Bazel 9 removed; registering them breaks toolchain resolution for every target
+  --deleted_packages=examples/workspace  (not an exclusion: //... fails on a broken package even when subtracted) it loads @npm, which its MODULE.bazel doesn't declare
+  known-failing build  with those fixes, its own tools/config_setting/BUILD.bazel has a syntax error under Bazel 9 ("syntax error at 'for': expected expression"), and //tools:stardoc_renderer sets java_binary's main_class, which the java_binary it gets doesn't have ("no such attribute 'main_class'")
+rules_poetry
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: examples, lib/private and lib/tests call native sh_test/py_binary without a load()
+  --incompatible_autoload_externally=+@rules_shell,+@rules_python  autoload the sh and python rules Bazel 9 removed
+  -//examples:aspect_rules_py_integration_test  runs `bazel` from PATH, which the executors don't have ("bazel: not found")
+  -//examples:cc_toolchain_integration_test  runs `bazel` from PATH, which the executors don't have ("bazel: not found")
+  -//examples:markers_integration_test  runs `bazel` from PATH, which the executors don't have ("bazel: not found")
+  -//examples:simple_integration_test  runs `bazel` from PATH, which the executors don't have ("bazel: not found")
+  -//examples:torch_integration_test  runs `bazel` from PATH, which the executors don't have ("bazel: not found")
+  -//examples:transitions_integration_test  runs `bazel` from PATH, which the executors don't have ("bazel: not found")
+  -//examples:workspace_integration_test  runs `bazel` from PATH, which the executors don't have ("bazel: not found")
+  -//examples:workspace_rules_python_integration_test  runs `bazel` from PATH, which the executors don't have ("bazel: not found")
+  -//lib/tests:runfiles_external_workspace_contents_test  its analysis-time assertion on an external repo's runfiles paths fails under Bazel 9.3.1 ("Expected condition to be true, but was false"); the layout change behind it is not yet identified
+  -//lib/tests:py_zip_validate  exits 1 with no output on the executors; cause not yet identified
+rules_pkl
+  known-failing build  its pkl module extension reads //.github:PklProject.deps.json, and the release archive has no .github/ package ("Unable to load package for //.github:PklProject.deps.json")
+rules_typst
+rules_verilator
+rules_wasm
+  -//tests:command-output-actual  builds @example//rust:command, a wasm32 Rust cdylib whose link needs wasm-component-ld, which the registered Rust toolchain lacks ("linker `wasm-component-ld` not found")
+  -//tests:verify-command-runs  diffs //tests:command-output-actual (above)
+rules_sbom
+rules_syft
+  override aspect_bazel_lib 2.22.5  the resolved aspect_bazel_lib's toolchain repos call rule(incompatible_use_toolchain_transition=...), which Bazel 9 removed; registering them breaks toolchain resolution for every target
+  known-failing build  with that override, its own syft/private/resolved_toolchain.bzl calls rule(incompatible_use_toolchain_transition=...), which Bazel 9 removed
+rules_shar

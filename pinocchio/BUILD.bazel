@@ -6,41 +6,41 @@ project(
     name = "pinocchio",
     targets = [
         "//...",
-        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
         "-//:all-joints_test",
-        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
         "-//:cartesian-product-liegroups_test",
-        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
         "-//:constraint_test",
-        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
         "-//:eigen-basic-op_test",
-        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
         "-//:eigen-tensor_test",
-        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
         "-//:explog_test",
-        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
         "-//:joint-free-flyer_test",
-        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
         "-//:joint-generic_test",
-        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
         "-//:joint-mimic_test",
-        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
         "-//:joint-prismatic_test",
-        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
         "-//:liegroups_test",
-        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
         "-//:macros_test",
-        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
         "-//:quaternion_test",
-        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
         "-//:rotation_test",
-        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
         "-//:rpy_test",
-        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
         "-//:symmetric_test",
-        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
         "-//:vector_test",
-        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+        # aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); each such test both #includes the header-only boost/test/included/unit_test.hpp (BCR patch) and links @boost.test//:boost.test, i.e. two copies of Boost.Test's runtime, a likely but unconfirmed cause
         "-//:version_test",
     ],
     flags = [
