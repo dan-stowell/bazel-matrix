@@ -646,3 +646,25 @@ boost.timer
   -//test/...  uses @platforms, @boost.chrono and @boost.core, which its MODULE.bazel doesn't declare
 boost.scope_exit
 boost.scope
+
+# Chunk A10: heavy high reverse-dep modules (a-l).
+llvm
+  known-failing build  open-ended: fetching @windows_support's msvc_runtime fails, its starlark_doc_extract targets lack bzl_library deps, and the toolchain/bootstrap stages find no toolchains for most cross targets
+llvm-project
+  --noincompatible_disallow_empty_glob  globs in bolt, lld, mlir, mlir/test and mlir/unittests match nothing
+  --deleted_packages=clang-tools-extra/clang-tidy  (not an exclusion: //... fails on a broken package even when subtracted) its genrule uses exec_tools, which Bazel 9 removed
+  -//clang-tools-extra/...  depends on the deleted clang-tools-extra/clang-tidy
+  -//mlir/test/...  its lit tests (py_test running llvm/utils/lit/lit.py) fail with "ModuleNotFoundError: No module named 'lit'", locally too
+  -//llvm/utils/lit/...  its lit tests (py_test running llvm/utils/lit/lit.py) fail with "ModuleNotFoundError: No module named 'lit'", locally too
+  -//libc/...  //libc:memcpy passes clang-only flags (-mllvm --tail-merge-threshold=0), and the images have only gcc
+folly
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+  --cxxopt=-std=c++20  it needs C++20 (requires, std::span, std::to_address), and the default is C++17
+  --host_cxxopt=-std=c++20  it needs C++20 (requires, std::span, std::to_address), and the default is C++17
+grpc-java
+  -//android/...  needs an Android SDK, which the images lack
+  -//binder/...  needs an Android SDK, which the images lack
+fizz
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+  --cxxopt=-std=c++20  its dep folly needs C++20 (consteval, requires), and the default is C++17
+  --host_cxxopt=-std=c++20  its dep folly needs C++20 (consteval, requires), and the default is C++17
