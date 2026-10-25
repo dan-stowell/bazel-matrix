@@ -7,6 +7,4 @@ project(
     targets = [
         "//...",
     ],
-    # its MODULE.bazel has a local_path_override for rules_runfile_codegen_core at ../core: BCR's strip_prefix extracts only this module's directory of the monorepo archive, so the sibling core/ is outside the extracted workspace ("The repository's path is \"../core\" ... does not exist")
-    known_failing = "build",
 )

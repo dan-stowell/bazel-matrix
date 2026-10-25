@@ -7,6 +7,4 @@ project(
     targets = [
         "//...",
     ],
-    # its .bazelrc imports .aspect/bazelrc/performance.bazelrc, which sets --incompatible_remote_results_ignore_disk, which Bazel 9 no longer recognizes ("Unrecognized option")
-    known_failing = "build",
 )

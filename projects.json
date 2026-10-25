@@ -23767,7 +23767,10 @@
         "module_file": {
           "url": "https://bcr.bazel.build/modules/rules_pex/0.1.1/MODULE.bazel",
           "integrity": "sha256-/kAoB5ES+gBhtZE5Y3r0EUF0iCqCugQNjIPy0QCM2T0="
-        }
+        },
+        "rc_drop": [
+          "--incompatible_merge_fixed_and_default_shell_env"
+        ]
       }
     },
     {
@@ -25839,7 +25842,10 @@
         "module_file": {
           "url": "https://bcr.bazel.build/modules/aspect_rules_jasmine/2.0.4/MODULE.bazel",
           "integrity": "sha256-+7gZ64t+XX9n/dOPfOy0E+KHWUzWZs4ZLHLIgoUnd1o="
-        }
+        },
+        "rc_drop": [
+          "--incompatible_remote_results_ignore_disk"
+        ]
       }
     },
     {
@@ -30568,7 +30574,11 @@
         "module_file": {
           "url": "https://bcr.bazel.build/modules/rules_nixpkgs_core/0.14.0/MODULE.bazel",
           "integrity": "sha256-Lqbsm7iadvIXYWG4PEccY63ryL1xL91HDXhI9VsBbgs="
-        }
+        },
+        "rc_drop": [
+          "import:%workspace%/../.bazelrc.remote-cache",
+          "import:%workspace%/../.bazelrc.common"
+        ]
       }
     },
     {
@@ -37575,7 +37585,10 @@
         "module_file": {
           "url": "https://bcr.bazel.build/modules/rules_cc_hdrs_map/0.33.0/MODULE.bazel",
           "integrity": "sha256-F486kXromQQqP1/wmdMvcE04EVd28EuNbfa0DTgoV0g="
-        }
+        },
+        "rc_drop": [
+          "--incompatible_merge_fixed_and_default_shell_env"
+        ]
       }
     },
     {
@@ -38109,7 +38122,11 @@
         "module_file": {
           "url": "https://bcr.bazel.build/modules/rules_pycross_backend_maturin/2.0.1/MODULE.bazel",
           "integrity": "sha256-jwcJ+igdzl2CD5doC8Ri49gaH7tXDilo20+8fCXzG6A="
-        }
+        },
+        "module_append": "\n# bazel-matrix: its MODULE.bazel has local_path_override(rules_pycross, path = \"../..\"), outside the archive's modules/backend_maturin (BCR's strip_prefix); use the BCR release instead\nsingle_version_override(module_name = \"rules_pycross\", version = \"2.0.1\")\n",
+        "module_remove": [
+          "local_path_override(\n    module_name = \"rules_pycross\",\n    path = \"../..\",\n)"
+        ]
       }
     },
     {
@@ -38278,7 +38295,11 @@
         "module_file": {
           "url": "https://bcr.bazel.build/modules/rules_runfile_codegen_go/0.1.2/MODULE.bazel",
           "integrity": "sha256-vtGRFACSpMkKcKgnbL/4cOcAw0P6adfbmzXbfS6LhpM="
-        }
+        },
+        "module_append": "\n# bazel-matrix: its MODULE.bazel has local_path_override(rules_runfile_codegen_core, path = \"../core\"), outside the archive's go/ (BCR's strip_prefix); use the BCR release instead\nsingle_version_override(module_name = \"rules_runfile_codegen_core\", version = \"0.1.2\")\n",
+        "module_remove": [
+          "local_path_override(\n    module_name = \"rules_runfile_codegen_core\",\n    path = \"../core\",\n)"
+        ]
       }
     },
     {
@@ -39217,7 +39238,11 @@
         "module_file": {
           "url": "https://bcr.bazel.build/modules/rules_web_testing_go/0.4.1/MODULE.bazel",
           "integrity": "sha256-69/mY3wkMxgQ4jfbbVlfr7jSYkmNv2w86nxrSDYHOIc="
-        }
+        },
+        "module_append": "\n# bazel-matrix: its MODULE.bazel has local_path_override(rules_webtesting, path = \"..\"), outside the archive's web_testing_go/ (BCR's strip_prefix); use the BCR release instead\nsingle_version_override(module_name = \"rules_webtesting\", version = \"0.4.1\")\n",
+        "module_remove": [
+          "local_path_override(\n    module_name = \"rules_webtesting\",\n    path = \"..\",\n)"
+        ]
       }
     },
     {

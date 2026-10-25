@@ -41,16 +41,23 @@ KNOWN_FAILING = ("build", "test")
 # ---------------------------------------------------------------------------
 # projects.txt
 
+# An rc-drop token: a flag name without a value (it drops `--flag`,
+# `--flag=<any>` and `--noflag`), or `import:` and an import's path as the rc
+# file writes it (it drops that `import`/`try-import` line). See sources.bzl.
+_RC_DROP = re.compile(r"--[A-Za-z0-9_.@/:+-]+|import:\S+")
+
 
 def parse_projects_txt(text):
     """[{name, version, exclude: [(pattern, reason)], flags: [(flag, reason)],
     bazel: (version, reason) or None, known_failing: (build|test, reason) or
-    None, overrides: [(module, version, reason)]}] from projects.txt.
+    None, overrides: [(module, version, reason)], rc_drop: [(token,
+    reason)]}] from projects.txt.
 
     A project line is `module` or `module@version`. Indented lines below it
     are `-//pattern reason`, `--flag reason`, `bazel <version> reason`,
-    `known-failing build|test reason` or `override <module> <version>
-    reason`; every one needs a reason. A blank line ends a project: an
+    `known-failing build|test reason`, `override <module> <version>
+    reason` or `rc-drop --flag|import:<path> reason`; every one needs a
+    reason. A blank line ends a project: an
     indented line after one is an error, not part of the project above.
     """
     projects, errors = [], []
@@ -71,7 +78,7 @@ def parse_projects_txt(text):
                 errors.append("line %d: %s listed twice" % (n, name))
             projects.append({"name": name, "version": version or None,
                              "exclude": [], "flags": [], "bazel": None,
-                             "known_failing": None, "overrides": []})
+                             "known_failing": None, "overrides": [], "rc_drop": []})
             continue
         if not projects:
             errors.append("line %d: indented line before any project" % n)
@@ -80,11 +87,15 @@ def parse_projects_txt(text):
             errors.append("line %d: indented line after a blank line; remove the blank line "
                           "if it belongs to %s" % (n, projects[-1]["name"]))
             continue
-        words = {"bazel": 2, "known-failing": 2, "override": 3}.get(line.split()[0], 1)
+        words = {"bazel": 2, "known-failing": 2, "override": 3, "rc-drop": 2}.get(line.split()[0], 1)
         parts = line.split(None, words)
         p = projects[-1]
         if parts[0] == "override" and len(parts) == 4 and re.fullmatch(r"[a-z][a-z0-9._-]*", parts[1]):
             p["overrides"].append((parts[1], parts[2], parts[3]))
+        elif parts[0] == "rc-drop" and len(parts) == 3 and _RC_DROP.fullmatch(parts[1]):
+            if parts[1] in [t for t, _ in p["rc_drop"]]:
+                errors.append("line %d: %s: rc-drop %s twice" % (n, p["name"], parts[1]))
+            p["rc_drop"].append((parts[1], parts[2]))
         elif parts[0] == "bazel" and len(parts) == 3:
             p["bazel"] = (parts[1], parts[2])
         elif parts[0] == "known-failing" and len(parts) == 3 and parts[1] in KNOWN_FAILING:
@@ -99,8 +110,8 @@ def parse_projects_txt(text):
             p["flags"].append((parts[0], parts[1]))
         else:
             errors.append("line %d: expected -//pattern, --flag, bazel <version>, "
-                          "known-failing build|test or override <module> <version>, each with a "
-                          "reason: %r" % (n, line))
+                          "known-failing build|test, override <module> <version> or "
+                          "rc-drop --flag|import:<path>, each with a reason: %r" % (n, line))
     if errors:
         raise ValueError("projects.txt:\n  " + "\n  ".join(errors))
     return projects
@@ -186,29 +197,57 @@ _OVERRIDE_CALL = re.compile(
     r"\b(single_version|multiple_version|archive|git|local_path)_override\s*\(([^)]*)\)", re.S)
 
 
-def module_append(overrides, module_text):
-    """Lines appended to a project's MODULE.bazel for its `override` lines.
+def module_append(overrides, module_text, has_version=None):
+    """(module_remove, module_append) for a project's `override` lines: the
+    exact local_path_override(...) texts that tools/sources.bzl removes from
+    its MODULE.bazel, and the lines it then appends.
 
-    Raises ValueError when projects.txt overrides a module twice, or when
-    the registry's MODULE.bazel already overrides it (a second override is
-    an error in Bazel) or include()s files sync can't see.
+    An override of a module the registry's MODULE.bazel local_path_override()s
+    replaces that override; sync records its text, which must be a whole
+    top-level statement, there once, with a literal module_name and no
+    nested parentheses. has_version(module, version), if given, says whether
+    the BCR has that version.
+
+    Raises ValueError when projects.txt overrides a module twice, when the
+    registry's MODULE.bazel already overrides it some other way (a second
+    override is an error in Bazel), when its local_path_override can't be
+    removed literally, or when the MODULE.bazel include()s files sync can't
+    see.
     """
     modules = [m for m, _, _ in overrides]
     twice = sorted({m for m in modules if modules.count(m) > 1})
     if twice:
         raise ValueError("override listed twice for " + ", ".join(twice))
-    text = re.sub(r"#[^\n]*", "", module_text)
+    for m, v, _ in overrides:
+        if has_version and not has_version(m, v):
+            raise ValueError("%s@%s isn't in the BCR" % (m, v))
+    # Comments blanked out, keeping every offset.
+    text = re.sub(r"#[^\n]*", lambda c: " " * len(c.group()), module_text)
     if re.search(r"\binclude\s*\(", text):
         raise ValueError("its MODULE.bazel include()s other files, which may already "
                          "override; sync can't check them")
-    for kind, args in _OVERRIDE_CALL.findall(text):
+    remove = []
+    for call in _OVERRIDE_CALL.finditer(text):
+        kind, args = call.group(1), call.group(2)
         name = re.search(r"module_name\s*=\s*[\"']([^\"']+)", args)
         if not name:
             raise ValueError("its MODULE.bazel has a %s_override whose module_name isn't a "
                              "string literal; sync can't check it" % kind)
-        if name.group(1) in modules:
-            raise ValueError("its MODULE.bazel already has %s_override for %s" % (kind, name.group(1)))
-    return render_append(overrides)
+        name = name.group(1)
+        if name not in modules:
+            continue
+        if kind != "local_path":
+            raise ValueError("its MODULE.bazel already has %s_override for %s" % (kind, name))
+        literal = module_text[call.start():call.end()]
+        line_start = text.rfind("\n", 0, call.start()) + 1
+        line_end = text.find("\n", call.end())
+        rest = text[call.end():] if line_end < 0 else text[call.end():line_end]
+        if (text[line_start:call.start()] or rest.strip() or "(" in args
+                or module_text.count(literal) != 1):
+            raise ValueError("its MODULE.bazel's local_path_override for %s isn't a whole "
+                             "top-level statement found once; sync can't remove it" % name)
+        remove.append(literal)
+    return remove, render_append(overrides)
 
 
 def render_append(overrides):
@@ -305,6 +344,13 @@ def module_mismatch(projects, data):
             errors.append("%s: pinned %s, projects.json has %s" % (p["name"], p["version"], e["version"]))
         if render_append(p["overrides"]) != e["source"].get("module_append", ""):
             errors.append("%s: projects.json's module_append doesn't match its override lines" % p["name"])
+        for text in e["source"].get("module_remove", []):
+            name = re.search(r"module_name\s*=\s*[\"']([^\"']+)", text)
+            if not text.startswith("local_path_override") or not name or name.group(1) not in [
+                    m for m, _, _ in p["overrides"]]:
+                errors.append("%s: projects.json's module_remove doesn't match its override lines" % p["name"])
+        if [t for t, _ in p["rc_drop"]] != e["source"].get("rc_drop", []):
+            errors.append("%s: projects.json's rc_drop doesn't match its rc-drop lines" % p["name"])
     for s in data["skipped"]:
         p = by_name.get(s["name"])
         # sync skips a pinned project only for its source type, with a
@@ -330,6 +376,7 @@ def counts(projects, skipped):
         "exclusions": sum(len(p["exclude"]) for p in projects),
         "flags": sum(len(p["flags"]) for p in projects),
         "overrides": sum(len(p.get("overrides", [])) for p in projects),
+        "rc_drops": sum(len(p.get("rc_drop", [])) for p in projects),
         "skipped": len(skipped),
     }
 
@@ -337,7 +384,8 @@ def counts(projects, skipped):
 def status_line(c):
     return ("%(projects)d projects: %(known_failing_build)d known-failing build, "
             "%(known_failing_test)d known-failing test, %(exclusions)d target exclusions, "
-            "%(flags)d extra flags, %(overrides)d module overrides, %(skipped)d skipped by sync" % c)
+            "%(flags)d extra flags, %(overrides)d module overrides, %(rc_drops)d rc drops, "
+            "%(skipped)d skipped by sync" % c)
 
 
 def default_inner_bazel(versions_bzl):
@@ -439,11 +487,16 @@ def main():
             continue
         if p["overrides"]:
             try:
-                entry["module_append"] = module_append(
-                    p["overrides"], module_file.decode("utf-8", "replace"))
+                remove, entry["module_append"] = module_append(
+                    p["overrides"], module_file.decode("utf-8", "replace"),
+                    lambda m, v: os.path.isfile(os.path.join(modules, m, v, "MODULE.bazel")))
             except ValueError as e:
                 errors.append("%s: override: %s" % (p["name"], e))
                 continue
+            if remove:
+                entry["module_remove"] = remove
+        if p["rc_drop"]:
+            entry["rc_drop"] = [t for t, _ in p["rc_drop"]]
         entries.append({"name": p["name"], "version": version, "source": entry})
     if errors:
         sys.exit("sync failed:\n  " + "\n  ".join(errors))

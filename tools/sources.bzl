@@ -36,9 +36,17 @@ def _bcr_source_impl(rctx):
         rctx.delete(patch)
     rctx.delete("MODULE.bazel")
     rctx.download(url = rctx.attr.module_file[0], output = "MODULE.bazel", integrity = rctx.attr.module_file[1])
-    if rctx.attr.module_append:
-        # projects.txt `override` lines, as single_version_override()s.
-        rctx.file("MODULE.bazel", rctx.read("MODULE.bazel") + rctx.attr.module_append)
+    if rctx.attr.module_remove or rctx.attr.module_append:
+        # projects.txt `override` lines: the local_path_override()s they
+        # replace removed, then single_version_override()s appended.
+        content = rctx.read("MODULE.bazel")
+        for text in rctx.attr.module_remove:
+            if content.count(text) != 1:
+                fail("%s: MODULE.bazel doesn't contain exactly once: %s" % (rctx.name, text))
+            content = content.replace(text, "")
+        rctx.file("MODULE.bazel", content + rctx.attr.module_append)
+    if rctx.attr.rc_drop:
+        _rc_drop(rctx, rctx.attr.rc_drop)
 
     # Bazel's patch writes a git symlink (mode 120000) as a regular file
     # holding the target path, with mode 0044 (circl 1.3.8's bazel-bin), which
@@ -78,6 +86,81 @@ def _bcr_source_impl(rctx):
     # run then needs only source.tar's digest, not the download.
     return rctx.repo_metadata(reproducible = True)
 
+def _normalize(path):
+    """path ("a/./b/../c") normalized, or None if it leaves the tree."""
+    parts = []
+    for c in path.split("/"):
+        if c == "..":
+            if not parts:
+                return None
+            parts.pop()
+        elif c and c != ".":
+            parts.append(c)
+    return "/".join(parts)
+
+def _rc_drop(rctx, drops):
+    """Applies projects.txt `rc-drop` lines to the root .bazelrc and the rc
+    files it imports (`import`/`try-import %workspace%/...`, recursively) that
+    are inside the tree.
+
+    A `--flag` drop removes the tokens `--flag`, `--flag=<any>` and
+    `--noflag` from their lines (a line left with only its command goes);
+    an `import:<path>` drop removes the `import <path>` or `try-import <path>`
+    lines, <path> as written. Fails when a drop matches nothing, or when a
+    matched token may be followed by its value or sits on a line with quotes,
+    backslashes or comments, which this doesn't parse.
+    """
+    flags = [d for d in drops if d.startswith("--")]
+    matched = {}
+    queue, seen = [".bazelrc"], {}
+    for _ in range(1000):
+        if not queue:
+            break
+        rc = queue.pop(0)
+        if rc in seen or not rctx.path(rc).exists:
+            continue
+        seen[rc] = True
+        lines, changed = [], False
+        for line in rctx.read(rc).split("\n"):
+            words = line.split()
+            if not words or words[0].startswith("#"):
+                lines.append(line)
+                continue
+            if words[0] in ("import", "try-import") and len(words) == 2:
+                if "import:" + words[1] in drops:
+                    matched["import:" + words[1]] = True
+                    changed = True
+                    continue
+                if words[1].startswith("%workspace%/"):
+                    path = _normalize(words[1][len("%workspace%/"):])
+                    if path != None:
+                        queue.append(path)
+                lines.append(line)
+                continue
+            kept = [words[0]]
+            for i, w in enumerate(words[1:]):
+                name = w.partition("=")[0]
+                drop = [f for f in flags if name in (f, "--no" + f[2:])]
+                if not drop:
+                    kept.append(w)
+                    continue
+                rest = words[2 + i:]
+                takes_next = "=" not in w and rest and not rest[0].startswith("-")
+                if takes_next or any([c in line for c in ["\"", "'", "\\", "#"]]):
+                    fail("%s: rc-drop %s: can't drop %s safely from %s: %s" % (rctx.name, drop[0], w, rc, line))
+                matched[drop[0]] = True
+            if len(kept) == len(words):
+                lines.append(line)
+            else:
+                changed = True
+                if len(kept) > 1:
+                    lines.append(" ".join(kept))
+        if changed:
+            rctx.file(rc, "\n".join(lines), executable = False)
+    unmatched = [d for d in drops if d not in matched]
+    if unmatched:
+        fail("%s: rc-drop matched nothing in %s: %s" % (rctx.name, sorted(seen), ", ".join(unmatched)))
+
 bcr_source = repository_rule(
     implementation = _bcr_source_impl,
     attrs = {
@@ -87,11 +170,15 @@ bcr_source = repository_rule(
         "module_file": attr.string_list(mandatory = True),
         # Appended to MODULE.bazel; see tools/sync.py's module_append.
         "module_append": attr.string(),
+        # Exact texts removed from MODULE.bazel first; see module_append.
+        "module_remove": attr.string_list(),
         # path -> "url integrity"
         "overlay": attr.string_dict(),
         "patch_strip": attr.int(),
         # url -> integrity, applied in order.
         "patches": attr.string_dict(),
+        # projects.txt `rc-drop` tokens; see _rc_drop.
+        "rc_drop": attr.string_list(),
         "strip_prefix": attr.string(),
         "urls": attr.string_list(mandatory = True),
     },
@@ -147,6 +234,8 @@ def _projects_impl(mctx):
             overlay = {x["path"]: x["url"] + " " + x["integrity"] for x in s.get("overlay", [])},
             module_file = [s["module_file"]["url"], s["module_file"]["integrity"]],
             module_append = s.get("module_append", ""),
+            module_remove = s.get("module_remove", []),
+            rc_drop = s.get("rc_drop", []),
         )
         names.append(p["name"])
     for v, info in INNER_BAZELS.items():

@@ -7,6 +7,4 @@ project(
     targets = [
         "//...",
     ],
-    # its .bazelrc sets --incompatible_merge_fixed_and_default_shell_env, which Bazel 9 no longer recognizes ("Unrecognized option")
-    known_failing = "build",
 )
