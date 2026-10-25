@@ -1642,9 +1642,7 @@ cel-cpp
   override aspect_bazel_lib 2.22.5  the resolved aspect_bazel_lib's toolchain repos call rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
   override aspect_rules_esbuild 0.27.1  the resolved aspect_rules_esbuild's esbuild/private/resolved_toolchain.bzl calls rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
   --incompatible_autoload_externally=+@rules_cc,+@com_google_protobuf  its dep cel-spec's proto/cel/expr/conformance/test/BUILD.bazel calls native proto_library/cc_proto_library/java_proto_library, which Bazel 9 removed; autoload them
-  -//conformance:all  its 64 non-dashboard conformance tests fail only with "Invalid timezone": they need tzdata, which the executor image lacks (the 24 dashboard variants left out with them ignore failures; //conformance/policy is kept)
-  -//eval/public:builtin_func_test  TestTimestampFunctionsWithTimeZone needs tzdata, which the executor image lacks
-  -//eval/public:extension_func_test  aborts (exit 134) in TestGetDate and TestGetTimeOfDay (it passes with those filtered out): they evaluate in America/Los_Angeles, which needs tzdata, then call TimestampOrDie()/MessageOrDie() on the error result
+  --test_filter=-timestamps.timestamp_selectors_tz/*:BuiltinsTest.TestTimestampFunctionsWithTimeZone:ExtensionTest.TestGetDate:ExtensionTest.TestGetTimeOfDay  these gtest cases need tzdata, which the executor image lacks: cel-spec's timestamp_selectors_tz conformance section (named zones such as Australia/Sydney fail with "Invalid timezone"), the builtin TestTimestampFunctionsWithTimeZone, and ExtensionTest's America/Los_Angeles cases, which abort (exit 134) on the error result via TimestampOrDie()/MessageOrDie()
 cereal
 ceres-solver
   --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD (via bazel/ceres.bzl) and examples/BUILD call native cc_library/cc_binary without a load()
@@ -1746,3 +1744,55 @@ lttng-ust
 lvm2
   override rules_cc 0.2.27  rules_cc before 0.2.25 rejects //:devmapper's `includes = ["."]` when it is the main repo ("resolves to the workspace root")
 lzip
+# Chunk e-2: more BCR modules (a-f).
+amqp-cpp
+antlr4-cpp-runtime
+apache_arrow
+aspect_rules_jasmine
+  known-failing build  its .bazelrc imports .aspect/bazelrc/performance.bazelrc, which sets --incompatible_remote_results_ignore_disk, which Bazel 9 no longer recognizes ("Unrecognized option")
+aspect_rules_jest
+  -//tools:preset.update_test  tools/preset.bazelrc is out of date for Bazel 9.3.1 (missing its new coverage --build_runfile_links and --experimental_remote_cache_eviction_retries lines)
+aspect_rules_swc
+  -//tools:preset.update_test  tools/preset.bazelrc is out of date for Bazel 9.3.1 (its Docs links name bazel@7.7.1)
+avro-cpp
+bazel-diff
+  -//tests/...  its rust_e2e_tests need //:bazel-diff-example.sh, which the release archive lacks; each also runs a nested bazel on the runner
+bazel_env.bzl
+cityhash
+clickhouse-cpp
+clipper2
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel calls native cc_library without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+cnats
+console_bridge
+container_structure_test
+  override aspect_bazel_lib 2.22.5  aspect_bazel_lib 1.28.0, which it declares, has toolchain repos calling rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
+  -//bazel/docs:update_test  the checked-in bazel/docs/defs.md is out of date for the stardoc resolved here, whose output adds a load() line to each usage block
+cppcheck
+cppitertools
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: BUILD and test/BUILD call native cc rules without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+  -//test/...  test/BUILD needs test/catch.hpp, which the release archive lacks (test/download_catch.sh fetches it)
+cpplint
+cpptoml
+cunit
+cxx.rs
+  --noenable_platform_specific_config  its .bazelrc's build:linux passes -Clink-arg=-fuse-ld=lld to rustc, and the executor image has no lld (gcc: "cannot find 'ld'"); its other build:linux flag, --cxxopt=-std=c++17, is the default anyway
+depend_on_what_you_use
+divsufsort
+dlpack
+doxygen
+earcut
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel calls native cc_library without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+effcee
+  --incompatible_autoload_externally=+@rules_cc  the googletest and re2 it resolves call native cc_library, which Bazel 9 removed; autoload them from rules_cc
+embree
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel calls native cc_library without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+faiss
+  -//tests/...  tests/BUILD.bazel uses @googletest, which its MODULE.bazel doesn't declare, and //tests:test_c_api fails to link: libfaiss calls BLAS (dgemm_, sgemm_), and nothing in its build provides a BLAS library
+fftw
+  -//:simd_support_neon_double  ARM NEON kernels: on x86-64 gcc has no arm_neon.h
+  -//:simd_support_neon_float  ARM NEON kernels: on x86-64 gcc has no arm_neon.h
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
