@@ -172,3 +172,89 @@ rules_java
   known-failing build  its MODULE.bazel patches protobuf with //third_party:protobuf_load-cc-rules.patch, but the release archive has no third_party package
 toolchain_utils
   known-failing build  fetching https://cosmo.zip/pub/cosmos/v/4.0.2/bin/ape-x86_64.elf times out (Connect timed out) from RBE
+
+# Chunk 4: the rest of the first batch.
+package_metadata
+tinyxml2
+aspect_rules_js
+  -//npm/private/test:write_npm_translate_lock_3_test  generated links/defs.bzl differs from npm/private/test/snapshots
+  -//npm/private/test:write_npm_translate_lock_4_test  generated links/defs.bzl differs from npm/private/test/snapshots
+  -//npm/private/test:write_npm_translate_lock_5_test  generated links/defs.bzl differs from npm/private/test/snapshots
+  -//npm/private/test:write_npm_translate_lock_6_test  generated links/defs.bzl differs from npm/private/test/snapshots
+  -//npm/private/test:write_npm_translate_lock_7_test  generated links/defs.bzl differs from npm/private/test/snapshots
+  -//js/private/test/image:checksum_test_test_test  js/private/test/image/checksum_test.checksums differs from checksum_test.expected
+  -//tools:preset.update_test  tools/preset.bazelrc is out of date for Bazel 9.3.1 (new --incompatible_enforce_starlark_utf8)
+aspect_rules_py
+  -//bazel:defaults.update_test  bazel/defaults.bazelrc is out of date for Bazel 9.3.1
+  -//py/tests/py_venv_conflict:validate_import_roots  ModuleNotFoundError: No module named 'conflict'
+gazelle
+  -//docs:check_reference.md  docs/reference.md differs from the generated one
+  -//internal:bazel_test  runs `bazel`, which isn't on the test's PATH (exec: "bazel": executable file not found)
+  -//tools/convert-go-deps-test-case:convert-go-deps-test-case_test  every TestRoundTrip subtest: "go: cannot find GOROOT directory: 'go' binary is trimmed and GOROOT is not set"
+rules_cc
+  -//tests/system_library:system_library_test  runs `bazel`, which isn't on the test's PATH (bazel: command not found)
+  -//tests/integration:lto_tests  needs clang: prints "clang not installed. Skipping test." and exits nonzero
+  -//tests/integration:ftime_trace_tests  needs clang: prints "clang/clang++ not installed. Skipping test." and exits nonzero
+rules_cc_autoconf
+  -//gnulib/tests/compat/dprintf-gnu:dprintf-gnu_test_gnu_conformance  GNU autoconf and Bazel disagree on config.h/subst.h on the executors
+  -//gnulib/tests/compat/dprintf-posix:dprintf-posix_test_gnu_conformance  GNU autoconf and Bazel disagree on config.h/subst.h on the executors
+  -//gnulib/tests/compat/fnmatch:fnmatch_test_gnu_conformance  GNU autoconf and Bazel disagree on config.h/subst.h on the executors
+  -//gnulib/tests/compat/fprintf-gnu:fprintf-gnu_test_gnu_conformance  GNU autoconf and Bazel disagree on config.h/subst.h on the executors
+  -//gnulib/tests/compat/fprintf-posix:fprintf-posix_test_gnu_conformance  GNU autoconf and Bazel disagree on config.h/subst.h on the executors
+  -//gnulib/tests/compat/memmem:memmem_test_gnu_conformance  GNU autoconf and Bazel disagree on config.h/subst.h on the executors
+  -//gnulib/tests/compat/mknod:mknod_test_gnu_conformance  GNU autoconf and Bazel disagree on config.h/subst.h on the executors
+  -//gnulib/tests/compat/obstack-printf-gnu:obstack-printf-gnu_test_gnu_conformance  GNU autoconf and Bazel disagree on config.h/subst.h on the executors
+  -//gnulib/tests/compat/printf-gnu:printf-gnu_test_gnu_conformance  GNU autoconf and Bazel disagree on config.h/subst.h on the executors
+  -//gnulib/tests/compat/printf-posix:printf-posix_test_gnu_conformance  GNU autoconf and Bazel disagree on config.h/subst.h on the executors
+  -//gnulib/tests/compat/snprintf-gnu:snprintf-gnu_test_gnu_conformance  GNU autoconf and Bazel disagree on config.h/subst.h on the executors
+  -//gnulib/tests/compat/snprintf-posix:snprintf-posix_test_gnu_conformance  GNU autoconf and Bazel disagree on config.h/subst.h on the executors
+  -//gnulib/tests/compat/sprintf-gnu:sprintf-gnu_test_gnu_conformance  GNU autoconf and Bazel disagree on config.h/subst.h on the executors
+  -//gnulib/tests/compat/sprintf-posix:sprintf-posix_test_gnu_conformance  GNU autoconf and Bazel disagree on config.h/subst.h on the executors
+  -//gnulib/tests/compat/vasprintf-gnu:vasprintf-gnu_test_gnu_conformance  GNU autoconf and Bazel disagree on config.h/subst.h on the executors
+  -//gnulib/tests/compat/vasprintf-posix:vasprintf-posix_test_gnu_conformance  GNU autoconf and Bazel disagree on config.h/subst.h on the executors
+  -//gnulib/tests/compat/vdprintf-gnu:vdprintf-gnu_test_gnu_conformance  GNU autoconf and Bazel disagree on config.h/subst.h on the executors
+  -//gnulib/tests/compat/vdprintf-posix:vdprintf-posix_test_gnu_conformance  GNU autoconf and Bazel disagree on config.h/subst.h on the executors
+  -//gnulib/tests/compat/vfprintf-gnu:vfprintf-gnu_test_gnu_conformance  GNU autoconf and Bazel disagree on config.h/subst.h on the executors
+  -//gnulib/tests/compat/vfprintf-posix:vfprintf-posix_test_gnu_conformance  GNU autoconf and Bazel disagree on config.h/subst.h on the executors
+  -//gnulib/tests/compat/vprintf-gnu:vprintf-gnu_test_gnu_conformance  GNU autoconf and Bazel disagree on config.h/subst.h on the executors
+  -//gnulib/tests/compat/vprintf-posix:vprintf-posix_test_gnu_conformance  GNU autoconf and Bazel disagree on config.h/subst.h on the executors
+  -//gnulib/tests/compat/vsnprintf-gnu:vsnprintf-gnu_test_gnu_conformance  GNU autoconf and Bazel disagree on config.h/subst.h on the executors
+  -//gnulib/tests/compat/vsnprintf-posix:vsnprintf-posix_test_gnu_conformance  GNU autoconf and Bazel disagree on config.h/subst.h on the executors
+  -//gnulib/tests/compat/vsprintf-gnu:vsprintf-gnu_test_gnu_conformance  GNU autoconf and Bazel disagree on config.h/subst.h on the executors
+  -//gnulib/tests/compat/vsprintf-posix:vsprintf-posix_test_gnu_conformance  GNU autoconf and Bazel disagree on config.h/subst.h on the executors
+  --output_groups=-py_ruff_checks  its .bazelrc adds a ruff aspect on every py target and EXE002 (executable without a shebang) fails on dozens (//autoconf/tests:diff_tester, //tools/convert:*_test, ...); excluding them would drop their tests, this drops only ruff
+rules_multitool
+  -//:buildifier.test  exits 1 in 0.0s with no output on the executors
+rules_python
+  -//tests/integration:bzlmod_lockfile_test_bazel_9.1.0  MODULE.bazel.lock is out of date
+  -//tests/integration:runtime_manifests_test_bazel_7.7.0  the nested Bazel's //:basic_test fails in 0.3s (exit 1) and the nested Bazel prints none of its output
+  -//tests/integration:runtime_manifests_test_bazel_8.5.1  the nested Bazel's //:basic_test fails in 0.3s (exit 1) and the nested Bazel prints none of its output
+  -//tests/integration:runtime_manifests_test_bazel_9.1.0  the nested Bazel's //:basic_test fails in 0.3s (exit 1) and the nested Bazel prints none of its output
+  -//tests/integration:runtime_manifests_test_bazel_self  the nested Bazel's //:basic_test fails in 0.3s (exit 1) and the nested Bazel prints none of its output
+tar.bzl
+  -//tar/tests:test_17_after_processing  symlinks reach the tar action as regular files under RBE: the listing has -rwx where the expected one has a symlink
+  -//tar/tests:test23_symlink_out_to_external_repo  symlinks reach the tar action as regular files under RBE: the listing has -rwx where the expected one has a symlink
+  -//tar/tests:test24_symlink_within_external_repo  symlinks reach the tar action as regular files under RBE: the listing has -rwx where the expected one has a symlink
+  -//tar/tests:test25_source_tree_symlink  symlinks reach the tar action as regular files under RBE: the listing has -rwx where the expected one has a symlink
+toolchains_llvm
+  -//utils:extra_distributions_test  utils/extra_distributions.sh needs jq, which the executor image lacks
+
+# Chunk 4 (cont.): known-failing projects from the first batch.
+bazel_lib
+  known-failing build  its dev dep local_repository ./lib/tests/external_test_repo isn't in the release archive; without dev deps, tools/* can't load @io_bazel_rules_go
+aspect_bazel_lib
+  known-failing build  its dev dep local_repository ./lib/tests/external_test_repo isn't in the release archive; without dev deps, tools/* can't load @io_bazel_rules_go
+googleapis
+  known-failing build  its .bazelrc sets @aspect_rules_ts//ts:skipLibCheck, but it doesn't depend on aspect_rules_ts
+grpc
+  known-failing build  dozens of packages call rules Bazel 9 removed (native cc_binary in examples/cpp/*, objc_library in third_party/objective_c, rule() configs in third_party/toolchains)
+opentelemetry-cpp
+  known-failing build  its deps opentracing-cpp and prometheus-cpp call native cc_library, which Bazel 9 removed; --incompatible_autoload_externally=+@rules_cc does not fix them
+protoc-gen-validate
+  known-failing build  its re2 dependency calls native cc_library (removed in Bazel 9), and java targets need WORKSPACE repos (@com_google_guava)
+rules_fuzzing
+  known-failing build  needs clang: its .bazelrc sets CC=clang and //fuzzing/private/runtime copies libclang_rt sanitizer runtimes; the images have only gcc
+rules_jvm_external
+  known-failing build  needs an Android SDK: @androidsdk//:aapt2 and friends are undeclared without one
+rules_oci
+  known-failing build  its rules_go dependency uses the native CcInfo symbol, which Bazel 9 removed
