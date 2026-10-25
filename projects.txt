@@ -2220,3 +2220,50 @@ circe
 claro-lang
   override aspect_bazel_lib 2.22.5  the resolved aspect_bazel_lib's toolchain repos call rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
   known-failing build  with that override, its @maven repo (rules_jvm_external) loads @rules_license//rules:package_info.bzl, which isn't visible from it
+
+# Chunk h-1: BCR modules (m-o).
+maliput_geopackage
+  --incompatible_autoload_externally=+@rules_cc  the yaml-cpp and googletest it resolves have BUILD files calling native cc_library, which Bazel 9 removed; autoload them from rules_cc
+maliput_malidrive
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: test/regression/*/BUILD.bazel and bazel/testing.bzl call native cc_test without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed, for those and for the yaml-cpp and googletest it resolves
+maliput_sparse
+  --incompatible_autoload_externally=+@rules_cc  the yaml-cpp and googletest it resolves have BUILD files calling native cc_library, which Bazel 9 removed; autoload them from rules_cc
+malloc_guard
+marchingcubecpp
+masorange_rules_helm
+  -//helm/tests/helm_chart:chart_a_stamp_test_values_test_diff_diff  its stamp test expects the values of its stamp.sh, which its .bazelrc passes only under test:ci ($GITHUB_WORKSPACE/stamp.sh); --workspace_status_command=./stamp.sh exits 127 here (cause not identified)
+mboworks_bashtest
+mboworks_bzl
+mboworks_mbo
+  known-failing build  gcc 11 (the image's only compiler) rejects mbo/types/stringify.h:311 under its -std=c++23 ("invalid return type 'StringifyOptions' of 'constexpr' function ... does not have 'constexpr' destructor"); its clang config's llvm toolchain include is commented out in its MODULE.bazel
+mboworks_proto
+mediainfo
+mercurial.bzl
+miniply
+mpc
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+mpich
+  --deleted_packages=bazel_test  (not an exclusion: //... fails on a broken package even when subtracted) a separate workspace (bazel_test/MODULE.bazel) loading @rules_cc, which the root MODULE.bazel doesn't declare
+  known-failing build  its root-package configure_make has lib_source glob(["**"]) of the main repo's root, so rules_foreign_cc copies the execroot into itself ("cannot copy a directory, '/buildbuddy-execroot/.', into itself") and configure is never copied ("configure: not found")
+msix_packaging
+mvfst
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+  --cxxopt=-std=c++20  the folly it resolves uses consteval, and the toolchain default is -std=c++17 ("'consteval' does not name a type")
+naja
+  -//test/...  its test packages use @googletest, which its MODULE.bazel doesn't declare
+  -//bench/...  //bench:snl_bench uses @google_benchmark, which its MODULE.bazel doesn't declare
+  --config=registered  its .bazelrc overrides naja-if and naja-verilog with the thirdparty/ git submodules, which the archive has empty ("No MODULE.bazel ... found in external/naja-verilog+"); its registered config uses the registry modules
+naja-if
+naja-verilog
+  -//:naja_verilog_tests  uses @googletest, which its MODULE.bazel doesn't declare
+nextpnr
+  --incompatible_autoload_externally=+@rules_cc  the bzip2 it resolves (via boost.iostreams) has a BUILD file calling native cc_binary, which Bazel 9 removed; autoload it from rules_cc
+ninjatracing
+nmea
+nogo_analyzer_bzlmod
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed (go/private/rules/cgo.bzl)
+  known-failing build  with that override, its root go_sdk.download(version = "1.24.2") is too old for the resolved gazelle's go_repository tools ("go.work requires go >= 1.24.12 (running go 1.24.2; GOTOOLCHAIN=local)")
+nvc
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+occt
