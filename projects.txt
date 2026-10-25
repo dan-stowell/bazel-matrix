@@ -845,3 +845,36 @@ tree-sitter-bazel
 rules_distroless
   override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed (go/private/rules/cgo.bzl)
 urdfdom_headers
+
+# Chunk A14: more BCR modules (a-l).
+gsm
+gz-fuel-tools
+  --strategy=TestRunner=local  //:buildifier.test (buildifier_prebuilt's runner) does `$(readlink <buildifier runfile>)` under set -e, and RBE stages runfiles as regular files, so readlink exits 1 silently; run tests on the runner, where runfiles are symlinks
+gz-physics
+  -//:buildifier.test  buildifier -mode=diff flags MODULE.bazel: the registry's copy (which replaces the archive's) puts compatibility_level before version
+gz-sensors
+  -//:buildifier.test  buildifier -mode=diff flags MODULE.bazel: the registry's copy (which replaces the archive's) puts compatibility_level before version
+helly25_bashtest
+highs
+imath
+implot
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+iverilog
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+javacc
+javaparser
+  --java_runtime_version=remotejdk_17  NodeList's getFirst/addFirst/... clash with the SequencedCollection methods JDK 21 added to List; remote-minimal compiles against JDK 21
+lame
+lexy
+  --incompatible_autoload_externally=+@rules_cc  its dep doctest calls native cc_library, which Bazel 9 removed; autoload it from rules_cc
+  known-failing test  //:lexy_test, its only test: 39 of 329 doctest cases (dsl::ascii, char_class, unicode) fail because doctest::toString(cp) of their code points prints "{?}" (doctest finds no operator<< for them) under the images' gcc
+libavif
+libbacktrace
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+libcap
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects `includes = ["libcap/.."]` (//:makenames) when it is the main repo ("resolves to the workspace root")
+libde265
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+libepoxy
+libestr
+libfastjson
