@@ -60,7 +60,7 @@ project(
         "-//gnulib/tests/compat/vsprintf-posix:vsprintf-posix_test_gnu_conformance",
     ],
     flags = [
-        # its .bazelrc runs ruff on every py target; many fail EXE002 (executable file without a shebang)
+        # its .bazelrc adds a ruff aspect on every py target and EXE002 (executable without a shebang) fails on dozens (//autoconf/tests:diff_tester, //tools/convert:*_test, ...); excluding them would drop their tests, this drops only ruff
         "--output_groups=-py_ruff_checks",
     ],
 )

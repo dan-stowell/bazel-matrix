@@ -8,13 +8,13 @@ project(
         "//...",
         # MODULE.bazel.lock is out of date
         "-//tests/integration:bzlmod_lockfile_test_bazel_9.1.0",
-        # the nested Bazel's //:basic_test fails (exit 1)
+        # the nested Bazel's //:basic_test fails in 0.3s (exit 1) and the nested Bazel prints none of its output
         "-//tests/integration:runtime_manifests_test_bazel_7.7.0",
-        # the nested Bazel's //:basic_test fails (exit 1)
+        # the nested Bazel's //:basic_test fails in 0.3s (exit 1) and the nested Bazel prints none of its output
         "-//tests/integration:runtime_manifests_test_bazel_8.5.1",
-        # the nested Bazel's //:basic_test fails (exit 1)
+        # the nested Bazel's //:basic_test fails in 0.3s (exit 1) and the nested Bazel prints none of its output
         "-//tests/integration:runtime_manifests_test_bazel_9.1.0",
-        # the nested Bazel's //:basic_test fails (exit 1)
+        # the nested Bazel's //:basic_test fails in 0.3s (exit 1) and the nested Bazel prints none of its output
         "-//tests/integration:runtime_manifests_test_bazel_self",
     ],
 )

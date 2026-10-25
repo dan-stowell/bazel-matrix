@@ -10,7 +10,7 @@ project(
         "-//docs:check_reference.md",
         # runs `bazel`, which isn't on the test's PATH (exec: "bazel": executable file not found)
         "-//internal:bazel_test",
-        # TestRoundTrip subtests fail (archive_override, bcr_go_mod, ...)
+        # every TestRoundTrip subtest: "go: cannot find GOROOT directory: 'go' binary is trimmed and GOROOT is not set"
         "-//tools/convert-go-deps-test-case:convert-go-deps-test-case_test",
     ],
 )

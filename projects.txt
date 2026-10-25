@@ -190,7 +190,7 @@ aspect_rules_py
 gazelle
   -//docs:check_reference.md  docs/reference.md differs from the generated one
   -//internal:bazel_test  runs `bazel`, which isn't on the test's PATH (exec: "bazel": executable file not found)
-  -//tools/convert-go-deps-test-case:convert-go-deps-test-case_test  TestRoundTrip subtests fail (archive_override, bcr_go_mod, ...)
+  -//tools/convert-go-deps-test-case:convert-go-deps-test-case_test  every TestRoundTrip subtest: "go: cannot find GOROOT directory: 'go' binary is trimmed and GOROOT is not set"
 rules_cc
   -//tests/system_library:system_library_test  runs `bazel`, which isn't on the test's PATH (bazel: command not found)
   -//tests/integration:lto_tests  needs clang: prints "clang not installed. Skipping test." and exits nonzero
@@ -222,15 +222,15 @@ rules_cc_autoconf
   -//gnulib/tests/compat/vsnprintf-posix:vsnprintf-posix_test_gnu_conformance  GNU autoconf and Bazel disagree on config.h/subst.h on the executors
   -//gnulib/tests/compat/vsprintf-gnu:vsprintf-gnu_test_gnu_conformance  GNU autoconf and Bazel disagree on config.h/subst.h on the executors
   -//gnulib/tests/compat/vsprintf-posix:vsprintf-posix_test_gnu_conformance  GNU autoconf and Bazel disagree on config.h/subst.h on the executors
-  --output_groups=-py_ruff_checks  its .bazelrc runs ruff on every py target; many fail EXE002 (executable file without a shebang)
+  --output_groups=-py_ruff_checks  its .bazelrc adds a ruff aspect on every py target and EXE002 (executable without a shebang) fails on dozens (//autoconf/tests:diff_tester, //tools/convert:*_test, ...); excluding them would drop their tests, this drops only ruff
 rules_multitool
   -//:buildifier.test  exits 1 in 0.0s with no output on the executors
 rules_python
   -//tests/integration:bzlmod_lockfile_test_bazel_9.1.0  MODULE.bazel.lock is out of date
-  -//tests/integration:runtime_manifests_test_bazel_7.7.0  the nested Bazel's //:basic_test fails (exit 1)
-  -//tests/integration:runtime_manifests_test_bazel_8.5.1  the nested Bazel's //:basic_test fails (exit 1)
-  -//tests/integration:runtime_manifests_test_bazel_9.1.0  the nested Bazel's //:basic_test fails (exit 1)
-  -//tests/integration:runtime_manifests_test_bazel_self  the nested Bazel's //:basic_test fails (exit 1)
+  -//tests/integration:runtime_manifests_test_bazel_7.7.0  the nested Bazel's //:basic_test fails in 0.3s (exit 1) and the nested Bazel prints none of its output
+  -//tests/integration:runtime_manifests_test_bazel_8.5.1  the nested Bazel's //:basic_test fails in 0.3s (exit 1) and the nested Bazel prints none of its output
+  -//tests/integration:runtime_manifests_test_bazel_9.1.0  the nested Bazel's //:basic_test fails in 0.3s (exit 1) and the nested Bazel prints none of its output
+  -//tests/integration:runtime_manifests_test_bazel_self  the nested Bazel's //:basic_test fails in 0.3s (exit 1) and the nested Bazel prints none of its output
 tar.bzl
   -//tar/tests:test_17_after_processing  symlinks reach the tar action as regular files under RBE: the listing has -rwx where the expected one has a symlink
   -//tar/tests:test23_symlink_out_to_external_repo  symlinks reach the tar action as regular files under RBE: the listing has -rwx where the expected one has a symlink
