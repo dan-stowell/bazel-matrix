@@ -2854,3 +2854,53 @@ rules_spring
   -//springboot/deps_filter_rules:TransitiveDepsFilterCaseD  same Bazel 7 canonical repo names as TransitiveDepsFilterCaseA
   -//springboot/deps_filter_rules:DepsFilterWithTransitivesExclusionTest  same Bazel 7 canonical repo names as TransitiveDepsFilterCaseA
   -//springboot/deps_filter_rules:DepsFilterWithoutTransitivesExclusionTest  same Bazel 7 canonical repo names as TransitiveDepsFilterCaseA
+
+# Chunk g-3: BCR modules (r).
+rules_formatjs
+rules_freecad
+rules_gcs
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed (go/private/rules/cgo.bzl)
+  override toolchains_protoc 0.6.1  the toolchains_protoc it declares generates a protoc repo whose BUILD.bazel calls native proto_library, which Bazel 9 removed ("name 'proto_library' is not defined"); 0.6.1 loads it from rules_proto
+  known-failing build  its dev toolchains_protoc registers a prebuilt protoc v27.0, which rejects the --option_dependencies flag that the resolved protobuf's proto_library passes ("Unknown flag: --option_dependencies")
+rules_ghdl
+rules_gherkin
+rules_gitops
+  -//:buildifier_test  buildifier_prebuilt's test runner exits 1 with no output on the executors, as for rules_multitool (its readlink of a runfile RBE stages as a regular file); that cause is not confirmed here
+  -//e2e:manual_k8s  its setup starts a kind cluster with docker, and the executors have no Docker daemon ("Cannot connect to the Docker daemon")
+  -//tools:preset.update_test  tools/preset.bazelrc is out of date for Bazel 9.3.1: the regenerated preset adds flags it lacks (coverage --build_runfile_links, --experimental_remote_cache_eviction_retries=5)
+rules_gleam
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed (go/private/rules/cgo.bzl)
+  known-failing build  with that override, gazelle's go_deps resolves golang.org/x/mod v0.41.0, which requires go >= 1.26.0, but its MODULE.bazel pins go_sdk.download(version = "1.25.1") ("requires go >= 1.26.0 (running go 1.25.1; GOTOOLCHAIN=local)"), and its gleam toolchain repos need those Go tools
+rules_google_secret_manager
+rules_go_write_protos
+rules_graphql
+  override rules_nodejs 6.7.7  the resolved rules_nodejs's nodejs/toolchain.bzl uses the native CcInfo symbol, which Bazel 9 removed
+  -//tools:preset.update_test  tools/preset.bazelrc is out of date for Bazel 9.3.1: the regenerated preset adds flags it lacks (coverage --build_runfile_links, --experimental_remote_cache_eviction_retries=5)
+rules_halide
+rules_heir
+rules_idb
+  known-failing build  an iOS-simulator test ruleset (needs idb and Xcode on macOS): its 32 example targets find no execution platform ("Unable to find an execution platform for target platform @@platforms//host:host from available execution platforms []"); why none is available here is not confirmed
+rules_img_pull_tool
+rules_img_signer_cosign
+rules_img_signer_notation
+rules_img_tool
+  --incompatible_autoload_externally=+@com_google_protobuf,+@rules_python  the googleapis it resolves calls native py_test (google/devtools/build/v1/BUILD.bazel), which Bazel 9 removed, so its build_proto target is missing; autoload it from rules_python, and the proto rules from protobuf
+  -//pkg/compress:compress_test  TestCPUDependentOutputRegression pins pgzip's gzip output hashes, which differ on the executors' CPU ("compressed output is not reproducible across CPU architectures")
+rules_ios
+  known-failing build  its own rules/internal/framework_middleman.bzl uses the native CcInfo symbol, which Bazel 9 removed ("The CcInfo symbol has been removed")
+rules_ispc
+rules_itest
+rules_js_rust_wasm_bindgen
+  known-failing build  the rules_rust 0.65.0 it declares fails to load under Bazel 9: rust/private/dummy_cc_toolchain/dummy_cc_toolchain.bzl does rule(provides = [...]) with a native provider that is None ("got element of type NoneType"); with rules_rust and rules_rust_wasm_bindgen overridden to 0.74.0, its test/ package loads @rules_rust_wasm_bindgen//rules_js:defs.bzl, which 0.74.0 no longer has
+rules_julia
+  -//julia/private/tests/sysimage/...  JuliaPrecompile of :farewell fails: Julia finds the cache of its dep :greeter (built in another action) stale and recompiles it ("Precompiling `farewell` also compiled other packages, meaning their caches were stale or missing"); why it is stale here is not confirmed
+  -//julia/private/tests/artifact:artifact_test  asserts hello.txt in the artifact isn't executable, but on the executors it has the execute bits set ("filemode(...) & 0x49 == 0", evaluated 0x49 == 0); that RBE input staging sets them is not confirmed
+rules_kconfig
+rules_latex
+  -//tests/ctan:transitive_resolve_test  downloads a CTAN package 'test-pkg-a', which no mirrors.ctan.org URL serves ("CTAN package 'test-pkg-a' not found at any known URL"); what the test expects to serve it is not confirmed
+  -//tests/js:test_chunks  needs node on PATH, which the executor image lacks ("node not found (set $NODE or put node on PATH)")
+  -//tests/js:test_render  needs node on PATH, which the executor image lacks ("node not found (set $NODE or put node on PATH)")
+  -//tests/js:test_synctex_math  needs node on PATH, which the executor image lacks ("node not found (set $NODE or put node on PATH)")
+rules_latex_host
+rules_layer_optimizer
+  -//layers/tests:order_test  test_ordered_overwrites_and_whiteouts finds only {'value'} in the result, not the expected dir/new ("AssertionError: {'value': b'new\n'}"); cause not confirmed
