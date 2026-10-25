@@ -588,3 +588,32 @@ pybind11_abseil
   known-failing build  its own packages (pybind11_abseil, compat, cpp_capsule_tools, tests) call native cc_library/py_library/py_test, which Bazel 9 removed
 zlib-ng
   override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+
+# Chunk A8: high reverse-dep modules (a-l).
+boost.hana
+boost.crc
+  -//test/...  uses @platforms, @boost.core, @boost.config and @boost.integer, which its MODULE.bazel doesn't declare
+boost.coroutine
+boost.chrono
+bazel_worker_java
+  known-failing build  its MODULE.bazel has local_path_override(module_name = "bazel_worker_api", path = "../proto"), which applies as the root module, and the archive has no ../proto
+assimp
+  --deleted_packages=contrib/googletest,contrib/googletest/googlemock/test,contrib/googletest/googletest/test  its vendored googletest calls native cc_library, which Bazel 9 removed, and its test packages load @rules_python, which its MODULE.bazel doesn't declare
+aspect_rules_lint
+libyuv
+libxinerama
+  override libx11 1.8.12.bcr.5  it uses @libx11//:libx11, which the libx11 it declares (1.8.12.bcr.3) doesn't define
+libxau
+libssh2
+libpfm
+libpcap
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+libevent
+libdwarf
+libdeflate
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+libdatrie
+libbpf
+happly
+  known-failing build  its root BUILD.bazel calls native cc_library, which Bazel 9 removed
+icu
