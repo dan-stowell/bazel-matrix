@@ -55,6 +55,14 @@ class ParseProjectsTxtTest(unittest.TestCase):
         self.assertEqual([p["known_failing"] for p in projects],
                          [("build", "no Bazel 9: native.cc_library"), ("test", "x y"), None])
 
+    def test_blank_line_ends_project(self):
+        with self.assertRaisesRegex(ValueError, "line 3: indented line after a blank line"):
+            sync.parse_projects_txt("a\n\n  known-failing build  why\n")
+        # Comments may sit between, and blank lines between projects.
+        projects = sync.parse_projects_txt("a\n# c\n  -//x  why\n\nb\n")
+        self.assertEqual([(p["name"], p["exclude"]) for p in projects],
+                         [("a", [("//x", "why")]), ("b", [])])
+
     def test_errors(self):
         for text in ["zlib\n  -//foo/...", "  -//x  why", "zlib\nzlib",
                      "zlib\n  //foo  why", "zlib\n  -//foo/*  why", "Bad Name",
@@ -120,6 +128,51 @@ class VersionsTest(unittest.TestCase):
         self.assertEqual(sync.default_inner_bazel('x\nDEFAULT_INNER_BAZEL = "9.3.1"\n'), "9.3.1")
         with self.assertRaises(ValueError):
             sync.default_inner_bazel("")
+
+
+class GeneratedTest(unittest.TestCase):
+    PROJECTS = sync.parse_projects_txt("a\n  known-failing build  why\nb\nc\n")
+
+    def test_build_files(self):
+        files = sync.build_files(self.PROJECTS, ["a", "c"])
+        self.assertEqual(sorted(files), ["a/BUILD.bazel", "c/BUILD.bazel"])
+        self.assertIn('known_failing = "build"', files["a/BUILD.bazel"])
+
+    def test_module_mismatch(self):
+        def check(fetched, skipped):
+            return sync.module_mismatch(self.PROJECTS, {
+                "projects": [{"name": n, "version": "1", "source": {}} for n in fetched],
+                "skipped": [{"name": n, "reason": "r"} for n in skipped]})
+        self.assertEqual(check(["a", "c"], ["b"]), [])
+        differ = "projects.json and projects.txt differ on: "
+        self.assertEqual(check(["a"], ["b"]), [differ + "c"])
+        self.assertEqual(check(["a", "c", "d"], ["b"]), [differ + "d"])
+        self.assertEqual(check(["a", "b", "c"], ["b"]), [differ + "b"])
+        self.assertIn(differ + "c", check(["a", "c", "c"], ["b"]))
+        self.assertEqual(check(["c", "a"], ["b"]),
+                         ["projects.json's projects are not in projects.txt's order"])
+
+    def test_pins_and_overrides(self):
+        projects = sync.parse_projects_txt("a@2\nb\n  override rules_cc 0.2.27  why\n")
+        append = sync.module_append(projects[1]["overrides"], "")
+        data = {"skipped": [], "projects": [
+            {"name": "a", "version": "2", "source": {}},
+            {"name": "b", "version": "1", "source": {"module_append": append}}]}
+        self.assertEqual(sync.module_mismatch(projects, data), [])
+        # Skipped for its source type at the pinned version: fine.
+        data["skipped"] = [{"name": "c", "reason": "c@3: git_repository sources aren't supported yet"}]
+        projects = sync.parse_projects_txt("a@2\nb\n  override rules_cc 0.2.27  why\nc@3\n")
+        self.assertEqual(sync.module_mismatch(projects, data), [])
+        projects = sync.parse_projects_txt("a@2\nb\n  override rules_cc 0.2.27  why\nc@4\n")
+        self.assertEqual(sync.module_mismatch(projects, data), [
+            "c: pinned 4, but projects.json skips it: c@3: git_repository sources aren't supported yet"])
+        data["skipped"] = []
+        projects = projects[:2]
+        data["projects"][0]["version"] = "1"
+        data["projects"][1]["source"] = {}
+        self.assertEqual(sync.module_mismatch(projects, data), [
+            "a: pinned 2, projects.json has 1",
+            "b: projects.json's module_append doesn't match its override lines"])
 
 
 class RenderBuildTest(unittest.TestCase):

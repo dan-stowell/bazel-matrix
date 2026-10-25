@@ -152,6 +152,8 @@ def project(name, targets, flags = [], bazel_version = None, known_failing = Non
     """
     if known_failing not in (None, "build", "test"):
         fail("known_failing must be None, \"build\" or \"test\"")
+    # For //tools:generated_test, which checks it against projects.txt.
+    native.exports_files(["BUILD.bazel"], visibility = ["//tools:__pkg__"])
     manual = ["manual"] if known_failing else []
     if bazel_version:
         bazel = _repo(bazel_version)

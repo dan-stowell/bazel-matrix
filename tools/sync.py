@@ -20,6 +20,7 @@ projects.json. Generated packages of projects not written are deleted.
 
 import argparse
 import base64
+import collections
 import hashlib
 import json
 import os
@@ -49,13 +50,18 @@ def parse_projects_txt(text):
     A project line is `module` or `module@version`. Indented lines below it
     are `-//pattern reason`, `--flag reason`, `bazel <version> reason`,
     `known-failing build|test reason` or `override <module> <version>
-    reason`; every one needs a reason.
+    reason`; every one needs a reason. A blank line ends a project: an
+    indented line after one is an error, not part of the project above.
     """
     projects, errors = [], []
+    blank = False
     for n, raw in enumerate(text.splitlines(), 1):
         line = raw.strip()
+        if not line:
+            blank = True
         if not line or line.startswith("#"):
             continue
+        after_blank, blank = blank, False
         if not raw[0].isspace():
             name, _, version = line.partition("@")
             if not re.fullmatch(r"[a-z][a-z0-9._-]*", name) or " " in line:
@@ -69,6 +75,10 @@ def parse_projects_txt(text):
             continue
         if not projects:
             errors.append("line %d: indented line before any project" % n)
+            continue
+        if after_blank:
+            errors.append("line %d: indented line after a blank line; remove the blank line "
+                          "if it belongs to %s" % (n, projects[-1]["name"]))
             continue
         words = {"bazel": 2, "known-failing": 2, "override": 3}.get(line.split()[0], 1)
         parts = line.split(None, words)
@@ -198,6 +208,11 @@ def module_append(overrides, module_text):
                              "string literal; sync can't check it" % kind)
         if name.group(1) in modules:
             raise ValueError("its MODULE.bazel already has %s_override for %s" % (kind, name.group(1)))
+    return render_append(overrides)
+
+
+def render_append(overrides):
+    """module_append's text, without its checks of the registry's MODULE.bazel."""
     return "".join("\n# bazel-matrix: %s\nsingle_version_override(module_name = %s, version = %s)\n"
                    % (reason, _q(m), _q(v)) for m, v, reason in overrides)
 
@@ -256,6 +271,47 @@ def render_build(project):
         out.append("    # %s\n    known_failing = %s,\n" % (reason, _q(what)))
     out.append(")\n")
     return "".join(out)
+
+
+def build_files(projects, names):
+    """{<module>/BUILD.bazel: its text} for the projects named (those
+    projects.json fetches).
+
+    Depends only on projects.txt (parsed) and projects.json, so
+    tools/generated_test.py can check the committed files without the BCR.
+    """
+    return {p["name"] + "/BUILD.bazel": render_build(p) for p in projects if p["name"] in names}
+
+
+def module_mismatch(projects, data):
+    """Problems with projects.json against projects.txt: its modules, their
+    order, pinned versions and override lines. (What sync gets from the BCR,
+    like unpinned versions, isn't checked.)"""
+    listed = [p["name"] for p in projects]
+    fetched = [e["name"] for e in data["projects"]]
+    errors = []
+    a = collections.Counter(listed)
+    b = collections.Counter(fetched + [s["name"] for s in data["skipped"]])
+    if a != b:
+        errors.append("projects.json and projects.txt differ on: " + ", ".join(sorted((a - b) + (b - a))))
+    if [m for m in fetched if m in a] != [m for m in listed if m in fetched]:
+        errors.append("projects.json's projects are not in projects.txt's order")
+    by_name = {p["name"]: p for p in projects}
+    for e in data["projects"]:
+        p = by_name.get(e["name"])
+        if not p:
+            continue
+        if p["version"] and p["version"] != e["version"]:
+            errors.append("%s: pinned %s, projects.json has %s" % (p["name"], p["version"], e["version"]))
+        if render_append(p["overrides"]) != e["source"].get("module_append", ""):
+            errors.append("%s: projects.json's module_append doesn't match its override lines" % p["name"])
+    for s in data["skipped"]:
+        p = by_name.get(s["name"])
+        # sync skips a pinned project only for its source type, with a
+        # reason naming that version (see source_entry).
+        if p and p["version"] and not s["reason"].startswith("%s@%s:" % (p["name"], p["version"])):
+            errors.append("%s: pinned %s, but projects.json skips it: %s" % (p["name"], p["version"], s["reason"]))
+    return errors
 
 
 def render_json(commit, entries, skipped):
@@ -396,9 +452,8 @@ def main():
 
     write("projects.json", render_json(commit, entries, skipped))
     names = {e["name"] for e in entries}
-    for p in projects:
-        if p["name"] in names:
-            write(os.path.join(p["name"], "BUILD.bazel"), render_build(p))
+    for path, text in build_files(projects, names).items():
+        write(path, text)
     for d in sorted(os.listdir(ROOT)):
         build = os.path.join(ROOT, d, "BUILD.bazel")
         if d not in names and is_generated(build):

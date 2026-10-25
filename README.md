@@ -112,6 +112,12 @@ environment variable, so the outer cache is shared across checkouts.
     as `bcr.bazel.build` URLs with integrity), and the projects it skipped
     (deprecated, no compatible version, unsupported source type) with why;
   - `<module>/BUILD.bazel`, deleting those of projects no longer listed.
+
+  `//tools:generated_test` fails when the committed `projects.json` or
+  `<module>/BUILD.bazel` files don't match `projects.txt` (sync wasn't
+  re-run). A blank line ends a project's indented lines. Changes that only
+  matter through the BCR (unpinning a project, `bazel <v>` lines,
+  `DEFAULT_INNER_BAZEL`) aren't checked.
 - `tools/sources.bzl`: the module extension reading `projects.json`; one
   lazily fetched repo per project (`@projects//:<module>` is its
   `source.tar`: the archive with the overlay, then the patches, then the
