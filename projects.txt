@@ -2613,7 +2613,7 @@ rules_auto_dotnet
   --lockfile_mode=off  its MODULE.bazel.lock has a version Bazel 9.3.1 doesn't support ("The version of MODULE.bazel.lock is not supported")
   -//tools:buildifier.test  buildifier_prebuilt's test runner exits 1 with no output on the executors, as for rules_multitool (its readlink of a runfile RBE stages as a regular file); that cause is not confirmed here
 rules_bittorrent
-  -//:docs_test  the stardoc-rendered repo.md.generated differs from the checked-in docs/repo.md ("files ... differ") under the stardoc and Bazel 9.3.1 it gets here; the diff was not inspected
+  -//:docs_test  the repo.md.generated that stardoc renders here differs from the checked-in docs/repo.md ("files ... differ"); the test prints no diff, and the cause is unconfirmed (likely a different stardoc or Bazel 9.3.1 rendering, as with rules_codeowners's stardoc_up_to_date)
 rules_bound
 rules_browsers
   override rules_nodejs 6.7.7  the resolved rules_nodejs's nodejs/toolchain.bzl uses the native CcInfo symbol, which Bazel 9 removed
@@ -2738,3 +2738,67 @@ proxy-wasm-rust-sdk
 psimpl
 psmisc
 pypackaging.bzl
+
+# Chunk g-2: BCR modules (r).
+rules_cc_hdrs_map
+  known-failing build  its .bazelrc sets --incompatible_merge_fixed_and_default_shell_env, which Bazel 9 no longer recognizes ("Unrecognized option")
+rules_cc_resources
+  -//example/...  a separate workspace (example/MODULE.bazel, with its own .bazelrc): as a package of the root, main.cpp's #include "example_my_resource.h" doesn't find the header cc_resources generates in bazel-bin/example ("No such file or directory")
+rules_chisel
+  -//tests/smoke:simple_adder_fir  needs @chisel_firtool, whose repo rule needs Java 11+ on PATH, which the runner image lacks ("Preparing firtool requires Java 11 or newer on PATH")
+  -//tests/smoke:simple_adder_sv_dir  needs @chisel_firtool, whose repo rule needs Java 11+ on PATH, which the runner image lacks ("Preparing firtool requires Java 11 or newer on PATH")
+  -//tests/smoke:simple_adder_sv_file  needs @chisel_firtool, whose repo rule needs Java 11+ on PATH, which the runner image lacks ("Preparing firtool requires Java 11 or newer on PATH")
+  -//tests/smoke:fir_verilog_test  needs @chisel_firtool, whose repo rule needs Java 11+ on PATH, which the runner image lacks ("Preparing firtool requires Java 11 or newer on PATH")
+rules_ciq
+  known-failing build  its local_ciq repository rule (the Garmin Connect IQ SDK) only supports macOS ("The local_ciq repository rule is currently only supported on macOS"), and //:libmtp_unsupported, which a target references, isn't declared
+rules_clj
+rules_cocotb
+rules_codeowners
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: BUILD, tests/BUILD and tests/nested_codeowners/BUILD call native sh_test without a load()
+  --incompatible_autoload_externally=+@rules_shell  autoload the sh rules Bazel 9 removed from rules_shell
+  -//:stardoc_up_to_date  the stardoc it resolves here emits load("@rules_codeowners//tools:codeowners.bzl", ...) lines that the checked-in docs lack
+rules_conda
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed (go/private/rules/cgo.bzl)
+  override rules_nodejs 6.7.7  the resolved rules_nodejs's generated @nodejs_toolchains defs.bzl calls rule(incompatible_use_toolchain_transition=...), which Bazel 9 removed
+  override aspect_bazel_lib 2.22.5  the resolved aspect_bazel_lib's toolchain repos call rule(incompatible_use_toolchain_transition=...), which Bazel 9 removed
+  -//conda/cc:import.doc_extract  documents conda/cc/import.bzl, which uses the native CcInfo symbol that Bazel 9 removed ("The CcInfo symbol has been removed")
+  -//conda/cc:import.docs-as-proto  documents conda/cc/import.bzl, which uses the native CcInfo symbol that Bazel 9 removed ("The CcInfo symbol has been removed")
+rules_contest
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: contest/BUILD.bazel and tests/**/BUILD.bazel call native sh_binary/sh_test without a load()
+  --incompatible_autoload_externally=+@rules_shell  autoload the sh rules Bazel 9 removed from rules_shell
+rules_cpan
+rules_c_proto
+  known-failing build  its own src/base.bzl uses the native CcInfo symbol, which Bazel 9 removed ("The CcInfo symbol has been removed")
+rules_csharp
+  --strategy=CSharpAppHostPatch=local  its CSharpAppHostPatch action runs the dotnet muxer but doesn't declare the SDK's host/fxr as an input, so remotely dotnet quits ("[.../host/fxr] does not exist"); run that action on the runner, where the whole SDK repo is present
+  -//tests/integration:linux_elf_test  flaky (failed 4 of 5 runs): under set -o pipefail it runs `strings "$BIN" | grep -q app.dll`, and when grep -q exits on the first match, strings dies of SIGPIPE, so the pipeline fails ("Patched assembly name 'app.dll' not found in binary")
+rules_curl
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: curl/upload/BUILD.bazel call native sh_binary without a load()
+  --incompatible_autoload_externally=+@rules_shell  autoload the sh rules Bazel 9 removed from rules_shell
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed (go/private/context.bzl)
+rules_cyclone
+  -//examples:aeb_csv_replay_test  examples/ is a separate workspace (examples/MODULE.bazel): its scenario's csv://clips/aeb_signals.csv is relative to that workspace root, so from the root module the runner doesn't find it ("'clips/aeb_signals.csv' 不存在", i.e. doesn't exist)
+rules_dart_proto
+  --lockfile_mode=off  its .bazelrc sets --lockfile_mode=error, and its MODULE.bazel.lock is out of date ("usages of the extension '@@rules_dart+//dart/pub:extensions.bzl%pub' have changed"), which fails analysis of 3 targets
+rules_detekt
+rules_devicetree
+rules_diff
+rules_docker_compose
+  -//docker_compose/private/tests/simple_test/img:simple_test  needs a Docker daemon, which the executors don't have ("Cannot connect to the Docker daemon at unix:///var/run/docker.sock")
+  -//docker_compose/private/tests/simple_test/oci:simple_test  needs a Docker daemon, which the executors don't have ("Cannot connect to the Docker daemon at unix:///var/run/docker.sock")
+  -//docker_compose/private/tests/verification:verification_test  needs a Docker daemon, which the executors don't have ("Cannot connect to the Docker daemon at unix:///var/run/docker.sock")
+rules_docker_compose_test
+rules_docs
+  --lockfile_mode=off  its MODULE.bazel.lock has a version Bazel 9.3.1 doesn't support ("The version of MODULE.bazel.lock is not supported")
+  known-failing build  its dev deps include local_path_override(path = "examples/typescript"), which the release archive lacks ("examples/typescript ... does not exist"), failing the main repo mapping; with --ignore_dev_dependency the root package and docgen/ can't load (they use dev deps @bazel_gazelle and @stardoc)
+rules_doom
+rules_elide
+  known-failing build  its MODULE.bazel registers //tests:_test_elide_toolchain, and the release archive has no tests/ package ("no such package 'tests'"), which breaks toolchain resolution for every target
+rules_elisp
+  known-failing build  its local_config repository rule needs makeinfo (texinfo) on the runner, which the image lacks ("program \"makeinfo\" not found"), and most packages depend on it
+rules_elm
+  known-failing build  the gazelle it resolves can't build its go_repository tools: "go.work requires go >= 1.24.12 (running go 1.23.5; GOTOOLCHAIN=local)" (its Go SDK is too old)
+rules_flutter
+  -//tools/dev_tool:flutter_bazel  depends on @pip//lzfse, whose sdist wheel build runs clang, which the image lacks ("No such file or directory: 'clang'")
+  -//tools/ios_screenshot:screenshot  depends on @pip//lzfse, whose sdist wheel build runs clang, which the image lacks ("No such file or directory: 'clang'")
+  -//tools/ios_screenshot:tunneld  depends on @pip//lzfse, whose sdist wheel build runs clang, which the image lacks ("No such file or directory: 'clang'")
