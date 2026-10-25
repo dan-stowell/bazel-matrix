@@ -1,6 +1,6 @@
 load("@rules_python//python:py_binary.bzl", "py_binary")
 load("@rules_python//python:py_test.bzl", "py_test")
-load("@projects//:modules.bzl", "MODULES")
+load("@projects//:modules.bzl", "GENERATED", "MODULES")
 load(":versions.bzl", "INNER_BAZELS")
 
 exports_files([
@@ -52,7 +52,8 @@ py_test(
     data = [
         "//:projects.json",
         "//:projects.txt",
-    ] + ["//%s:BUILD.bazel" % m for m in MODULES],
+    ] + ["//%s:BUILD.bazel" % m for m in MODULES + [g for g in GENERATED if g not in MODULES]],
+    env = {"GENERATED": " ".join(GENERATED)},
     imports = ["."],
 )
 

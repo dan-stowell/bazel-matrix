@@ -26,6 +26,15 @@ class GeneratedTest(unittest.TestCase):
         # Raises on duplicates and malformed lines.
         cls.projects = sync.parse_projects_txt(read("projects.txt"))
         cls.data = json.loads(read("projects.json"))
+        cls.fetched = [e["name"] for e in cls.data["projects"]]
+
+    def test_no_orphans(self):
+        # tools/BUILD.bazel passes the packages with a generated BUILD.bazel.
+        generated = os.environ["GENERATED"].split()
+        self.assertEqual(sorted(generated), sorted(self.fetched),
+                         "generated packages but not fetched: %s; fetched but no generated "
+                         "package: %s%s" % (sorted(set(generated) - set(self.fetched)),
+                                             sorted(set(self.fetched) - set(generated)), FIX))
 
     def test_projects_json(self):
         errors = sync.module_mismatch(self.projects, self.data)
@@ -33,7 +42,7 @@ class GeneratedTest(unittest.TestCase):
 
     def test_build_files(self):
         stale = []
-        for path, text in sorted(sync.build_files(self.projects, self.data).items()):
+        for path, text in sorted(sync.build_files(self.projects, self.fetched).items()):
             try:
                 if read(path) != text:
                     stale.append(path)

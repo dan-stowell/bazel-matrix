@@ -20,6 +20,7 @@ projects.json. Generated packages of projects not written are deleted.
 
 import argparse
 import base64
+import collections
 import hashlib
 import json
 import os
@@ -272,38 +273,28 @@ def render_build(project):
     return "".join(out)
 
 
-def build_files(projects, data):
-    """{<module>/BUILD.bazel: its text} for the projects projects.json fetches.
+def build_files(projects, names):
+    """{<module>/BUILD.bazel: its text} for the projects named (those
+    projects.json fetches).
 
-    Depends only on projects.txt (parsed) and projects.json (data), so
+    Depends only on projects.txt (parsed) and projects.json, so
     tools/generated_test.py can check the committed files without the BCR.
     """
-    names = {e["name"] for e in data["projects"]}
     return {p["name"] + "/BUILD.bazel": render_build(p) for p in projects if p["name"] in names}
 
 
 def module_mismatch(projects, data):
     """Problems with projects.json against projects.txt: its modules, their
-    pinned versions and their override lines. (Unpinned versions need the
-    BCR, so they aren't checked.)"""
+    order, pinned versions and override lines. (What sync gets from the BCR,
+    like unpinned versions, isn't checked.)"""
     listed = [p["name"] for p in projects]
     fetched = [e["name"] for e in data["projects"]]
-    skipped = [s["name"] for s in data["skipped"]]
     errors = []
-    both = sorted(set(fetched) & set(skipped))
-    if both:
-        errors.append("both fetched and skipped: " + ", ".join(both))
-    recorded = fetched + skipped
-    twice = sorted({m for m in recorded if recorded.count(m) > 1} - set(both))
-    if twice:
-        errors.append("recorded twice: " + ", ".join(twice))
-    missing = sorted(set(listed) - set(recorded))
-    if missing:
-        errors.append("in projects.txt but not projects.json: " + ", ".join(missing))
-    extra = sorted(set(recorded) - set(listed))
-    if extra:
-        errors.append("in projects.json but not projects.txt: " + ", ".join(extra))
-    if [m for m in fetched if m in listed] != [m for m in listed if m in fetched]:
+    a = collections.Counter(listed)
+    b = collections.Counter(fetched + [s["name"] for s in data["skipped"]])
+    if a != b:
+        errors.append("projects.json and projects.txt differ on: " + ", ".join(sorted((a - b) + (b - a))))
+    if [m for m in fetched if m in a] != [m for m in listed if m in fetched]:
         errors.append("projects.json's projects are not in projects.txt's order")
     by_name = {p["name"]: p for p in projects}
     for e in data["projects"]:
@@ -314,6 +305,12 @@ def module_mismatch(projects, data):
             errors.append("%s: pinned %s, projects.json has %s" % (p["name"], p["version"], e["version"]))
         if render_append(p["overrides"]) != e["source"].get("module_append", ""):
             errors.append("%s: projects.json's module_append doesn't match its override lines" % p["name"])
+    for s in data["skipped"]:
+        p = by_name.get(s["name"])
+        # sync skips a pinned project only for its source type, with a
+        # reason naming that version (see source_entry).
+        if p and p["version"] and not s["reason"].startswith("%s@%s:" % (p["name"], p["version"])):
+            errors.append("%s: pinned %s, but projects.json skips it: %s" % (p["name"], p["version"], s["reason"]))
     return errors
 
 
@@ -455,7 +452,7 @@ def main():
 
     write("projects.json", render_json(commit, entries, skipped))
     names = {e["name"] for e in entries}
-    for path, text in build_files(projects, {"projects": entries}).items():
+    for path, text in build_files(projects, names).items():
         write(path, text)
     for d in sorted(os.listdir(ROOT)):
         build = os.path.join(ROOT, d, "BUILD.bazel")

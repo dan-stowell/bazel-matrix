@@ -134,7 +134,7 @@ class GeneratedTest(unittest.TestCase):
     PROJECTS = sync.parse_projects_txt("a\n  known-failing build  why\nb\nc\n")
 
     def test_build_files(self):
-        files = sync.build_files(self.PROJECTS, {"projects": [{"name": "a"}, {"name": "c"}]})
+        files = sync.build_files(self.PROJECTS, ["a", "c"])
         self.assertEqual(sorted(files), ["a/BUILD.bazel", "c/BUILD.bazel"])
         self.assertIn('known_failing = "build"', files["a/BUILD.bazel"])
 
@@ -142,12 +142,13 @@ class GeneratedTest(unittest.TestCase):
         def check(fetched, skipped):
             return sync.module_mismatch(self.PROJECTS, {
                 "projects": [{"name": n, "version": "1", "source": {}} for n in fetched],
-                "skipped": [{"name": n} for n in skipped]})
+                "skipped": [{"name": n, "reason": "r"} for n in skipped]})
         self.assertEqual(check(["a", "c"], ["b"]), [])
-        self.assertEqual(check(["a"], ["b"]), ["in projects.txt but not projects.json: c"])
-        self.assertEqual(check(["a", "c", "d"], ["b"]), ["in projects.json but not projects.txt: d"])
-        self.assertEqual(check(["a", "b", "c"], ["b"]), ["both fetched and skipped: b"])
-        self.assertIn("recorded twice: c", check(["a", "c", "c"], ["b"]))
+        differ = "projects.json and projects.txt differ on: "
+        self.assertEqual(check(["a"], ["b"]), [differ + "c"])
+        self.assertEqual(check(["a", "c", "d"], ["b"]), [differ + "d"])
+        self.assertEqual(check(["a", "b", "c"], ["b"]), [differ + "b"])
+        self.assertIn(differ + "c", check(["a", "c", "c"], ["b"]))
         self.assertEqual(check(["c", "a"], ["b"]),
                          ["projects.json's projects are not in projects.txt's order"])
 
@@ -158,6 +159,15 @@ class GeneratedTest(unittest.TestCase):
             {"name": "a", "version": "2", "source": {}},
             {"name": "b", "version": "1", "source": {"module_append": append}}]}
         self.assertEqual(sync.module_mismatch(projects, data), [])
+        # Skipped for its source type at the pinned version: fine.
+        data["skipped"] = [{"name": "c", "reason": "c@3: git_repository sources aren't supported yet"}]
+        projects = sync.parse_projects_txt("a@2\nb\n  override rules_cc 0.2.27  why\nc@3\n")
+        self.assertEqual(sync.module_mismatch(projects, data), [])
+        projects = sync.parse_projects_txt("a@2\nb\n  override rules_cc 0.2.27  why\nc@4\n")
+        self.assertEqual(sync.module_mismatch(projects, data), [
+            "c: pinned 4, but projects.json skips it: c@3: git_repository sources aren't supported yet"])
+        data["skipped"] = []
+        projects = projects[:2]
         data["projects"][0]["version"] = "1"
         data["projects"][1]["source"] = {}
         self.assertEqual(sync.module_mismatch(projects, data), [
