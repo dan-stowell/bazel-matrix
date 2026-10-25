@@ -2371,6 +2371,7 @@ cuda_toolchain_types
 cuda_toolkit
 cudnn_frontend
 cutlass
+
 # Chunk D5: the remaining BCR modules (s-z).
 swift-filename-matcher
   known-failing build  a Swift project: rules_swift finds no Swift toolchain on the Linux executor (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift
@@ -2441,6 +2442,7 @@ sourcekit_bazel_bsp
   known-failing build  its //Sources:sourcekit-bazel-bsp builds with SwiftPM (build_spm.sh runs swift), and the images lack swift ("swift: command not found")
 safedi
   known-failing build  a Swift project: rules_swift finds no Swift toolchain on the Linux executor (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift
+
 # Chunk e-5: the rest of the a, d-f modules.
 apple_mig
 apple_rules_lint
