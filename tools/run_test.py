@@ -154,17 +154,21 @@ class ClassifyTest(unittest.TestCase):
             self.assertEqual(run.classify(status, "test", "build"), (status, "fail"))
 
     def test_shard_ok(self):
-        def shard(code, *names):
-            return {"code": code, "status": {n: "" for n in names}}
-        kinds = {"a": "pass", "b": "expected", "c": "fail", "d": "candidate"}
-        self.assertTrue(run.shard_ok(shard(0, "a"), kinds))
-        self.assertTrue(run.shard_ok(shard(3, "a", "b", "d"), kinds))
-        self.assertTrue(run.shard_ok(shard(1, "b"), kinds))
+        def shard(code, **status):
+            return {"code": code, "status": status}
+        targets = {"a": "test", "b": "test", "c": "test", "d": "test", "e": "build"}
+        kinds = {"a": "pass", "b": "expected", "c": "fail", "d": "candidate", "e": "expected"}
+        self.assertTrue(run.shard_ok(shard(0, a="PASSED"), targets, kinds))
+        self.assertTrue(run.shard_ok(shard(3, a="PASSED", b="FAILED", d="PASSED"), targets, kinds))
+        self.assertTrue(run.shard_ok(shard(1, b="FAILED TO BUILD"), targets, kinds))
+        self.assertTrue(run.shard_ok(shard(1, e="FAILED"), targets, kinds))
         # Unexplained nonzero exits stay fatal.
-        self.assertFalse(run.shard_ok(shard(3, "a"), kinds))
-        self.assertFalse(run.shard_ok(shard(3, "b", "c"), kinds))
-        self.assertFalse(run.shard_ok(shard(37, "b"), kinds))
-        self.assertFalse(run.shard_ok(shard(None, "b"), kinds))
+        self.assertFalse(run.shard_ok(shard(3, a="PASSED"), targets, kinds))
+        self.assertFalse(run.shard_ok(shard(3, b="FAILED", c="FAILED"), targets, kinds))
+        self.assertFalse(run.shard_ok(shard(1, b="FAILED"), targets, kinds))  # tests fail with 3
+        self.assertFalse(run.shard_ok(shard(3, e="FAILED"), targets, kinds))
+        self.assertFalse(run.shard_ok(shard(37, b="FAILED"), targets, kinds))
+        self.assertFalse(run.shard_ok(shard(None, b="FAILED"), targets, kinds))
 
 
 class ShardResultTest(unittest.TestCase):

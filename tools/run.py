@@ -13,7 +13,7 @@ round-robin in name order. It prints each shard's invocation links as it
 finishes, then one row per project and the totals; the logs are in
 bb-out/run/<command>-<time>-<pid>/. Exit status 0 when every project passed
 or failed as expected (see below) and every shard's runner Bazel exited 0,
-or 1 or 3 with only expected failures.
+or the exit its expected failures explain (3 tests, 1 builds).
 
 Without project names it leaves out what `//...` leaves out: a
 `known-failing build` project entirely; for a `known-failing test` project,
@@ -117,13 +117,21 @@ def classify(status, target, known_failing):
     return status, "fail"
 
 
-def shard_ok(result, kinds):
-    """Whether a shard's runner exit is fine: 0, or the exit Bazel gives
-    for failed builds (1) or tests (3) when its only failures are expected."""
+def shard_ok(result, targets, kinds):
+    """Whether a shard's runner exit is fine: 0, or the exit Bazel gives for
+    its failures when they're all expected: 3 for failed tests, 1 for
+    failed builds (a failed :build, or a :test that FAILED TO BUILD)."""
     if result["code"] == 0:
         return True
-    mine = [kinds[n] for n in result["status"]]
-    return result["code"] in (1, 3) and "expected" in mine and "fail" not in mine
+    names = result["status"]
+    if any(kinds[n] == "fail" for n in names):
+        return False
+    allowed = set()
+    for n, s in names.items():
+        if kinds[n] == "expected":
+            built = targets[n] == "build" or s == "FAILED TO BUILD"
+            allowed.add(1 if built else 3)
+    return result["code"] in allowed
 
 
 def shard(names, k):
@@ -323,7 +331,7 @@ def main(argv=None):
         print("known-failing but passed, candidates to un-mark: %s" % " ".join(candidates))
     # The runner's exit code too: a shard can fail after its targets passed.
     no_regressions = "fail" not in kinds.values()
-    ok = no_regressions and all(shard_ok(r, kinds) for r in results)
+    ok = no_regressions and all(shard_ok(r, targets, kinds) for r in results)
     if not ok and no_regressions:
         print("a shard failed although no project regressed; see its log")
     return 0 if ok else 1
