@@ -7,6 +7,6 @@ project(
     targets = [
         "//...",
     ],
-    # its deps opentracing-cpp and prometheus-cpp call native cc_library, which Bazel 9 removed
+    # its deps opentracing-cpp and prometheus-cpp call native cc_library, which Bazel 9 removed; --incompatible_autoload_externally=+@rules_cc does not fix them
     known_failing = "build",
 )

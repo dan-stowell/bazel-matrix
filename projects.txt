@@ -184,7 +184,7 @@ magic_enum
 cpuinfo
 libuv
 opentelemetry-cpp
-  known-failing build  its deps opentracing-cpp and prometheus-cpp call native cc_library, which Bazel 9 removed
+  known-failing build  its deps opentracing-cpp and prometheus-cpp call native cc_library, which Bazel 9 removed; --incompatible_autoload_externally=+@rules_cc does not fix them
 protoc-gen-validate
   known-failing build  its re2 dependency calls native cc_library (removed in Bazel 9), and java targets need WORKSPACE repos (@com_google_guava)
 fast_float
