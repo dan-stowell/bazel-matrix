@@ -9,6 +9,7 @@
 #   bazel 8.4.2           reason   pin the inner Bazel (see tools/project.bzl)
 #   known-failing build   reason   tag :build and :test manual (the inner build fails)
 #   known-failing test    reason   tag :test manual (only the inner test fails)
+#   override rules_cc 0.2.27  reason  add single_version_override() to its MODULE.bazel
 # A reason is the concrete first error, on one line.
 
 zlib
@@ -68,9 +69,9 @@ glog
   -//:stl_logging_test  uses @com_github_google_googletest, which its MODULE.bazel doesn't declare
   -//:utilities_test  uses @com_github_google_googletest, which its MODULE.bazel doesn't declare
 sqlite3
-  known-failing build  rules_cc rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root"); fine as a dependency
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
 bzip2
-  known-failing build  rules_cc rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root"); fine as a dependency
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
 rules_apple
   known-failing build  needs macOS: its tests compile with /usr/bin/xcrun and need a macOS execution platform
 
@@ -108,3 +109,14 @@ pybind11_bazel
   -//examples/basic:basic_pybind_deps_test  ModuleNotFoundError: No module named 'basic'
 libuv
   known-failing test  //:tests: "The libuv test suite cannot be run as root" (the executors run tests as root); //:benchmarks times out (300s)
+xxhash
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = [""]` when it is the main repo ("resolves to the workspace root")
+eigen
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+c-ares
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+libffi
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+highway
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+  -//:topology_test  aborts on the executors: topology.cc:590 "Assert lp <= max_lp" (3 logical CPUs on a 128-core EPYC host)

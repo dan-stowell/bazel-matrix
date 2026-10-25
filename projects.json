@@ -818,7 +818,8 @@
         "module_file": {
           "url": "https://bcr.bazel.build/modules/sqlite3/3.53.4/MODULE.bazel",
           "integrity": "sha256-GCenHBkgSJNZelzYRQ1MoKZN3qh2QVIkmQUUB/nBO3c="
-        }
+        },
+        "module_append": "\n# bazel-matrix: rules_cc before 0.2.25 rejects its root-package `includes = [\".\"]` when it is the main repo (\"resolves to the workspace root\")\nsingle_version_override(module_name = \"rules_cc\", version = \"0.2.27\")\n"
       }
     },
     {
@@ -840,7 +841,8 @@
         "module_file": {
           "url": "https://bcr.bazel.build/modules/bzip2/1.0.8.bcr.4/MODULE.bazel",
           "integrity": "sha256-gKamp0k4hbET3sJ2BANjbZcAk1azPfFyDnmmXRJhSc8="
-        }
+        },
+        "module_append": "\n# bazel-matrix: rules_cc before 0.2.25 rejects its root-package `includes = [\".\"]` when it is the main repo (\"resolves to the workspace root\")\nsingle_version_override(module_name = \"rules_cc\", version = \"0.2.27\")\n"
       }
     },
     {
@@ -1472,6 +1474,203 @@
           "url": "https://bcr.bazel.build/modules/libuv/1.48.0.bcr.2/MODULE.bazel",
           "integrity": "sha256-8vfxpzBkWc9cRD3H8B/sYDxQ4e7mMT/LpDOYVB5txqQ="
         }
+      }
+    },
+    {
+      "name": "xxhash",
+      "version": "0.8.3.bcr.1",
+      "source": {
+        "urls": [
+          "https://github.com/Cyan4973/xxHash/archive/refs/tags/v0.8.3.tar.gz"
+        ],
+        "integrity": "sha256-quYI3+ghPf0F2QmldxjvgvMHIsOSNEWD0/OQUMfymoA=",
+        "strip_prefix": "xxHash-0.8.3",
+        "overlay": [
+          {
+            "path": "BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/xxhash/0.8.3.bcr.1/overlay/BUILD.bazel",
+            "integrity": "sha256-RKFLq2Lmvy/2/83I4d05U64xN3RqKrnQ4i8Hzeo2hTM="
+          },
+          {
+            "path": "MODULE.bazel",
+            "url": "https://bcr.bazel.build/modules/xxhash/0.8.3.bcr.1/overlay/MODULE.bazel",
+            "integrity": "sha256-0M9ox7r0ifuNh+DmLZY3/ds6Zv+T+ZGvcCEnB/3shrA="
+          }
+        ],
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/xxhash/0.8.3.bcr.1/MODULE.bazel",
+          "integrity": "sha256-0M9ox7r0ifuNh+DmLZY3/ds6Zv+T+ZGvcCEnB/3shrA="
+        },
+        "module_append": "\n# bazel-matrix: rules_cc before 0.2.25 rejects its root-package `includes = [\"\"]` when it is the main repo (\"resolves to the workspace root\")\nsingle_version_override(module_name = \"rules_cc\", version = \"0.2.27\")\n"
+      }
+    },
+    {
+      "name": "eigen",
+      "version": "5.0.1.bcr.2",
+      "source": {
+        "urls": [
+          "https://gitlab.com/libeigen/eigen/-/package_files/246179253/download",
+          "https://github.com/eigen-mirror/eigen/archive/refs/tags/5.0.1.tar.gz",
+          "https://gitlab.com/libeigen/eigen/-/archive/5.0.1/eigen-5.0.1.tar.gz"
+        ],
+        "integrity": "sha256-6cMm3IwFzR4ETHHzDxsuNKYWGjtuz0RdVrU/8WaePew=",
+        "strip_prefix": "eigen-5.0.1",
+        "archive_type": "tar.gz",
+        "overlay": [
+          {
+            "path": "BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/eigen/5.0.1.bcr.2/overlay/BUILD.bazel",
+            "integrity": "sha256-XI8nuqpXed2gL2mmdWOo905711/IW2B+mLxERdsUrFw="
+          },
+          {
+            "path": "MODULE.bazel",
+            "url": "https://bcr.bazel.build/modules/eigen/5.0.1.bcr.2/overlay/MODULE.bazel",
+            "integrity": "sha256-OTqbDfQ2wnY4dHHcoXErUtPQOXPx8/X+gGOFobH29LU="
+          }
+        ],
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/eigen/5.0.1.bcr.2/MODULE.bazel",
+          "integrity": "sha256-OTqbDfQ2wnY4dHHcoXErUtPQOXPx8/X+gGOFobH29LU="
+        },
+        "module_append": "\n# bazel-matrix: rules_cc before 0.2.25 rejects its root-package `includes = [\".\"]` when it is the main repo (\"resolves to the workspace root\")\nsingle_version_override(module_name = \"rules_cc\", version = \"0.2.27\")\n"
+      }
+    },
+    {
+      "name": "c-ares",
+      "version": "1.34.6.bcr.1",
+      "source": {
+        "urls": [
+          "https://github.com/c-ares/c-ares/releases/download/v1.34.5/c-ares-1.34.5.tar.gz"
+        ],
+        "integrity": "sha256-fZNXkOmvCBwlxJX9E8LPzaR5KYNBjpY1jvbnMg7gY0Y=",
+        "strip_prefix": "c-ares-1.34.5",
+        "overlay": [
+          {
+            "path": "BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/c-ares/1.34.6.bcr.1/overlay/BUILD.bazel",
+            "integrity": "sha256-rrGTqizbqs+BHoGFRO3L9hSSLYvZEeyGBwF8CzfaTuc="
+          },
+          {
+            "path": "MODULE.bazel",
+            "url": "https://bcr.bazel.build/modules/c-ares/1.34.6.bcr.1/overlay/MODULE.bazel",
+            "integrity": "sha256-hrk2fs4gCCnduUOq7AUN5iGykKCfjZBVWFsVl0MlSl8="
+          },
+          {
+            "path": "REPO.bazel",
+            "url": "https://bcr.bazel.build/modules/c-ares/1.34.6.bcr.1/overlay/REPO.bazel",
+            "integrity": "sha256-ATsuuuEy6sq6KDwrG2UUUOpazWHV9alEqqgMgUNzUTs="
+          },
+          {
+            "path": "include/ares_build.h",
+            "url": "https://bcr.bazel.build/modules/c-ares/1.34.6.bcr.1/overlay/include/ares_build.h",
+            "integrity": "sha256-P4N/yKYYgfpqTsK+UPR1zYM/YPvSf1Joim9zNmnM2o4="
+          },
+          {
+            "path": "include/config_android/ares_config.h",
+            "url": "https://bcr.bazel.build/modules/c-ares/1.34.6.bcr.1/overlay/include/config_android/ares_config.h",
+            "integrity": "sha256-o7Z0jA5pjw24FfOD3cliaIKsJbl9+yaj6SL9/BCEGfk="
+          },
+          {
+            "path": "include/config_darwin/ares_config.h",
+            "url": "https://bcr.bazel.build/modules/c-ares/1.34.6.bcr.1/overlay/include/config_darwin/ares_config.h",
+            "integrity": "sha256-9uKPfRa8jxEdbKMSm7ABJ9NXqPXIv8c9p0YlMoQVtcY="
+          },
+          {
+            "path": "include/config_freebsd/ares_config.h",
+            "url": "https://bcr.bazel.build/modules/c-ares/1.34.6.bcr.1/overlay/include/config_freebsd/ares_config.h",
+            "integrity": "sha256-8R8Z4GcRbjssa4BdutiaRcNZnxNYkB3uphxqRAXMjkY="
+          },
+          {
+            "path": "include/config_linux/ares_config.h",
+            "url": "https://bcr.bazel.build/modules/c-ares/1.34.6.bcr.1/overlay/include/config_linux/ares_config.h",
+            "integrity": "sha256-jTDrf69PC4GRU8R28BZppydUVI4SFlnHOSg3jRLTfqI="
+          },
+          {
+            "path": "include/config_openbsd/ares_config.h",
+            "url": "https://bcr.bazel.build/modules/c-ares/1.34.6.bcr.1/overlay/include/config_openbsd/ares_config.h",
+            "integrity": "sha256-vU7qUaAiscCW9bw4+SjLNnPqbbj8hpKQ7jst0x9xYtU="
+          },
+          {
+            "path": "include/config_windows/ares_config.h",
+            "url": "https://bcr.bazel.build/modules/c-ares/1.34.6.bcr.1/overlay/include/config_windows/ares_config.h",
+            "integrity": "sha256-ai/WNOv3agYcaIZNDYPrvASwAAWFJYhthOrrK3r4sRw="
+          }
+        ],
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/c-ares/1.34.6.bcr.1/MODULE.bazel",
+          "integrity": "sha256-hrk2fs4gCCnduUOq7AUN5iGykKCfjZBVWFsVl0MlSl8="
+        },
+        "module_append": "\n# bazel-matrix: rules_cc before 0.2.25 rejects its root-package `includes = [\".\"]` when it is the main repo (\"resolves to the workspace root\")\nsingle_version_override(module_name = \"rules_cc\", version = \"0.2.27\")\n"
+      }
+    },
+    {
+      "name": "libffi",
+      "version": "3.4.7.bcr.5",
+      "source": {
+        "urls": [
+          "https://github.com/libffi/libffi/releases/download/v3.4.7/libffi-3.4.7.tar.gz"
+        ],
+        "integrity": "sha256-E4YH3uJovezzdK35FEwA6DnjhUH3XySh/PGLeP2kiy0=",
+        "strip_prefix": "libffi-3.4.7",
+        "overlay": [
+          {
+            "path": "BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/libffi/3.4.7.bcr.5/overlay/BUILD.bazel",
+            "integrity": "sha256-LYXTn1VY1Lqx2i4QMSXrixUf/UzwQmDEJuDM/LP4wII="
+          },
+          {
+            "path": "MODULE.bazel",
+            "url": "https://bcr.bazel.build/modules/libffi/3.4.7.bcr.5/overlay/MODULE.bazel",
+            "integrity": "sha256-MJjh+LaJTvfyQRnSEKDVh+/MUHdcGMInreR4AWApqLc="
+          },
+          {
+            "path": "fficonfig.h.in",
+            "url": "https://bcr.bazel.build/modules/libffi/3.4.7.bcr.5/overlay/fficonfig.h.in",
+            "integrity": "sha256-DHca/b6enWso+TAEEnzvKZWUyxDoIhQ5qm9RH/7Eo30="
+          },
+          {
+            "path": "libffi.bzl",
+            "url": "https://bcr.bazel.build/modules/libffi/3.4.7.bcr.5/overlay/libffi.bzl",
+            "integrity": "sha256-Kzczj+HATmjjWvg6YSNRVshzZH6RrRUZA/l2DzEQuxs="
+          },
+          {
+            "path": "msvc_asm.bzl",
+            "url": "https://bcr.bazel.build/modules/libffi/3.4.7.bcr.5/overlay/msvc_asm.bzl",
+            "integrity": "sha256-JwOtmCOBJmLaz/lupnvHNjJSGNbjIR0GtGGW3gZALaA="
+          }
+        ],
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/libffi/3.4.7.bcr.5/MODULE.bazel",
+          "integrity": "sha256-MJjh+LaJTvfyQRnSEKDVh+/MUHdcGMInreR4AWApqLc="
+        },
+        "module_append": "\n# bazel-matrix: rules_cc before 0.2.25 rejects its root-package `includes = [\".\"]` when it is the main repo (\"resolves to the workspace root\")\nsingle_version_override(module_name = \"rules_cc\", version = \"0.2.27\")\n"
+      }
+    },
+    {
+      "name": "highway",
+      "version": "1.4.0.bcr.1",
+      "source": {
+        "urls": [
+          "https://github.com/google/highway/releases/download/1.4.0/highway-1.4.0.tar.gz"
+        ],
+        "integrity": "sha256-NvZyq0jds8hVXp6J4W/kAM19FsbrRVoaPQwUamOrq9w=",
+        "strip_prefix": "highway-1.4.0",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/highway/1.4.0.bcr.1/patches/module_dot_bazel.patch",
+            "integrity": "sha256-t3G8CpjFdp3diVNyCxN8QGu1bjZLonUwXRQFH0LXvgQ="
+          },
+          {
+            "url": "https://bcr.bazel.build/modules/highway/1.4.0.bcr.1/patches/public_includes.patch",
+            "integrity": "sha256-ybW8sAk523HA0t1KZvliGdYPiJwTh0bMTmk8B/S6b8M="
+          }
+        ],
+        "patch_strip": 1,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/highway/1.4.0.bcr.1/MODULE.bazel",
+          "integrity": "sha256-7BQKkNWlIRuw+xLMknDLSgoNfmswKaVe0ASOoO0zxeg="
+        },
+        "module_append": "\n# bazel-matrix: rules_cc before 0.2.25 rejects its root-package `includes = [\".\"]` when it is the main repo (\"resolves to the workspace root\")\nsingle_version_override(module_name = \"rules_cc\", version = \"0.2.27\")\n"
       }
     }
   ],
