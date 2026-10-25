@@ -258,3 +258,29 @@ rules_jvm_external
   known-failing build  needs an Android SDK: @androidsdk//:aapt2 and friends are undeclared without one
 rules_oci
   known-failing build  its rules_go dependency uses the native CcInfo symbol, which Bazel 9 removed
+
+# Chunk A1: high reverse-dep modules (a-l).
+boost.throw_exception
+boost.static_assert
+boost.mpl
+boost.preprocessor
+boost.utility
+boost.iterator
+boost.smart_ptr
+boost.optional
+boost.range
+boost.predef
+boost.mp11
+boost.concept_check
+boost.system
+boost.container_hash
+libx11
+aspect_tools_telemetry
+glib
+  -//glib/tests:gdatetime  test_GDateTime_equal: 'tz' should not be NULL (needs tzdata, which the executor image lacks)
+  -//glib/tests:utils-isolated  test_cleanup_handles_errors: assertion g_chmod (runtime_dir, 0755) >= 0 fails: errno 2, No such file or directory
+gz-utils
+  -//:buildifier.test  exits 1 in 0.1s with no output on the executors
+jq.bzl
+hermetic_launcher
+  known-failing build  its MODULE.bazel overrides xz with patch //patches:xz-s390x-support.patch, but the release archive has no patches package
