@@ -156,15 +156,15 @@ inner Bazel gets `bazel <version>` (add the version to
 old for it as the root module gets `override <module> <version>`: sync
 records it in `projects.json` and `tools/sources.bzl` appends a
 `single_version_override()` to its MODULE.bazel (e.g. rules_cc before
-0.2.25 rejects `includes = ["."]` in the main repo's root package). If the registry's MODULE.bazel `local_path_override()`s that module (a
+0.2.25 rejects `includes = ["."]` in the main repo's root package).
+If the registry's MODULE.bazel `local_path_override()`s that module (a
 monorepo submodule pointing at `..`, outside its archive), sync records
-that call's exact text and `tools/sources.bzl` removes it first; any other
-override of it, or one sync can't find literally, is an error. A project
-whose rc files set a flag this Bazel rejects, or import a file outside its
-archive, gets `rc-drop --flag` or `rc-drop import:<path>` (see the
-projects.txt header): `tools/sources.bzl` removes just that token or
-import line from its `.bazelrc` and the in-tree rc files it imports, and
-fails when nothing matches.
+that call's exact lines and `tools/sources.bzl` removes them first; any
+other override of it, or one sync can't find literally, is an error. A
+project whose rc files set a flag this Bazel rejects, or import a file
+outside its archive, gets ``rc-drop <file> `<exact line>` <reason>``:
+`tools/sources.bzl` removes that line, which must occur exactly once
+(compared whitespace-trimmed), and fails the fetch otherwise.
 
 Only `archive` BCR sources are supported so far; sync skips
 `git_repository` ones.

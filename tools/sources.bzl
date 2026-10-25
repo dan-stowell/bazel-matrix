@@ -36,17 +36,18 @@ def _bcr_source_impl(rctx):
         rctx.delete(patch)
     rctx.delete("MODULE.bazel")
     rctx.download(url = rctx.attr.module_file[0], output = "MODULE.bazel", integrity = rctx.attr.module_file[1])
-    if rctx.attr.module_remove or rctx.attr.module_append:
-        # projects.txt `override` lines: the local_path_override()s they
-        # replace removed, then single_version_override()s appended.
-        content = rctx.read("MODULE.bazel")
-        for text in rctx.attr.module_remove:
-            if content.count(text) != 1:
-                fail("%s: MODULE.bazel doesn't contain exactly once: %s" % (rctx.name, text))
-            content = content.replace(text, "")
-        rctx.file("MODULE.bazel", content + rctx.attr.module_append)
-    if rctx.attr.rc_drop:
-        _rc_drop(rctx, rctx.attr.rc_drop)
+    # Exact lines removed: from MODULE.bazel the local_path_override()s that
+    # projects.txt `override` lines replace, from rc files `rc-drop` lines.
+    for path, texts in rctx.attr.remove.items():
+        if not rctx.path(path).exists:
+            fail("%s: %s doesn't exist" % (rctx.name, path))
+        content = rctx.read(path)
+        for text in texts:
+            content = _remove_lines(rctx.name, path, content, text)
+        rctx.file(path, content, executable = False)
+    if rctx.attr.module_append:
+        # projects.txt `override` lines, as single_version_override()s.
+        rctx.file("MODULE.bazel", rctx.read("MODULE.bazel") + rctx.attr.module_append)
 
     # Bazel's patch writes a git symlink (mode 120000) as a regular file
     # holding the target path, with mode 0044 (circl 1.3.8's bazel-bin), which
@@ -86,97 +87,21 @@ def _bcr_source_impl(rctx):
     # run then needs only source.tar's digest, not the download.
     return rctx.repo_metadata(reproducible = True)
 
-def _normalize(path):
-    """path ("a/./b/../c") normalized, or None if it leaves the tree."""
-    parts = []
-    for c in path.split("/"):
-        if c == "..":
-            if not parts:
-                return None
-            parts.pop()
-        elif c and c != ".":
-            parts.append(c)
-    return "/".join(parts)
-
-def _rc_drop(rctx, drops):
-    """Applies projects.txt `rc-drop` lines to the root .bazelrc and the rc
-    files it imports (`import`/`try-import %workspace%/...`, recursively) that
-    are inside the tree.
-
-    A `--flag` drop removes the tokens `--flag`, `--flag=<any>` and
-    `--noflag` from their lines (a line left with only its command goes);
-    an `import:<path>` drop removes the `import <path>` or `try-import <path>`
-    lines, <path> as written. Fails when a drop matches nothing, when a
-    matched flag may take the next word as its value, when a line naming a
-    dropped flag has quotes, a backslash, a comment or continues another
-    (none of which this parses), or when an rc file resolves outside the tree.
-    """
-    flags = [d for d in drops if d.startswith("--")]
-    matched = {}
-    root = str(rctx.path(".").realpath) + "/"
-    queue, seen = [".bazelrc"], {".bazelrc": True}
-    for _ in range(100):
-        if not queue:
-            break
-        rc = queue.pop(0)
-        if not rctx.path(rc).exists:
-            continue
-        if not str(rctx.path(rc).realpath).startswith(root):
-            fail("%s: rc-drop: %s resolves outside the source tree" % (rctx.name, rc))
-        lines, changed, continued = [], False, False
-        for line in rctx.read(rc).split("\n"):
-            words = [w for w in line.replace("\t", " ").replace("\r", " ").split(" ") if w]
-            unparsed = continued or any([c in line for c in ["\"", "'", "\\", "#"]])
-            continued = line.rstrip().endswith("\\")
-            if not words or words[0].startswith("#"):
-                lines.append(line)
-                continue
-            if unparsed and [f for f in flags if f[2:] in line]:
-                # Quotes, comments and continuations aren't parsed here.
-                fail("%s: rc-drop: can't parse %s safely: %s" % (rctx.name, rc, line))
-            if words[0] in ("import", "try-import") and len(words) == 2:
-                if "import:" + words[1] in drops:
-                    matched["import:" + words[1]] = True
-                    changed = True
-                    continue
-                if words[1].startswith("%workspace%/"):
-                    path = _normalize(words[1][len("%workspace%/"):])
-                    if path != None and path not in seen:
-                        seen[path] = True
-                        queue.append(path)
-                lines.append(line)
-                continue
-            kept = [words[0]]
-            for i, w in enumerate(words[1:]):
-                name = w.partition("=")[0]
-                drop = [f for f in flags if name in (f, "--no" + f[2:])]
-                if not drop:
-                    kept.append(w)
-                    continue
-                rest = words[2 + i:]
-                if "=" not in w and rest and not rest[0].startswith("--"):
-                    # Maybe its value (`--jobs 4`, `--jobs -1`).
-                    fail("%s: rc-drop %s: can't tell whether %s takes the next word as its value in %s: %s" % (
-                        rctx.name,
-                        drop[0],
-                        w,
-                        rc,
-                        line,
-                    ))
-                matched[drop[0]] = True
-            if len(kept) == len(words):
-                lines.append(line)
-            else:
-                changed = True
-                if len(kept) > 1:
-                    lines.append(" ".join(kept))
-        if changed:
-            rctx.file(rc, "\n".join(lines), executable = False)
-    if queue:
-        fail("%s: rc-drop: more than 100 rc files" % rctx.name)
-    unmatched = [d for d in drops if d not in matched]
-    if unmatched:
-        fail("%s: rc-drop matched nothing in %s: %s" % (rctx.name, sorted(seen), ", ".join(unmatched)))
+def _remove_lines(name, path, text, lines):
+    """text without the whole lines `lines` (compared with surrounding
+    whitespace stripped), which must occur exactly once. The same as
+    tools/sync.py's remove_lines."""
+    have = text.split("\n")
+    want = [w.strip() for w in lines.split("\n")]
+    n = len(want)
+    hits = [
+        i
+        for i in range(len(have) - n + 1)
+        if [h.strip() for h in have[i:i + n]] == want
+    ]
+    if len(hits) != 1:
+        fail("%s: %s doesn't have these lines exactly once (%d times): %s" % (name, path, len(hits), lines))
+    return "\n".join(have[:hits[0]] + have[hits[0] + n:])
 
 bcr_source = repository_rule(
     implementation = _bcr_source_impl,
@@ -187,15 +112,13 @@ bcr_source = repository_rule(
         "module_file": attr.string_list(mandatory = True),
         # Appended to MODULE.bazel; see tools/sync.py's module_append.
         "module_append": attr.string(),
-        # Exact texts removed from MODULE.bazel first; see module_append.
-        "module_remove": attr.string_list(),
         # path -> "url integrity"
         "overlay": attr.string_dict(),
         "patch_strip": attr.int(),
         # url -> integrity, applied in order.
         "patches": attr.string_dict(),
-        # projects.txt `rc-drop` tokens; see _rc_drop.
-        "rc_drop": attr.string_list(),
+        # path -> exact lines removed, before module_append; see _remove_lines.
+        "remove": attr.string_list_dict(),
         "strip_prefix": attr.string(),
         "urls": attr.string_list(mandatory = True),
     },
@@ -251,8 +174,7 @@ def _projects_impl(mctx):
             overlay = {x["path"]: x["url"] + " " + x["integrity"] for x in s.get("overlay", [])},
             module_file = [s["module_file"]["url"], s["module_file"]["integrity"]],
             module_append = s.get("module_append", ""),
-            module_remove = s.get("module_remove", []),
-            rc_drop = s.get("rc_drop", []),
+            remove = s.get("remove", {}),
         )
         names.append(p["name"])
     for v, info in INNER_BAZELS.items():

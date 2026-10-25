@@ -61,7 +61,7 @@ class ParseProjectsTxtTest(unittest.TestCase):
         o = [("core", "0.1.2", "r")]
         lpo = ('local_path_override(\n    module_name = "core",  # the sibling\n'
                '    path = "../core",\n)')
-        text = 'module(name = "m")\nbazel_dep(name = "core", version = "0.1.2")\n\n%s  # x\n' % lpo
+        text = 'module(name = "m")\nbazel_dep(name = "core", version = "0.1.2")\n\n%s\n' % lpo
         remove, append = sync.module_append(o, text)
         self.assertEqual(remove, [lpo])
         self.assertEqual(append, sync.render_append(o))
@@ -73,7 +73,7 @@ class ParseProjectsTxtTest(unittest.TestCase):
         o = [("core", "0.1.2", "r")]
         bad = {
             "not top level": 'x = local_path_override(module_name = "core", path = "..")\n',
-            "indented": '  local_path_override(module_name = "core", path = "..")\n',
+            "a comment after it": 'local_path_override(module_name = "core", path = "..")  # x\n',
             "in a loop": '[local_path_override(module_name = "core", path = p) for p in [".."]]\n',
             "more after it": 'local_path_override(module_name = "core", path = "..") + 1\n',
             "nested call": 'local_path_override(module_name = "core", path = str(".."))\n',
@@ -81,7 +81,7 @@ class ParseProjectsTxtTest(unittest.TestCase):
                      '# local_path_override(module_name = "core", path = "..")\n',
         }
         for what, text in bad.items():
-            with self.assertRaisesRegex(ValueError, "isn't a whole top-level statement", msg=what):
+            with self.assertRaisesRegex(ValueError, "isn't whole lines found once", msg=what):
                 sync.module_append(o, text)
         with self.assertRaisesRegex(ValueError, "isn't a string literal"):
             sync.module_append(o, '[local_path_override(module_name = m, path = "..") for m in ["core"]]\n')
@@ -93,16 +93,38 @@ class ParseProjectsTxtTest(unittest.TestCase):
     def test_rc_drop(self):
         p = sync.parse_projects_txt("\n".join([
             "m",
-            "  rc-drop --incompatible_merge_fixed_and_default_shell_env  Bazel 9 removed it",
-            "  rc-drop import:%workspace%/../.bazelrc.common  outside the archive",
+            "  rc-drop .bazelrc `build --x`  Bazel 9 removed it",
+            "  rc-drop .bazelrc ` import %workspace%/../a.rc `  outside the archive",
+            "  rc-drop .aspect/b.rc `common:ci --y=1 --z`  also removed",
             ""]))[0]
         self.assertEqual(p["rc_drop"], [
-            ("--incompatible_merge_fixed_and_default_shell_env", "Bazel 9 removed it"),
-            ("import:%workspace%/../.bazelrc.common", "outside the archive")])
-        for text in ["m\n  rc-drop --x", "m\n  rc-drop --x=1  why", "m\n  rc-drop x  why",
-                     "m\n  rc-drop import:  why", "m\n  rc-drop --x  a\n  rc-drop --x  b"]:
+            (".bazelrc", "build --x", "Bazel 9 removed it"),
+            (".bazelrc", "import %workspace%/../a.rc", "outside the archive"),
+            (".aspect/b.rc", "common:ci --y=1 --z", "also removed")])
+        self.assertEqual(sync.rc_remove(p["rc_drop"]), {
+            ".bazelrc": ["build --x", "import %workspace%/../a.rc"],
+            ".aspect/b.rc": ["common:ci --y=1 --z"]})
+        for text in ["m\n  rc-drop .bazelrc `build --x`", "m\n  rc-drop .bazelrc build --x  why",
+                     "m\n  rc-drop `build --x`  why", "m\n  rc-drop ../.bazelrc `build --x`  why",
+                     "m\n  rc-drop /etc/bazel.bazelrc `build --x`  why",
+                     "m\n  rc-drop MODULE.bazel `bazel_dep(name = \"x\")`  why",
+                     "m\n  rc-drop .bazelrc `build --x`  a\n  rc-drop .bazelrc ` build --x`  b"]:
             with self.assertRaises(ValueError, msg=text):
                 sync.parse_projects_txt(text)
+
+    def test_remove_lines(self):
+        rc = "build --x\n  build --x=1\ncommon --y\n"
+        self.assertEqual(sync.remove_lines(rc, "build --x"), "  build --x=1\ncommon --y\n")
+        self.assertEqual(sync.remove_lines(rc, "build --x=1"), "build --x\ncommon --y\n")
+        # Whole lines only: no prefix or substring matches.
+        self.assertIsNone(sync.remove_lines(rc, "build"))
+        self.assertIsNone(sync.remove_lines(rc, "--y"))
+        self.assertIsNone(sync.remove_lines(rc, "build --z"))
+        self.assertIsNone(sync.remove_lines(rc, ""))
+        self.assertIsNone(sync.remove_lines("a\na\n", "a"))
+        # Several lines, in order.
+        self.assertEqual(sync.remove_lines("x(\n  a,\n)\ny\n", "x(\na,\n)"), "y\n")
+        self.assertIsNone(sync.remove_lines("x(\n  a,\n)\n", "x(\n)"))
 
     def test_known_failing(self):
         projects = sync.parse_projects_txt(
@@ -223,12 +245,14 @@ class GeneratedTest(unittest.TestCase):
             "c: pinned 4, but projects.json skips it: c@3: git_repository sources aren't supported yet"])
         data["skipped"] = []
         projects = projects[:2]
-        data["projects"][1]["source"]["module_remove"] = ['local_path_override(module_name = "rules_cc", path = "..")']
+        data["projects"][1]["source"]["remove"] = {
+            "MODULE.bazel": ['local_path_override(module_name = "rules_cc", path = "..")']}
         self.assertEqual(sync.module_mismatch(projects, data), [])
-        data["projects"][1]["source"]["module_remove"] = ['local_path_override(module_name = "zlib", path = "..")']
+        data["projects"][1]["source"]["remove"] = {
+            "MODULE.bazel": ['local_path_override(module_name = "zlib", path = "..")']}
         self.assertEqual(sync.module_mismatch(projects, data), [
-            "b: projects.json's module_remove doesn't match its override lines"])
-        del data["projects"][1]["source"]["module_remove"]
+            "b: projects.json's MODULE.bazel removals don't match its override lines"])
+        del data["projects"][1]["source"]["remove"]
         data["projects"][0]["version"] = "1"
         data["projects"][1]["source"] = {}
         self.assertEqual(sync.module_mismatch(projects, data), [
@@ -237,16 +261,19 @@ class GeneratedTest(unittest.TestCase):
 
 
     def test_rc_drop(self):
-        projects = sync.parse_projects_txt("a\n  rc-drop --x  why\nb\n")
+        projects = sync.parse_projects_txt("a\n  override m 1  r\n  rc-drop .bazelrc `build --x`  why\nb\n")
+        lpo = 'local_path_override(module_name = "m", path = "..")'
         data = {"skipped": [], "projects": [
-            {"name": "a", "version": "1", "source": {"rc_drop": ["--x"]}},
+            {"name": "a", "version": "1", "source": {
+                "module_append": sync.render_append(projects[0]["overrides"]),
+                "remove": {"MODULE.bazel": [lpo], ".bazelrc": ["build --x"]}}},
             {"name": "b", "version": "1", "source": {}}]}
         self.assertEqual(sync.module_mismatch(projects, data), [])
-        data["projects"][0]["source"] = {}
-        data["projects"][1]["source"] = {"rc_drop": ["--x"]}
+        data["projects"][0]["source"]["remove"] = {"MODULE.bazel": [lpo]}
+        data["projects"][1]["source"] = {"remove": {".bazelrc": ["build --x"]}}
         self.assertEqual(sync.module_mismatch(projects, data), [
-            "a: projects.json's rc_drop doesn't match its rc-drop lines",
-            "b: projects.json's rc_drop doesn't match its rc-drop lines"])
+            "a: projects.json's rc file removals don't match its rc-drop lines",
+            "b: projects.json's rc file removals don't match its rc-drop lines"])
 
 
 class RenderBuildTest(unittest.TestCase):

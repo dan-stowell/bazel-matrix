@@ -41,22 +41,20 @@ KNOWN_FAILING = ("build", "test")
 # ---------------------------------------------------------------------------
 # projects.txt
 
-# An rc-drop token: a flag name without a value (it drops `--flag`,
-# `--flag=<any>` and `--noflag`), or `import:` and an import's path as the rc
-# file writes it (it drops that `import`/`try-import` line). See sources.bzl.
-_RC_DROP = re.compile(r"--[A-Za-z0-9_.@/:+-]+|import:\S+")
+# `rc-drop <file> `<exact line>` reason`: <file> relative to the source root.
+_RC_DROP = re.compile(r"rc-drop\s+(\S+)\s+`([^`]+)`\s+(\S.*)")
 
 
 def parse_projects_txt(text):
     """[{name, version, exclude: [(pattern, reason)], flags: [(flag, reason)],
     bazel: (version, reason) or None, known_failing: (build|test, reason) or
-    None, overrides: [(module, version, reason)], rc_drop: [(token,
+    None, overrides: [(module, version, reason)], rc_drop: [(file, line,
     reason)]}] from projects.txt.
 
     A project line is `module` or `module@version`. Indented lines below it
     are `-//pattern reason`, `--flag reason`, `bazel <version> reason`,
     `known-failing build|test reason`, `override <module> <version>
-    reason` or `rc-drop --flag|import:<path> reason`; every one needs a
+    reason` or ``rc-drop <file> `<exact line>` reason``; every one needs a
     reason. A blank line ends a project: an
     indented line after one is an error, not part of the project above.
     """
@@ -92,10 +90,16 @@ def parse_projects_txt(text):
         p = projects[-1]
         if parts[0] == "override" and len(parts) == 4 and re.fullmatch(r"[a-z][a-z0-9._-]*", parts[1]):
             p["overrides"].append((parts[1], parts[2], parts[3]))
-        elif parts[0] == "rc-drop" and len(parts) == 3 and _RC_DROP.fullmatch(parts[1]):
-            if parts[1] in [t for t, _ in p["rc_drop"]]:
-                errors.append("line %d: %s: rc-drop %s twice" % (n, p["name"], parts[1]))
-            p["rc_drop"].append((parts[1], parts[2]))
+        elif parts[0] == "rc-drop":
+            m = _RC_DROP.fullmatch(line)
+            path = m and m.group(1)
+            if not m or path.startswith("/") or ".." in path.split("/") or path == "MODULE.bazel":
+                errors.append("line %d: expected rc-drop <file in the source tree, not MODULE.bazel> "
+                              "`<exact line>` reason: %r" % (n, line))
+            elif (path, m.group(2).strip()) in [(f, l) for f, l, _ in p["rc_drop"]]:
+                errors.append("line %d: %s: the same rc-drop twice" % (n, p["name"]))
+            else:
+                p["rc_drop"].append((path, m.group(2).strip(), m.group(3)))
         elif parts[0] == "bazel" and len(parts) == 3:
             p["bazel"] = (parts[1], parts[2])
         elif parts[0] == "known-failing" and len(parts) == 3 and parts[1] in KNOWN_FAILING:
@@ -111,7 +115,7 @@ def parse_projects_txt(text):
         else:
             errors.append("line %d: expected -//pattern, --flag, bazel <version>, "
                           "known-failing build|test, override <module> <version> or "
-                          "rc-drop --flag|import:<path>, each with a reason: %r" % (n, line))
+                          "rc-drop <file> `<line>`, each with a reason: %r" % (n, line))
     if errors:
         raise ValueError("projects.txt:\n  " + "\n  ".join(errors))
     return projects
@@ -203,9 +207,9 @@ def module_append(overrides, module_text, has_version=None):
     its MODULE.bazel, and the lines it then appends.
 
     An override of a module the registry's MODULE.bazel local_path_override()s
-    replaces that override; sync records its text, which must be a whole
-    top-level statement, there once, with a literal module_name and no
-    nested parentheses. has_version(module, version), if given, says whether
+    replaces that override; sync records its text, which must be whole lines
+    found once (as tools/sources.bzl removes it; see remove_lines), with a
+    literal module_name and no nested parentheses. has_version(module, version), if given, says whether
     the BCR has that version.
 
     Raises ValueError when projects.txt overrides a module twice, when the
@@ -239,15 +243,32 @@ def module_append(overrides, module_text, has_version=None):
         if kind != "local_path":
             raise ValueError("its MODULE.bazel already has %s_override for %s" % (kind, name))
         literal = module_text[call.start():call.end()]
-        line_start = text.rfind("\n", 0, call.start()) + 1
-        line_end = text.find("\n", call.end())
-        rest = text[call.end():] if line_end < 0 else text[call.end():line_end]
-        if (text[line_start:call.start()] or rest.strip() or "(" in args
-                or module_text.count(literal) != 1):
-            raise ValueError("its MODULE.bazel's local_path_override for %s isn't a whole "
-                             "top-level statement found once; sync can't remove it" % name)
+        if "(" in args or remove_lines(module_text, literal) is None:
+            raise ValueError("its MODULE.bazel's local_path_override for %s isn't whole lines "
+                             "found once; sync can't remove it" % name)
         remove.append(literal)
     return remove, render_append(overrides)
+
+
+def remove_lines(text, lines):
+    """text without the whole lines `lines`, compared with surrounding
+    whitespace stripped, or None unless they occur exactly once. The same as
+    tools/sources.bzl's _remove_lines."""
+    have = text.split("\n")
+    want = [w.strip() for w in lines.split("\n")]
+    hits = [i for i in range(len(have) - len(want) + 1)
+            if [h.strip() for h in have[i:i + len(want)]] == want]
+    if len(hits) != 1 or not lines.strip():
+        return None
+    return "\n".join(have[:hits[0]] + have[hits[0] + len(want):])
+
+
+def rc_remove(rc_drop):
+    """projects.json's `remove` entries for a project's rc-drop lines."""
+    out = {}
+    for path, line, _ in rc_drop:
+        out.setdefault(path, []).append(line)
+    return out
 
 
 def render_append(overrides):
@@ -344,13 +365,14 @@ def module_mismatch(projects, data):
             errors.append("%s: pinned %s, projects.json has %s" % (p["name"], p["version"], e["version"]))
         if render_append(p["overrides"]) != e["source"].get("module_append", ""):
             errors.append("%s: projects.json's module_append doesn't match its override lines" % p["name"])
-        for text in e["source"].get("module_remove", []):
+        remove = dict(e["source"].get("remove", {}))
+        for text in remove.pop("MODULE.bazel", []):
             name = re.search(r"module_name\s*=\s*[\"']([^\"']+)", text)
             if not text.startswith("local_path_override") or not name or name.group(1) not in [
                     m for m, _, _ in p["overrides"]]:
-                errors.append("%s: projects.json's module_remove doesn't match its override lines" % p["name"])
-        if [t for t, _ in p["rc_drop"]] != e["source"].get("rc_drop", []):
-            errors.append("%s: projects.json's rc_drop doesn't match its rc-drop lines" % p["name"])
+                errors.append("%s: projects.json's MODULE.bazel removals don't match its override lines" % p["name"])
+        if rc_remove(p["rc_drop"]) != remove:
+            errors.append("%s: projects.json's rc file removals don't match its rc-drop lines" % p["name"])
     for s in data["skipped"]:
         p = by_name.get(s["name"])
         # sync skips a pinned project only for its source type, with a
@@ -494,9 +516,9 @@ def main():
                 errors.append("%s: override: %s" % (p["name"], e))
                 continue
             if remove:
-                entry["module_remove"] = remove
+                entry["remove"] = {"MODULE.bazel": remove}
         if p["rc_drop"]:
-            entry["rc_drop"] = [t for t, _ in p["rc_drop"]]
+            entry.setdefault("remove", {}).update(rc_remove(p["rc_drop"]))
         entries.append({"name": p["name"], "version": version, "source": entry})
     if errors:
         sys.exit("sync failed:\n  " + "\n  ".join(errors))
