@@ -422,7 +422,10 @@ toml.bzl
   -//tools:preset.update_test  tools/preset.bazelrc is out of date for Bazel 9.3.1 (its Docs links name bazel@8.5.0)
 rules_erlang
   override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed
-  --deleted_packages=gazelle,gazelle/erl_attrs_to_json  (not an exclusion: //... fails on a broken package even when subtracted) gazelle/BUILD.bazel calls native sh_binary, which Bazel 9 removed; gazelle/erl_attrs_to_json globs src/**/*.hrl, which matches nothing
+  --deleted_packages=gazelle/erl_attrs_to_json  (not an exclusion: //... fails on a broken package even when subtracted) gazelle/erl_attrs_to_json globs src/**/*.hrl, which matches nothing
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: gazelle/BUILD.bazel calls native sh_binary without a load()
+  --incompatible_autoload_externally=+@rules_shell  autoload the sh rules Bazel 9 removed from rules_shell
+  -//gazelle/...  gazelle/*.go doesn't compile against the resolved bazel-gazelle (its Kinds/Loads signatures mismatch: "have ... want ... map[string]string")
   known-failing build  needs Erlang/OTP: validating @erlang_config's otp at /usr fails (exit 127), the images have no erl
 nasm
 ncurses
@@ -981,3 +984,32 @@ sophus
   override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
   override eigen 3.4.0.bcr.3  the eigen 3.4.0.bcr.1 it declares downloads gitlab.com's 3.4.0 archive, whose checksum no longer matches; 3.4.0.bcr.3 fetches the same release from the GitHub mirror
   --incompatible_autoload_externally=+@rules_cc  the fmt 10.2.1 it declares has a BUILD.bazel calling native cc_library, which Bazel 9 removed; autoload it from rules_cc
+
+# Chunk b-6: well-known libraries (m-r, plus upb).
+mimalloc
+  --deleted_packages=test/bcr  (not an exclusion: //... fails on a broken package even when subtracted) the overlay's test/bcr/BUILD.bazel loads @rules_shell, which its MODULE.bazel doesn't declare
+nanobind
+nanopb
+  -//:all_types_nanopb  its cc_nanopb_proto_compile rule calls rules_proto_grpc 5.0.0's proto_compile, which calls ctx.resolve_tools, removed in Bazel 9 (newer rules_proto_grpc needs a coreutils toolchain the rule doesn't request)
+  -//:all_types_nanopb_pb  its cc_nanopb_proto_compile rule calls rules_proto_grpc 5.0.0's proto_compile, which calls ctx.resolve_tools, removed in Bazel 9 (newer rules_proto_grpc needs a coreutils toolchain the rule doesn't request)
+  -//:all_types_nanopb_pb_srcs  its cc_nanopb_proto_compile rule calls rules_proto_grpc 5.0.0's proto_compile, which calls ctx.resolve_tools, removed in Bazel 9 (newer rules_proto_grpc needs a coreutils toolchain the rule doesn't request)
+  -//:all_types_nanopb_pb_hdrs  its cc_nanopb_proto_compile rule calls rules_proto_grpc 5.0.0's proto_compile, which calls ctx.resolve_tools, removed in Bazel 9 (newer rules_proto_grpc needs a coreutils toolchain the rule doesn't request)
+  -//:test_compilation  its cc_nanopb_proto_compile rule calls rules_proto_grpc 5.0.0's proto_compile, which calls ctx.resolve_tools, removed in Bazel 9 (newer rules_proto_grpc needs a coreutils toolchain the rule doesn't request)
+  -//:test_compilation_pb  its cc_nanopb_proto_compile rule calls rules_proto_grpc 5.0.0's proto_compile, which calls ctx.resolve_tools, removed in Bazel 9 (newer rules_proto_grpc needs a coreutils toolchain the rule doesn't request)
+  -//:test_compilation_pb_srcs  its cc_nanopb_proto_compile rule calls rules_proto_grpc 5.0.0's proto_compile, which calls ctx.resolve_tools, removed in Bazel 9 (newer rules_proto_grpc needs a coreutils toolchain the rule doesn't request)
+  -//:test_compilation_pb_hdrs  its cc_nanopb_proto_compile rule calls rules_proto_grpc 5.0.0's proto_compile, which calls ctx.resolve_tools, removed in Bazel 9 (newer rules_proto_grpc needs a coreutils toolchain the rule doesn't request)
+  -//:bazel_options_support  depends on //:all_types_nanopb (above)
+ninja
+onnx
+pegtl
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: the overlay's root BUILD.bazel and src/example/pegtl call native cc_* rules without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+rapidcheck
+  --noincompatible_disallow_empty_glob  its root BUILD.bazel globs include/**/*.cpp, which matches nothing
+rocksdb
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+  -//:env_env_test  aborts in EnvPosixTestWithParam: "failed to find an ioctl-friendly temporary directory" (no candidate tmp dir on the executor supports the file ioctls it needs)
+upb
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its BUILD files call native proto_library/cc_proto_library/sh_test and its bazel/*.bzl use the native CcInfo/ProtoInfo symbols without a load()
+  --incompatible_autoload_externally=+@rules_cc,+@com_google_protobuf,+@rules_python,+@rules_shell  autoload the cc, proto, python and sh rules and symbols Bazel 9 removed
+  known-failing build  with those autoloads, its own bazel/upb_proto_library.bzl calls aspect(incompatible_use_toolchain_transition=...), which Bazel 9 removed

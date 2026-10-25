@@ -6,10 +6,16 @@ project(
     name = "rules_erlang",
     targets = [
         "//...",
+        # gazelle/*.go doesn't compile against the resolved bazel-gazelle (its Kinds/Loads signatures mismatch: "have ... want ... map[string]string")
+        "-//gazelle/...",
     ],
     flags = [
-        # (not an exclusion: //... fails on a broken package even when subtracted) gazelle/BUILD.bazel calls native sh_binary, which Bazel 9 removed; gazelle/erl_attrs_to_json globs src/**/*.hrl, which matches nothing
-        "--deleted_packages=gazelle,gazelle/erl_attrs_to_json",
+        # (not an exclusion: //... fails on a broken package even when subtracted) gazelle/erl_attrs_to_json globs src/**/*.hrl, which matches nothing
+        "--deleted_packages=gazelle/erl_attrs_to_json",
+        # Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: gazelle/BUILD.bazel calls native sh_binary without a load()
+        "--noincompatible_disable_autoloads_in_main_repo",
+        # autoload the sh rules Bazel 9 removed from rules_shell
+        "--incompatible_autoload_externally=+@rules_shell",
     ],
     # needs Erlang/OTP: validating @erlang_config's otp at /usr fails (exit 127), the images have no erl
     known_failing = "build",
