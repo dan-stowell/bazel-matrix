@@ -701,3 +701,32 @@ engflowapis
   known-failing build  its BUILD files call native proto_library without a load(), which Bazel 9 removed; autoloading doesn't apply to the main repo
 envoy_api
   known-failing build  bazel/cc_proto_descriptor_library/builddefs.bzl, loaded by every API package, loads @protobuf, but its MODULE.bazel names protobuf com_google_protobuf (the BCR patch misses that file)
+
+# Chunk A12: more BCR modules (a-l).
+boost.python
+cpp-httplib
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+cpu_features
+cxxopts
+fuzztest
+  known-failing build  needs clang: its .bazelrc passes --cxxopt=-Wc++17-compat-pedantic and centipede's build_defs pass -gline-tables-only, which gcc (the images' only compiler) rejects
+gdk-pixbuf
+  -//tests:pixbuf-fail  the executor OOM-kills it: it grew past 62 GB (observed 66.9 GB) decoding its malformed test images
+ghdl
+giflib
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+glm
+highwayhash
+jemalloc
+jsinterop_base
+  known-failing build  as the root, its archive_override of j2cl to the j2cl master branch applies, and j2cl master's j2cl_maven_import_external no longer takes the `testonly` its MODULE.bazel passes
+jsonnet
+  --incompatible_autoload_externally=+@rules_cc  its dep googletest calls native cc_library, which Bazel 9 removed; autoload it from rules_cc
+jsonnet_go
+libvpx
+libwebm
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+libzip
+  -//verify_generated_code/...  a separate workspace (verify_generated_code/MODULE.bazel) whose rules_foreign_cc dep the root module doesn't declare
+lodepng
+lua
