@@ -43,7 +43,13 @@ tools/run.py test --known-failing  # also the known-failing ones
 
 Like `//...`, it leaves out `known-failing build` projects, and for a
 `known-failing test` project `test` runs its `:build` (row `BUILT`), so
-regressions of its inner build still show. A shard's result is its runner
+regressions of its inner build still show. A known-failing project that
+does run (named, or with `--known-failing`) shows its result with its mark:
+`FAILED (known-failing build)` is expected and doesn't fail the run, while
+`PASSED (known-failing build: candidate to un-mark)` is listed as a
+candidate. `known-failing build` excuses build and test failures;
+`known-failing test` only test failures, so its build failing is a
+regression. A shard's result is its runner
 Bazel's exit code: `bb remote` can exit 1 afterwards when downloading the
 outputs fails, and run.py prints a warning when the two disagree. A project
 whose inner `bazel test` finds no tests (exit 4) passes; its summary and
