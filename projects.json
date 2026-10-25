@@ -34525,6 +34525,526 @@
           "integrity": "sha256-0coW+wzBdnRtUTyocV6M8aKia56vRdRKdHYdiAVpVTQ="
         }
       }
+    },
+    {
+      "name": "apple_mig",
+      "version": "138.0.1",
+      "source": {
+        "urls": [
+          "https://github.com/hermeticbuild/apple_mig/releases/download/v138.0.1/apple_mig-138.0.1.tar.gz"
+        ],
+        "integrity": "sha256-rN62F80INEYytN/THsXPDq3iTAD+HhfZhIDVuXC09M4=",
+        "strip_prefix": "apple_mig-138.0.1",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/apple_mig/138.0.1/MODULE.bazel",
+          "integrity": "sha256-ZcxV8wZCuKdl4Aca8Bo+ztWt/d7aEkoAtqcBr0U+2K0="
+        }
+      }
+    },
+    {
+      "name": "apple_rules_lint",
+      "version": "0.4.0",
+      "source": {
+        "urls": [
+          "https://github.com/apple/apple_rules_lint/releases/download/0.4.0/apple_rules_lint-0.4.0.tar.gz"
+        ],
+        "integrity": "sha256-SD6gPXPV+zMnXQKdqNNoESQ/wy36Tcc6Q6y7b0sa9iE=",
+        "strip_prefix": "apple_rules_lint-0.4.0",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/apple_rules_lint/0.4.0/MODULE.bazel",
+          "integrity": "sha256-xZgxw6U4lDBRYgN3eBZSfyVzKaXaNjmU4dYrmuZyn3E="
+        }
+      }
+    },
+    {
+      "name": "asc_swift",
+      "version": "1.7.1",
+      "source": {
+        "urls": [
+          "https://github.com/aaronsky/asc-swift/releases/download/1.7.1/asc_swift-1.7.1.tar.gz"
+        ],
+        "integrity": "sha256-HPaqz7hSFAbDBehF92vFZyc3V2xAXSdkZxVrIlXeV2M=",
+        "strip_prefix": "asc_swift-1.7.1",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/asc_swift/1.7.1/patches/module_dot_bazel_version.patch",
+            "integrity": "sha256-OUm0oXrTheHfAD7kLVhc5mWjgAqxma295YTvxC0NTzs="
+          }
+        ],
+        "patch_strip": 1,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/asc_swift/1.7.1/MODULE.bazel",
+          "integrity": "sha256-GpihUmt5p3HQ1/nG9C/Xcs/3UcU480BrDUZOwrNdjUM="
+        }
+      }
+    },
+    {
+      "name": "aspect_gazelle_js",
+      "version": "1.2.3",
+      "source": {
+        "urls": [
+          "https://github.com/aspect-build/aspect-gazelle/releases/download/js-v1.2.3/aspect-gazelle-js-v1.2.3.tar.gz"
+        ],
+        "integrity": "sha256-L0PfRS9tZK7WuLGxd8DK0jj3Pf7k8dAHo8tkt1u+tJs=",
+        "strip_prefix": "aspect-gazelle-js-v1.2.3",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/aspect_gazelle_js/1.2.3/MODULE.bazel",
+          "integrity": "sha256-QR57T/et9rgiBqSX1fKmKJl2gX7m2QNhitfRLN4EG3c="
+        }
+      }
+    },
+    {
+      "name": "aspect_gazelle_prebuilt",
+      "version": "0.0.28",
+      "source": {
+        "urls": [
+          "https://github.com/aspect-build/aspect-gazelle/releases/download/prebuilt-v0.0.28/aspect-gazelle-prebuilt-v0.0.28.tar.gz"
+        ],
+        "integrity": "sha256-W/liTw+Q/ieJMSKdC16daCjz4sIheFdYlkXmful5K7Y=",
+        "strip_prefix": "aspect-gazelle-prebuilt-v0.0.28",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/aspect_gazelle_prebuilt/0.0.28/MODULE.bazel",
+          "integrity": "sha256-OPjkCM5ESPKdcus2ju6Kj7C5NQHcG0gnD47BLMgx994="
+        }
+      }
+    },
+    {
+      "name": "aspect_rules_js_rust_wasm_bindgen",
+      "version": "0.0.2",
+      "source": {
+        "urls": [
+          "https://github.com/UebelAndre/aspect_rules_js_rust_wasm_bindgen/releases/download/0.0.2/aspect_rules_js_rust_wasm_bindgen-0.0.2.tar.gz"
+        ],
+        "integrity": "sha256-jHejCbe6rWPfjG7xguCqczRpJSM01U+bsw5JHpbzt/s=",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/aspect_rules_js_rust_wasm_bindgen/0.0.2/MODULE.bazel",
+          "integrity": "sha256-5sqahtXec8OTqyvQGMw3Ncrfo396pLzoXpE0UUtnbvY="
+        }
+      }
+    },
+    {
+      "name": "autosharding",
+      "version": "0.0.0-20260826-3a21f69",
+      "source": {
+        "urls": [
+          "https://github.com/GoogleCloudPlatform/autosharding/archive/3a21f69fe5516fe340af29ef68e327381473ecc7.tar.gz"
+        ],
+        "integrity": "sha256-ErSMV9qteEU/vjwI8cQ1+KRUygHqlquqPW8RaAXkPuI=",
+        "strip_prefix": "autosharding-3a21f69fe5516fe340af29ef68e327381473ecc7",
+        "overlay": [
+          {
+            "path": "BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/autosharding/0.0.0-20260826-3a21f69/overlay/BUILD.bazel",
+            "integrity": "sha256-llKELrRj/sdw7ArfnT1y4INXeinvZgbdYL8KvV2nh9M="
+          },
+          {
+            "path": "MODULE.bazel",
+            "url": "https://bcr.bazel.build/modules/autosharding/0.0.0-20260826-3a21f69/overlay/MODULE.bazel",
+            "integrity": "sha256-KCLk6fTz+h9hfLYkh47m1605ljiU0QySuCASabgbGg0="
+          },
+          {
+            "path": "proto/autosharding/v1/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/autosharding/0.0.0-20260826-3a21f69/overlay/proto/autosharding/v1/BUILD.bazel",
+            "integrity": "sha256-8WJLGfASKWKtcQ55EcwqfNZkhArrTVLWLeOEeB+gn9c="
+          }
+        ],
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/autosharding/0.0.0-20260826-3a21f69/MODULE.bazel",
+          "integrity": "sha256-KCLk6fTz+h9hfLYkh47m1605ljiU0QySuCASabgbGg0="
+        }
+      }
+    },
+    {
+      "name": "azure-storage-files-datalake-cpp",
+      "version": "12.12.0",
+      "source": {
+        "urls": [
+          "https://github.com/Azure/azure-sdk-for-cpp/archive/refs/tags/azure-storage-blobs_12.13.0.tar.gz"
+        ],
+        "integrity": "sha256-MAu9HWvFC4mIs92inW1idXSk8+JafgCmmG2l05ZfZ5o=",
+        "strip_prefix": "azure-sdk-for-cpp-azure-storage-blobs_12.13.0/sdk/storage/azure-storage-files-datalake",
+        "overlay": [
+          {
+            "path": "BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/azure-storage-files-datalake-cpp/12.12.0/overlay/BUILD.bazel",
+            "integrity": "sha256-NVkSasSqDxbbAvGg2nSOzNL1NADkxTVZwwmQZLZxF4Y="
+          },
+          {
+            "path": "test/MODULE.bazel",
+            "url": "https://bcr.bazel.build/modules/azure-storage-files-datalake-cpp/12.12.0/overlay/test/MODULE.bazel",
+            "integrity": "sha256-yX4dK3qp8rAfvYw00QwDyt3IcxrGeYZ0v34qx7w4FBA="
+          },
+          {
+            "path": "test/bcr_patches/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/azure-storage-files-datalake-cpp/12.12.0/overlay/test/bcr_patches/BUILD.bazel",
+            "integrity": "sha256-TE+3oTjzJAnr0GzqM+6kTQyjOt7KktNbDZPrMZ9+JdQ="
+          },
+          {
+            "path": "test/bcr_patches/azure_core_curl_visibility.patch",
+            "url": "https://bcr.bazel.build/modules/azure-storage-files-datalake-cpp/12.12.0/overlay/test/bcr_patches/azure_core_curl_visibility.patch",
+            "integrity": "sha256-62hOTgQx4AAo9kn5/zxIJguWsyJG12ELhw86cdO6C10="
+          }
+        ],
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/azure-storage-files-datalake-cpp/12.12.0/MODULE.bazel",
+          "integrity": "sha256-x3LISZOe9nBfmakXESEDPawMe0BAmrl/GwNRUlnitBk="
+        }
+      }
+    },
+    {
+      "name": "debian_dependency_bazelizer",
+      "version": "1.0.0",
+      "source": {
+        "urls": [
+          "https://github.com/shabanzd/debian_dependency_bazelizer/releases/download/1.0.0/debian_dependency_bazelizer-1.0.0.tar.gz"
+        ],
+        "integrity": "sha256-9XGX8DVFRX5xFkQismyeRKxqna6jvl0bKUZzHjDS+5E=",
+        "strip_prefix": "debian_dependency_bazelizer-1.0.0",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/debian_dependency_bazelizer/1.0.0/MODULE.bazel",
+          "integrity": "sha256-NL5nItwTevsIh755u2NK1nUC9WJveP/ywYd8D/Jsfvs="
+        }
+      }
+    },
+    {
+      "name": "dnsmasq",
+      "version": "2.92",
+      "source": {
+        "urls": [
+          "https://thekelleys.org.uk/dnsmasq/dnsmasq-2.92.tar.xz"
+        ],
+        "integrity": "sha256-S/UMLBAY+fvCYDffUbkOzqDLc9RhYoRnY7kt8NbDpFg=",
+        "strip_prefix": "dnsmasq-2.92",
+        "overlay": [
+          {
+            "path": "BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/dnsmasq/2.92/overlay/BUILD.bazel",
+            "integrity": "sha256-SHe6s5k/fZmi4ocCMBtC+tMSZ3P18/4FDHyL02kRFuU="
+          },
+          {
+            "path": "MODULE.bazel",
+            "url": "https://bcr.bazel.build/modules/dnsmasq/2.92/overlay/MODULE.bazel",
+            "integrity": "sha256-5Jsbjwg0moWF3GWi5yF8FRF+7/5YyZO8BzSU2lOlOrw="
+          },
+          {
+            "path": "test/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/dnsmasq/2.92/overlay/test/BUILD.bazel",
+            "integrity": "sha256-HqvHxoX3Xt/Ljqp3J1TX5fyfrl39aMmFDtwGIG0Z66c="
+          },
+          {
+            "path": "test/version_test.cc",
+            "url": "https://bcr.bazel.build/modules/dnsmasq/2.92/overlay/test/version_test.cc",
+            "integrity": "sha256-glZac2d2BFI4lddMlXTjYoPXAInx5rouz/vx/c9ODOE="
+          }
+        ],
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/dnsmasq/2.92/MODULE.bazel",
+          "integrity": "sha256-5Jsbjwg0moWF3GWi5yF8FRF+7/5YyZO8BzSU2lOlOrw="
+        }
+      }
+    },
+    {
+      "name": "emdawnwebgpu",
+      "version": "20260423.175430",
+      "source": {
+        "urls": [
+          "https://github.com/google/dawn/releases/download/v20260423.175430/emdawnwebgpu_pkg-v20260423.175430.zip"
+        ],
+        "integrity": "sha256-Otfr6VpKIHZN9GxaY7CtSJeCruJoBP/4UR2Xl8EOcy8=",
+        "strip_prefix": "emdawnwebgpu_pkg",
+        "overlay": [
+          {
+            "path": "BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/emdawnwebgpu/20260423.175430/overlay/BUILD.bazel",
+            "integrity": "sha256-7SZpH7r8dZuk6Gm3AqoKABwfzISpmsDMBONpD0t1b18="
+          },
+          {
+            "path": "MODULE.bazel",
+            "url": "https://bcr.bazel.build/modules/emdawnwebgpu/20260423.175430/overlay/MODULE.bazel",
+            "integrity": "sha256-1FuP/LDuA0sj5ocE3BMZmzL6nVSMj26PGyxn0qiZ/hw="
+          },
+          {
+            "path": "tests/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/emdawnwebgpu/20260423.175430/overlay/tests/BUILD.bazel",
+            "integrity": "sha256-oCxze/k2dzxR+PRXSUCgtyh+gRzDSRa/mZQ3w/P0zzo="
+          },
+          {
+            "path": "tests/MODULE.bazel",
+            "url": "https://bcr.bazel.build/modules/emdawnwebgpu/20260423.175430/overlay/tests/MODULE.bazel",
+            "integrity": "sha256-Evylxj7ZQEHMlpWaIGXzBZNG5Bn4PtQkZptej9A1vuk="
+          },
+          {
+            "path": "tests/webgpu_headers_test.cc",
+            "url": "https://bcr.bazel.build/modules/emdawnwebgpu/20260423.175430/overlay/tests/webgpu_headers_test.cc",
+            "integrity": "sha256-7zzcCKp2KPkEjYmsd5DPBDNWT407YPZMGY+o4/2tXks="
+          },
+          {
+            "path": "tests/webgpu_smoke.cc",
+            "url": "https://bcr.bazel.build/modules/emdawnwebgpu/20260423.175430/overlay/tests/webgpu_smoke.cc",
+            "integrity": "sha256-JQAxiRImHcmOFIzNM33gzB50p9nsuLJpXBXburtI8mc="
+          }
+        ],
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/emdawnwebgpu/20260423.175430/MODULE.bazel",
+          "integrity": "sha256-1FuP/LDuA0sj5ocE3BMZmzL6nVSMj26PGyxn0qiZ/hw="
+        }
+      }
+    },
+    {
+      "name": "engflowapis-go",
+      "version": "2025.07.24-06.20.24",
+      "source": {
+        "urls": [
+          "https://github.com/EngFlow/engflowapis/releases/download/2025.07.24-06.20.24/engflowapis-2025.07.24-06.20.24.tar.gz"
+        ],
+        "integrity": "sha256-zWbgY+4CGOo6v1NkSy/Vopkh3Ajz7SXmWIAQaDCdjZs=",
+        "strip_prefix": "go",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/engflowapis-go/2025.07.24-06.20.24/MODULE.bazel",
+          "integrity": "sha256-X/I+jScYaBf3I4T6xlWlKLbYymh5EOfQ25rZJj7uGBY="
+        }
+      }
+    },
+    {
+      "name": "engflowapis-java",
+      "version": "2025.07.24-06.20.24",
+      "source": {
+        "urls": [
+          "https://github.com/EngFlow/engflowapis/releases/download/2025.07.24-06.20.24/engflowapis-2025.07.24-06.20.24.tar.gz"
+        ],
+        "integrity": "sha256-zWbgY+4CGOo6v1NkSy/Vopkh3Ajz7SXmWIAQaDCdjZs=",
+        "strip_prefix": "java",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/engflowapis-java/2025.07.24-06.20.24/MODULE.bazel",
+          "integrity": "sha256-YAv2/o5kEw9fngXIbPa+Dcuxa4BIu5wZT30NylSjmRo="
+        }
+      }
+    },
+    {
+      "name": "envoy_toolshed",
+      "version": "0.3.25",
+      "source": {
+        "urls": [
+          "https://github.com/envoyproxy/toolshed/releases/download/bazel-v0.3.25/toolshed-bazel-v0.3.25.tar.gz"
+        ],
+        "integrity": "sha256-sIjXxNgzaTvKVar3JFysSrSqQDoA5NTBx2gzMUs/eSA=",
+        "strip_prefix": "toolshed-bazel-v0.3.25",
+        "overlay": [
+          {
+            "path": "bcr/MODULE.bazel",
+            "url": "https://bcr.bazel.build/modules/envoy_toolshed/0.3.25/overlay/bcr/MODULE.bazel",
+            "integrity": "sha256-4rSTmWsfaI6L7aQ0MZ6M2+B88cZSxknnscbRbRb4xSw="
+          }
+        ],
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/envoy_toolshed/0.3.25/MODULE.bazel",
+          "integrity": "sha256-+YZL0Xlx0sThUJtAIARGEZ7fNSA+nkBAuasMyffsZFk="
+        }
+      }
+    },
+    {
+      "name": "etherlab-ethercat",
+      "version": "1.6.7.bcr.1",
+      "source": {
+        "urls": [
+          "https://gitlab.com/etherlab.org/ethercat/-/releases/1.6.7/downloads/dist-tarballs/ethercat.tar.gz"
+        ],
+        "integrity": "sha256-gRBi1Gt09Hf/URXvic+d1g6qqwMtomqPt3IJlJeuSg4=",
+        "strip_prefix": "ethercat-1.6.7",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/etherlab-ethercat/1.6.7.bcr.1/patches/fix_fake_lib_h.patch",
+            "integrity": "sha256-dmxjINbmnwxEzMJbeBqTvjYLbr5hYEUqBO9BvKtNyE4="
+          },
+          {
+            "url": "https://bcr.bazel.build/modules/etherlab-ethercat/1.6.7.bcr.1/patches/fix_fake_lib_cpp.patch",
+            "integrity": "sha256-frVaLAXOCrX49Y06TDOOsNjpR2i61TZEVxnSJquegX4="
+          }
+        ],
+        "patch_strip": 1,
+        "overlay": [
+          {
+            "path": "BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/etherlab-ethercat/1.6.7.bcr.1/overlay/BUILD.bazel",
+            "integrity": "sha256-ivFSpd+jJn3+/WE0Srdz5fvCPfkSFQjXO3ItM9bXvBc="
+          },
+          {
+            "path": "LICENSE",
+            "url": "https://bcr.bazel.build/modules/etherlab-ethercat/1.6.7.bcr.1/overlay/LICENSE",
+            "integrity": "sha256-H93hNmR90vrN21M9iEuAVH8V6T9vcsSyql1legdnsDc="
+          },
+          {
+            "path": "MODULE.bazel",
+            "url": "https://bcr.bazel.build/modules/etherlab-ethercat/1.6.7.bcr.1/overlay/MODULE.bazel",
+            "integrity": "sha256-exZzuNL006BKj3BPm0r35+xU2CKoZS8QWYToKAHTZqA="
+          },
+          {
+            "path": "config.h",
+            "url": "https://bcr.bazel.build/modules/etherlab-ethercat/1.6.7.bcr.1/overlay/config.h",
+            "integrity": "sha256-87+6U6/9ePxmtBFS4G2gv0cvI3M4HBpb6PTF0/jEvU0="
+          }
+        ],
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/etherlab-ethercat/1.6.7.bcr.1/MODULE.bazel",
+          "integrity": "sha256-exZzuNL006BKj3BPm0r35+xU2CKoZS8QWYToKAHTZqA="
+        }
+      }
+    },
+    {
+      "name": "evidence_store_bazel",
+      "version": "0.0.3",
+      "source": {
+        "urls": [
+          "https://github.com/nesono/evidence_store/releases/download/evidence_store_bazel-v0.0.3/evidence_store_bazel-v0.0.3.tar.gz"
+        ],
+        "integrity": "sha256-0xy61RLMM3FXpEZ5ql3B5xcg1vAm5uduLM/RDBqRdKE=",
+        "strip_prefix": "evidence_store_bazel-v0.0.3",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/evidence_store_bazel/0.0.3/MODULE.bazel",
+          "integrity": "sha256-Y/N4Q7Lt/G8KXhLx/dbpa5/yBY61Zqi42PaM3GBNvAc="
+        }
+      }
+    },
+    {
+      "name": "federated_language",
+      "version": "0.5.2",
+      "source": {
+        "urls": [
+          "https://github.com/google-parfait/federated-language/releases/download/v0.5.2/federated-language-0.5.2.tar.gz"
+        ],
+        "integrity": "sha256-3XZ7Z9BU2KsU5ioW7a03biVhDy7cW3jM9BtHPe1WYtQ=",
+        "strip_prefix": "federated-language-0.5.2",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/federated_language/0.5.2/MODULE.bazel",
+          "integrity": "sha256-KGydphFuPSp/ryGbd2ENgdGNUvJrlw1jg1c0rciFXFc="
+        }
+      }
+    },
+    {
+      "name": "foxglove_schemas_protobuf",
+      "version": "0.2.2.bcr.1",
+      "source": {
+        "urls": [
+          "https://github.com/foxglove/foxglove-sdk/archive/refs/tags/releases/python/foxglove-schemas-protobuf/v0.2.2.tar.gz"
+        ],
+        "integrity": "sha256-OmQmlHGo3IKelXmiAPHbLOFP0ez587BmAoojYg/CQCA=",
+        "strip_prefix": "foxglove-sdk-releases-python-foxglove-schemas-protobuf-v0.2.2",
+        "overlay": [
+          {
+            "path": "BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/foxglove_schemas_protobuf/0.2.2.bcr.1/overlay/BUILD.bazel",
+            "integrity": "sha256-TgUZHdmJkkoTIBppxHuuYo0ELTpijD0E1KZpNyOwSgY="
+          },
+          {
+            "path": "MODULE.bazel",
+            "url": "https://bcr.bazel.build/modules/foxglove_schemas_protobuf/0.2.2.bcr.1/overlay/MODULE.bazel",
+            "integrity": "sha256-h/P14cCmVwWrX7zRjquWUBPAOy0LQXdSimfuGfpsdS8="
+          }
+        ],
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/foxglove_schemas_protobuf/0.2.2.bcr.1/MODULE.bazel",
+          "integrity": "sha256-h/P14cCmVwWrX7zRjquWUBPAOy0LQXdSimfuGfpsdS8="
+        }
+      }
+    },
+    {
+      "name": "foxglove_websocket",
+      "version": "1.3.0",
+      "source": {
+        "urls": [
+          "https://github.com/foxglove/ws-protocol/archive/refs/tags/releases/cpp/v1.3.0.tar.gz"
+        ],
+        "integrity": "sha256-XB1M2mCom/Y17wFQ6M0vTaVp+SvrishVV5Xtf9R/KiE=",
+        "strip_prefix": "ws-protocol-releases-cpp-v1.3.0",
+        "overlay": [
+          {
+            "path": "BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/foxglove_websocket/1.3.0/overlay/BUILD.bazel",
+            "integrity": "sha256-IB4BkWQSCaNz8Nona7iraVafcL92Vj+1cSi/us7TNKk="
+          },
+          {
+            "path": "MODULE.bazel",
+            "url": "https://bcr.bazel.build/modules/foxglove_websocket/1.3.0/overlay/MODULE.bazel",
+            "integrity": "sha256-+WFR78+V+VhVTcmOGYGe+0OzqGQmddHdMugWXEJZbK0="
+          }
+        ],
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/foxglove_websocket/1.3.0/MODULE.bazel",
+          "integrity": "sha256-+WFR78+V+VhVTcmOGYGe+0OzqGQmddHdMugWXEJZbK0="
+        }
+      }
+    },
+    {
+      "name": "foxglove_ws_protocol",
+      "version": "0.8.1",
+      "source": {
+        "urls": [
+          "https://github.com/foxglove/ws-protocol/archive/refs/tags/releases/typescript/ws-protocol-examples/v0.8.1.tar.gz"
+        ],
+        "integrity": "sha256-7uSErv5MsI3O+exS31+QTgF+FVF4Zdz6JGL/gHDJ2QY=",
+        "strip_prefix": "ws-protocol-releases-typescript-ws-protocol-examples-v0.8.1",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/foxglove_ws_protocol/0.8.1/patches/foxglove_ws_protocol.patch",
+            "integrity": "sha256-C4Qok0Aouq3FLdAgIvEHQcVIe23huj17x0tmFhQ2SYU="
+          }
+        ],
+        "patch_strip": 1,
+        "overlay": [
+          {
+            "path": "BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/foxglove_ws_protocol/0.8.1/overlay/BUILD.bazel",
+            "integrity": "sha256-bKJccxXcX6xIUQKWzWGUlRW+6VfJ0oZHN/oaiq07im8="
+          }
+        ],
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/foxglove_ws_protocol/0.8.1/MODULE.bazel",
+          "integrity": "sha256-utf7P4waYBa1+z2lgxPEMQcgU4MBmGiQr21+5luJ4O8="
+        }
+      }
+    },
+    {
+      "name": "fremtind_rules_vitest",
+      "version": "0.2.1",
+      "source": {
+        "urls": [
+          "https://github.com/fremtind/rules_vitest/releases/download/v0.2.1/rules_vitest-v0.2.1.tar.gz"
+        ],
+        "integrity": "sha256-VWXvbOCVPQLg/WRYQoQflLNUewm7/w4IrifWu9NQuVI=",
+        "strip_prefix": "rules_vitest-0.2.1",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/fremtind_rules_vitest/0.2.1/patches/module_dot_bazel_version.patch",
+            "integrity": "sha256-0cLbpxlP1rkTj/HvN1Ax7ABaoSjNvBPCm5b9Rj1iq2U="
+          }
+        ],
+        "patch_strip": 1,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/fremtind_rules_vitest/0.2.1/MODULE.bazel",
+          "integrity": "sha256-CD6KVCwFYNCn6wQf2S7eQOG+sgXFxf01HQfd3T7Pmnc="
+        }
+      }
+    },
+    {
+      "name": "fshlib",
+      "version": "0.5.0",
+      "source": {
+        "urls": [
+          "https://github.com/filmil/fshlib/releases/download/v0.5.0/fshlib-v0.5.0.zip"
+        ],
+        "integrity": "sha256-Zrgr42ooZJ7PKc34gLnvA7qgR7tgn+6i5LWA6vRQw1Y=",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/fshlib/0.5.0/patches/module_dot_bazel_version.patch",
+            "integrity": "sha256-GDz6ByqZoFIG6bQ8YJQvfTtebWJsOD5ksE19DSa3BLQ="
+          }
+        ],
+        "patch_strip": 1,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/fshlib/0.5.0/MODULE.bazel",
+          "integrity": "sha256-mDHO4HdR0hECXHPP3x2pmwH0McdsZBeHVAa0RP3YKuE="
+        }
+      }
     }
   ],
   "skipped": []

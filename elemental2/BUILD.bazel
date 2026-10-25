@@ -11,6 +11,6 @@ project(
         # the bazel_worker_api it resolves calls native proto_library, which Bazel 9 removed; autoload it from protobuf
         "--incompatible_autoload_externally=+@com_google_protobuf",
     ],
-    # with rules_go and bazel_worker_api fixed, its deps j2cl, jsinterop_base and bazel_worker_java reference @maven artifacts (args4j_args4j, org_jspecify_jspecify, com_google_escapevelocity_escapevelocity) that the resolved maven repo doesn't define
+    # its MODULE.bazel archive_overrides j2cl, jsinterop_generator and jsinterop_base to their unpinned GitHub master.zip archives (no integrity), so it builds against whatever master is now; with rules_go and bazel_worker_api fixed, those deps reference @maven artifacts (args4j_args4j, org_jspecify_jspecify, com_google_escapevelocity_escapevelocity) that the resolved maven repo doesn't define
     known_failing = "build",
 )
