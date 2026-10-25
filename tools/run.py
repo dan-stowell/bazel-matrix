@@ -142,9 +142,12 @@ def run_shard(i, command, targets, extra, out_dir):
         raise ValueError("shard %d is empty" % i)
     log_path = os.path.join(out_dir, "%d.log" % i)
     id_path = os.path.join(out_dir, "%d.id" % i)
+    # A shard of only :build targets (known-failing test projects) builds:
+    # `bazel test` without tests would exit 4.
+    bazel_command = "build" if set(targets.values()) == {"build"} else command
     # A result line per non-test target, so passes are reported, not inferred.
     flags = ["--show_result=1000000"]
-    if command == "test" and "build" in targets.values():
+    if bazel_command == "test" and "build" in targets.values():
         flags.append("--nobuild_tests_only")  # .bazelrc sets it for test
     start = time.time()
     with open(log_path, "w") as log:
@@ -152,14 +155,17 @@ def run_shard(i, command, targets, extra, out_dir):
             if None in _procs:
                 raise RuntimeError("stopping")
             proc = subprocess.Popen(
-                [os.path.join(ROOT, "tools", "bb.sh"), "--invocation_id_file=" + id_path, command]
+                [os.path.join(ROOT, "tools", "bb.sh"), "--invocation_id_file=" + id_path,
+                 bazel_command]
                 + labels + flags + extra,
                 cwd=ROOT, stdout=log, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL)
             _procs.append(proc)
         proc.wait()
     wall = time.time() - start
     with open(log_path, errors="replace") as f:
-        code, outer, status = parse_log(f.read(), command, targets)
+        code, outer, status = parse_log(f.read(), bazel_command, targets)
+    if bazel_command != command:
+        status = {n: "BUILT" if s == "PASSED" else s for n, s in status.items()}
     remote = ""
     if os.path.exists(id_path):
         with open(id_path) as f:
@@ -168,10 +174,16 @@ def run_shard(i, command, targets, extra, out_dir):
             "outer": outer, "status": status, "wall": wall, "log": log_path, "error": ""}
 
 
+_stopping = []
+
+
 def stop_all(signum, _frame):
     """Stops every bb remote child (SIGINT makes it cancel its remote run)."""
+    if _stopping:
+        return  # a second signal while stopping
+    _stopping.append(signum)
     with _lock:
-        procs = list(_procs)
+        procs = [p for p in _procs if p is not None]
         _procs.append(None)  # no new children after this
     for p in procs:
         if p.poll() is None:
