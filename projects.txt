@@ -7,6 +7,9 @@
 #   -//inner/pattern/...  reason   leave inner targets out
 #   --inner_flag=value    reason   pass a flag to the inner build and test
 #   bazel 8.4.2           reason   pin the inner Bazel (see tools/project.bzl)
+#   known-failing build   reason   tag :build and :test manual (the inner build fails)
+#   known-failing test    reason   tag :test manual (only the inner test fails)
+# A reason is the concrete first error, on one line.
 
 zlib
 abseil-cpp
