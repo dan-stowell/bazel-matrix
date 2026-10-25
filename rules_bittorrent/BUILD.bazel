@@ -6,7 +6,7 @@ project(
     name = "rules_bittorrent",
     targets = [
         "//...",
-        # the stardoc-rendered repo.md.generated differs from the checked-in docs/repo.md ("files ... differ") under the stardoc and Bazel 9.3.1 it gets here; the diff was not inspected
+        # the repo.md.generated that stardoc renders here differs from the checked-in docs/repo.md ("files ... differ"); the test prints no diff, and the cause is unconfirmed (likely a different stardoc or Bazel 9.3.1 rendering, as with rules_codeowners's stardoc_up_to_date)
         "-//:docs_test",
     ],
 )
