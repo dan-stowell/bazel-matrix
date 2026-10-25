@@ -2499,7 +2499,7 @@ fshlib
 
 # Chunk h-2: BCR modules (o-p).
 ofiuco
-  -//lib/private:zipper_test  its test_directory case fails on the executors: the zipped file list has repeated __init__.py and _bazel_site_init.py entries that the directory listing doesn't (cause not identified)
+  --incompatible_default_to_explicit_init_py  //lib/private:zipper_test zips its runfiles directory and expects no __init__.py in it (its expected listing drops them), but rules_python creates empty __init__.py files there implicitly by default
   --deleted_packages=examples,examples/transitions,examples/transitions/constraint,examples/transitions/toolchains,examples/transitions/toolchains/args,examples/transitions/toolchains/clang,examples/transitions/toolchains/clang/args,examples/transitions/toolchains/clang/tools,examples/transitions/toolchains/gcc,examples/transitions/toolchains/gcc/args,examples/transitions/toolchains/gcc/tools,examples/wheel  (not an exclusion: //... fails on a broken package even when subtracted) examples/transitions and examples/wheel are separate workspaces (own MODULE.bazel; they use @poetry, @gcc-linux-x86_64, @linux_sysroot), and examples/BUILD.bazel's integration tests glob example dirs (airflow, ...) that the release archive lacks ("glob pattern 'airflow/**/*' didn't match anything")
 ogre-next
   -//:ogre-main-macos  macOS-only sources (Objective-C++ under OgreMain/src/OSX) without target_compatible_with; gcc here can't compile them ("cannot execute 'cc1objplus'")
@@ -2532,7 +2532,7 @@ openmesh
   known-failing build  its BCR source URL (www.graphics.rwth-aachen.de) refuses connections from the runners and this VM ("Connection refused"), and the BCR lists no mirror
 openssh
 p4c
-  -//backends/p4tools:p4testgen_api_test  reads p4include/core.p4 through the source-relative path test/gtest/../../p4include in its runfiles, where it isn't ("Couldn't read standard header ..."); whether it is missing from data is not confirmed
+  -//backends/p4tools:p4testgen_api_test  test/gtest/helpers.cpp reads p4include/core.p4 from <source dir>/../../p4include, but the cc_test has no data, so p4include isn't in its runfiles ("Couldn't read standard header ...")
   --action_env=CC=gcc  its .bazelrc sets --action_env=CC=clang, and the images have only gcc
   --action_env=CXX=g++  its .bazelrc sets --action_env=CXX=clang++, and the images have only gcc
   --repo_env=CC=gcc  its .bazelrc sets --repo_env=CC=/usr/bin/clang, and the images have only gcc
@@ -2685,3 +2685,56 @@ rules_proto_grpc_csharp
   override rules_foreign_cc 0.16.0  the resolved rules_foreign_cc (0.10.1) calls rule(incompatible_use_toolchain_transition=...), which Bazel 9 removed
   override rules_dotnet 0.22.2  the resolved rules_dotnet's dotnet/private/resolved_toolchain.bzl calls rule(incompatible_use_toolchain_transition=...), which Bazel 9 removed
 rules_proto_grpc_doc
+
+# Chunk h-3: the rest of the m-q BCR modules.
+phtree-cpp
+pixelmatch-cpp17
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: third_party/stb/BUILD.bazel calls native cc rules without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed
+pkg-config
+platforms_contrib
+plyodine
+  known-failing build  it includes the C++23 headers <generator> and <expected> (plyodine/ply_writer.h, ply_header_reader.h), which gcc 11's libstdc++, the image's only one, lacks ("fatal error: generator: No such file or directory")
+polyscope
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: deps/*/BUILD.bazel, examples/demo-app and test call native cc rules without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed
+  known-failing build  with those flags, the glfw it resolves (behind its rendering backends) includes X11/Xlib.h, and the image has no X11 headers
+portable_cc_toolchain
+pplib
+ppp
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+pre-commit
+pre-commit-hooks
+  known-failing build  as the root module its MODULE.bazel registers only a Python 3.13 toolchain (python.toolchain is a dev dependency) but pip.parse()s hubs for 3.10-3.13 ("Unable to find interpreter for pip hub 'clang-format-3.10'"), and its dev dep hermetic_cc_toolchain 3.1.0 fails to load under Bazel 9 (zig_toolchain.bzl: "at index 0 of provides, got element of type NoneType")
+prismo
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed (go/private/rules/cgo.bzl)
+  override rules_nodejs 6.7.7  the resolved rules_nodejs's nodejs/toolchain.bzl uses the native CcInfo symbol, which Bazel 9 removed
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: bazel/BUILD.bazel and tools/format/BUILD.bazel call native sh_binary without a load()
+  --incompatible_autoload_externally=+@rules_shell  autoload the sh rules Bazel 9 removed
+prjoxide
+prjoxide-db
+prjtrellis
+prjtrellis-db
+procps-ng
+  override ncurses 6.4.20221231.bcr.14  the ncurses it resolves (6.4.20221231.bcr.4) calls native cc rules, which Bazel 9 removed ("This rule has been removed from Bazel")
+  -//:hugetop  includes ncurses.h, but the ncurses module's :ncurses target exports curses.h and no ncurses.h or ncursesw/ncurses.h ("ncurses.h: No such file or directory")
+  -//:slabtop  includes ncurses.h, but the ncurses module's :ncurses target exports curses.h and no ncurses.h or ncursesw/ncurses.h ("ncurses.h: No such file or directory")
+  -//:watch  includes ncurses.h, but the ncurses module's :ncurses target exports curses.h and no ncurses.h or ncursesw/ncurses.h ("ncurses.h: No such file or directory")
+prodrive_technologies_bazel_latex
+  override rules_foreign_cc 0.16.0  the resolved rules_foreign_cc calls rule(incompatible_use_toolchain_transition=...), which Bazel 9 removed, and uses the removed native CcInfo
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its latex.bzl calls native sh_binary
+  --incompatible_autoload_externally=+@rules_shell,+@rules_python  autoload the sh and py rules Bazel 9 removed (its latexrun repo's BUILD.bazel calls native py_binary)
+  known-failing build  with those fixes, every latex_document depends on //:ghostscript_dependencies, whose Linux ghostscript build (//third_party:lib_ghost_script_configure_linux, configure_make) runs autoreconf, which the executor image lacks ("autoreconf: command not found")
+protoc_gen_clojure
+proto-converter
+  --noincompatible_disallow_empty_glob  src/google/protobuf/util/converter/BUILD.bazel globs *unittest.cc, which matches nothing in the archive, and Bazel 9 rejects empty globs
+  --cxxopt=-std=c++17  its .bazelrc sets -std=c++14, but the abseil-cpp it resolves needs C++17 ("C++ versions less than C++17 are not supported")
+  --host_cxxopt=-std=c++17  its .bazelrc sets -std=c++14, but the abseil-cpp it resolves needs C++17 ("C++ versions less than C++17 are not supported")
+  known-failing build  with those flags, src/google/protobuf/util/converter/BUILD.bazel loads cc_proto_library from @rules_cc//cc:defs.bzl, which fails for Bazel 8+ ("cc_proto_library is removed from @rules_cc//cc:defs.bzl in Bazel 8"), and its googletest calls the removed native cc rules
+protothreads
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD calls native cc rules without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed
+proxy-wasm-rust-sdk
+psimpl
+psmisc
+pypackaging.bzl
