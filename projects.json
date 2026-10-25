@@ -9579,6 +9579,625 @@
           "integrity": "sha256-M6pUyMRAycC184bxT3cHs860Rk0g/e+k8Y13v6ltuIg="
         }
       }
+    },
+    {
+      "name": "llvm",
+      "version": "0.8.25",
+      "source": {
+        "urls": [
+          "https://github.com/hermeticbuild/hermetic-llvm/releases/download/v0.8.25/hermetic-llvm-v0.8.25.tar.gz"
+        ],
+        "integrity": "sha256-L1Js6jIi/M6VNQOmrfswzEg10uBgmSkGLfThoB8OPPY=",
+        "strip_prefix": "hermetic-llvm-0.8.25",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/llvm/0.8.25/patches/module_dot_bazel_version.patch",
+            "integrity": "sha256-6I1WmxGmR2vWVntefaTbKhGdb3eJb+leJScmrguFtsw="
+          }
+        ],
+        "patch_strip": 1,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/llvm/0.8.25/MODULE.bazel",
+          "integrity": "sha256-U3j3lYqOK8ZAuWtbF+tHNk1wX5RfknoZLG2m/yc5o6o="
+        }
+      }
+    },
+    {
+      "name": "llvm-project",
+      "version": "17.0.4.bcr.1",
+      "source": {
+        "urls": [
+          "https://github.com/bazel-contrib/llvm-project-redist/releases/download/llvmorg-17.0.4.bcr.1/llvm-project-17.0.4.bcr.1.bzl.tar.zst"
+        ],
+        "integrity": "sha256-gtqfNq+WA7BvU75HjcNGGblXf9knddbynazNP9DMLMw=",
+        "strip_prefix": "llvm-project-17.0.4.bcr.1.bzl",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/llvm-project/17.0.4.bcr.1/MODULE.bazel",
+          "integrity": "sha256-RV9p+DTXcU1jbFBoRtewTu68USlkIHcSwTn4dP5xpIA="
+        }
+      }
+    },
+    {
+      "name": "folly",
+      "version": "2026.08.31.00",
+      "source": {
+        "urls": [
+          "https://github.com/facebook/folly/releases/download/v2026.08.31.00/folly-v2026.08.31.00.tar.gz"
+        ],
+        "integrity": "sha256-jBXLbHVwdAXgcPDsZ9PolcxDy83yq+j6dyazaYvdSw0=",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/patches/folly_debugging_symbolizer_Dwarf.cpp.patch",
+            "integrity": "sha256-2+/8J/9t5YDKBb3XMMedFb+4NAlSwrSEj7bx04DdH4s="
+          },
+          {
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/patches/folly_debugging_symbolizer_DwarfImpl.cpp.patch",
+            "integrity": "sha256-Hb9NWzZuyZb/att+9eCwZnnRmvNBrRWX+z9oFxx5dWw="
+          },
+          {
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/patches/folly_debugging_symbolizer_DwarfUtil.cpp.patch",
+            "integrity": "sha256-OctT8ri564QlFJS+HX/PfRzgu0311D1Hln2KW8TvN3I="
+          },
+          {
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/patches/folly_debugging_symbolizer_DwarfUtil.h.patch",
+            "integrity": "sha256-mxzgYWEhwhY8xKwfLtCzrg7kS7qAK1FbwPcfRWgXcIs="
+          },
+          {
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/patches/test_utils_bazel_runfiles.patch",
+            "integrity": "sha256-fadIJN5bSIqAkOSj/rWBMthNJtqTZ9LFaL1i9tgNJhc="
+          },
+          {
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/patches/use_quote_includes_for_snappy.patch",
+            "integrity": "sha256-FnCn7rHbOvbtMJ9L7O1quSXqBXkZwnMP4nen1rwz3kQ="
+          }
+        ],
+        "patch_strip": 1,
+        "overlay": [
+          {
+            "path": "BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/BUILD.bazel",
+            "integrity": "sha256-jSoAFkEd6Xq+w/lBVbj2GzSvIXmvbkXep9RY6hFln5g="
+          },
+          {
+            "path": "CMake/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/CMake/BUILD.bazel",
+            "integrity": "sha256-xJ8uTg94UaEOKP+eAHX25OijxrH2+AzQ9o07e0wohc8="
+          },
+          {
+            "path": "MODULE.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/MODULE.bazel",
+            "integrity": "sha256-Nwtq5p/eJ+6xNHGMx96/ySLk3J2FBb4vYgqR9zahnZ0="
+          },
+          {
+            "path": "bzl/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/bzl/BUILD.bazel",
+            "integrity": "sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU="
+          },
+          {
+            "path": "bzl/cpp_library.bzl",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/bzl/cpp_library.bzl",
+            "integrity": "sha256-XGfl7WWYz4F/r5zItF8OTRXm6ROlJmelmQM8vrBhs6U="
+          },
+          {
+            "path": "folly/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/BUILD.bazel",
+            "integrity": "sha256-DnsSZuCnRrt8sPAzeduR/0SPLgLi2QOZJcb/CTNR+vM="
+          },
+          {
+            "path": "folly/algorithm/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/algorithm/BUILD.bazel",
+            "integrity": "sha256-yFhcSzvm+Wcer8GIs1lHEbceTYmYkDi1tUfojyW9LwU="
+          },
+          {
+            "path": "folly/algorithm/simd/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/algorithm/simd/BUILD.bazel",
+            "integrity": "sha256-p/7T0F6nE+o0kSyLywSPBESMW6/6A9k3I7cq7ROuz/w="
+          },
+          {
+            "path": "folly/algorithm/simd/detail/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/algorithm/simd/detail/BUILD.bazel",
+            "integrity": "sha256-LqwF3zrMOP3eZ3Wcvtk9l0dUn8LIXVvZbn5mjw1/xNc="
+          },
+          {
+            "path": "folly/channels/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/channels/BUILD.bazel",
+            "integrity": "sha256-FhmyzrHwjOuawZI0lPdty/clxTZMd1+jF02jqFsJDlI="
+          },
+          {
+            "path": "folly/channels/detail/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/channels/detail/BUILD.bazel",
+            "integrity": "sha256-6D+9qmjoLr8mk4kq5w6StykpvHDtlRVVhAC4Q88yw94="
+          },
+          {
+            "path": "folly/chrono/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/chrono/BUILD.bazel",
+            "integrity": "sha256-YdYqkc5NGKqF1DGZNYJy1bUI0P4YTaBHdXGqw24BboM="
+          },
+          {
+            "path": "folly/cli/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/cli/BUILD.bazel",
+            "integrity": "sha256-K5ct4kH2ePtoBYkJtwrb8VO0csh9yhEDNRo8J5OkMfM="
+          },
+          {
+            "path": "folly/codec/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/codec/BUILD.bazel",
+            "integrity": "sha256-mP9z42gRBZ+pHtYEGXyizPYorjvZo0cVVQHc/eH7xZA="
+          },
+          {
+            "path": "folly/compression/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/compression/BUILD.bazel",
+            "integrity": "sha256-wxNFBnKOmcUU3H9vJkcxemZDAGF7jbyshPYTUVw8coA="
+          },
+          {
+            "path": "folly/compression/elias_fano/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/compression/elias_fano/BUILD.bazel",
+            "integrity": "sha256-51WfIxq7XinS2fqt5X8DcNmlqO2mr99MHuOukI19a1A="
+          },
+          {
+            "path": "folly/concurrency/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/concurrency/BUILD.bazel",
+            "integrity": "sha256-p97H8TaAUPQtTq0xHIAOPxB4yskn/x833LSQPsA6hRg="
+          },
+          {
+            "path": "folly/concurrency/container/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/concurrency/container/BUILD.bazel",
+            "integrity": "sha256-2FhUTlumFdgk2iISLR66N/WkP/g1ZVgtw3Izs43+ft8="
+          },
+          {
+            "path": "folly/concurrency/memory/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/concurrency/memory/BUILD.bazel",
+            "integrity": "sha256-VNXceZSTZ1yTgSUIga/TI/0JvsCN+7TOnD0AF3l4W3g="
+          },
+          {
+            "path": "folly/container/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/container/BUILD.bazel",
+            "integrity": "sha256-fpOG6I/4LWJK2nk8zzdrcOKTHbV18Ov78pSJuyqQAfE="
+          },
+          {
+            "path": "folly/container/detail/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/container/detail/BUILD.bazel",
+            "integrity": "sha256-Ma486J4ZDjqy8g/7Kca8yVS/ne9qckPr2oCy7PqFZpg="
+          },
+          {
+            "path": "folly/coro/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/coro/BUILD.bazel",
+            "integrity": "sha256-Nde+KesAzV/80kwZnaZK/+fsa77Q05PhJalIh/VKNE8="
+          },
+          {
+            "path": "folly/coro/detail/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/coro/detail/BUILD.bazel",
+            "integrity": "sha256-kPRdpiSlxoRbBZ3+vVk7B7cp+6JAgbyUW2hQ/DbZ3XY="
+          },
+          {
+            "path": "folly/coro/safe/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/coro/safe/BUILD.bazel",
+            "integrity": "sha256-oELD/sa9Yw3gtsJmQvqaiiRrHrqzlYvkJpI19md29bA="
+          },
+          {
+            "path": "folly/coro/safe/detail/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/coro/safe/detail/BUILD.bazel",
+            "integrity": "sha256-U1Rrj4w6uLJqEusbuzPwkJwlkPcLxxccO5xggrz0T5Q="
+          },
+          {
+            "path": "folly/crypto/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/crypto/BUILD.bazel",
+            "integrity": "sha256-5x/ic9a/5XA+Pw5Dy5J+ORwq7V2FXsiuiyaDda74w04="
+          },
+          {
+            "path": "folly/crypto/detail/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/crypto/detail/BUILD.bazel",
+            "integrity": "sha256-S3pQEqQb2se29xR2JUZPUEdxEgRpVM92ktq+wFlqjT8="
+          },
+          {
+            "path": "folly/debugging/exception_tracer/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/debugging/exception_tracer/BUILD.bazel",
+            "integrity": "sha256-LVWsKKs+BVFFRNUD6ol6vTi6sWXWEI0n2qqZTqu7pPY="
+          },
+          {
+            "path": "folly/debugging/symbolizer/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/debugging/symbolizer/BUILD.bazel",
+            "integrity": "sha256-A1glQ1It8mIBTGEYWJk+7rl+jCXgpw+XFQiviy3AGB8="
+          },
+          {
+            "path": "folly/debugging/symbolizer/detail/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/debugging/symbolizer/detail/BUILD.bazel",
+            "integrity": "sha256-DiAr3dGI4Yg+j1TIuzPgLK6lWOqe2YwwO2MCrKrcSqg="
+          },
+          {
+            "path": "folly/detail/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/detail/BUILD.bazel",
+            "integrity": "sha256-mtZ95QVevsZ+dzcX1IxL3Iw+IgsG/kRCdSVzkQCeTtY="
+          },
+          {
+            "path": "folly/detail/base64_detail/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/detail/base64_detail/BUILD.bazel",
+            "integrity": "sha256-1ByrukV+GU5rH9gyRoHt+SrkoychzSEgyc3ZEKH35HU="
+          },
+          {
+            "path": "folly/executors/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/executors/BUILD.bazel",
+            "integrity": "sha256-4wrnYtvR6QPHJeMLblskEzHs4HKhQM1VYv3s8wzkQ0w="
+          },
+          {
+            "path": "folly/executors/task_queue/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/executors/task_queue/BUILD.bazel",
+            "integrity": "sha256-anDQmL22AyVD8Fb9/n/6D7W9jgXHrK78GXddDaQ8LO4="
+          },
+          {
+            "path": "folly/executors/thread_factory/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/executors/thread_factory/BUILD.bazel",
+            "integrity": "sha256-fzd8PTSpYfW0lxnngcZTRAhr5Ynm/aFk7uUu7Qxbbsk="
+          },
+          {
+            "path": "folly/ext/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/ext/BUILD.bazel",
+            "integrity": "sha256-PLK9wTpfjduwIpZx43+YT9157WN2a+TxWu4AMRrqMgQ="
+          },
+          {
+            "path": "folly/ext/buck2/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/ext/buck2/BUILD.bazel",
+            "integrity": "sha256-T/yQwWcx/9kOmyoA7tEoKcI+7OA4aGWJATxVVqeug1U="
+          },
+          {
+            "path": "folly/external/aor/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/external/aor/BUILD.bazel",
+            "integrity": "sha256-0cHc+Hoj60Vu+OOXsmVAASYxZAW1HUSwc6siVfN1Leo="
+          },
+          {
+            "path": "folly/external/farmhash/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/external/farmhash/BUILD.bazel",
+            "integrity": "sha256-+adfAfFmcQGSRzOteRw1IMn/NtoXadhknlNkQZ4E4HQ="
+          },
+          {
+            "path": "folly/external/fast-crc32/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/external/fast-crc32/BUILD.bazel",
+            "integrity": "sha256-GeZdVuWbjAg5JDHeNnqD3Vn9I/LvBv2gQLOjC1myjx4="
+          },
+          {
+            "path": "folly/external/nvidia/detail/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/external/nvidia/detail/BUILD.bazel",
+            "integrity": "sha256-NuxwuK+Q6oUe9yZ0jObvoUqaa2q54pZ4L5xV9fdHzeE="
+          },
+          {
+            "path": "folly/external/nvidia/hash/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/external/nvidia/hash/BUILD.bazel",
+            "integrity": "sha256-XPFOZ0R59lHUlQoSRPfIASsNuPUXlde0Q0SwQgDiAaY="
+          },
+          {
+            "path": "folly/external/nvidia/hash/detail/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/external/nvidia/hash/detail/BUILD.bazel",
+            "integrity": "sha256-fMtLKSnO731frHfQ9tXIdoEpRGxeXOlRyJHqNLvxDCg="
+          },
+          {
+            "path": "folly/external/rapidhash/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/external/rapidhash/BUILD.bazel",
+            "integrity": "sha256-2V7hw9N+esRDmBBvU98hz8m5oXdlhYZXldyLPH8nfs0="
+          },
+          {
+            "path": "folly/fibers/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/fibers/BUILD.bazel",
+            "integrity": "sha256-JcHAwD+fKRmHQTBnTN2pmakeey9SXfTnAL6eCzZjpbg="
+          },
+          {
+            "path": "folly/fibers/async/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/fibers/async/BUILD.bazel",
+            "integrity": "sha256-17ebmhAchf2lc5Num1g5IQtnpBL47Cw7h7b62MfUryQ="
+          },
+          {
+            "path": "folly/fibers/detail/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/fibers/detail/BUILD.bazel",
+            "integrity": "sha256-p9b/FL7VbvMp6dxIIbJBtT4Ntqu/oN5E5HckRRO8ymg="
+          },
+          {
+            "path": "folly/functional/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/functional/BUILD.bazel",
+            "integrity": "sha256-8v/6mSMJTytsAttJmcuK61g1Ib7nHUdTdEoG/NvUpqE="
+          },
+          {
+            "path": "folly/futures/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/futures/BUILD.bazel",
+            "integrity": "sha256-KrUUuoNDeVXvts1VyIpQaArjwCRV4+DU0ffTPROHK78="
+          },
+          {
+            "path": "folly/futures/detail/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/futures/detail/BUILD.bazel",
+            "integrity": "sha256-9jwRHw/UwZxO5o9WijFgaK5yrrqVkcER5MvqJL1mV+Y="
+          },
+          {
+            "path": "folly/gen/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/gen/BUILD.bazel",
+            "integrity": "sha256-P3nO+blEBjKB/fnQpytdBcUlds60LDgqdWuGBVjNmCg="
+          },
+          {
+            "path": "folly/hash/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/hash/BUILD.bazel",
+            "integrity": "sha256-febi3130SkgJlTniDip68iLIYoMVGZUHTQtGilUy2XE="
+          },
+          {
+            "path": "folly/hash/detail/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/hash/detail/BUILD.bazel",
+            "integrity": "sha256-3dGoyL8HgJGAGxaPX7pvhwmBD57ozHMJV5InOPX1CPE="
+          },
+          {
+            "path": "folly/init/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/init/BUILD.bazel",
+            "integrity": "sha256-00gkEMhoC4nhaI1Pq7S56kevvNEUzqAIi3KtmZa3Ue4="
+          },
+          {
+            "path": "folly/io/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/io/BUILD.bazel",
+            "integrity": "sha256-5z1B1/qubVpBxHgq0gVX5e0TJlRwrcOdfM99NGVZ2IU="
+          },
+          {
+            "path": "folly/io/async/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/io/async/BUILD.bazel",
+            "integrity": "sha256-NLfQh8nLa6S6mtlw/O6oBaB+iK3iTQJDLiOdL+vTn0E="
+          },
+          {
+            "path": "folly/io/async/fdsock/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/io/async/fdsock/BUILD.bazel",
+            "integrity": "sha256-wIphEcdCKdvyO11ZvfKX9l922AyOHNYGSXFEPQjYVVc="
+          },
+          {
+            "path": "folly/io/async/observer/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/io/async/observer/BUILD.bazel",
+            "integrity": "sha256-74xj5yun3u+QOgVbtUWALzo/zENVCrxNPb3Trrknzgg="
+          },
+          {
+            "path": "folly/io/async/ssl/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/io/async/ssl/BUILD.bazel",
+            "integrity": "sha256-ky8i/6jx/KK/ucQkt9qzfCHAyGHmWAebQnPJrVihvIc="
+          },
+          {
+            "path": "folly/io/async/test/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/io/async/test/BUILD.bazel",
+            "integrity": "sha256-YxSnQXILbbdgNc7UVQ7Bw2smwiDVQHG37pwsfw4kVj4="
+          },
+          {
+            "path": "folly/io/async/test/certs/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/io/async/test/certs/BUILD.bazel",
+            "integrity": "sha256-LnyYswIqeYdyLeI8gAWVd6R+lSuxlSVf8mSqKek8kpw="
+          },
+          {
+            "path": "folly/io/coro/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/io/coro/BUILD.bazel",
+            "integrity": "sha256-NwZ+uY0tXu1Iu9goJj5LxiaMnpkU/roIo2lbmYj1wXw="
+          },
+          {
+            "path": "folly/io/tool/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/io/tool/BUILD.bazel",
+            "integrity": "sha256-0pR4Na2L+d4lXP8hvE7LQK6E4CTICeHeox0DQm2tmiA="
+          },
+          {
+            "path": "folly/json/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/json/BUILD.bazel",
+            "integrity": "sha256-E8bE/F/vNfRlJdqWCJeJLAL4xJXZZyNuEJLuoEsEVX8="
+          },
+          {
+            "path": "folly/json/bser/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/json/bser/BUILD.bazel",
+            "integrity": "sha256-ZJkxw2OPeSbWnhQ/pauZiHDs3sdbbBH2DYmW6QtrhWA="
+          },
+          {
+            "path": "folly/json/tool/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/json/tool/BUILD.bazel",
+            "integrity": "sha256-PUj/zxNqVYpCv5X/9ry/soREb/KUU3pbNGWrIcvGbBM="
+          },
+          {
+            "path": "folly/lang/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/lang/BUILD.bazel",
+            "integrity": "sha256-WUrodBp7Ov94V21sZfICrwK81dX5cLWEfaDKBUplKW4="
+          },
+          {
+            "path": "folly/lang/bind/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/lang/bind/BUILD.bazel",
+            "integrity": "sha256-dD60Y3+fP9NWg8WBHJPxnY1Z2egKlBUa0+qVcizMDM0="
+          },
+          {
+            "path": "folly/logging/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/logging/BUILD.bazel",
+            "integrity": "sha256-ZLt+vzC+DEzYQXFBN9M5Fq+292Zy/314YgCj6BAq1Kw="
+          },
+          {
+            "path": "folly/math/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/math/BUILD.bazel",
+            "integrity": "sha256-kihNQEkig36iYIEL8W9Rjm1kjSdlgIH60occW6npK0w="
+          },
+          {
+            "path": "folly/memory/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/memory/BUILD.bazel",
+            "integrity": "sha256-q41eci7XU2iJLdMnme8Dp8b66Bx/1unGgo0XZ0pDNfQ="
+          },
+          {
+            "path": "folly/memory/detail/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/memory/detail/BUILD.bazel",
+            "integrity": "sha256-4Cv0pSXMrkJ3BupaA6v6/go1o5j8UYQFTu2clKQaNAM="
+          },
+          {
+            "path": "folly/net/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/net/BUILD.bazel",
+            "integrity": "sha256-11bRnVzA1tXscHIZ9pyD+WkwVKGzw7PtrYsA0Fxon48="
+          },
+          {
+            "path": "folly/net/detail/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/net/detail/BUILD.bazel",
+            "integrity": "sha256-KkMmGLp6B+BvwhY9AV3ERT8836tdK5H0pcCdslMotGw="
+          },
+          {
+            "path": "folly/observer/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/observer/BUILD.bazel",
+            "integrity": "sha256-VcMC9egsbhWRQyC/d4C9AX7Wacc1Ec1LYghtYn7PCy8="
+          },
+          {
+            "path": "folly/observer/detail/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/observer/detail/BUILD.bazel",
+            "integrity": "sha256-rYY2qT50bERfklPWVoai4//DW3qtNiRyocSvEDc6NF8="
+          },
+          {
+            "path": "folly/poly/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/poly/BUILD.bazel",
+            "integrity": "sha256-udn3trEuI5VPX7yQCLI4dUo7iwZx6xjFLWhlT9l8Fu8="
+          },
+          {
+            "path": "folly/portability/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/portability/BUILD.bazel",
+            "integrity": "sha256-I41G6W+RJCgQj9Sk73obYjNGvSS2yFpzlwUadjixSXY="
+          },
+          {
+            "path": "folly/portability/provide/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/portability/provide/BUILD.bazel",
+            "integrity": "sha256-MUubjk24ywinWtXEOfTq3XblcWApKx2zQd+u6VnOVVo="
+          },
+          {
+            "path": "folly/random/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/random/BUILD.bazel",
+            "integrity": "sha256-d+yb0kjE8symM3+2TYWwdWt3pwSJm3cDeWtRutWH6DM="
+          },
+          {
+            "path": "folly/result/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/result/BUILD.bazel",
+            "integrity": "sha256-45Giv4m0dK54lrA2WlwmODPIFsg3n7R8oM7gMGcU2LQ="
+          },
+          {
+            "path": "folly/result/detail/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/result/detail/BUILD.bazel",
+            "integrity": "sha256-Cho+71vhAyahJpQQjYddu/b/ZWp4GFUA5QeyS+yuSFU="
+          },
+          {
+            "path": "folly/settings/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/settings/BUILD.bazel",
+            "integrity": "sha256-uglQkMS/Eww0rJoHlcYRpLHxDdHgOvR3HzFVfe0ItZ0="
+          },
+          {
+            "path": "folly/ssl/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/ssl/BUILD.bazel",
+            "integrity": "sha256-DpKOKe0XEoEGHLkkp1Q4TSS0TTEZNX56TVqQjmecWKg="
+          },
+          {
+            "path": "folly/ssl/detail/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/ssl/detail/BUILD.bazel",
+            "integrity": "sha256-Mv24c0VOHGhn97aRHXuBIRZ/WZsyM1pOH26NIJgw4eM="
+          },
+          {
+            "path": "folly/stats/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/stats/BUILD.bazel",
+            "integrity": "sha256-e/I33D1GBb1HcNMH67PHY9bFQrtsSiHloP3eL1yKWX0="
+          },
+          {
+            "path": "folly/stats/detail/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/stats/detail/BUILD.bazel",
+            "integrity": "sha256-MqqIxaPDeoVuNHvWmA6LQh+42hCXxeDbWChlwWXpt2U="
+          },
+          {
+            "path": "folly/synchronization/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/synchronization/BUILD.bazel",
+            "integrity": "sha256-Gjl/KxKqhKixzJWOAgiYn+QwjpJUdsyuYs9kbkhfb8Y="
+          },
+          {
+            "path": "folly/synchronization/detail/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/synchronization/detail/BUILD.bazel",
+            "integrity": "sha256-m+jlNlDP5bm440PuYTJfRPxHAjTBRsSd9e0TCIBGtyA="
+          },
+          {
+            "path": "folly/synchronization/example/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/synchronization/example/BUILD.bazel",
+            "integrity": "sha256-o4gHfMec6Vqt5nXcNg0/lpxGkH5hgxiqKQ9e3/3Wl1M="
+          },
+          {
+            "path": "folly/system/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/system/BUILD.bazel",
+            "integrity": "sha256-Qy+bGcAjC1mWy5dLTFAxgsCIk9wUxviaIH43B6/4wbA="
+          },
+          {
+            "path": "folly/system/arch/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/system/arch/BUILD.bazel",
+            "integrity": "sha256-upT/CeCeJvEnW68KrK1wzBmc2dnG6fnlc2RtyZwDYag="
+          },
+          {
+            "path": "folly/system/os/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/system/os/BUILD.bazel",
+            "integrity": "sha256-JEYgpXKsmIq7jHQorpwSW7vU4P1IwVb+LKrXAyqwS0M="
+          },
+          {
+            "path": "folly/test/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/test/BUILD.bazel",
+            "integrity": "sha256-qcBmR8RRDd8abdDHc/WtQsEg3ZvFA0QDU1r1LnO3dfY="
+          },
+          {
+            "path": "folly/testing/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/testing/BUILD.bazel",
+            "integrity": "sha256-e5A3I4j215cOaGF3vGnvJFVZLDeA+CMW/xaKoYvz37o="
+          },
+          {
+            "path": "folly/tool/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/tool/BUILD.bazel",
+            "integrity": "sha256-MHlND01Yc2b+w3ZwuMDo+3ZXKTtKDs5P89BOcYUgnas="
+          },
+          {
+            "path": "folly/tracing/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/overlay/folly/tracing/BUILD.bazel",
+            "integrity": "sha256-BSbdIpcuZDDWdsw4kwoxI+Qb7R6zvYH9W1womPZ0iqM="
+          }
+        ],
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/folly/2026.08.31.00/MODULE.bazel",
+          "integrity": "sha256-Nwtq5p/eJ+6xNHGMx96/ySLk3J2FBb4vYgqR9zahnZ0="
+        },
+        "module_append": "\n# bazel-matrix: rules_cc before 0.2.25 rejects its root-package `includes = [\".\"]` when it is the main repo (\"resolves to the workspace root\")\nsingle_version_override(module_name = \"rules_cc\", version = \"0.2.27\")\n"
+      }
+    },
+    {
+      "name": "grpc-java",
+      "version": "1.84.0",
+      "source": {
+        "urls": [
+          "https://github.com/grpc/grpc-java/archive/refs/tags/v1.84.0.tar.gz"
+        ],
+        "integrity": "sha256-SsA+MkTalWXxP2KiTof1fuE7qnZXAz2zXqCG4W/DKGk=",
+        "strip_prefix": "grpc-java-1.84.0",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/grpc-java/1.84.0/patches/module_dot_bazel.patch",
+            "integrity": "sha256-SHpvZKKnkuLr820AAPOGoUHvt96tkO7Jjt+cNJvbmdA="
+          },
+          {
+            "url": "https://bcr.bazel.build/modules/grpc-java/1.84.0/patches/bcr_test_module.patch",
+            "integrity": "sha256-cw+PnZhjVUBCgyqHN0u1KHn8oPsvPtqkOLQuIWFaBM8="
+          }
+        ],
+        "patch_strip": 1,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/grpc-java/1.84.0/MODULE.bazel",
+          "integrity": "sha256-opxAsAQtjIDH//5VtjnuT6QIfIAg9IbxePjrqwc5CSY="
+        }
+      }
+    },
+    {
+      "name": "fizz",
+      "version": "2026.08.31.00",
+      "source": {
+        "urls": [
+          "https://github.com/facebookincubator/fizz/releases/download/v2026.08.31.00/fizz-v2026.08.31.00.tar.gz"
+        ],
+        "integrity": "sha256-u/79sz8Oe/WL9suAZ+z+3+yXGsT/LTHqVFCH4WyHrMM=",
+        "overlay": [
+          {
+            "path": "BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/fizz/2026.08.31.00/overlay/BUILD.bazel",
+            "integrity": "sha256-v+sOR0hXiV+e48smLtrVG1DpT21tO8/rWjVZcRpK1cQ="
+          },
+          {
+            "path": "MODULE.bazel",
+            "url": "https://bcr.bazel.build/modules/fizz/2026.08.31.00/overlay/MODULE.bazel",
+            "integrity": "sha256-VfLVilMbBmWg/FHaLBPBqoNh8UttPTBdDd2n1ojd86M="
+          }
+        ],
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/fizz/2026.08.31.00/MODULE.bazel",
+          "integrity": "sha256-VfLVilMbBmWg/FHaLBPBqoNh8UttPTBdDd2n1ojd86M="
+        },
+        "module_append": "\n# bazel-matrix: rules_cc before 0.2.25 rejects its root-package `includes = [\".\"]` when it is the main repo (\"resolves to the workspace root\")\nsingle_version_override(module_name = \"rules_cc\", version = \"0.2.27\")\n"
+      }
     }
   ],
   "skipped": []
