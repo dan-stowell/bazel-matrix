@@ -41,6 +41,8 @@ class ParseProjectsTxtTest(unittest.TestCase):
             sync.module_append(o, 'single_version_override(\n    version = "1",\n    module_name = "rules_cc",\n)\n')
         with self.assertRaisesRegex(ValueError, "already has git_override"):
             sync.module_append(o, 'git_override(module_name = "rules_cc", remote = "x", commit = "y")')
+        with self.assertRaisesRegex(ValueError, "isn't a string literal"):
+            sync.module_append(o, 'N = "rules_cc"\nsingle_version_override(module_name = N, version = "1")\n')
         with self.assertRaisesRegex(ValueError, "include"):
             sync.module_append(o, 'include("//:deps.MODULE.bazel")\n')
         # Other modules' overrides and commented-out ones are fine.

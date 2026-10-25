@@ -193,7 +193,10 @@ def module_append(overrides, module_text):
                          "override; sync can't check them")
     for kind, args in _OVERRIDE_CALL.findall(text):
         name = re.search(r"module_name\s*=\s*[\"']([^\"']+)", args)
-        if name and name.group(1) in modules:
+        if not name:
+            raise ValueError("its MODULE.bazel has a %s_override whose module_name isn't a "
+                             "string literal; sync can't check it" % kind)
+        if name.group(1) in modules:
             raise ValueError("its MODULE.bazel already has %s_override for %s" % (kind, name.group(1)))
     return "".join("\n# bazel-matrix: %s\nsingle_version_override(module_name = %s, version = %s)\n"
                    % (reason, _q(m), _q(v)) for m, v, reason in overrides)
