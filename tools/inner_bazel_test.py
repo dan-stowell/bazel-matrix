@@ -83,6 +83,15 @@ class TestXmlTest(unittest.TestCase):
         self.assertEqual(cases["//:badlib"].get("classname"), "p.build")
         self.assertIn("https://x/abc", suite.find("system-out").text)
 
+    def test_no_tests(self):
+        root = ET.fromstring(inner_bazel.test_xml("p", {}, [], "L", no_tests=True))
+        suite = root.find("testsuite")
+        self.assertEqual((suite.get("tests"), suite.get("failures"), suite.get("skipped")), ("1", "0", "1"))
+        self.assertEqual(suite.find("testcase/skipped").get("message"), "NO_TESTS")
+        text = inner_bazel.summary_text("p", "test", "9", inner_bazel.NO_TESTS, "L", {}, [], 1)
+        self.assertIn("tests: NO_TESTS", text)
+        self.assertIn("tests: none", inner_bazel.summary_text("p", "build", "9", 0, "L", {}, [], 1))
+
     def test_unexplained_failure(self):
         root = ET.fromstring(inner_bazel.test_xml("p", {("//:t", "c"): ("PASSED", 0)}, [], "L", ok=False))
         suite = root.find("testsuite")

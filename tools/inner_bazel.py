@@ -30,7 +30,10 @@ import tempfile
 import time
 import xml.etree.ElementTree as ET
 
-WORK_ROOT = "/tmp/bazel-matrix/work"
+# Not under /tmp: Bazel 9's hermetic /tmp (no longer optional) mounts a
+# tmpfs there in locally sandboxed actions, which then can't run below an
+# output base in /tmp.
+WORK_ROOT = "/var/tmp/bazel-matrix/work"
 # Where tools/credentials.bzl writes the API key, relative to the outer
 # output base.
 KEY_FILE = "bazel-matrix/api-key"
@@ -43,6 +46,9 @@ KILL_GRACE = 5
 
 # Inner exit codes that count as success: 4 is "no test targets found".
 _OK = {"build": {0}, "test": {0, 4}}
+# Inner `bazel test` exit code when //... (minus exclusions) has no tests:
+# reported as NO_TESTS, but not a failure.
+NO_TESTS = 4
 _PASSING = {"PASSED", "FLAKY"}
 
 
@@ -157,8 +163,12 @@ def _case_names(tests):
     return {(l, c): l if count[l] == 1 else "%s [%s]" % (l, c[:12]) for l, c in tests}
 
 
-def test_xml(project, tests, failed_builds, link, ok=True):
-    """A JUnit XML document: one testcase per inner test target."""
+def test_xml(project, tests, failed_builds, link, ok=True, no_tests=False):
+    """A JUnit XML document: one testcase per inner test target.
+
+    no_tests (the inner Bazel found no test targets) adds a skipped
+    `no tests` testcase with message NO_TESTS.
+    """
     suite = ET.Element("testsuite", name=project)
     failures = skipped = 0
     names = _case_names(tests)
@@ -180,6 +190,11 @@ def test_xml(project, tests, failed_builds, link, ok=True):
         case = ET.SubElement(suite, "testcase", name=label, classname=project + ".build")
         ET.SubElement(case, "failure", message="FAILED_TO_BUILD").text = "see " + link
     count = len(tests) + len(failed_builds)
+    if no_tests and not tests:
+        skipped += 1
+        count += 1
+        case = ET.SubElement(suite, "testcase", name="no tests", classname=project)
+        ET.SubElement(case, "skipped", message="NO_TESTS")
     if not ok and not failures:
         failures += 1
         count += 1
@@ -204,7 +219,8 @@ def summary_text(project, mode, version, code, link, tests, failed_builds, wall)
         "inner bazel: " + version,
         "exit code: %d" % code,
         "inner invocation: " + link,
-        "tests: " + (", ".join("%s %d" % kv for kv in sorted(counts.items())) or "none"),
+        "tests: " + (", ".join("%s %d" % kv for kv in sorted(counts.items())) or
+                     ("NO_TESTS (no test targets)" if mode == "test" and code == NO_TESTS else "none")),
         "failed to build: %d" % len(failed_builds),
     ] + ["  " + l for l in failed_builds] + ["wall time: %ds" % wall]
     return "\n".join(lines) + "\n"
@@ -378,7 +394,7 @@ def main(argv=None):
     sys.stderr.write(summary)
     if args.mode == "test" and os.environ.get("XML_OUTPUT_FILE"):
         with open(os.environ["XML_OUTPUT_FILE"], "w") as f:
-            f.write(test_xml(args.project, tests, failed_builds, link, ok))
+            f.write(test_xml(args.project, tests, failed_builds, link, ok, code == NO_TESTS))
     if not ok and args.log:
         with open(args.log) as f:
             sys.stderr.write("".join(f.readlines()[-80:]))

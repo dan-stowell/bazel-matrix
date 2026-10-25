@@ -24,9 +24,17 @@ class ParseProjectsTxtTest(unittest.TestCase):
         self.assertEqual(re2["flags"], [("--copt=-w", "noisy warnings")])
         self.assertEqual(re2["bazel"], ("8.4.2", "needs Bazel 8"))
 
+    def test_known_failing(self):
+        projects = sync.parse_projects_txt(
+            "a\n  known-failing build  no Bazel 9: native.cc_library\nb\n  known-failing test  x y\nc\n")
+        self.assertEqual([p["known_failing"] for p in projects],
+                         [("build", "no Bazel 9: native.cc_library"), ("test", "x y"), None])
+
     def test_errors(self):
         for text in ["zlib\n  -//foo/...", "  -//x  why", "zlib\nzlib",
-                     "zlib\n  //foo  why", "zlib\n  -//foo/*  why", "Bad Name"]:
+                     "zlib\n  //foo  why", "zlib\n  -//foo/*  why", "Bad Name",
+                     "zlib\n  known-failing run  why", "zlib\n  known-failing build",
+                     "zlib\n  known-failing build  a\n  known-failing test  b"]:
             with self.assertRaises(ValueError, msg=text):
                 sync.parse_projects_txt(text)
 
@@ -103,6 +111,12 @@ class RenderBuildTest(unittest.TestCase):
         text = sync.render_build({"name": "zlib", "exclude": [], "flags": [], "bazel": None})
         self.assertNotIn("flags", text)
         self.assertNotIn("bazel_version", text)
+        self.assertNotIn("known_failing", text)
+
+    def test_known_failing(self):
+        text = sync.render_build({"name": "m", "exclude": [], "flags": [], "bazel": None,
+                                  "known_failing": ("test", "needs a GPU")})
+        self.assertIn('    # needs a GPU\n    known_failing = "test",\n', text)
 
 
 if __name__ == "__main__":

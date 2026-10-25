@@ -138,7 +138,7 @@ inner_test = rule(
     },
 )
 
-def project(name, targets, flags = [], bazel_version = None):
+def project(name, targets, flags = [], bazel_version = None, known_failing = None):
     """The `build` and `test` targets of one project.
 
     Args:
@@ -147,7 +147,12 @@ def project(name, targets, flags = [], bazel_version = None):
       flags: extra inner flags for both build and test.
       bazel_version: pins this project's inner Bazel; by default it's
         --//:inner_bazel_version.
+      known_failing: "build" tags both targets `manual`, "test" only the
+        test, so `//...` skips them; naming them still runs them.
     """
+    if known_failing not in (None, "build", "test"):
+        fail("known_failing must be None, \"build\" or \"test\"")
+    manual = ["manual"] if known_failing else []
     if bazel_version:
         bazel = _repo(bazel_version)
         version = bazel_version
@@ -165,7 +170,7 @@ def project(name, targets, flags = [], bazel_version = None):
         targets = targets,
         flags = flags,
     )
-    inner_build(name = "build", **common)
+    inner_build(name = "build", tags = manual if known_failing == "build" else [], **common)
     inner_test(
         name = "test",
         size = "enormous",
@@ -176,6 +181,6 @@ def project(name, targets, flags = [], bazel_version = None):
             "requires-network",
             "resources:cpu:2",
             "resources:memory:2500",
-        ],
+        ] + manual,
         **common
     )
