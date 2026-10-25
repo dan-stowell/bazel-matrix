@@ -2814,7 +2814,7 @@ rules_proto_grpc_scala
 rules_proto_grpc_swift
   known-failing build  rules_swift_package_manager runs `swift package dump-package` while fetching, and the images lack swift (exit 1)
 rules_pycross_backend_maturin
-  known-failing build  its MODULE.bazel has local_path_override(rules_pycross, path = "../.."): the module is modules/backend_maturin of the rules_pycross repo, and its archive has no rules_pycross at ../.. ("No MODULE.bazel, REPO.bazel, or WORKSPACE file found in .../external/rules_pycross+")
+  known-failing build  its MODULE.bazel has local_path_override(rules_pycross, path = "../.."): BCR's strip_prefix extracts only modules/backend_maturin of the rules_pycross archive, so ../.. is outside the extracted workspace ("No MODULE.bazel, REPO.bazel, or WORKSPACE file found in .../external/rules_pycross+")
 rules_pydeps
   --strategy=TestRunner=local  //:buildifier.test (buildifier_prebuilt's runner) does `$(readlink <buildifier runfile>)` under set -e, and RBE stages runfiles as regular files, so readlink exits 1 silently (the test fails in 0.1 s with no output); run tests on the runner, where runfiles are symlinks
 rules_pylyglot
@@ -2827,9 +2827,9 @@ rules_riviera
 rules_robolectric
 rules_rs_mutants
 rules_runfile_codegen_go
-  known-failing build  its MODULE.bazel has a local_path_override for rules_runfile_codegen_core at ../core, a sibling directory of the monorepo that its archive doesn't contain ("The repository's path is \"../core\" ... does not exist")
+  known-failing build  its MODULE.bazel has a local_path_override for rules_runfile_codegen_core at ../core: BCR's strip_prefix extracts only this module's directory of the monorepo archive, so the sibling core/ is outside the extracted workspace ("The repository's path is \"../core\" ... does not exist")
 rules_runfile_codegen_kotlin
-  known-failing build  its MODULE.bazel has a local_path_override for rules_runfile_codegen_core at ../core, a sibling directory of the monorepo that its archive doesn't contain ("The repository's path is \"../core\" ... does not exist")
+  known-failing build  its MODULE.bazel has a local_path_override for rules_runfile_codegen_core at ../core: BCR's strip_prefix extracts only this module's directory of the monorepo archive, so the sibling core/ is outside the extracted workspace ("The repository's path is \"../core\" ... does not exist")
 rules_runfiles_group
 rules_rust_mutants
 rules_s3
@@ -2906,3 +2906,58 @@ rules_latex
 rules_latex_host
 rules_layer_optimizer
   -//layers/tests:order_test  test_ordered_overwrites_and_whiteouts finds only {'value'} in the result, not the expected dir/new ("AssertionError: {'value': b'new\n'}"); cause not confirmed
+
+# Chunk i-3: BCR modules (rules_spring_aot-ryandraves_nlb).
+rules_spring_aot
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed
+rules_squashfs
+  override aspect_bazel_lib 2.22.5  the resolved aspect_bazel_lib's toolchain repos call rule(incompatible_use_toolchain_transition=...), which Bazel 9 removed
+  -//squashfs/toolchain/mksquashfs/...  needs @squashfs-tools, whose GitHub tag archive (squashfs-tools/archive/refs/tags/4.6.1.tar.gz) no longer matches the integrity the BCR records ("Checksum was sha256-nEl04H... but wanted ...")
+  -//squashfs/toolchain/sqfstar/...  needs @squashfs-tools (same checksum mismatch as //squashfs/toolchain/mksquashfs)
+  -//squashfs/toolchain/unsquashfs/...  needs @squashfs-tools (same checksum mismatch as //squashfs/toolchain/mksquashfs)
+rules_swift_previews
+  known-failing build  a Swift project: rules_swift finds no Swift toolchain on the Linux executors ("No matching toolchains found for types" for its swift_library targets), and the images lack swift
+rules_swift_resources
+  known-failing build  a Swift project: rules_swift finds no Swift toolchain on the Linux executors ("No matching toolchains found for types" for its swift_library targets), and the images lack swift
+rules_synology
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: unittests/info-file/BUILD.bazel calls native sh_test without a load()
+  --incompatible_autoload_externally=+@rules_shell  autoload the shell rules Bazel 9 removed
+  override aspect_bazel_lib 2.22.5  the resolved aspect_bazel_lib's toolchain repos call rule(incompatible_use_toolchain_transition=...), which Bazel 9 removed
+  -//tools:tools_lib  its root go_sdk.download(version = "1.23.4") is too old for the resolved gazelle's go_repository tools ("go.work requires go >= 1.24.12 (running go 1.23.4; GOTOOLCHAIN=local)"), which its go_deps need
+  -//tools:resize  same go_repository tools failure as //tools:tools_lib
+  -//tools:buildifier  same go_repository tools failure as //tools:tools_lib
+  -//tools:gazelle-runner  same go_repository tools failure as //tools:tools_lib
+  -//:gazelle-runner  same go_repository tools failure as //tools:tools_lib
+rules_systemrdl
+rules_tcl
+rules_tensorrt_rtx
+rules_tf
+  -//tf/toolchains/git:is_git_available  no git toolchain registered here ("No matching toolchains found")
+rules_tofu
+rules_tsickle
+  override rules_nodejs 6.7.7  the resolved rules_nodejs's nodejs/toolchain.bzl uses the native CcInfo symbol, which Bazel 9 removed
+rules_varlink
+rules_verible
+rules_vivado
+rules_vsg
+rules_vulkan
+rules_vunit
+rules_web_e2e
+rules_web_testing_go
+  known-failing build  its MODULE.bazel has local_path_override(rules_webtesting, path = ".."): BCR's strip_prefix extracts only this submodule of the rules_webtesting repo, so .. is outside the extracted workspace
+rules_web_testing_java
+  known-failing build  its MODULE.bazel has local_path_override(rules_webtesting, path = ".."): BCR's strip_prefix extracts only this submodule of the rules_webtesting repo, so .. is outside the extracted workspace
+rules_web_testing_python
+  known-failing build  its MODULE.bazel has local_path_override(rules_webtesting, path = ".."): BCR's strip_prefix extracts only this submodule of the rules_webtesting repo, so .. is outside the extracted workspace
+rules_web_testing_scala
+  known-failing build  its MODULE.bazel has local_path_override()s for rules_webtesting ("..") and rules_web_testing_java ("../web_testing_java"): BCR's strip_prefix extracts only this submodule of the rules_webtesting repo, so both are outside the extracted workspace
+rules_xcodeproj
+  -//xcodeproj/internal/bazel_integration_files:bazel_integration_files  builds @rsync, whose rsync.h includes the BSD/macOS header sys/filio.h, which Linux lacks ("fatal error: sys/filio.h: No such file or directory")
+  -//tools/params_processors:cc_compiler_params_processor_tests  depends on //:py_init_shim, but the release archive has no root BUILD file ("no such package ''")
+rules_ytt
+  known-failing build  its own ytt/private/resolved_toolchains.bzl calls rule(incompatible_use_toolchain_transition=...), which Bazel 9 removed, and every package loads it
+ryandraves_nlb
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: tools/workspace_tool.bzl calls native.sh_binary and bzl/rules/platform_transition.bzl uses the native CcInfo
+  --incompatible_autoload_externally=+@rules_cc,+@rules_shell,+@rules_python  autoload the cc, shell and python rules and providers Bazel 9 removed
+  known-failing build  the rules_rust 0.51.0 it declares uses the native CcInfo, which Bazel 9 removed; overriding it to 0.54.1 (the last with @rules_rust//wasm_bindgen, which its MODULE.bazel uses; later releases moved it to rules_rust_wasm_bindgen) still fails (rust/private/rust.bzl: "at index 0 of providers, got element of type ...BaseRuleClasses$5, want Provider"); the aspect_bazel_lib it resolves also loads @local_config_platform, which Bazel 9 no longer provides
