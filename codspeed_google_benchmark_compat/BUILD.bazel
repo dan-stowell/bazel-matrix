@@ -6,14 +6,12 @@ project(
     name = "codspeed_google_benchmark_compat",
     targets = [
         "//...",
-        # its @tools_pip_deps lock has scipy/numpy wheels only for CPython 3.9 (//_config:is_cp39), not for the configured Python ("doesn't match any of the Python wheels available")
-        "-//tools:compare",
-        # same: needs scipy/numpy from @tools_pip_deps, which has only cp39 wheels
-        "-//tools:gbench",
         # example.py does `import google_benchmark`, the package at bindings/python/google_benchmark, but bindings/python isn't on the test's sys.path ("No module named 'google_benchmark'")
         "-//bindings/python/google_benchmark:example",
     ],
     flags = [
+        # its MODULE.bazel builds @tools_pip_deps (scipy, numpy for //tools) for Python 3.9 only, but makes 3.12 the default Python, so those packages match no wheel ("doesn't match any of the Python wheels available"); select 3.9
+        "--@rules_python//python/config_settings:python_version=3.9",
         # its dep googletest calls native cc_library, which Bazel 9 removed; autoload it from rules_cc
         "--incompatible_autoload_externally=+@rules_cc",
     ],

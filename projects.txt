@@ -2339,9 +2339,8 @@ codescythe
 codesign.bzl
 codspeed_core
 codspeed_google_benchmark_compat
+  --@rules_python//python/config_settings:python_version=3.9  its MODULE.bazel builds @tools_pip_deps (scipy, numpy for //tools) for Python 3.9 only, but makes 3.12 the default Python, so those packages match no wheel ("doesn't match any of the Python wheels available"); select 3.9
   --incompatible_autoload_externally=+@rules_cc  its dep googletest calls native cc_library, which Bazel 9 removed; autoload it from rules_cc
-  -//tools:compare  its @tools_pip_deps lock has scipy/numpy wheels only for CPython 3.9 (//_config:is_cp39), not for the configured Python ("doesn't match any of the Python wheels available")
-  -//tools:gbench  same: needs scipy/numpy from @tools_pip_deps, which has only cp39 wheels
   -//bindings/python/google_benchmark:example  example.py does `import google_benchmark`, the package at bindings/python/google_benchmark, but bindings/python isn't on the test's sys.path ("No module named 'google_benchmark'")
 com_clementguillot_rules_quarkus
   --lockfile_mode=off  its MODULE.bazel.lock is in a format Bazel 9 doesn't support ("The version of MODULE.bazel.lock is not supported")
