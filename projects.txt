@@ -713,7 +713,7 @@ cxxopts
 fuzztest
   known-failing build  needs clang: its .bazelrc passes --cxxopt=-Wc++17-compat-pedantic and centipede's build_defs pass -gline-tables-only, which gcc (the images' only compiler) rejects
 gdk-pixbuf
-  -//tests:pixbuf-fail  the executor OOM-kills it: it grew past 62 GB (observed 66.9 GB) decoding its malformed test images
+  -//tests:pixbuf-fail  one test binary feeds every image in tests/test-images/fail to the loaders, and one decoder allocates past the executor's 62 GB limit (observed 66.9 GB, EXECUTOR_OOM_KILL); the killed run leaves no log naming the image
 ghdl
 giflib
   override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
