@@ -6,7 +6,7 @@ project(
     name = "sdformat",
     targets = [
         "//...",
-        # exits 1 in 0.1s with no output on the executors
+        # buildifier wants the registry's MODULE.bazel (used in place of its own) reformatted: compatibility_level after version
         "-//:buildifier.test",
     ],
 )
