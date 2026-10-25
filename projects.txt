@@ -1800,7 +1800,7 @@ fftw
 
 # Chunk f-4: the rest of the g-l BCR modules.
 gason
-  -//:benchmark  with the registry's zero-context diff.patch applied, src/benchmark.cpp doesn't compile ("'COMPILER' was not declared in this scope" at 234:79)
+  -//:benchmark  src/benchmark.cpp doesn't compile ("'COMPILER' was not declared in this scope" at 234:79): the registry's diff.patch adds the _MSC_VER/#else COMPILER branches in a zero-context hunk (@@ -213,0 +214,4 @@); GNU patch applies it correctly, but the file Bazel's patch produces leaves gcc without a COMPILER define
   -//:all_tests  a test_suite of //:benchmark (excluded above) and //:test-suite, which //... still runs
   --incompatible_autoload_externally=+@rules_cc  its dep rapidjson calls native cc_library, which Bazel 9 removed; autoload it from rules_cc
 gateweavers_rules_vhdl
@@ -1841,7 +1841,7 @@ jvm_image
 kdtreepp
 keynub_licdongle
 libc_replacer
-  override toolchains_musl 0.1.29  the toolchains_musl 0.1.27 it declares generates musl_cc_toolchain_config.bzl repos that fail to load under Bazel 9 (line 543: "at index 0 of provides, got element of type NoneType, want Provider")
+  override toolchains_musl 0.1.29  the toolchains_musl 0.1.27 it declares ships toolchain archives whose musl_cc_toolchain_config.bzl does rule(provides = [CcToolchainConfigInfo]) with the native CcToolchainConfigInfo and no load(); Bazel 9 removed it, so it is None ("at index 0 of provides, got element of type NoneType")
   override buildifier_prebuilt 10.1.0  the buildifier_prebuilt 8.2.0 it declares loads @local_config_platform//:constraints.bzl, which Bazel 9 removed
 libcreate
 libfn
@@ -1854,3 +1854,54 @@ libxml2-go
 lit2md
 livox_sdk2
 logfmt_cpp
+
+# Chunk f-5: boost modules (b).
+boost.accumulators
+  -//test/...  uses @boost.foreach, @boost.random, @boost.test, @boost.utility, @platforms, which its MODULE.bazel doesn't declare
+boost.assign
+boost.bloom
+  -//test/...  uses @boost.mp11, which its MODULE.bazel doesn't declare
+boost.cobalt
+  -//test/...  uses @boost.test, which its MODULE.bazel doesn't declare
+boost.compatibility
+boost.contract
+  -//test/...  uses @boost.bind, @boost.detail, @boost.iostreams, @boost.lexical_cast, which its MODULE.bazel doesn't declare
+boost.convert
+  -//test/...  uses @boost.detail, @boost.random, @boost.test, @boost.utility, which its MODULE.bazel doesn't declare
+boost.coroutine2
+boost.fiber
+  -//test/...  uses @boost.atomic, @boost.bind, @boost.chrono, @boost.function, @boost.test, @boost.thread, which its MODULE.bazel doesn't declare
+boost.flyweight
+  -//test/...  uses @boost.serialization, @boost.tuple, @boost.utility, @onetbb, which its MODULE.bazel doesn't declare
+boost.gil
+  -//test/...  uses @platforms, which its MODULE.bazel doesn't declare
+boost.hash2
+  -//test/...  uses @boost.array, @boost.core, which its MODULE.bazel doesn't declare
+boost.headers
+boost.histogram
+boost.hof
+boost.icl
+boost.json
+boost.lambda2
+boost.leaf
+boost.local_function
+  -//test/...  uses @boost.concept_check, @boost.core, @boost.detail, @boost.function, @boost.functional, which its MODULE.bazel doesn't declare
+boost.locale
+boost.log
+  -//test/...  uses @boost.test, which its MODULE.bazel doesn't declare
+boost.metaparse
+  -//test/...  uses @platforms, which its MODULE.bazel doesn't declare
+boost.mqtt5
+  --//:ssl=openssl  its //:ssl string_flag defaults to boringssl, but its MODULE.bazel declares only openssl ("No repository visible as '@boringssl'")
+boost.msm
+  -//test/...  uses @platforms, which its MODULE.bazel doesn't declare
+boost.mysql
+  -//example:1_sync  linking fails: undefined reference to boost::asio::error::get_ssl_category() and boost::asio::ssl::error::get_stream_category(), which boost.mysql's objects need and nothing in the link provides
+boost.nowide
+  -//test:test_fs  uses @boost.filesystem, which its MODULE.bazel doesn't declare
+  -//test:upstream_tests  the test_suite that includes //test:test_fs (excluded above)
+boost.numeric_odeint
+  -//test/...  uses @boost.format, @boost.multiprecision, @boost.phoenix, @boost.test, which its MODULE.bazel doesn't declare
+boost.openmethod
+  -//test/...  uses @boost.test, @boost.utility, which its MODULE.bazel doesn't declare
+boost.outcome
