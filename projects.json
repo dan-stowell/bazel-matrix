@@ -30443,7 +30443,8 @@
         "module_file": {
           "url": "https://bcr.bazel.build/modules/rules_proto_grpc_cpp/5.8.0/MODULE.bazel",
           "integrity": "sha256-fWEVHdIvbfX8ge2miwxKCeshyey4zL0q6hrXctU24ng="
-        }
+        },
+        "module_append": "\n# bazel-matrix: the resolved rules_foreign_cc (toolchains/native_tools/native_tools_toolchain.bzl) calls rule(incompatible_use_toolchain_transition=...), which Bazel 9 removed\nsingle_version_override(module_name = \"rules_foreign_cc\", version = \"0.16.0\")\n"
       }
     },
     {
@@ -30458,7 +30459,8 @@
         "module_file": {
           "url": "https://bcr.bazel.build/modules/rules_proto_grpc_python/5.8.0/MODULE.bazel",
           "integrity": "sha256-F6uiHmIq4PuBiZEYRFg9AesS1wjmPqOoOjbCevuQjcs="
-        }
+        },
+        "module_append": "\n# bazel-matrix: the resolved rules_foreign_cc uses the native CcInfo and calls rule(incompatible_use_toolchain_transition=...), both removed in Bazel 9\nsingle_version_override(module_name = \"rules_foreign_cc\", version = \"0.16.0\")\n"
       }
     },
     {
@@ -31890,7 +31892,7 @@
           "url": "https://bcr.bazel.build/modules/nogo_analyzer_bzlmod/0.1.0/MODULE.bazel",
           "integrity": "sha256-VRJ730qrA/Bi5ZKLMi+b/LCuFNXzcVjaG0FrzMv7G5w="
         },
-        "module_append": "\n# bazel-matrix: the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed (go/private/rules/cgo.bzl)\nsingle_version_override(module_name = \"rules_go\", version = \"0.65.0\")\n"
+        "module_append": "\n# bazel-matrix: the resolved rules_go uses the native CcInfo, which Bazel 9 removed; 0.61.0 (gazelle 0.45.0) rather than 0.61.1 or later, which require gazelle 0.51.3, whose go.work needs go >= 1.24.12 while its MODULE.bazel pins go_sdk 1.24.2\nsingle_version_override(module_name = \"rules_go\", version = \"0.61.0\")\n"
       }
     },
     {

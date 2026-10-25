@@ -2084,9 +2084,10 @@ proxygen
 protovalidate-cc
 rules_proto_grpc_cpp
   --incompatible_autoload_externally=+@rules_cc,+@com_google_protobuf  the grpc it resolves has BUILD files calling native cc and proto rules, which Bazel 9 removed; autoload them
-  known-failing build  with those autoloads, the rules_foreign_cc it resolves (toolchains/native_tools/native_tools_toolchain.bzl) calls rule(incompatible_use_toolchain_transition=...), which Bazel 9 removed
+  override rules_foreign_cc 0.16.0  the resolved rules_foreign_cc (toolchains/native_tools/native_tools_toolchain.bzl) calls rule(incompatible_use_toolchain_transition=...), which Bazel 9 removed
 rules_proto_grpc_python
-  known-failing build  the grpc it resolves has BUILD files calling native cc rules (no grpc_python_plugin), its rules_foreign_cc uses the removed native CcInfo, and its toolchains call rule(incompatible_use_toolchain_transition=...), all removed in Bazel 9
+  --incompatible_autoload_externally=+@rules_cc,+@com_google_protobuf  the grpc it resolves has BUILD files calling native cc and proto rules, which Bazel 9 removed; autoload them
+  override rules_foreign_cc 0.16.0  the resolved rules_foreign_cc uses the native CcInfo and calls rule(incompatible_use_toolchain_transition=...), both removed in Bazel 9
 rules_proto_grpc_go
   override rules_go 0.65.0  the resolved rules_go's go/private/extensions.bzl calls module_ctx facts .clear(), which Bazel 9's Facts value lacks ("'Facts' value has no field or method 'clear'")
 rules_proto_grpc_java
@@ -2280,8 +2281,7 @@ nextpnr
 ninjatracing
 nmea
 nogo_analyzer_bzlmod
-  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed (go/private/rules/cgo.bzl)
-  known-failing build  with that override, its root go_sdk.download(version = "1.24.2") is too old for the resolved gazelle's go_repository tools ("go.work requires go >= 1.24.12 (running go 1.24.2; GOTOOLCHAIN=local)")
+  override rules_go 0.61.0  the resolved rules_go uses the native CcInfo, which Bazel 9 removed; 0.61.0 (gazelle 0.45.0) rather than 0.61.1 or later, which require gazelle 0.51.3, whose go.work needs go >= 1.24.12 while its MODULE.bazel pins go_sdk 1.24.2
 nvc
   override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
 occt

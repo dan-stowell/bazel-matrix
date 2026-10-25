@@ -11,6 +11,4 @@ project(
         # the grpc it resolves has BUILD files calling native cc and proto rules, which Bazel 9 removed; autoload them
         "--incompatible_autoload_externally=+@rules_cc,+@com_google_protobuf",
     ],
-    # with those autoloads, the rules_foreign_cc it resolves (toolchains/native_tools/native_tools_toolchain.bzl) calls rule(incompatible_use_toolchain_transition=...), which Bazel 9 removed
-    known_failing = "build",
 )

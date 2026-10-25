@@ -7,6 +7,4 @@ project(
     targets = [
         "//...",
     ],
-    # with that override, its root go_sdk.download(version = "1.24.2") is too old for the resolved gazelle's go_repository tools ("go.work requires go >= 1.24.12 (running go 1.24.2; GOTOOLCHAIN=local)")
-    known_failing = "build",
 )
