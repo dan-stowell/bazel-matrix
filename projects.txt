@@ -2559,3 +2559,68 @@ peregrine
 periphery
   known-failing build  rules_swift finds no Swift toolchain (no such target '@build_bazel_rules_swift_local_config//:linux-toolchain'): the executor image has no Swift
 phaser_zc_protobuf
+
+  known-failing build  a Swift project: rules_swift finds no Swift toolchain on the Linux executor (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift
+
+
+# Chunk g-1: BCR modules (r).
+rabbitmq_osiris
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed (go/private/context.bzl); gazelle, which rules_erlang's dep rabbitmq_seshat loads, fails on it
+  --noincompatible_disallow_empty_glob  rules_erlang's erlang_app globs include/**/*.hrl, and the module has no include/ ("glob pattern 'include/**/*.hrl' didn't match anything")
+  known-failing build  needs Erlang/OTP: validating @erlang_config's otp at /usr fails (exit 127, "/usr/bin/erl: No such file or directory"), the images have no erl; its BUILD.bazel also uses @tls_gen, which its MODULE.bazel doesn't declare
+rabbitmq_ra
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed (go/private/context.bzl); gazelle, which rules_erlang's dep rabbitmq_seshat loads, fails on it
+  --noincompatible_disallow_empty_glob  rules_erlang's erlang_app globs include/**/*.hrl, and the module has no include/ ("glob pattern 'include/**/*.hrl' didn't match anything")
+  known-failing build  needs Erlang/OTP: validating @erlang_config's otp at /usr fails (exit 127, "/usr/bin/erl: No such file or directory"), the images have no erl
+rabbitmq_seshat
+  --noincompatible_disallow_empty_glob  rules_erlang's erlang_app globs include/**/*.hrl, and the module has no include/ ("didn't match anything")
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed (go/private/context.bzl); gazelle loads it
+  known-failing build  the resolved rules_erlang's gazelle/BUILD.bazel calls native sh_binary, which Bazel 9 removed ("name 'sh_binary' is not defined"); past that it builds with rules_erlang, which needs Erlang/OTP the images lack (as for rabbitmq_osiris; not confirmed here)
+rav1e
+  known-failing build  rules_rs's process wrapper rejects the Rust outputs (librav1e.a, the rlib) because they embed the absolute execroot /buildbuddy-execroot ("embeds the absolute working directory"); what embeds it (likely the gcc-built C/asm parts, as with zenoh-cpp's ring under gcc) is not confirmed
+rawrtc
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+rawrtc_common
+rawrtc_data_channel
+rawrtc_re
+rawrtc_rew
+rawrtc_usrsctp
+reflexxes-rmltype2
+roboticslibrary.rl
+rply
+rpmpack
+  --deleted_packages=example_bazel  (not an exclusion: //... fails on a broken package even when subtracted) it loads @rules_pkg, which its MODULE.bazel doesn't declare
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed (go/private/context.bzl)
+rsyslog
+  --incompatible_autoload_externally=+@rules_cc  the curl, libuuid and rules_m4 m4 toolchain repos it resolves call native cc_library/cc_binary, which Bazel 9 removed; autoload them from rules_cc
+  -//:smoke_test  sends its message with `nc -u -w 0`, which the executor image's netcat rejects ("invalid wait-time 0")
+rtipc
+ruff_prebuilt
+  -//:readme  its README.md isn't in the release archive ("missing input file '//:README.md'")
+rules_abs
+  override toolchains_protoc 0.6.1  the toolchains_protoc 0.3.7 it declares generates a protoc repo whose BUILD.bazel calls native proto_library, which Bazel 9 removed ("name 'proto_library' is not defined"); 0.6.1 loads it from rules_proto
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed (go/private/rules/cgo.bzl); the broken @go_toolchains breaks toolchain resolution for every target
+  known-failing build  its dev toolchains_protoc registers a prebuilt protoc v27.0, which rejects the --option_dependencies flag that the resolved protobuf's proto_library passes ("Unknown flag: --option_dependencies")
+rules_ada
+  -//tests/shared_library:main_output  its run_binary runs :main, which exits 127: the dynamic loader can't find libmath_ops.so ("cannot open shared object file"); why its rpath misses it on the executors is not yet identified
+  -//tests/shared_library:main_dynamic_libgcc_output  its run_binary runs :main_dynamic_libgcc, which exits 127: the dynamic loader can't find libmath_ops_dynamic_libgcc.so ("cannot open shared object file"); why its rpath misses it on the executors is not yet identified
+  -//tests/shared_library:main_test  diffs :main_output (above)
+  -//tests/shared_library:main_dynamic_libgcc_test  diffs :main_dynamic_libgcc_output (above)
+rules_angular
+  known-failing build  its .bazelrc sets @aspect_rules_ts//ts:skipLibCheck, but its MODULE.bazel doesn't depend on aspect_rules_ts ("No repository visible as '@aspect_rules_ts' from main repository")
+rules_apko
+rules_appimage
+rules_apple_linker
+  known-failing build  an Apple linker ruleset: gcc rejects the --ld-path=...ld64.lld it adds ("unrecognized command-line option"), and its Swift targets need a Swift toolchain, which rules_swift's local config lacks on Linux (no //:linux-toolchain)
+rules_apple_remote_xcframework
+rules_auto_dotnet
+  --lockfile_mode=off  its MODULE.bazel.lock has a version Bazel 9.3.1 doesn't support ("The version of MODULE.bazel.lock is not supported")
+  -//tools:buildifier.test  buildifier_prebuilt's test runner exits 1 with no output on the executors, as for rules_multitool (its readlink of a runfile RBE stages as a regular file); that cause is not confirmed here
+rules_bittorrent
+  -//:docs_test  the stardoc-rendered repo.md.generated differs from the checked-in docs/repo.md ("files ... differ") under the stardoc and Bazel 9.3.1 it gets here; the diff was not inspected
+rules_bound
+rules_browsers
+  override rules_nodejs 6.7.7  the resolved rules_nodejs's nodejs/toolchain.bzl uses the native CcInfo symbol, which Bazel 9 removed
+  override aspect_bazel_lib 2.22.5  the resolved aspect_bazel_lib's toolchain repos call rule(incompatible_use_toolchain_transition=...), which Bazel 9 removed
+rules_bsx
+rules_build_error
