@@ -617,3 +617,32 @@ libbpf
 happly
   known-failing build  its root BUILD.bazel calls native cc_library, which Bazel 9 removed
 icu
+
+# Chunk A9: high reverse-dep modules (a-l).
+gz-transport
+  -//:buildifier.test  buildifier -mode=diff flags MODULE.bazel: the registry's copy (which replaces the archive's) puts compatibility_level before version
+gz-rendering
+  -//:buildifier.test  buildifier -mode=diff flags MODULE.bazel: the registry's copy (which replaces the archive's) puts compatibility_level before version
+grpc-proto
+glpk
+  known-failing build  its overlay's cc_library adds -I$(package path)/src, which as the main repo is "/src": "The include path '/src' references a path outside of the execution root"
+gloop
+  known-failing build  its .bazelrc passes clang-only warning flags (-Wmost, -Wthread-safety) to every compile, and the images have only gcc
+geographiclib
+doctest
+darts-clone
+cpp_toolbelt
+contrib_rules_jvm
+  known-failing build  rules_go 0.52.0 and rules_android, which it depends on, use CcInfo, which Bazel 9 removed; with rules_go overridden to 0.59.0, rules_android and its junit5/sample package (java_library without srcs) still fail
+cdt
+ccd
+bullet
+build_stack_rules_proto
+  known-failing build  rules_scala 7.0.0, which it declares, uses the native JavaInfo, which Bazel 9 removed; with rules_scala overridden to 7.4.0, grpc-java's java_grpc_library.bzl uses the removed native ProtoInfo and several plugin repos lack their targets
+boost.vmd
+boost.type_erasure
+boost.tti
+boost.timer
+  -//test/...  uses @platforms, @boost.chrono and @boost.core, which its MODULE.bazel doesn't declare
+boost.scope_exit
+boost.scope
