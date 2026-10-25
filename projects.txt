@@ -1492,8 +1492,7 @@ ultrajson
   -//deps/double-conversion:cctest  the vendored double-conversion's test includes double-conversion/bignum.h, a path no dep of that target provides
 ujson4c
 tweag-credential-helper
-  known-failing build  its MODULE.bazel pins go_sdk.download(version = "1.24.2"), but the resolved gazelle's go.work requires go >= 1.24.12 (GOTOOLCHAIN=local), so building gazelle's go_repository tools fails and no Go dependency fetches
-  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo (go/private/rules/cgo.bzl), which Bazel 9 removed
+  override rules_go 0.61.0  the rules_go 0.58.3 it declares uses the native CcInfo (go/private/rules/cgo.bzl), which Bazel 9 removed; 0.61.0 (gazelle 0.45.0) rather than 0.61.1 or later, which require gazelle 0.51.3, whose go.work needs go >= 1.24.12 while its MODULE.bazel pins go_sdk 1.24.2
 trec_eval
   --deleted_packages=test  a separate workspace (test/MODULE.bazel, the BCR test module) whose bazel_skylib dep the root module doesn't declare
 tools_android
@@ -1504,7 +1503,7 @@ toolchains_arm_gnu
 toolchains_buildbuddy
   override rules_go 0.65.0  the resolved rules_go uses the native CcInfo (go/private/rules/cgo.bzl), which Bazel 9 removed
   override aspect_bazel_lib 2.22.5  the resolved aspect_bazel_lib's toolchain repos call rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
-  -//:buildifier.test  a no_sandbox buildifier_test over the workspace's sources; it exits 1 with no output on RBE and 123 (xargs: a buildifier run failed) with no output when run on the runner; cause not established
+  -//:buildifier.test  buildifier -mode=diff flags MODULE.bazel: the registry's copy (which replaces the archive's) puts version after repo_name in module(), and the single_version_override() lines appended for the overrides above are one-line (seen with the test run on the runner; on RBE it also exits 1 with no output)
   -//examples:rbe_bzlmod_test  runs a nested Bazel against BuildBuddy RBE and needs BUILDBUDDY_API_KEY in the test environment ("BUILDBUDDY_API_KEY: unbound variable")
   -//examples:rbe_workspace_test  as rbe_bzlmod_test: needs BUILDBUDDY_API_KEY in the test environment
 thorvg
@@ -2371,3 +2370,73 @@ cuda_toolchain_types
 cuda_toolkit
 cudnn_frontend
 cutlass
+# Chunk D5: the remaining BCR modules (s-z).
+swift-filename-matcher
+  known-failing build  a Swift project: rules_swift finds no Swift toolchain on the Linux executor (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift
+xctestrunner
+xcodeproj
+  known-failing build  a Swift project: rules_swift finds no Swift toolchain on the Linux executor (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift
+texlive-texmf
+swxmlhash
+  known-failing build  a Swift project: rules_swift finds no Swift toolchain on the Linux executor (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift
+swift-system
+  known-failing build  a Swift project: rules_swift finds no Swift toolchain on the Linux executor (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift
+swift-syntax
+  known-failing build  a Swift project: rules_swift finds no Swift toolchain on the Linux executor (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift
+swift-index-store
+  known-failing build  a Swift project: rules_swift finds no Swift toolchain on the Linux executor (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift
+sourcekitten
+  known-failing build  a Swift project: rules_swift finds no Swift toolchain on the Linux executor (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift
+xrootfs
+xplane_sdk
+xilinx_bootgen
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+wsg32
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: wsg_32_driver/BUILD.bazel calls native cc_library without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+wpilib_toolchains
+wolfd_bazel_compile_commands
+wheelos_common_msgs
+  known-failing build  its BUILD files load cc_proto_library from @rules_cc//cc:defs.bzl, which fails in Bazel 9 ("cc_proto_library is removed from @rules_cc//cc:defs.bzl in Bazel 8")
+vhdl_ls_gen
+universal-robots-client-library
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD calls native cc_library without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+triton-inference-server-common
+  --incompatible_autoload_externally=+@rules_cc,+@rules_python,+@rules_java,+@com_google_protobuf  its resolved deps use rules and symbols Bazel 9 removed: grpc calls native.cc_library (cc_grpc_library) and native py_library (src/python/grpcio), protoc-gen-validate uses JavaInfo and envoy_api ProtoInfo without a load(); autoload them
+  override rules_foreign_cc 0.16.0  the resolved rules_foreign_cc passes rule(incompatible_use_toolchain_transition) and uses the native CcInfo, both removed in Bazel 9
+toolchains_riscv_gnu
+  known-failing build  its own toolchain/config.bzl, loaded by its module extension, calls rule(provides = [CcToolchainConfigInfo]), which is None in Bazel 9 ("got element of type NoneType, want Provider")
+toolchains_llvm_bootstrapped
+  known-failing build  //... has targets that can't build on the host configuration: toolchain/runtimes args (resource_dir, rtlib, ...) select() on the target platform with no default, bzl_library doc_extract targets miss deps (@tar.bzl, @bazel_tools repo .bzl), and after ~18 min the inner Bazel exits 33 (out of memory) with its 2 GB heap
+toolchains_avr
+  --deleted_packages=examples/blinkie,examples/blinkie/src/hello,examples/blinkie/src/pulse  a separate workspace (examples/blinkie/MODULE.bazel) using @avr and hedron_compile_commands, which the root module doesn't declare
+  -//cc/toolchain/...  its cc_toolchain targets (avr_impl_*) use mcu_args, whose args select() on //avr/platform:<mcu> with no default, so on the host configuration no condition matches
+thinkit
+  known-failing build  the openconfig_gnmi 0.14.1 it declares (the BCR's newest) has bazel/generate_cc.bzl calling attr.label(providers = ["..."]) with strings, which Bazel 9 rejects ("got element of type string, want sequence")
+tftp-hpa
+texlive
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+tensorrt_headers
+swift-tomldecoder
+  known-failing build  a Swift project: rules_swift finds no Swift toolchain on the Linux executor (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift
+swiftlint
+  known-failing build  bazel/BUILD loads //Tests:generated_tests.bzl, but the release archive has no Tests package; it is also a Swift project, and the images lack swift
+swift-indexstore
+  known-failing build  a Swift project: rules_swift finds no Swift toolchain on the Linux executor (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift
+swift_gazelle_plugin
+  known-failing build  its root BUILD.bazel's ci_workflow (line 189) refers to //release, //examples and //tools/generate_ci_workflow, which the release archive lacks; excluding //:ci_workflow and //:update_ci_workflow doesn't avoid the errors (the flags below get past earlier ones)
+  --incompatible_autoload_externally=+@rules_shell  the cgrindel_bazel_starlib it resolves calls native sh_binary in updatesrc/private, which Bazel 9 removed; autoload it from rules_shell
+  override aspect_bazel_lib 2.22.5  the resolved aspect_bazel_lib's toolchain repos call rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
+swift-bylaws
+swift_bep_parser
+  known-failing build  BuildEventProtocol/BUILD loads swift_module_alias from @build_bazel_rules_swift//swift:swift.bzl, which the resolved rules_swift no longer exports; it is also a Swift project, and the images lack swift
+sv-elab
+supply_chain_tools
+  known-failing build  its MODULE.bazel has local_path_override(rules_license, path = "../rules_license"), which points outside its archive's strip_prefix and applies when it is the root module
+sparrowhawk
+  --incompatible_autoload_externally=+@rules_cc  the re2 and thrax it resolves have BUILD files calling native cc rules, which Bazel 9 removed; autoload them from rules_cc
+sourcekit_bazel_bsp
+  known-failing build  its //Sources:sourcekit-bazel-bsp builds with SwiftPM (build_spm.sh runs swift), and the images lack swift ("swift: command not found")
+safedi
+  known-failing build  a Swift project: rules_swift finds no Swift toolchain on the Linux executor (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift

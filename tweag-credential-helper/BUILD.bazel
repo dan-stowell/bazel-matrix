@@ -7,6 +7,4 @@ project(
     targets = [
         "//...",
     ],
-    # its MODULE.bazel pins go_sdk.download(version = "1.24.2"), but the resolved gazelle's go.work requires go >= 1.24.12 (GOTOOLCHAIN=local), so building gazelle's go_repository tools fails and no Go dependency fetches
-    known_failing = "build",
 )
