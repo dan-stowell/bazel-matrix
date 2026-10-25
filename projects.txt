@@ -1642,7 +1642,7 @@ cel-cpp
   override aspect_bazel_lib 2.22.5  the resolved aspect_bazel_lib's toolchain repos call rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
   override aspect_rules_esbuild 0.27.1  the resolved aspect_rules_esbuild's esbuild/private/resolved_toolchain.bzl calls rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
   --incompatible_autoload_externally=+@rules_cc,+@com_google_protobuf  its dep cel-spec's proto/cel/expr/conformance/test/BUILD.bazel calls native proto_library/cc_proto_library/java_proto_library, which Bazel 9 removed; autoload them
-  --test_filter=-timestamps.timestamp_selectors_tz/*:BuiltinsTest.TestTimestampFunctionsWithTimeZone:ExtensionTest.TestGetDate:ExtensionTest.TestGetTimeOfDay  these gtest cases need tzdata, which the executor image lacks: cel-spec's timestamp_selectors_tz conformance section (named zones such as Australia/Sydney fail with "Invalid timezone"), the builtin TestTimestampFunctionsWithTimeZone, and ExtensionTest's America/Los_Angeles cases, which abort (exit 134) on the error result via TimestampOrDie()/MessageOrDie()
+  --test_filter=-timestamps.timestamp_selectors_tz/getDate:timestamps.timestamp_selectors_tz/getDayOfMonth_name_pos:timestamps.timestamp_selectors_tz/getDayOfMonth_name_neg:timestamps.timestamp_selectors_tz/getDayOfYear:timestamps.timestamp_selectors_tz/getMinutes:BuiltinsTest.TestTimestampFunctionsWithTimeZone:ExtensionTest.TestGetDate:ExtensionTest.TestGetTimeOfDay  these gtest cases need tzdata, which the executor image lacks: the 5 cel-spec timestamp_selectors_tz conformance cases with named zones (Australia/Sydney, US/Central, America/St_Johns, Asia/Kathmandu fail with "Invalid timezone"), the builtin TestTimestampFunctionsWithTimeZone, and ExtensionTest's America/Los_Angeles cases, which abort (exit 134) on the error result via TimestampOrDie()/MessageOrDie()
 cereal
 ceres-solver
   --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD (via bazel/ceres.bzl) and examples/BUILD call native cc_library/cc_binary without a load()
@@ -1969,3 +1969,92 @@ cxxtest
   -//sample/...  the sample runners include the sample test headers (e.g. simple_test.h), which their cc_tests don't make available ("fatal error: simple_test.h: No such file or directory")
   override rules_cc 0.2.27  rules_cc before 0.2.25 rejects //:cxxtest's `includes = ["."]` when it is the main repo ("resolves to the workspace root")
 cyclonedds
+# Chunk e-3: more BCR modules (a-f).
+apriltag
+array_record
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: BUILD, cpp/BUILD and python/BUILD call native py_library/py_test/cc_proto_library without a load()
+  --incompatible_autoload_externally=+@rules_cc,+@rules_python,+@com_google_protobuf  autoload the cc, python and proto rules Bazel 9 removed
+asio-grpc
+  override grpc 1.84.0  grpc 1.69.0, which it declares, has a bazel/generate_cc.bzl that fails to load under Bazel 9 (label(providers=...) gets a string)
+  --incompatible_autoload_externally=+@rules_cc  the c-ares, doctest, googletest and re2 it resolves call native cc_library, which Bazel 9 removed; autoload them from rules_cc
+  --test_arg=--test-case-exclude=*Traits?can?specify?zero?max?latency  skips "agrpc::run Traits can specify zero max latency" (doctest wildcards, no spaces): the case runs agrpc::run for 15 polls with zero max latency and checks a handler posted to the grpc_context ran; here it hadn't (CHECK(invoked) false). Both its tests are doctest binaries, so the flag only skips this case
+aspect_rules_oxc
+aspect_rules_rollup
+  override aspect_bazel_lib 2.22.5  the resolved aspect_bazel_lib's toolchain repos call rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
+  override rules_nodejs 6.7.7  rules_nodejs 6.2.0, which it declares, registers nodejs toolchains whose defs.bzl calls rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
+  -//.aspect/bazelrc:update_aspect_bazelrc_presets_0_test  the checked-in .aspect/bazelrc preset is out of date for Bazel 9.3.1 (its comments and flags are generated for the running Bazel)
+  -//.aspect/bazelrc:update_aspect_bazelrc_presets_1_test  the checked-in .aspect/bazelrc preset is out of date for Bazel 9.3.1 (its comments and flags are generated for the running Bazel)
+  -//.aspect/bazelrc:update_aspect_bazelrc_presets_2_test  the checked-in .aspect/bazelrc preset is out of date for Bazel 9.3.1 (its comments and flags are generated for the running Bazel)
+  -//.aspect/bazelrc:update_aspect_bazelrc_presets_3_test  the checked-in .aspect/bazelrc preset is out of date for Bazel 9.3.1 (its comments and flags are generated for the running Bazel)
+  -//.aspect/bazelrc:update_aspect_bazelrc_presets_4_test  the checked-in .aspect/bazelrc preset is out of date for Bazel 9.3.1 (its comments and flags are generated for the running Bazel)
+  -//.aspect/bazelrc:update_aspect_bazelrc_presets_5_test  the checked-in .aspect/bazelrc preset is out of date for Bazel 9.3.1 (its comments and flags are generated for the running Bazel)
+  -//.github/workflows:update_aspect_bazelrc_presets_0_test  the checked-in .github/workflows bazelrc preset is out of date for Bazel 9.3.1 (its comments and flags are generated for the running Bazel)
+  -//.github/workflows:update_aspect_bazelrc_presets_1_test  the checked-in .github/workflows bazelrc preset is out of date for Bazel 9.3.1 (its comments and flags are generated for the running Bazel)
+  -//docs:update_test  the checked-in docs are out of date for the stardoc resolved here, whose output adds a load() line to each usage block
+aspect_rules_terser
+  -//tools:preset.update_test  tools/preset.bazelrc is out of date for Bazel 9.3.1 (its Docs links name bazel@7.7.1)
+aspect_rules_webpack
+  -//webpack/tests/worker/...  its bundle runs a persistent-worker entry point that reads bundle.js-0.params, which isn't there when RBE runs it as a standalone process (ENOENT)
+  -//tools:preset.update_test  tools/preset.bazelrc is out of date for Bazel 9.3.1 (its Docs links name bazel@7.7.1)
+  -//docs:update_test  the checked-in docs are out of date for the stardoc resolved here (it renders **kwargs where they have kwargs)
+babylon
+  --deleted_packages=bazel/fmt,example/anyflow,example/bcr-presubmit,example/depend-use-bzlmod,example/depend-use-workspace,example/use-anyflow-with-brpc,example/use-arena-with-brpc,example/use-async-logger,example/use-counter-with-bvar,example/use-execution-queue,example/use-with-bthread,example/use-with-glog,registry/modules/boost.uuid/1.83.0.bcr.1/overlay,registry/modules/libevent/2.1.12/overlay,registry/modules/leveldb/1.23/overlay,registry/modules/thrift/0.21.0/overlay,registry/modules/openssl/3.3.2/overlay  example/* are separate workspaces (each has its own MODULE.bazel); registry/ is a local registry whose overlay BUILD files are for other modules' sources (their globs match nothing here); bazel/fmt is a BUILD file for a WORKSPACE-era fmt repo, whose globs match nothing here
+  known-failing build  even with its other fixes here, protobuf fails to load: babylon pins protobuf 32.1 with its own single_version_override (so it can't be overridden here), and 32.1's bazel/upb_*.bzl use the native CcInfo, which Bazel 9 removed
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: src/babylon/**/BUILD.bazel call native cc_library/cc_test and test/proto/BUILD.bazel native proto_library/cc_proto_library without a load()
+  --incompatible_autoload_externally=+@rules_cc,+@com_google_protobuf  autoload the cc and proto rules Bazel 9 removed
+bant
+basis_universal
+bazel_bats
+  known-failing test  every bats_test exits 127: bats-core's launcher execs <test>.runfiles/libexec/bats-core/bats, which isn't in the runfiles (the bats_core repo's files are under its own runfiles directory)
+bazel_gomock
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed (go/private/rules/cgo.bzl)
+  known-failing build  with rules_go fixed, the gazelle it resolves can't build its go_repository tools: its go.work requires go >= 1.24.12, and bazel_gomock's MODULE.bazel pins go_sdk 1.23.4 (GOTOOLCHAIN=local)
+bazel_jar_jar
+bazeldnf
+  known-failing build  its .bazelrc sets --@protobuf//bazel/toolchains:prefer_prebuilt_protoc, but its MODULE.bazel doesn't depend on protobuf ("No repository visible as '@protobuf'")
+behaviortree_cpp
+  override aspect_bazel_lib 2.22.5  the resolved aspect_bazel_lib's toolchain repos call rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed (go/private/rules/cgo.bzl)
+  override aspect_rules_esbuild 0.27.1  the resolved aspect_rules_esbuild's esbuild/private/resolved_toolchain.bzl calls rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
+  --incompatible_autoload_externally=+@rules_cc  the cppzmq, libzmq, magic_enum and sqlite3 it resolves call native cc rules, which Bazel 9 removed; autoload them from rules_cc
+blaze-math
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel calls native cc_library without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+bubblewrap
+  --deleted_packages=tests/bcr  tests/bcr is the BCR presubmit module (its own MODULE.bazel) loading @rules_shell, which the root MODULE.bazel doesn't declare
+c-blosc2
+  --incompatible_autoload_externally=+@rules_cc  the zlib-ng it resolves calls native cc rules, which Bazel 9 removed; autoload them from rules_cc
+cadical
+ccronexpr
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+cpp-sqlite
+  --incompatible_autoload_externally=+@rules_cc  the sqlite3 it resolves calls native cc rules, which Bazel 9 removed; autoload them from rules_cc
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+cucumber-cpp
+cxxurl
+delaunator-cpp
+dylib
+  -//tests/...  tests/BUILD.bazel uses @googletest, which its MODULE.bazel doesn't declare
+fastjson
+fasttext
+  --incompatible_autoload_externally=+@rules_cc  the pybind11_bazel it resolves (build_defs.bzl's pybind_extension) calls native cc rules, which Bazel 9 removed; autoload them from rules_cc
+fire
+  -//examples:vehicle_requirements_validation  its validator reads examples/vehicle_params.yaml (or a _validated.yaml next to it) from the execroot without declaring it as an input, so on RBE the file is absent ("Parameter file does not exist")
+  -//examples:vehicle_requirements  depends on //examples:vehicle_requirements_validation (above)
+  -//examples:component_requirements  depends on //examples:vehicle_requirements_validation (above)
+  -//examples:component_requirements_validation  depends on //examples:vehicle_requirements_validation (above)
+  -//examples:release_report  depends on //examples:vehicle_requirements_validation (above)
+  -//examples/brake_control:brake_controller_requirements  depends on //examples:vehicle_requirements_validation (above)
+  -//examples/brake_control:brake_controller_requirements_validation  depends on //examples:vehicle_requirements_validation (above)
+  -//examples/brake_control:brake_controller_trace  depends on //examples:vehicle_requirements_validation (above)
+flip
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel calls native cc_library without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+freertos
+  -//:arm_cm0_port  an ARM Cortex-M port: its portmacro.h needs config values (configENABLE_MPU, configMAX_SYSCALL_INTERRUPT_PRIORITY) that the default FreeRTOSConfig.h here doesn't define
+  -//:arm_cm3_port  an ARM Cortex-M port: its portmacro.h needs config values (configENABLE_MPU, configMAX_SYSCALL_INTERRUPT_PRIORITY) that the default FreeRTOSConfig.h here doesn't define
+  -//:arm_cm33_ntz_port  an ARM Cortex-M port: its portmacro.h needs config values (configENABLE_MPU, configMAX_SYSCALL_INTERRUPT_PRIORITY) that the default FreeRTOSConfig.h here doesn't define
+  -//:arm_cm4f_port  an ARM Cortex-M port: its portmacro.h needs config values (configENABLE_MPU, configMAX_SYSCALL_INTERRUPT_PRIORITY) that the default FreeRTOSConfig.h here doesn't define
+  -//:arm_cm7_port  an ARM Cortex-M port: its portmacro.h needs config values (configENABLE_MPU, configMAX_SYSCALL_INTERRUPT_PRIORITY) that the default FreeRTOSConfig.h here doesn't define
+  -//:xtensa_port  an Xtensa port: it needs the Xtensa toolchain's xtensa/config/core.h

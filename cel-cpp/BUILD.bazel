@@ -10,7 +10,7 @@ project(
     flags = [
         # its dep cel-spec's proto/cel/expr/conformance/test/BUILD.bazel calls native proto_library/cc_proto_library/java_proto_library, which Bazel 9 removed; autoload them
         "--incompatible_autoload_externally=+@rules_cc,+@com_google_protobuf",
-        # these gtest cases need tzdata, which the executor image lacks: cel-spec's timestamp_selectors_tz conformance section (named zones such as Australia/Sydney fail with "Invalid timezone"), the builtin TestTimestampFunctionsWithTimeZone, and ExtensionTest's America/Los_Angeles cases, which abort (exit 134) on the error result via TimestampOrDie()/MessageOrDie()
-        "--test_filter=-timestamps.timestamp_selectors_tz/*:BuiltinsTest.TestTimestampFunctionsWithTimeZone:ExtensionTest.TestGetDate:ExtensionTest.TestGetTimeOfDay",
+        # these gtest cases need tzdata, which the executor image lacks: the 5 cel-spec timestamp_selectors_tz conformance cases with named zones (Australia/Sydney, US/Central, America/St_Johns, Asia/Kathmandu fail with "Invalid timezone"), the builtin TestTimestampFunctionsWithTimeZone, and ExtensionTest's America/Los_Angeles cases, which abort (exit 134) on the error result via TimestampOrDie()/MessageOrDie()
+        "--test_filter=-timestamps.timestamp_selectors_tz/getDate:timestamps.timestamp_selectors_tz/getDayOfMonth_name_pos:timestamps.timestamp_selectors_tz/getDayOfMonth_name_neg:timestamps.timestamp_selectors_tz/getDayOfYear:timestamps.timestamp_selectors_tz/getMinutes:BuiltinsTest.TestTimestampFunctionsWithTimeZone:ExtensionTest.TestGetDate:ExtensionTest.TestGetTimeOfDay",
     ],
 )
