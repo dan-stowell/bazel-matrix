@@ -338,3 +338,30 @@ libzmq
 libwebp
 libexpat
   -//:expat_tests  tests/basic_tests.c: 'g_bytesScanned' undeclared; tests/runtests.c: assignment of read-only variable 'g_reparseDeferralEnabledDefault'
+
+# Chunk A4: high reverse-dep modules (a-l).
+boost.parameter
+boost.graph
+boost.variant2
+boost.spirit
+  -//test/...  uses @boost.test, which its MODULE.bazel doesn't declare
+boost.random
+boost.iostreams
+boost.exception
+boost.conversion
+boost.program_options
+  -//test/...  its select() uses @platforms, which its MODULE.bazel doesn't declare
+boost.multiprecision
+boost.endian
+boost.context
+boost.any
+boost.unordered
+libuuid
+libtiff
+gmp
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+fontconfig
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+google_bazel_common
+  --deleted_packages=tools/jarjar  tools/jarjar/BUILD calls native sh_binary/sh_test, which Bazel 9 removed
+cairo
