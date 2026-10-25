@@ -268,6 +268,17 @@ def remove_stale(root):
             remove_tree(path)
 
 
+def read_bazelversion(path):
+    """The version in a .bazelversion file, read as bazelisk does: its first
+    line that is neither empty nor a `#` comment, or None."""
+    with open(path) as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith("#"):
+                return line
+    return None
+
+
 def output_base(cwd):
     """The outer output base: the parent of the `execroot` above cwd.
 
@@ -358,9 +369,8 @@ def main(argv=None):
         subprocess.run(["tar", "-xf", args.source, "-C", src], check=True)
         version_file = os.path.join(src, ".bazelversion")
         if os.path.exists(version_file):
-            with open(version_file) as f:
-                upstream = f.read().strip()
-            if upstream != args.bazel_version:
+            upstream = read_bazelversion(version_file)
+            if upstream and upstream != args.bazel_version:
                 print("note: upstream .bazelversion is %s; using %s" % (upstream, args.bazel_version),
                       file=log, flush=True)
         bep = os.path.join(work, "bep.json")
