@@ -6,5 +6,7 @@ project(
     name = "rules_pkg",
     targets = [
         "//...",
+        # no git toolchain registered here
+        "-//toolchains/git:is_git_available",
     ],
 )

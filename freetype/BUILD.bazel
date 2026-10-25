@@ -6,5 +6,7 @@ project(
     name = "freetype",
     targets = [
         "//...",
+        # uses @emoji_font, which its MODULE.bazel doesn't declare
+        "-//bazel_test/...",
     ],
 )

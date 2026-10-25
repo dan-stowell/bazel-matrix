@@ -7,4 +7,8 @@ project(
     targets = [
         "//...",
     ],
+    flags = [
+        # tests/BUILD.bazel calls native cc_test, which Bazel 9 removed; autoload it from rules_cc
+        "--incompatible_autoload_externally=+@rules_cc",
+    ],
 )

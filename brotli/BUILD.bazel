@@ -6,5 +6,7 @@ project(
     name = "brotli",
     targets = [
         "//...",
+        # c/common/dictionary.bin isn't in the release archive
+        "-//:dictionary",
     ],
 )

@@ -7,4 +7,6 @@ project(
     targets = [
         "//...",
     ],
+    # its MODULE.bazel patches protobuf with //third_party:protobuf_load-cc-rules.patch, but the release archive has no third_party package
+    known_failing = "build",
 )

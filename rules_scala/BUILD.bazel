@@ -7,4 +7,8 @@ project(
     targets = [
         "//...",
     ],
+    flags = [
+        # its MODULE.bazel.lock has a version Bazel 9 can't read
+        "--lockfile_mode=off",
+    ],
 )

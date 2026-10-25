@@ -7,4 +7,6 @@ project(
     targets = [
         "//...",
     ],
+    # needs macOS: its tests compile with /usr/bin/xcrun and need a macOS execution platform
+    known_failing = "build",
 )

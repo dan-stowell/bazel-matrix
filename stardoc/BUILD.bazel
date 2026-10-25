@@ -6,5 +6,7 @@ project(
     name = "stardoc",
     targets = [
         "//...",
+        # docs/stardoc_rule.md isn't in the release archive
+        "-//:stardoc_rule_doc",
     ],
 )

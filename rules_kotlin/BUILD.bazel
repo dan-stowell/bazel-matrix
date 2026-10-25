@@ -7,4 +7,8 @@ project(
     targets = [
         "//...",
     ],
+    flags = [
+        # the root BUILD.bazel globs *.tgz, which the release archive lacks
+        "--noincompatible_disallow_empty_glob",
+    ],
 )

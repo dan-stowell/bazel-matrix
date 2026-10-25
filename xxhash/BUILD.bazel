@@ -7,4 +7,6 @@ project(
     targets = [
         "//...",
     ],
+    # rules_cc rejects its root-package `includes = [""]` when it is the main repo ("resolves to the workspace root"); fine as a dependency
+    known_failing = "build",
 )

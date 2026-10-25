@@ -7,4 +7,8 @@ project(
     targets = [
         "//...",
     ],
+    flags = [
+        # its .bazelrc sets --repo_env=CC=clang; the runner image has no clang
+        "--repo_env=CC=gcc",
+    ],
 )

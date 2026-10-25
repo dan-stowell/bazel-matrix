@@ -7,4 +7,8 @@ project(
     targets = [
         "//...",
     ],
+    flags = [
+        # locally sandboxed CopyFile actions fail: the inner output base is under /tmp, where hermetic tmp mounts a tmpfs
+        "--noincompatible_sandbox_hermetic_tmp",
+    ],
 )

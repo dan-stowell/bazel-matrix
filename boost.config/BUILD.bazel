@@ -6,5 +6,7 @@ project(
     name = "boost.config",
     targets = [
         "//...",
+        # uses @platforms, which its MODULE.bazel doesn't declare
+        "-//test/...",
     ],
 )

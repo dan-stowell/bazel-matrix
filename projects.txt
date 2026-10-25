@@ -43,38 +43,58 @@ rules_shell
 gazelle
 bazel_features
 bazel_lib
+  --ignore_dev_dependency  its dev dep local_repository ./lib/tests/external_test_repo isn't in the release archive
 rules_java
+  known-failing build  its MODULE.bazel patches protobuf with //third_party:protobuf_load-cc-rules.patch, but the release archive has no third_party package
 rules_proto
 apple_support
+  known-failing build  needs macOS: //toolchain:xcode_env fails analysis without Xcode
 aspect_bazel_lib
+  --ignore_dev_dependency  its dev dep local_repository ./lib/tests/external_test_repo isn't in the release archive
 rules_rust
+  -//cargo/private/cargo_toml_variable_extractor/testdata/...  its genrules run cargo, whose rustc panics linking (link.rs: unwrap on None)
 rules_swift
+  -//test/fixtures/module_interface/...  the Linux swift toolchain's swiftc can't load libswiftCore.so on the executors
 rules_jvm_external
+  --noincompatible_sandbox_hermetic_tmp  locally sandboxed CopyFile actions fail: the inner output base is under /tmp, where hermetic tmp mounts a tmpfs
 aspect_rules_js
 buildifier_prebuilt
 rules_nodejs
 rules_pkg
+  -//toolchains/git:is_git_available  no git toolchain registered here
 rules_apple
+  known-failing build  needs macOS: its tests compile with /usr/bin/xcrun and need a macOS execution platform
 rules_proto_grpc
+  -//tools/fixer/...  clippy (enabled by its .bazelrc) fails on //tools/fixer:fixer
 rules_android
+  --noincompatible_disallow_empty_glob  third_party/libxml2/BUILD.bazel globs include/private/*.h, which matches nothing
 rules_foreign_cc
 rules_perl
 stardoc
+  -//:stardoc_rule_doc  docs/stardoc_rule.md isn't in the release archive
 rules_kotlin
+  --noincompatible_disallow_empty_glob  the root BUILD.bazel globs *.tgz, which the release archive lacks
 aspect_rules_ts
 rules_multitool
 tar.bzl
 toolchain_utils
 rules_cc_autoconf
+  -//autoconf/tests:diff_tester  ruff EXE002: executable file without a shebang
+  -//tools/convert:bcr_test  ruff EXE002: executable file without a shebang
 package_metadata
 rules_m4
+  --incompatible_autoload_externally=+@rules_cc  its dev deps (googletest 1.11) call native cc_library/cc_test, which Bazel 9 removed; autoload them from rules_cc
 rules_bison
+  --incompatible_autoload_externally=+@rules_cc  its dev deps (googletest 1.11) call native cc_library/cc_test, which Bazel 9 removed; autoload them from rules_cc
 rules_flex
 rules_scala
+  --lockfile_mode=off  its MODULE.bazel.lock has a version Bazel 9 can't read
 rules_oci
+  --incompatible_autoload_externally=+@rules_shell  examples/attest/BUILD.bazel calls native sh_test, which Bazel 9 removed; autoload it from rules_shell
 rules_testing
 toolchains_llvm
 rules_fuzzing
+  --repo_env=CC=gcc  its .bazelrc sets --repo_env=CC=clang; the runner image has no clang
 aspect_rules_py
 bazel_worker_api
 buildozer
@@ -83,6 +103,7 @@ cmake_configure_file
 
 # Libraries, most BCR reverse dependencies first.
 boost.config
+  -//test/...  uses @platforms, which its MODULE.bazel doesn't declare
 boost.core
 boost.assert
 boost.type_traits
@@ -90,45 +111,73 @@ googletest
 openssl
 boringssl
 grpc
+  --incompatible_autoload_externally=+@rules_cc  its dev deps (opentelemetry-cpp) call native cc_library/cc_test, which Bazel 9 removed; autoload them from rules_cc
 eigen
+  known-failing build  rules_cc rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root"); fine as a dependency
 zstd
 fmt
 googleapis
+  known-failing build  its .bazelrc sets @aspect_rules_ts//ts:skipLibCheck, but it doesn't depend on aspect_rules_ts
 google_benchmark
+  --incompatible_autoload_externally=+@rules_cc  its dev deps (an old googletest) call native cc_library/cc_test, which Bazel 9 removed; autoload them from rules_cc
 nlohmann_json
 curl
 lz4
 freetype
+  -//bazel_test/...  uses @emoji_font, which its MODULE.bazel doesn't declare
 bzip2
+  known-failing build  rules_cc rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root"); fine as a dependency
 tinyxml2
 libpng
 glog
+  -//:cleanup_immediately_test  uses @com_github_google_googletest, which its MODULE.bazel doesn't declare
+  -//:cleanup_with_absolute_prefix_test  uses @com_github_google_googletest, which its MODULE.bazel doesn't declare
+  -//:cleanup_with_relative_prefix_test  uses @com_github_google_googletest, which its MODULE.bazel doesn't declare
+  -//:stacktrace_test  uses @com_github_google_googletest, which its MODULE.bazel doesn't declare
+  -//:stl_logging_test  uses @com_github_google_googletest, which its MODULE.bazel doesn't declare
+  -//:utilities_test  uses @com_github_google_googletest, which its MODULE.bazel doesn't declare
 gflags
 sqlite3
+  known-failing build  rules_cc rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root"); fine as a dependency
 xz
+  -//:ossfuzz  needs -fsanitize=fuzzer (clang); the executors' gcc rejects it
 libxml2
 libjpeg_turbo
 rapidjson
+  --incompatible_autoload_externally=+@rules_cc  its dev deps (an old googletest) call native cc_library/cc_test, which Bazel 9 removed; autoload them from rules_cc
 mbedtls
 pcre2
 yaml-cpp
 brotli
+  -//:dictionary  c/common/dictionary.bin isn't in the release archive
 libffi
+  known-failing build  rules_cc rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root"); fine as a dependency
 spdlog
+  -//:spdlog_test  tests/test_systemd.cpp needs systemd/sd-journal.h, which the executor image lacks
 flatbuffers
+  --incompatible_autoload_externally=+@rules_cc  its dev deps (an old re2, via grpc) call native cc_library/cc_test, which Bazel 9 removed; autoload them from rules_cc
 abseil-py
 c-ares
+  known-failing build  rules_cc rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root"); fine as a dependency
 snappy
+  -//:snappy-test  snappy-test.h: '::gettimeofday' has not been declared
+  -//:snappy_benchmark  needs //:snappy-test (above)
+  -//:snappy_unittest  needs //:snappy-test (above)
 asio
 libyaml
 xxhash
+  known-failing build  rules_cc rejects its root-package `includes = [""]` when it is the main repo ("resolves to the workspace root"); fine as a dependency
 highway
+  known-failing build  rules_cc rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root"); fine as a dependency
 jsoncpp
 catch2
 magic_enum
 cpuinfo
 libuv
 opentelemetry-cpp
+  --incompatible_autoload_externally=+@rules_cc  its dev deps (opentracing-cpp) call native cc_library/cc_test, which Bazel 9 removed; autoload them from rules_cc
 protoc-gen-validate
+  --incompatible_autoload_externally=+@rules_shell  tests/harness/executor/BUILD calls native sh_test, which Bazel 9 removed; autoload it from rules_shell
 fast_float
+  --incompatible_autoload_externally=+@rules_cc  tests/BUILD.bazel calls native cc_test, which Bazel 9 removed; autoload it from rules_cc
 onetbb

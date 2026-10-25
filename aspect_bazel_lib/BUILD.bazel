@@ -7,4 +7,8 @@ project(
     targets = [
         "//...",
     ],
+    flags = [
+        # its dev dep local_repository ./lib/tests/external_test_repo isn't in the release archive
+        "--ignore_dev_dependency",
+    ],
 )

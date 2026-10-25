@@ -7,4 +7,6 @@ project(
     targets = [
         "//...",
     ],
+    # needs macOS: //toolchain:xcode_env fails analysis without Xcode
+    known_failing = "build",
 )
