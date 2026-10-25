@@ -6,7 +6,7 @@ project(
     name = "toolchains_avr",
     targets = [
         "//...",
-        # its cc_toolchain targets (avr_impl_*) use mcu_args, whose args select() on //avr/platform:<mcu> with no default, so on the host configuration no condition matches
+        # its cc_toolchain targets (avr_impl_*) use mcu_args, whose args select() on //avr/platform:<mcu> with no default, so on the host configuration no condition matches; excluding mcu_args, avr_impl_* and avr_toolchain_* individually still leaves that error
         "-//cc/toolchain/...",
     ],
     flags = [

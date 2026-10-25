@@ -1518,7 +1518,7 @@ simplehttp
   --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its BUILD files call native cc_library/cc_test without a load()
   --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
 sign-here
-  known-failing build  a Swift project: rules_swift finds no Swift toolchain on the Linux executor (no target linux-toolchain in build_bazel_rules_swift_local_config), and its Swift targets need one (the flags below get past the native sh_binary errors before it)
+  known-failing build  a Swift project: rules_swift's repository autoconfiguration, which runs on the runner, finds no Swift installation there (no target linux-toolchain in build_bazel_rules_swift_local_config), and its Swift targets need one (the flags below get past the native sh_binary errors before it)
   --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: tools/coverage and tools/readme call native sh_binary without a load()
   --incompatible_autoload_externally=+@rules_shell  autoload the shell rules Bazel 9 removed from rules_shell
 saru
@@ -2391,21 +2391,21 @@ cutlass
 
 # Chunk D5: the remaining BCR modules (s-z).
 swift-filename-matcher
-  known-failing build  a Swift project: rules_swift finds no Swift toolchain on the Linux executor (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift
+  known-failing build  a Swift project: rules_swift's repository autoconfiguration, which runs on the runner, finds no Swift installation there (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift
 xctestrunner
 xcodeproj
-  known-failing build  a Swift project: rules_swift finds no Swift toolchain on the Linux executor (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift
+  known-failing build  a Swift project: rules_swift's repository autoconfiguration, which runs on the runner, finds no Swift installation there (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift
 texlive-texmf
 swxmlhash
-  known-failing build  a Swift project: rules_swift finds no Swift toolchain on the Linux executor (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift
+  known-failing build  a Swift project: rules_swift's repository autoconfiguration, which runs on the runner, finds no Swift installation there (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift
 swift-system
-  known-failing build  a Swift project: rules_swift finds no Swift toolchain on the Linux executor (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift
+  known-failing build  a Swift project: rules_swift's repository autoconfiguration, which runs on the runner, finds no Swift installation there (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift
 swift-syntax
-  known-failing build  a Swift project: rules_swift finds no Swift toolchain on the Linux executor (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift
+  known-failing build  a Swift project: rules_swift's repository autoconfiguration, which runs on the runner, finds no Swift installation there (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift
 swift-index-store
-  known-failing build  a Swift project: rules_swift finds no Swift toolchain on the Linux executor (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift
+  known-failing build  a Swift project: rules_swift's repository autoconfiguration, which runs on the runner, finds no Swift installation there (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift
 sourcekitten
-  known-failing build  a Swift project: rules_swift finds no Swift toolchain on the Linux executor (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift
+  known-failing build  a Swift project: rules_swift's repository autoconfiguration, which runs on the runner, finds no Swift installation there (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift
 xrootfs
 xplane_sdk
 xilinx_bootgen
@@ -2430,7 +2430,7 @@ toolchains_llvm_bootstrapped
   known-failing build  //... has targets that can't build on the host configuration: toolchain/runtimes args (resource_dir, rtlib, ...) select() on the target platform with no default, bzl_library doc_extract targets miss deps (@tar.bzl, @bazel_tools repo .bzl), and after ~18 min the inner Bazel exits 33 (out of memory) with its 2 GB heap
 toolchains_avr
   --deleted_packages=examples/blinkie,examples/blinkie/src/hello,examples/blinkie/src/pulse  a separate workspace (examples/blinkie/MODULE.bazel) using @avr and hedron_compile_commands, which the root module doesn't declare
-  -//cc/toolchain/...  its cc_toolchain targets (avr_impl_*) use mcu_args, whose args select() on //avr/platform:<mcu> with no default, so on the host configuration no condition matches
+  -//cc/toolchain/...  its cc_toolchain targets (avr_impl_*) use mcu_args, whose args select() on //avr/platform:<mcu> with no default, so on the host configuration no condition matches; excluding mcu_args, avr_impl_* and avr_toolchain_* individually still leaves that error
 thinkit
   known-failing build  the openconfig_gnmi 0.14.1 it declares (the BCR's newest) has bazel/generate_cc.bzl calling attr.label(providers = ["..."]) with strings, which Bazel 9 rejects ("got element of type string, want sequence")
 tftp-hpa
@@ -2438,13 +2438,13 @@ texlive
   override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
 tensorrt_headers
 swift-tomldecoder
-  known-failing build  a Swift project: rules_swift finds no Swift toolchain on the Linux executor (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift
+  known-failing build  a Swift project: rules_swift's repository autoconfiguration, which runs on the runner, finds no Swift installation there (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift
 swiftlint
   known-failing build  bazel/BUILD loads //Tests:generated_tests.bzl, but the release archive has no Tests package; it is also a Swift project, and the images lack swift
 swift-indexstore
-  known-failing build  a Swift project: rules_swift finds no Swift toolchain on the Linux executor (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift
+  known-failing build  a Swift project: rules_swift's repository autoconfiguration, which runs on the runner, finds no Swift installation there (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift
 swift_gazelle_plugin
-  known-failing build  its root BUILD.bazel's ci_workflow (line 189) refers to //release, //examples and //tools/generate_ci_workflow, which the release archive lacks; excluding //:ci_workflow and //:update_ci_workflow doesn't avoid the errors (the flags below get past earlier ones)
+  known-failing build  its root BUILD.bazel's ci_workflow (line 189) refers to //release, //examples and //tools/generate_ci_workflow, which the release archive lacks; excluding it and every root target that reaches it (update_ci_workflow, update_all, tidy, update_files, smoke_integration_tests, all_integration_tests) still leaves those errors in the inner build (the flags below get past earlier ones)
   --incompatible_autoload_externally=+@rules_shell  the cgrindel_bazel_starlib it resolves calls native sh_binary in updatesrc/private, which Bazel 9 removed; autoload it from rules_shell
   override aspect_bazel_lib 2.22.5  the resolved aspect_bazel_lib's toolchain repos call rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
 swift-bylaws
@@ -2458,7 +2458,7 @@ sparrowhawk
 sourcekit_bazel_bsp
   known-failing build  its //Sources:sourcekit-bazel-bsp builds with SwiftPM (build_spm.sh runs swift), and the images lack swift ("swift: command not found")
 safedi
-  known-failing build  a Swift project: rules_swift finds no Swift toolchain on the Linux executor (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift
+  known-failing build  a Swift project: rules_swift's repository autoconfiguration, which runs on the runner, finds no Swift installation there (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift
 
 # Chunk e-5: the rest of the a, d-f modules.
 apple_mig

@@ -11,6 +11,6 @@ project(
         # the cgrindel_bazel_starlib it resolves calls native sh_binary in updatesrc/private, which Bazel 9 removed; autoload it from rules_shell
         "--incompatible_autoload_externally=+@rules_shell",
     ],
-    # its root BUILD.bazel's ci_workflow (line 189) refers to //release, //examples and //tools/generate_ci_workflow, which the release archive lacks; excluding //:ci_workflow and //:update_ci_workflow doesn't avoid the errors (the flags below get past earlier ones)
+    # its root BUILD.bazel's ci_workflow (line 189) refers to //release, //examples and //tools/generate_ci_workflow, which the release archive lacks; excluding it and every root target that reaches it (update_ci_workflow, update_all, tidy, update_files, smoke_integration_tests, all_integration_tests) still leaves those errors in the inner build (the flags below get past earlier ones)
     known_failing = "build",
 )
