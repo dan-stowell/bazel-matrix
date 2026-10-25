@@ -514,3 +514,38 @@ boost.bimap
 boost.static_string
 boost.sort
   -//test/...  its select() uses @platforms, which its MODULE.bazel doesn't declare
+
+# Chunk A7: high reverse-dep modules (a-l).
+azure-core-cpp
+  --@curl//:ssl_lib=openssl  //:azure_core_cpp's select() fails otherwise: "azure_core_cpp must be built with --@curl//:ssl_lib=openssl when Curl is enabled as a transport"
+  --incompatible_autoload_externally=+@rules_cc  its deps (curl, googletest) call native cc_library, which Bazel 9 removed; autoload them from rules_cc
+alsa_lib
+libunwind
+libsodium
+j2cl
+  known-failing build  dozens of its packages (transpiler/.../backend/libraryinfo, backend/wasm, tools/rta...) call native proto_library/java_proto_library, which Bazel 9 removed, and junit/.../j2cl_junit_integration_test.bzl uses an undefined kotlin_and_j2cl_library
+imgui
+  --incompatible_autoload_externally=+@rules_cc  its deps (glfw) call native cc_library, which Bazel 9 removed; autoload them from rules_cc
+  -//backends:renderer-opengl3  links -lGL, which the images lack
+  -//backends:platform-glfw  its dep glfw includes X11/Xlib.h, which the images lack
+  -//examples/example_glfw_opengl3/...  uses //backends:platform-glfw and //backends:renderer-opengl3 (X11 headers, -lGL)
+gz-plugin
+  --strategy=TestRunner=local  //:buildifier.test (buildifier_prebuilt's runner) does `$(readlink <buildifier runfile>)` under set -e, and RBE stages runfiles as regular files, so readlink exits 1 silently; run tests on the runner, where runfiles are symlinks
+gutil
+  --action_env=CC=gcc  its .bazelrc sets --action_env=CC=clang, and the images have only gcc
+  --action_env=CXX=g++  its .bazelrc sets --action_env=CXX=clang++, and the images have only gcc
+  --repo_env=CC=gcc  its .bazelrc sets --repo_env=CC=/usr/bin/clang, and the images have only gcc
+gperf
+fribidi
+cython
+cppzmq
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+coroutines
+boost.xpressive
+boost.units
+boost.signals2
+boost.rational
+boost.ptr_container
+boost.polygon
+  -//test/...  its select() uses @platforms, which its MODULE.bazel doesn't declare
+boost.multi_array
