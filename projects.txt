@@ -812,3 +812,36 @@ libxtrans
 lunasvg
 lz4-erlang
   known-failing build  its toolchains/cc_toolchain_config.bzl uses the native CcToolchainConfigInfo, and its root BUILD.bazel calls native cc rules, both removed in Bazel 9
+
+# Chunk b-5: more reverse-dep modules (m-z).
+squashfs-tools
+rules_rust_wasm_bindgen
+  -//test:hello_world_bundler_wasm_bindgen_test  runs headless Firefox through webdriver, which the executors lack: "driver status: signal: 9 (SIGKILL)"
+  -//test:hello_world_deno_wasm_bindgen_test  runs headless Firefox through webdriver, which the executors lack: "driver status: signal: 9 (SIGKILL)"
+  -//test:hello_world_nodejs_wasm_bindgen_test  runs headless Firefox through webdriver, which the executors lack: "driver status: signal: 9 (SIGKILL)"
+  -//test:hello_world_nomodules_wasm_bindgen_test  runs headless Firefox through webdriver, which the executors lack: "driver status: signal: 9 (SIGKILL)"
+  -//test:hello_world_web_wasm_bindgen_test  runs headless Firefox through webdriver, which the executors lack: "driver status: signal: 9 (SIGKILL)"
+rules_closure
+  known-failing build  closure/compiler/test and third_party/phantomjs call native sh_test/sh_binary, which Bazel 9 removed (other packages depend on them), and its resolved rules_go uses the removed native CcInfo
+rules_dart
+  --lockfile_mode=off  "MODULE.bazel.lock is no longer up-to-date" (usages of @//dart/pub:extensions.bzl%pub changed) fails analysis of 140 targets under its .bazelrc's --lockfile_mode=error
+yaml.bzl
+  -//tools:preset.update_test  tools/preset.bazelrc is out of date for Bazel 9.3.1 (missing its new coverage --build_runfile_links lines)
+marisa-trie
+rules_d
+sha256.bzl
+rules_rust_prost
+readerwriterqueue
+rules_multirun
+toolchains_protoc
+nghttp2
+protovalidate
+  known-failing build  its resolved rules_go and rules_foreign_cc use the native CcInfo symbol, which Bazel 9 removed; with both overridden, gazelle's go_repository_tools fails: "invalid go version '1.24.12': must match format 1.23" (its Go SDK is too old)
+range-v3
+  known-failing build  its root BUILD.bazel calls native cc_library, which Bazel 9 removed
+vulkan_headers
+userspace_rcu
+tree-sitter-bazel
+rules_distroless
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed (go/private/rules/cgo.bzl)
+urdfdom_headers
