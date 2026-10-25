@@ -141,7 +141,7 @@ class GeneratedTest(unittest.TestCase):
     def test_module_mismatch(self):
         def check(fetched, skipped):
             return sync.module_mismatch(self.PROJECTS, {
-                "projects": [{"name": n} for n in fetched],
+                "projects": [{"name": n, "version": "1", "source": {}} for n in fetched],
                 "skipped": [{"name": n} for n in skipped]})
         self.assertEqual(check(["a", "c"], ["b"]), [])
         self.assertEqual(check(["a"], ["b"]), ["in projects.txt but not projects.json: c"])
@@ -150,6 +150,19 @@ class GeneratedTest(unittest.TestCase):
         self.assertIn("recorded twice: c", check(["a", "c", "c"], ["b"]))
         self.assertEqual(check(["c", "a"], ["b"]),
                          ["projects.json's projects are not in projects.txt's order"])
+
+    def test_pins_and_overrides(self):
+        projects = sync.parse_projects_txt("a@2\nb\n  override rules_cc 0.2.27  why\n")
+        append = sync.module_append(projects[1]["overrides"], "")
+        data = {"skipped": [], "projects": [
+            {"name": "a", "version": "2", "source": {}},
+            {"name": "b", "version": "1", "source": {"module_append": append}}]}
+        self.assertEqual(sync.module_mismatch(projects, data), [])
+        data["projects"][0]["version"] = "1"
+        data["projects"][1]["source"] = {}
+        self.assertEqual(sync.module_mismatch(projects, data), [
+            "a: pinned 2, projects.json has 1",
+            "b: projects.json's module_append doesn't match its override lines"])
 
 
 class RenderBuildTest(unittest.TestCase):

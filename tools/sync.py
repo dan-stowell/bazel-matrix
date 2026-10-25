@@ -207,6 +207,11 @@ def module_append(overrides, module_text):
                              "string literal; sync can't check it" % kind)
         if name.group(1) in modules:
             raise ValueError("its MODULE.bazel already has %s_override for %s" % (kind, name.group(1)))
+    return render_append(overrides)
+
+
+def render_append(overrides):
+    """module_append's text, without its checks of the registry's MODULE.bazel."""
     return "".join("\n# bazel-matrix: %s\nsingle_version_override(module_name = %s, version = %s)\n"
                    % (reason, _q(m), _q(v)) for m, v, reason in overrides)
 
@@ -278,7 +283,9 @@ def build_files(projects, data):
 
 
 def module_mismatch(projects, data):
-    """Problems with projects.json's modules against projects.txt's projects."""
+    """Problems with projects.json against projects.txt: its modules, their
+    pinned versions and their override lines. (Unpinned versions need the
+    BCR, so they aren't checked.)"""
     listed = [p["name"] for p in projects]
     fetched = [e["name"] for e in data["projects"]]
     skipped = [s["name"] for s in data["skipped"]]
@@ -298,6 +305,15 @@ def module_mismatch(projects, data):
         errors.append("in projects.json but not projects.txt: " + ", ".join(extra))
     if [m for m in fetched if m in listed] != [m for m in listed if m in fetched]:
         errors.append("projects.json's projects are not in projects.txt's order")
+    by_name = {p["name"]: p for p in projects}
+    for e in data["projects"]:
+        p = by_name.get(e["name"])
+        if not p:
+            continue
+        if p["version"] and p["version"] != e["version"]:
+            errors.append("%s: pinned %s, projects.json has %s" % (p["name"], p["version"], e["version"]))
+        if render_append(p["overrides"]) != e["source"].get("module_append", ""):
+            errors.append("%s: projects.json's module_append doesn't match its override lines" % p["name"])
     return errors
 
 
