@@ -22,7 +22,7 @@ project(
         "-//examples:workspace_integration_test",
         # runs `bazel` from PATH, which the executors don't have ("bazel: not found")
         "-//examples:workspace_rules_python_integration_test",
-        # its analysis-time assertion on an external repo's runfiles paths fails under Bazel 9.3.1 ("Expected condition to be true, but was false"); the layout change behind it is not yet identified
+        # its analysis-time assertion about an external repo's runfiles fails under Bazel 9.3.1 ("Expected condition to be true, but was false"); the expected and actual values aren't printed and the cause is not yet identified
         "-//lib/tests:runfiles_external_workspace_contents_test",
         # exits 1 with no output on the executors; cause not yet identified
         "-//lib/tests:py_zip_validate",
