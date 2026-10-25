@@ -2447,8 +2447,7 @@ safedi
 apple_mig
 apple_rules_lint
 asc_swift
-  --repo_env=CC=gcc  its .bazelrc sets common:linux --repo_env=CC=clang, and the executor image has only gcc ("Cannot find gcc or CC (clang)")
-  known-failing build  needs a Swift toolchain: rules_swift's local config defines no linux-toolchain without swiftc, which the image lacks; also its dev dep app-store-connect-openapi-specification.zip from developer.apple.com no longer matches its pinned checksum
+  known-failing build  its .bazelrc sets common:linux --repo_env=CC=clang, and the image has no clang ("Cannot find gcc or CC (clang)"); with CC=gcc it still needs a Swift toolchain (rules_swift's local config defines no linux-toolchain without swiftc, which the image lacks), and its dev dep app-store-connect-openapi-specification.zip from developer.apple.com no longer matches its pinned checksum
 aspect_gazelle_js
   known-failing build  its MODULE.bazel has local_path_override(aspect_gazelle, path = "../.."), which applies as the root module: the module is a subdirectory of the aspect-build/aspect-gazelle repo, and its archive has nothing at ../.. ("No MODULE.bazel ... found in external/aspect_gazelle+")
 aspect_gazelle_prebuilt
