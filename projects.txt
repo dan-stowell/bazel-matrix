@@ -224,7 +224,7 @@ rules_cc_autoconf
   -//gnulib/tests/compat/vsprintf-posix:vsprintf-posix_test_gnu_conformance  GNU autoconf and Bazel disagree on config.h/subst.h on the executors
   --output_groups=-py_ruff_checks  its .bazelrc adds a ruff aspect on every py target and EXE002 (executable without a shebang) fails on dozens (//autoconf/tests:diff_tester, //tools/convert:*_test, ...); excluding them would drop their tests, this drops only ruff
 rules_multitool
-  -//:buildifier.test  exits 1 in 0.0s with no output on the executors
+  -//:buildifier.test  buildifier_prebuilt's runner does `$(readlink <buildifier runfile>)` under set -e; RBE stages runfiles as regular files, so readlink exits 1 silently
 rules_python
   -//tests/integration:bzlmod_lockfile_test_bazel_9.1.0  MODULE.bazel.lock is out of date
   -//tests/integration:runtime_manifests_test_bazel_7.7.0  the nested Bazel's //:basic_test fails in 0.3s (exit 1) and the nested Bazel prints none of its output
@@ -278,9 +278,36 @@ libx11
 aspect_tools_telemetry
 glib
   -//glib/tests:gdatetime  test_GDateTime_equal: 'tz' should not be NULL (needs tzdata, which the executor image lacks)
-  -//glib/tests:utils-isolated  test_cleanup_handles_errors: assertion g_chmod (runtime_dir, 0755) >= 0 fails: errno 2, No such file or directory
+  -//glib/tests:utils-isolated  test_cleanup_handles_errors chmods the runtime dir to 0 so cleanup can't delete it, but the executors run tests as root: cleanup deletes it and g_chmod (runtime_dir, 0755) fails with ENOENT
 gz-utils
-  -//:buildifier.test  exits 1 in 0.1s with no output on the executors
+  -//:buildifier.test  buildifier_prebuilt's runner does `$(readlink <buildifier runfile>)` under set -e; RBE stages runfiles as regular files, so readlink exits 1 silently
 jq.bzl
 hermetic_launcher
   known-failing build  its MODULE.bazel overrides xz with patch //patches:xz-s390x-support.patch, but the release archive has no patches package
+
+# Chunk A2: high reverse-dep modules (a-l).
+boost.filesystem
+  -//test/...  uses @boost.test, which its MODULE.bazel doesn't declare
+boost.function
+boost.integer
+boost.lexical_cast
+boost.fusion
+boost.detail
+  -//test/...  uses @boost.array, which its MODULE.bazel doesn't declare
+boost.bind
+boost.move
+boost.typeof
+boost.algorithm
+boost.tuple
+boost.container
+  -//test/...  uses @boost.core, @boost.iterator and @boost.tuple, which its MODULE.bazel doesn't declare
+boost.winapi
+bison
+flex
+gawk
+ape
+  -//ape/cosmos/upload:upload  uploads the cosmos binaries with curl, which fails on the executors: SSL certificate problem: self signed certificate in certificate chain
+harfbuzz
+libxext
+  override libx11 1.8.12.bcr.5  its //:xext uses @libx11//:libx11, which the libx11 it declares (1.8.12.bcr.3) doesn't define
+bazelrc-preset.bzl

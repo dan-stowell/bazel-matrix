@@ -6,7 +6,7 @@ project(
     name = "gz-utils",
     targets = [
         "//...",
-        # exits 1 in 0.1s with no output on the executors
+        # buildifier_prebuilt's runner does `$(readlink <buildifier runfile>)` under set -e; RBE stages runfiles as regular files, so readlink exits 1 silently
         "-//:buildifier.test",
     ],
 )
