@@ -1008,7 +1008,7 @@ rapidcheck
   --noincompatible_disallow_empty_glob  its root BUILD.bazel globs include/**/*.cpp, which matches nothing
 rocksdb
   override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
-  -//:env_env_test  aborts in EnvPosixTestWithParam: "failed to find an ioctl-friendly temporary directory": its FS_IOC_GETVERSION ioctl probe fails on a fresh mkdtemp dir in both /var/tmp and /tmp (mkdtemp succeeded; it printed no error), and with no /.dockerenv it aborts instead of skipping
+  -//:env_env_test  aborts in EnvPosixTestWithParam: "failed to find an ioctl-friendly temporary directory": its probe (create a file in a fresh mkdtemp dir and issue FS_IOC_GETVERSION on it) fails in both /var/tmp and /tmp, and its stat("/.dockerenv") check, which would skip the test instead, fails too
 upb
   --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its BUILD files call native proto_library/cc_proto_library/sh_test and its bazel/*.bzl use the native CcInfo/ProtoInfo symbols without a load()
   --incompatible_autoload_externally=+@rules_cc,+@com_google_protobuf,+@rules_python,+@rules_shell  autoload the cc, proto, python and sh rules and symbols Bazel 9 removed
@@ -1140,7 +1140,7 @@ mp-units
   known-failing build  with -std=c++20, its overlay hardcodes MP_UNITS_API_STD_FORMAT=1, and the executor GCC's libstdc++ has no std::format (compat_macros.h: #error "std::formatting facility not supported")
 nanomsg
 nlopt
-  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects the resolved pcre2's root-package `includes = ["."]` ("resolves to the workspace root")
+  override rules_cc 0.2.27  rules_cc before 0.2.25 also rejects an external repo's root-package `includes = ["."]`: the resolved pcre2's @pcre2//:pcre2 fails analysis ("resolves to the workspace root")
   --incompatible_autoload_externally=+@rules_cc  the pcre2 it resolves has a BUILD.bazel calling native cc rules, which Bazel 9 removed; autoload them from rules_cc
 nsync
   --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD calls native cc_* rules without a load()
@@ -1183,3 +1183,132 @@ rules_jsonnet
   known-failing build  with rules_go 0.65.0, gazelle's go_repository_tools fails: "go.work requires go >= 1.24.12 (running go 1.23.7; GOTOOLCHAIN=local)" (its Go SDK is too old)
 rules_haskell
   known-failing build  its resolved rules_nixpkgs_core's util.bzl loads get_cpu_value from @bazel_tools//tools/cpp:lib_cc_configure.bzl, which Bazel 9 no longer has; its own haskell/*.bzl also use the removed native CcInfo/CcSharedLibraryInfo
+
+# Chunk b-8: more libraries, tools and rulesets (m-r).
+make
+meson
+mimick
+minicoro
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+mold
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: third-party/tbb/BUILD.bazel calls native cc_* rules without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+mosquitto
+  -//:mosquitto_ctrl  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//:mosquitto_pub  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//:mosquitto_rr  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//:mosquitto_sub  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:01-con-discon-success  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:01-con-discon-success-v5  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:01-con-discon-will  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:01-con-discon-will-clear  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:01-con-discon-will-v5  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:01-extended-auth-continue  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:01-extended-auth-failure  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:01-keepalive-pingreq  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:01-no-clean-session  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:01-pre-connect-callback  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:01-server-keepalive-pingreq  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:01-unpwd-set  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:01-will-set  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:01-will-unpwd-set  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:02-subscribe-helper-callback-qos2  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:02-subscribe-helper-simple-qos2  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:02-subscribe-qos0  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:02-subscribe-qos1  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:02-subscribe-qos1-async1  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:02-subscribe-qos1-async2  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:02-subscribe-qos2  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:02-unsubscribe  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:02-unsubscribe2-v5  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:02-unsubscribe-multiple-v5  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:02-unsubscribe-v5  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:03-publish-b2c-qos1  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:03-publish-b2c-qos1-unexpected-puback  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:03-publish-b2c-qos2  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:03-publish-b2c-qos2-len  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:03-publish-b2c-qos2-unexpected-pubcomp  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:03-publish-b2c-qos2-unexpected-pubrel  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:03-publish-c2b-qos1-disconnect  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:03-publish-c2b-qos1-len  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:03-publish-c2b-qos1-receive-maximum  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:03-publish-c2b-qos2  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:03-publish-c2b-qos2-disconnect  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:03-publish-c2b-qos2-len  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:03-publish-c2b-qos2-maximum-qos-0  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:03-publish-c2b-qos2-maximum-qos-1  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:03-publish-c2b-qos2-pubrec-error  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:03-publish-c2b-qos2-receive-maximum  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:03-publish-loop  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:03-publish-loop-forever  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:03-publish-loop-manual  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:03-publish-loop-start  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:03-publish-qos0  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:03-publish-qos0-no-payload  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:03-request-response-1  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:03-request-response-2  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:03-request-response-correlation-1  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:04-retain-qos0  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:08-ssl-bad-cacert  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:08-ssl-connect-cert-auth  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:08-ssl-connect-cert-auth-custom-ssl-ctx  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:08-ssl-connect-cert-auth-custom-ssl-ctx-default  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:08-ssl-connect-cert-auth-enc  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:08-ssl-connect-no-auth  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:08-ssl-connect-san  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:08-ssl-fake-cacert  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:08-tls-psk-bridge  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:08-tls-psk-pub  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:09-util-topic-tokenise  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:11-prop-oversize-packet  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:11-prop-recv  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:11-prop-send-content-type  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:11-prop-send-payload-format  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+  -//test:fuzzish  links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
+ng-log
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its bazel/ng-log.bzl macro (used by the root BUILD.bazel and bazel/example) calls native cc_library without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+nonstd-span
+open62541
+opencensus-proto
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its opencensus/proto/... BUILD files call native cc_proto_library without a load()
+  --incompatible_autoload_externally=+@rules_cc,+@com_google_protobuf  autoload the cc and proto rules Bazel 9 removed
+  known-failing build  with those autoloads, its packages load the resolved grpc's bazel/cc_grpc_library.bzl, whose generate_cc.bzl passes a string where attr.label(providers=...) needs a list of providers, which Bazel 9 rejects ("Error in label: at index 0 of providers, got element of type string, want sequence"): its proto packages (e.g. opencensus/proto/agent/trace/v1) load it, and its go_proto_library targets use @com_github_golang_protobuf, which its MODULE.bazel doesn't declare
+opentracing-cpp
+  -//mocktracer/test:json_test  its vendored Catch2 (3rd_party/include/opentracing/catch2/catch.hpp) sizes a static array with MINSIGSTKSZ, which glibc 2.34+ no longer defines as a constant ("size of array 'altStackMem' is not an integral constant-expression")
+  -//mocktracer/test:propagation_test  its vendored Catch2 (3rd_party/include/opentracing/catch2/catch.hpp) sizes a static array with MINSIGSTKSZ, which glibc 2.34+ no longer defines as a constant ("size of array 'altStackMem' is not an integral constant-expression")
+  -//mocktracer/test:tracer_factory_test  its vendored Catch2 (3rd_party/include/opentracing/catch2/catch.hpp) sizes a static array with MINSIGSTKSZ, which glibc 2.34+ no longer defines as a constant ("size of array 'altStackMem' is not an integral constant-expression")
+  -//mocktracer/test:tracer_test  its vendored Catch2 (3rd_party/include/opentracing/catch2/catch.hpp) sizes a static array with MINSIGSTKSZ, which glibc 2.34+ no longer defines as a constant ("size of array 'altStackMem' is not an integral constant-expression")
+  -//test:string_view_test  its vendored Catch2 (3rd_party/include/opentracing/catch2/catch.hpp) sizes a static array with MINSIGSTKSZ, which glibc 2.34+ no longer defines as a constant ("size of array 'altStackMem' is not an integral constant-expression")
+  -//test:tracer_test  its vendored Catch2 (3rd_party/include/opentracing/catch2/catch.hpp) sizes a static array with MINSIGSTKSZ, which glibc 2.34+ no longer defines as a constant ("size of array 'altStackMem' is not an integral constant-expression")
+  -//test:util_test  its vendored Catch2 (3rd_party/include/opentracing/catch2/catch.hpp) sizes a static array with MINSIGSTKSZ, which glibc 2.34+ no longer defines as a constant ("size of array 'altStackMem' is not an integral constant-expression")
+  -//test:value_test  its vendored Catch2 (3rd_party/include/opentracing/catch2/catch.hpp) sizes a static array with MINSIGSTKSZ, which glibc 2.34+ no longer defines as a constant ("size of array 'altStackMem' is not an integral constant-expression")
+orocos-kdl
+  -//tests/...  tests/BUILD.bazel uses @cppunit, which its MODULE.bazel doesn't declare
+paho.mqtt.cpp
+  --incompatible_autoload_externally=+@rules_cc  the paho.mqtt.c it resolves has a BUILD.bazel calling native cc rules, which Bazel 9 removed; autoload them from rules_cc
+  -//test/...  test/BUILD.bazel uses @catch2, which its MODULE.bazel doesn't declare
+patchelf
+pkgconf
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+pocketfft
+psimd
+pystring
+qdldl
+qpdf
+qr-code-generator
+ragel
+re.bzl
+  -//tools:preset.update_test  tools/preset.bazelrc is out of date for Bazel 9.3.1 (its Docs links name bazel@8.5.0)
+redis
+reflect-cpp
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel calls native cc_* rules without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+reproc
+rules_bazel_integration_test
+rules_mypy
+  --strategy=TestRunner=local  //:buildifier.test (buildifier_prebuilt's runner) does `$(readlink <buildifier runfile>)` under set -e, and RBE stages runfiles as regular files, so readlink exits 1 silently; run tests on the runner, where runfiles are symlinks
+rules_tar
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed
+  override aspect_bazel_lib 2.22.5  the resolved aspect_bazel_lib's toolchain repos call rule(incompatible_use_toolchain_transition=...), which Bazel 9 removed; registering them breaks toolchain resolution for every target
+  override hermetic_cc_toolchain 4.3.0  the resolved hermetic_cc_toolchain's toolchain/private/cc_toolchains.bzl fails to load under Bazel 9: a rule() there gets None in provides ("at index 0 of provides, got element of type NoneType, want Provider")
