@@ -6,17 +6,17 @@ project(
     name = "freertos",
     targets = [
         "//...",
-        # an ARM Cortex-M port: its portmacro.h needs config values (configENABLE_MPU, configMAX_SYSCALL_INTERRUPT_PRIORITY) that the default FreeRTOSConfig.h here doesn't define
+        # an ARM Cortex-M port, which needs an ARM cross-toolchain; with the host x86-64 gcc it fails at its portmacro.h (first: configENABLE_MPU / configMAX_SYSCALL_INTERRUPT_PRIORITY undefined)
         "-//:arm_cm0_port",
-        # an ARM Cortex-M port: its portmacro.h needs config values (configENABLE_MPU, configMAX_SYSCALL_INTERRUPT_PRIORITY) that the default FreeRTOSConfig.h here doesn't define
+        # an ARM Cortex-M port, which needs an ARM cross-toolchain; with the host x86-64 gcc it fails at its portmacro.h (first: configENABLE_MPU / configMAX_SYSCALL_INTERRUPT_PRIORITY undefined)
         "-//:arm_cm3_port",
-        # an ARM Cortex-M port: its portmacro.h needs config values (configENABLE_MPU, configMAX_SYSCALL_INTERRUPT_PRIORITY) that the default FreeRTOSConfig.h here doesn't define
+        # an ARM Cortex-M port, which needs an ARM cross-toolchain; with the host x86-64 gcc it fails at its portmacro.h (first: configENABLE_MPU / configMAX_SYSCALL_INTERRUPT_PRIORITY undefined)
         "-//:arm_cm33_ntz_port",
-        # an ARM Cortex-M port: its portmacro.h needs config values (configENABLE_MPU, configMAX_SYSCALL_INTERRUPT_PRIORITY) that the default FreeRTOSConfig.h here doesn't define
+        # an ARM Cortex-M port, which needs an ARM cross-toolchain; with the host x86-64 gcc it fails at its portmacro.h (first: configENABLE_MPU / configMAX_SYSCALL_INTERRUPT_PRIORITY undefined)
         "-//:arm_cm4f_port",
-        # an ARM Cortex-M port: its portmacro.h needs config values (configENABLE_MPU, configMAX_SYSCALL_INTERRUPT_PRIORITY) that the default FreeRTOSConfig.h here doesn't define
+        # an ARM Cortex-M port, which needs an ARM cross-toolchain; with the host x86-64 gcc it fails at its portmacro.h (first: configENABLE_MPU / configMAX_SYSCALL_INTERRUPT_PRIORITY undefined)
         "-//:arm_cm7_port",
-        # an Xtensa port: it needs the Xtensa toolchain's xtensa/config/core.h
+        # an Xtensa port, which needs the Xtensa cross-toolchain (its xtensa/config/core.h); the host x86-64 gcc lacks it
         "-//:xtensa_port",
     ],
 )
