@@ -6,13 +6,11 @@ project(
     name = "tar.bzl",
     targets = [
         "//...",
-        # symlinks reach the tar action as regular files under RBE: the listing has -rwx where the expected one has a symlink
-        "-//tar/tests:test_17_after_processing",
-        # symlinks reach the tar action as regular files under RBE: the listing has -rwx where the expected one has a symlink
-        "-//tar/tests:test23_symlink_out_to_external_repo",
-        # symlinks reach the tar action as regular files under RBE: the listing has -rwx where the expected one has a symlink
-        "-//tar/tests:test24_symlink_within_external_repo",
-        # symlinks reach the tar action as regular files under RBE: the listing has -rwx where the expected one has a symlink
-        "-//tar/tests:test25_source_tree_symlink",
+    ],
+    flags = [
+        # test_17_after_processing and test23-25 need symlinks kept in action inputs (preserve_symlinks readlinks them): they fail under RBE (symlinks staged as regular files) and under linux-sandbox, pass with local
+        "--spawn_strategy=local",
+        # with --spawn_strategy=local: don't reuse outputs that remote execution produced for the same action keys
+        "--noremote_accept_cached",
     ],
 )
