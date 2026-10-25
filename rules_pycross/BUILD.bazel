@@ -6,7 +6,7 @@ project(
     name = "rules_pycross",
     targets = [
         "//...",
-        # 31 nested-Bazel tests (8-29 min each, 33 min per run); a different 7-8 fail each run, the nested Bazel failing to extract rules_python's cpython 3.14 archive ("Error in download_and_extract: java.io.IOException: Error extracting")
+        # 31 nested-Bazel tests (8-29 min each, 33 min per run); a different 7-8 fail each run: each nested Bazel extracts rules_python's cpython 3.14 archives into its own output base on the runner, and the runner disk fills ("Error extracting ...: No space left on device")
         "-//tests/e2e/...",
     ],
 )

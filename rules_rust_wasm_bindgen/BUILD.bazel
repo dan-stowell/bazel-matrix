@@ -6,15 +6,15 @@ project(
     name = "rules_rust_wasm_bindgen",
     targets = [
         "//...",
-        # runs headless Firefox through webdriver, which the executors lack: "driver status: signal: 9 (SIGKILL)"
+        # its hermetic Firefox (@firefox_linux_x86_64) fails to start under webdriver: libmozgtk.so needs libgtk-3.so.0, which the executor image lacks
         "-//test:hello_world_bundler_wasm_bindgen_test",
-        # runs headless Firefox through webdriver, which the executors lack: "driver status: signal: 9 (SIGKILL)"
+        # its hermetic Firefox (@firefox_linux_x86_64) fails to start under webdriver: libmozgtk.so needs libgtk-3.so.0, which the executor image lacks
         "-//test:hello_world_deno_wasm_bindgen_test",
-        # runs headless Firefox through webdriver, which the executors lack: "driver status: signal: 9 (SIGKILL)"
+        # its hermetic Firefox (@firefox_linux_x86_64) fails to start under webdriver: libmozgtk.so needs libgtk-3.so.0, which the executor image lacks
         "-//test:hello_world_nodejs_wasm_bindgen_test",
-        # runs headless Firefox through webdriver, which the executors lack: "driver status: signal: 9 (SIGKILL)"
+        # its hermetic Firefox (@firefox_linux_x86_64) fails to start under webdriver: libmozgtk.so needs libgtk-3.so.0, which the executor image lacks
         "-//test:hello_world_nomodules_wasm_bindgen_test",
-        # runs headless Firefox through webdriver, which the executors lack: "driver status: signal: 9 (SIGKILL)"
+        # its hermetic Firefox (@firefox_linux_x86_64) fails to start under webdriver: libmozgtk.so needs libgtk-3.so.0, which the executor image lacks
         "-//test:hello_world_web_wasm_bindgen_test",
     ],
 )
