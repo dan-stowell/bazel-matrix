@@ -484,3 +484,33 @@ yams
   known-failing build  its rules_apple fails analysis under Bazel 9: transition inputs [//command_line_option:apple_crosstool_top] do not correspond to valid settings
 verilator
 tcl_lang
+
+# Chunk A6: high reverse-dep modules (a-l).
+boost.functional
+boost.foreach
+boost.describe
+libxcb
+liburing
+  known-failing build  the overlay's //:generate_headers runs `ln -sf $pkg_dir/Makefile.common Makefile.common`, which fails as the main repo (pkg_dir is .: "are the same file")
+gz-msgs
+  -//:buildifier.test  buildifier -mode=diff flags MODULE.bazel: the registry's copy (which replaces the archive's) puts compatibility_level before version
+glfw
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+elfutils
+cgrindel_bazel_starlib
+  known-failing build  its root BUILD.bazel loads //ci:defs.bzl, but the release archive has no ci package
+cel-spec
+  override rules_go 0.59.0  rules_go 0.53.0, which it declares, uses CcInfo, which Bazel 9 removed
+  --deleted_packages=proto/cel/expr/conformance,proto/cel/expr/conformance/test  they call native proto_library/cc_proto_library/java_proto_library, which Bazel 9 removed
+capnp-cpp
+boost.uuid
+boost.test
+  -//test/...  uses @boost.lexical_cast and @boost.thread, which its MODULE.bazel doesn't declare, and a //baseline-outputs package the archive lacks
+boost.numeric_ublas
+boost.logic
+boost.lambda
+boost.charconv
+boost.bimap
+boost.static_string
+boost.sort
+  -//test/...  its select() uses @platforms, which its MODULE.bazel doesn't declare
