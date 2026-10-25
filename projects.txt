@@ -927,3 +927,57 @@ google_cloud_cpp
 graphene
 grpc_ecosystem_grpc_gateway
 gsl
+
+# Chunk D1: more BCR modules (s-z).
+simdjson
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+simdutf
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+simde
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel calls native cc rules without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+stb
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+s2geometry
+  --deleted_packages=python  python/BUILD.bazel loads @pybind11_bazel, which its MODULE.bazel doesn't declare
+sentencepiece
+  --deleted_packages=third_party/abseil-cpp,third_party/abseil-cpp/absl,third_party/abseil-cpp/absl/algorithm,third_party/abseil-cpp/absl/base,third_party/abseil-cpp/absl/cleanup,third_party/abseil-cpp/absl/container,third_party/abseil-cpp/absl/crc,third_party/abseil-cpp/absl/debugging,third_party/abseil-cpp/absl/flags,third_party/abseil-cpp/absl/functional,third_party/abseil-cpp/absl/hash,third_party/abseil-cpp/absl/log,third_party/abseil-cpp/absl/log/internal,third_party/abseil-cpp/absl/memory,third_party/abseil-cpp/absl/meta,third_party/abseil-cpp/absl/numeric,third_party/abseil-cpp/absl/profiling,third_party/abseil-cpp/absl/random,third_party/abseil-cpp/absl/random/internal,third_party/abseil-cpp/absl/status,third_party/abseil-cpp/absl/strings,third_party/abseil-cpp/absl/synchronization,third_party/abseil-cpp/absl/time,third_party/abseil-cpp/absl/time/internal/cctz,third_party/abseil-cpp/absl/types,third_party/abseil-cpp/absl/utility,third_party/absl,third_party/absl/algorithm,third_party/absl/base,third_party/absl/cleanup,third_party/absl/container,third_party/absl/crc,third_party/absl/debugging,third_party/absl/flags,third_party/absl/functional,third_party/absl/hash,third_party/absl/log,third_party/absl/log/internal,third_party/absl/memory,third_party/absl/meta,third_party/absl/numeric,third_party/absl/profiling,third_party/absl/random,third_party/absl/random/internal,third_party/absl/status,third_party/absl/strings,third_party/absl/synchronization,third_party/absl/time,third_party/absl/time/internal/cctz,third_party/absl/types,third_party/absl/utility  its vendored third_party/abseil-cpp and third_party/absl copies are meant to be used as their own workspace: their BUILD files load //absl:copts/configure_copts.bzl, which doesn't resolve from sentencepiece's root
+sentry_native
+stdexec
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel calls native cc rules without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+sqlite_orm
+  -//examples/...  a separate workspace (examples/MODULE.bazel) using sqlite_orm as a dependency
+spirv_headers
+spirv_tools
+tl-expected
+tl-optional
+tinyformat
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel calls native cc rules without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+tinyexr
+tinygltf
+tinyobjloader
+tomlplusplus
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+thrift
+tink_cc
+tcmalloc
+  known-failing build  its sources include tcmalloc/internal/config.h, which stops 1710 compiles with #error "GCC 12.1 or higher is required.": the executor image's gcc is older (the overrides below get it past analysis)
+  override aspect_bazel_lib 2.22.5  the resolved aspect_bazel_lib's toolchain repos call rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
+  override aspect_rules_esbuild 0.27.1  the resolved aspect_rules_esbuild calls rule() with incompatible_use_toolchain_transition (esbuild/private/resolved_toolchain.bzl), which Bazel 9 removed
+utf8proc
+uthash
+yyjson
+xsimd
+xtl
+  -//test/...  a separate workspace (test/MODULE.bazel, the BCR test module) whose doctest dep the root module doesn't declare
+xtensor
+zopfli
+trompeloeil
+  -//test/...  a separate workspace (test/MODULE.bazel, the BCR test module) whose catch2 dep the root module doesn't declare
+sophus
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+  override eigen 3.4.0.bcr.3  the eigen 3.4.0.bcr.1 it declares downloads gitlab.com's 3.4.0 archive, whose checksum no longer matches; 3.4.0.bcr.3 fetches the same release from the GitHub mirror
+  --incompatible_autoload_externally=+@rules_cc  the fmt 10.2.1 it declares has a BUILD.bazel calling native cc_library, which Bazel 9 removed; autoload it from rules_cc
