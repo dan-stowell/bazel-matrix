@@ -2893,11 +2893,13 @@ rules_itest
 rules_js_rust_wasm_bindgen
   known-failing build  the rules_rust 0.65.0 it declares fails to load under Bazel 9: rust/private/dummy_cc_toolchain/dummy_cc_toolchain.bzl does rule(provides = [...]) with a native provider that is None ("got element of type NoneType"); with rules_rust and rules_rust_wasm_bindgen overridden to 0.74.0, its test/ package loads @rules_rust_wasm_bindgen//rules_js:defs.bzl, which 0.74.0 no longer has
 rules_julia
-  -//julia/private/tests/sysimage/...  JuliaPrecompile of :farewell fails: Julia finds the cache of its dep :greeter (built in another action) stale and recompiles it ("Precompiling `farewell` also compiled other packages, meaning their caches were stale or missing"); why it is stale here is not confirmed
+  -//julia/private/tests/sysimage:farewell  JuliaPrecompile of :farewell fails: Julia finds the cache of its dep :greeter (built in another action) stale and recompiles it ("Precompiling `farewell` also compiled other packages, meaning their caches were stale or missing"); why it is stale here is not confirmed
+  -//julia/private/tests/sysimage:image  a sysimage of :farewell (above)
+  -//julia/private/tests/sysimage:sysimage_test  depends on :farewell (above)
   -//julia/private/tests/artifact:artifact_test  asserts hello.txt in the artifact isn't executable, but on the executors it has the execute bits set ("filemode(...) & 0x49 == 0", evaluated 0x49 == 0); that RBE input staging sets them is not confirmed
 rules_kconfig
 rules_latex
-  -//tests/ctan:transitive_resolve_test  downloads a CTAN package 'test-pkg-a', which no mirrors.ctan.org URL serves ("CTAN package 'test-pkg-a' not found at any known URL"); what the test expects to serve it is not confirmed
+  -//tests/ctan:transitive_resolve_test  fails to fetch a CTAN package 'test-pkg-a' from every mirrors.ctan.org URL it tries ("CTAN package 'test-pkg-a' not found at any known URL"); why the fetch fails (absent package or a network error) is not confirmed
   -//tests/js:test_chunks  needs node on PATH, which the executor image lacks ("node not found (set $NODE or put node on PATH)")
   -//tests/js:test_render  needs node on PATH, which the executor image lacks ("node not found (set $NODE or put node on PATH)")
   -//tests/js:test_synctex_math  needs node on PATH, which the executor image lacks ("node not found (set $NODE or put node on PATH)")
