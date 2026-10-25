@@ -950,7 +950,7 @@ stdexec
   --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel calls native cc rules without a load()
   --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
 sqlite_orm
-  -//examples/...  a separate workspace (examples/MODULE.bazel) using sqlite_orm as a dependency
+  -//examples/...  examples/BUILD.bazel (the BCR example module, with its own examples/MODULE.bazel) lists srcs = ["examples/in_memory.cpp"], which resolves to examples/examples/in_memory.cpp, but the file is examples/in_memory.cpp ("missing input file")
 spirv_headers
 spirv_tools
 tl-expected
@@ -967,7 +967,7 @@ tomlplusplus
 thrift
 tink_cc
 tcmalloc
-  known-failing build  its sources include tcmalloc/internal/config.h, which stops 1710 compiles with #error "GCC 12.1 or higher is required.": the executor image's gcc is older (the overrides below get it past analysis)
+  known-failing build  its sources include tcmalloc/internal/config.h, which stops 1710 compiles with #error "GCC 12.1 or higher is required.": the executor image has gcc 11 (the overrides below get it past analysis)
   override aspect_bazel_lib 2.22.5  the resolved aspect_bazel_lib's toolchain repos call rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
   override aspect_rules_esbuild 0.27.1  the resolved aspect_rules_esbuild calls rule() with incompatible_use_toolchain_transition (esbuild/private/resolved_toolchain.bzl), which Bazel 9 removed
 utf8proc
@@ -1013,3 +1013,63 @@ upb
   --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its BUILD files call native proto_library/cc_proto_library/sh_test and its bazel/*.bzl use the native CcInfo/ProtoInfo symbols without a load()
   --incompatible_autoload_externally=+@rules_cc,+@com_google_protobuf,+@rules_python,+@rules_shell  autoload the cc, proto, python and sh rules and symbols Bazel 9 removed
   known-failing build  with those autoloads, its own bazel/upb_proto_library.bzl calls aspect(incompatible_use_toolchain_transition=...), which Bazel 9 removed
+# Chunk D2: more BCR modules (s-z).
+valkey
+verible
+  known-failing build  its own bazel/flex.bzl and bazel/bison.bzl pass a select() as genrule toolchains ("attribute toolchains is not configurable" in Bazel 9) so verible/verilog/parser and verible/common/analysis fail to load (the flags below get past the native-rule errors before it)
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its BUILD files call native sh_binary, sh_test and proto_library without a load()
+  --incompatible_autoload_externally=+@rules_cc,+@rules_shell,+@com_google_protobuf  autoload the rules Bazel 9 removed from rules_cc, rules_shell and protobuf
+wabt
+  --deleted_packages=third_party/gtest,third_party/gtest/googletest/test,third_party/gtest/googlemock/test  a vendored googletest copy that wabt's BUILD files don't use: its test packages load @rules_python, which wabt doesn't declare, and //third_party/gtest refers to @bazel_tools//platforms, which Bazel 9 removed
+yoga
+zstd-jni
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+x264
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+x265
+thrax
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel calls native cc_library without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+suitesparse
+  --deleted_packages=GraphBLAS/cpu_features  a vendored cpu_features copy whose BUILD.bazel loads @bazel_skylib, which suitesparse's MODULE.bazel doesn't declare; its own BUILD.bazel doesn't use it
+scip
+soplex
+symengine
+  override rules_m4 0.3.1  the resolved rules_m4's m4 toolchain repo (m4_v1.4.18) has a bin/BUILD.bazel calling native cc_binary, which Bazel 9 removed
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+  --noincompatible_disallow_empty_glob  the gmp it resolves globs mpn/arm64/add.asm, which its archive lacks, and Bazel 9 rejects empty globs
+sse2neon
+sdl3
+sfml
+  -//bazel_test/...  a separate workspace (bazel_test/MODULE.bazel, the BCR test module); from the root its smoke_test depends on //:sfml (above)
+  -//:window  links the system libudev and includes libudev.h (see its BUILD.bazel), which the executor image lacks
+  -//:graphics  depends on //:window (above)
+  -//:sfml  depends on //:window (above)
+seastar
+  known-failing build  its core library //:seastar includes system headers the executor image lacks (valgrind/valgrind.h, hwloc.h, netinet/sctp.h) and uses std::hardware_destructive_interference_size, which the image's gcc 11 libstdc++ lacks (the flags below get it to compile)
+  --cxxopt=-std=c++20  it needs C++20 (std::source_location, std::convertible_to, requires), and the default is C++17
+  --host_cxxopt=-std=c++20  it needs C++20 (std::source_location, std::convertible_to, requires), and the default is C++17
+  --incompatible_autoload_externally=+@rules_cc  the yaml-cpp 0.8.0 it resolves has a BUILD.bazel calling native cc_library, which Bazel 9 removed; autoload it from rules_cc
+sockpp
+slinky
+unittest-cpp
+uncrustify
+urdfdom
+watchman
+  known-failing build  it resolves libaio 0.3.113.bcr.0, which the BCR yanked ("The tarball link for 0.3.113.bcr.0 is broken")
+wangle
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+  --cxxopt=-std=c++20  its dep folly needs C++20 (std::type_identity), and the default is C++17
+  --host_cxxopt=-std=c++20  its dep folly needs C++20 (std::type_identity), and the default is C++17
+zziplib
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+zip
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+zenoh-c
+  --deleted_packages=tests  a separate workspace (tests/MODULE.bazel, the BCR test module) whose rules_shell dep the root module doesn't declare
+zenoh-pico
+  --deleted_packages=tests  a separate workspace (tests/MODULE.bazel, the BCR test module) whose rules_shell dep the root module doesn't declare
+zchunk
+tree-sitter-c-bazel
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: src/BUILD calls native sh_binary without a load()
+  --incompatible_autoload_externally=+@rules_cc,+@rules_shell  autoload the cc and shell rules Bazel 9 removed from rules_cc and rules_shell

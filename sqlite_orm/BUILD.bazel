@@ -6,7 +6,7 @@ project(
     name = "sqlite_orm",
     targets = [
         "//...",
-        # a separate workspace (examples/MODULE.bazel) using sqlite_orm as a dependency
+        # examples/BUILD.bazel (the BCR example module, with its own examples/MODULE.bazel) lists srcs = ["examples/in_memory.cpp"], which resolves to examples/examples/in_memory.cpp, but the file is examples/in_memory.cpp ("missing input file")
         "-//examples/...",
     ],
 )
