@@ -6,7 +6,9 @@ project(
     name = "rules_buf",
     targets = [
         "//...",
-        # its script runs xargs on an empty buildifier path ("xargs: : No such file or directory")
-        "-//:buildifier_check",
+    ],
+    flags = [
+        # //:buildifier_check: its script resolves buildifier with readlink, which yields an empty path because RBE stages runfiles as regular files ("xargs: : No such file or directory"); run tests on the runner, where runfiles are symlinks
+        "--strategy=TestRunner=local",
     ],
 )

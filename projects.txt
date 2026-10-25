@@ -457,7 +457,7 @@ rules_batch
 # Chunk b-2: high reverse-dep modules (m-z).
 p4runtime
 sdformat
-  -//:buildifier.test  exits 1 in 0.1s with no output on the executors
+  -//:buildifier.test  buildifier wants the registry's MODULE.bazel (used in place of its own) reformatted: compatibility_level after version
 websocketpp
   override asio 1.34.2.bcr.1  the asio 1.28.2 it declares has a BUILD.bazel calling native cc_library, which Bazel 9 removed
   override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
@@ -469,7 +469,7 @@ openconfig_gnmi
   known-failing build  its own bazel/generate_cc.bzl fails to load under Bazel 9 (rule() got unexpected keyword argument 'incompatible_use_toolchain_transition'); its resolved rules_go and rules_foreign_cc use the removed native CcInfo
 rules_libusb
 rules_buf
-  -//:buildifier_check  its script runs xargs on an empty buildifier path ("xargs: : No such file or directory")
+  --strategy=TestRunner=local  //:buildifier_check: its script resolves buildifier with readlink, which yields an empty path because RBE stages runfiles as regular files ("xargs: : No such file or directory"); run tests on the runner, where runfiles are symlinks
 xkbcommon
   override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
 opengl-registry
@@ -549,3 +549,42 @@ boost.ptr_container
 boost.polygon
   -//test/...  its select() uses @platforms, which its MODULE.bazel doesn't declare
 boost.multi_array
+
+# Chunk b-3: more reverse-dep modules (m-z).
+maliput
+  --incompatible_autoload_externally=+@rules_cc  the yaml-cpp and eigen it resolves have BUILD files calling native cc_library, which Bazel 9 removed; autoload them from rules_cc
+openfst
+riegeli
+  known-failing build  open-ended under Bazel 9: python/BUILD calls native sh_binary; its resolved rules_foreign_cc, rules_go and highwayhash use removed natives; with those fixed, its TensorFlow ops need @local_config_tf and its xz dep's glob src/liblzma/*.h matches nothing
+node_addon_api
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+  --deleted_packages=test_module  (not an exclusion: //... fails on a broken package even when subtracted) test_module/BUILD.bazel loads @aspect_rules_js, which its MODULE.bazel doesn't declare
+  known-failing build  @rules_nodejs//nodejs/headers:current_node_cc_headers fails analysis: the node toolchain's nodeinfo.headers is None (also with rules_nodejs 6.7.7)
+tclap
+rules_zig
+swig
+  override pcre2 10.49  the resolved pcre2's BUILD.bazel calls a native rule Bazel 9 removed (line 70)
+z3
+yosys
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+prometheus-cpp
+  --deleted_packages=core/tests,pull/tests/integration,pull/tests/unit,push/tests/integration,push/tests/internal,util/tests/unit  (not an exclusion: //... fails on a broken package even when subtracted) they call native cc_test/sh_test, which Bazel 9 removed
+  override rules_foreign_cc 0.16.0  the resolved rules_foreign_cc uses the native CcInfo symbol, which Bazel 9 removed
+  --incompatible_autoload_externally=+@rules_cc  the civetweb and google_benchmark it resolves have BUILD files calling native cc_library, which Bazel 9 removed; autoload them from rules_cc
+rules_rust_bindgen
+tinyxml
+  known-failing build  its source archive (netcologne.dl.sourceforge.net/project/tinyxml/.../tinyxml_2_6_2.tar.gz) fails to download from RBE
+nanoflann
+pugixml
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+xds
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed (go/private/rules/cgo.bzl)
+  known-failing build  its protoc-gen-validate and grpc deps use the native JavaInfo and PyInfo symbols, which Bazel 9 removed
+rules_swift_package_manager
+  known-failing build  //:BUILD.bazel:201's _ci_workflow needs //examples, //release and //tools/generate_ci_workflow, which the release archive lacks; its Swift rules need a Swift toolchain anyway
+openexr
+rules_android_ndk
+pybind11_abseil
+  known-failing build  its own packages (pybind11_abseil, compat, cpp_capsule_tools, tests) call native cc_library/py_library/py_test, which Bazel 9 removed
+zlib-ng
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
