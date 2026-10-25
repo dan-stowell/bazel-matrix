@@ -391,3 +391,65 @@ libxrender
   override libx11 1.8.12.bcr.5  it uses @libx11//:libx11, which the libx11 it declares (1.8.12.bcr.3) doesn't define
 egl-registry
 download_utils
+
+# Chunk b-1: highest reverse-dep modules m-z.
+rules_rs
+rules_gazebo
+  override buildifier_prebuilt 10.1.0  the resolved buildifier_prebuilt loads @local_config_platform//:constraints.bzl, which Bazel 9 removed
+  -//:buildifier.test  buildifier's lint wants the single_version_override() bazel-matrix appends to its MODULE.bazel reformatted
+rules_autoconf
+rules_vhdl
+rules_verilog
+rules_venv
+  -//python/ruff/private/tests/generated_input:generated_inputs_ruff_test.check  ruff EXE002 "The file is executable but no shebang is present": the sources are 0644 in the release archive and in source.tar, but executable in the remote actions on the executors
+  -//python/ruff/private/tests/greeting:py_library_lint.check  ruff EXE002 "The file is executable but no shebang is present": the sources are 0644 in the release archive and in source.tar, but executable in the remote actions on the executors
+  -//python/ruff/private/tests/imports:fibonacci_import_test_lint.check  ruff EXE002 "The file is executable but no shebang is present": the sources are 0644 in the release archive and in source.tar, but executable in the remote actions on the executors
+  -//python/ruff/private/tests/imports:py_library_lint.check  ruff EXE002 "The file is executable but no shebang is present": the sources are 0644 in the release archive and in source.tar, but executable in the remote actions on the executors
+  -//python/ruff/private/tests/printer:py_binary_lint.check  ruff EXE002 "The file is executable but no shebang is present": the sources are 0644 in the release archive and in source.tar, but executable in the remote actions on the executors
+readline
+rules_coreutils
+  override hermetic_cc_toolchain 4.3.0  its dev dep hermetic_cc_toolchain 4.0.1 fails to load under Bazel 9: rule() provides gets None (a removed native provider)
+  -//hooks/...  its pre-commit pip hub needs a Python 3.10 toolchain that isn't registered ("Unable to find interpreter for pip hub 'pre-commit-3.10'")
+with_cfg.bzl
+  -//with_cfg/tests:default_frontend_exec_properties_test_subject  its genrule sets exec_properties pool=all: "No registered executors in pool \"all\"" on RBE
+  -//with_cfg/tests:default_frontend_exec_properties_test_subject_/default_frontend_exec_properties_test_subject  its genrule sets exec_properties pool=all: "No registered executors in pool \"all\"" on RBE
+rules_nasm
+toml.bzl
+  -//tools:preset.update_test  tools/preset.bazelrc is out of date for Bazel 9.3.1 (its Docs links name bazel@8.5.0)
+rules_erlang
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed
+  --deleted_packages=gazelle,gazelle/erl_attrs_to_json  (not an exclusion: //... fails on a broken package even when subtracted) gazelle/BUILD.bazel calls native sh_binary, which Bazel 9 removed; gazelle/erl_attrs_to_json globs src/**/*.hrl, which matches nothing
+  known-failing build  needs Erlang/OTP: validating @erlang_config's otp at /usr fails (exit 127), the images have no erl
+nasm
+ncurses
+swift_argument_parser
+  known-failing build  needs a Swift toolchain: rules_swift's local config has no //:linux-toolchain on the executors
+rules_webtesting
+  override rules_go 0.65.0  the resolved rules_go 0.51.0-rc1 uses the native CcInfo symbol, which Bazel 9 removed (go/private/rules/cgo.bzl)
+  -//go/webdriver:go_default_test_chrome-win10  web_test runner: "cannot find @bazel_tools//tools/bash/runfiles:runfiles.bash" (Bazel 9 dropped it)
+  -//go/webdriver:go_default_test_chrome-win10-connect  web_test runner: "cannot find @bazel_tools//tools/bash/runfiles:runfiles.bash" (Bazel 9 dropped it)
+  -//go/webdriver:go_default_test_chromium-local  web_test runner: "cannot find @bazel_tools//tools/bash/runfiles:runfiles.bash" (Bazel 9 dropped it)
+  -//go/webdriver:go_default_test_firefox-local  web_test runner: "cannot find @bazel_tools//tools/bash/runfiles:runfiles.bash" (Bazel 9 dropped it)
+  -//go/webtest:go_default_test_chrome-win10  web_test runner: "cannot find @bazel_tools//tools/bash/runfiles:runfiles.bash" (Bazel 9 dropped it)
+  -//go/webtest:go_default_test_chrome-win10-connect  web_test runner: "cannot find @bazel_tools//tools/bash/runfiles:runfiles.bash" (Bazel 9 dropped it)
+  -//go/webtest:go_default_test_chromium-local  web_test runner: "cannot find @bazel_tools//tools/bash/runfiles:runfiles.bash" (Bazel 9 dropped it)
+  -//go/webtest:go_default_test_firefox-local  web_test runner: "cannot find @bazel_tools//tools/bash/runfiles:runfiles.bash" (Bazel 9 dropped it)
+  -//go/wtl/proxy:go_default_test_chrome-win10  web_test runner: "cannot find @bazel_tools//tools/bash/runfiles:runfiles.bash" (Bazel 9 dropped it)
+  -//go/wtl/proxy:go_default_test_chrome-win10-connect  web_test runner: "cannot find @bazel_tools//tools/bash/runfiles:runfiles.bash" (Bazel 9 dropped it)
+  -//go/wtl/proxy:go_default_test_chromium-local  web_test runner: "cannot find @bazel_tools//tools/bash/runfiles:runfiles.bash" (Bazel 9 dropped it)
+  -//go/wtl/proxy:go_default_test_firefox-local  web_test runner: "cannot find @bazel_tools//tools/bash/runfiles:runfiles.bash" (Bazel 9 dropped it)
+  -//go/wtl/proxy/driverhub/quithandler:go_default_test_chrome-win10  web_test runner: "cannot find @bazel_tools//tools/bash/runfiles:runfiles.bash" (Bazel 9 dropped it)
+  -//go/wtl/proxy/driverhub/quithandler:go_default_test_chrome-win10-connect  web_test runner: "cannot find @bazel_tools//tools/bash/runfiles:runfiles.bash" (Bazel 9 dropped it)
+  -//go/wtl/proxy/driverhub/quithandler:go_default_test_chromium-local  web_test runner: "cannot find @bazel_tools//tools/bash/runfiles:runfiles.bash" (Bazel 9 dropped it)
+  -//go/wtl/proxy/driverhub/quithandler:go_default_test_firefox-local  web_test runner: "cannot find @bazel_tools//tools/bash/runfiles:runfiles.bash" (Bazel 9 dropped it)
+  -//go/wtl/proxy/driverhub/scripttimeout:go_default_test_chrome-win10  web_test runner: "cannot find @bazel_tools//tools/bash/runfiles:runfiles.bash" (Bazel 9 dropped it)
+  -//go/wtl/proxy/driverhub/scripttimeout:go_default_test_chrome-win10-connect  web_test runner: "cannot find @bazel_tools//tools/bash/runfiles:runfiles.bash" (Bazel 9 dropped it)
+  -//go/wtl/proxy/driverhub/scripttimeout:go_default_test_chromium-local  web_test runner: "cannot find @bazel_tools//tools/bash/runfiles:runfiles.bash" (Bazel 9 dropped it)
+  -//go/wtl/proxy/driverhub/scripttimeout:go_default_test_firefox-local  web_test runner: "cannot find @bazel_tools//tools/bash/runfiles:runfiles.bash" (Bazel 9 dropped it)
+xorgproto
+m4
+rules_cuda
+  -//tests/flag:cuda_library_no_sysroot_flag_test  @rules_cuda_examples//basic:kernel finds no C++ toolchain in the test's configuration
+  -//tests/flag:cuda_library_sysroot_from_copt_flag_test  @rules_cuda_examples//basic:kernel finds no C++ toolchain in the test's configuration
+  -//tests/flag:cuda_library_sysroot_flag_test  @rules_cuda_examples//basic:kernel finds no C++ toolchain in the test's configuration
+rules_batch
