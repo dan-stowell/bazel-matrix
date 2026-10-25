@@ -120,3 +120,55 @@ libffi
 highway
   override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
   -//:topology_test  aborts on the executors: topology.cc:590 "Assert lp <= max_lp" (3 logical CPUs on a 128-core EPYC host)
+
+# Chunk 3: rulesets and libraries.
+rules_flex
+rules_bison
+  --incompatible_autoload_externally=+@rules_cc  its dev deps (googletest 1.11) call native cc_library/cc_test, which Bazel 9 removed; autoload them from rules_cc
+rules_m4
+  --incompatible_autoload_externally=+@rules_cc  its dev deps (googletest 1.11) call native cc_library/cc_test, which Bazel 9 removed; autoload them from rules_cc
+rules_foreign_cc
+rules_kotlin
+  --noincompatible_disallow_empty_glob  the root BUILD.bazel globs *.tgz, which the release archive lacks
+rules_nodejs
+rules_perl
+rules_proto_grpc
+  -//tools/fixer/...  clippy (enabled by its .bazelrc) fails on //tools/fixer:fixer
+rules_rust
+  -//cargo/private/cargo_toml_variable_extractor/testdata/...  its genrules run cargo, whose rustc panics linking (link.rs: unwrap on None)
+rules_scala
+  --lockfile_mode=off  its MODULE.bazel.lock has a version Bazel 9 can't read
+  -//test/...  tests take //:.bazelversion as data, which the release archive lacks
+  -//manual_test/...  tests take //:.bazelversion as data, which the release archive lacks
+  -//test_thirdparty_version/...  tests take //:.bazelversion as data, which the release archive lacks
+rules_swift
+  -//test/...  test/fixtures/module_interface (used across //test) needs swiftc, which can't load libswiftCore.so on the executors
+rules_testing
+onetbb
+mbedtls
+pcre2
+rapidjson
+  --incompatible_autoload_externally=+@rules_cc  its dev deps (an old googletest) call native cc_library/cc_test, which Bazel 9 removed; autoload them from rules_cc
+snappy
+  -//:snappy-test  snappy-test.h: '::gettimeofday' has not been declared
+  -//:snappy_benchmark  needs //:snappy-test (above)
+  -//:snappy_unittest  needs //:snappy-test (above)
+xz
+  -//:ossfuzz  needs -fsanitize=fuzzer (clang); the executors' gcc rejects it
+yaml-cpp
+flatbuffers
+  -//swift/...  no Swift toolchain on Linux here
+  --incompatible_autoload_externally=+@rules_cc  its dev deps (an old re2, via grpc) call native cc_library/cc_test, which Bazel 9 removed; autoload them from rules_cc
+  -//reflection/ts/...  flatc's TypeScript genrules exit 1 after warning that --ts-flat-files is deprecated
+  -//tests/ts/...  flatc's TypeScript genrules exit 1 after warning that --ts-flat-files is deprecated
+  -//tests:monster_test_grpc  tests/monster_test.grpc.fb.h doesn't compile against the resolved grpc: MonsterStorage::CallbackService 'does not name a class'
+  -//tests:test_builder  needs //tests:monster_test_grpc (above)
+  -//grpc/tests/...  tests/monster_test.grpc.fb.h doesn't compile against the resolved grpc: MonsterStorage::CallbackService 'does not name a class'
+apple_support
+  known-failing build  needs macOS: //toolchain:xcode_env fails analysis without Xcode
+rules_android
+  known-failing build  needs an Android SDK: @androidsdk//:core-for-system-modules-jar is undeclared without one
+rules_java
+  known-failing build  its MODULE.bazel patches protobuf with //third_party:protobuf_load-cc-rules.patch, but the release archive has no third_party package
+toolchain_utils
+  known-failing build  fetching https://cosmo.zip/pub/cosmos/v/4.0.2/bin/ape-x86_64.elf times out (Connect timed out) from RBE
