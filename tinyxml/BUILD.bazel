@@ -7,6 +7,4 @@ project(
     targets = [
         "//...",
     ],
-    # its source archive (netcologne.dl.sourceforge.net/project/tinyxml/.../tinyxml_2_6_2.tar.gz) fails to download from RBE
-    known_failing = "build",
 )
