@@ -6,7 +6,7 @@ project(
     name = "gason",
     targets = [
         "//...",
-        # with the registry's zero-context diff.patch applied, src/benchmark.cpp doesn't compile ("'COMPILER' was not declared in this scope" at 234:79)
+        # src/benchmark.cpp doesn't compile ("'COMPILER' was not declared in this scope" at 234:79): the registry's diff.patch adds the _MSC_VER/#else COMPILER branches in a zero-context hunk (@@ -213,0 +214,4 @@); GNU patch applies it correctly, but the file Bazel's patch produces leaves gcc without a COMPILER define
         "-//:benchmark",
         # a test_suite of //:benchmark (excluded above) and //:test-suite, which //... still runs
         "-//:all_tests",
