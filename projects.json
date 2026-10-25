@@ -2241,6 +2241,236 @@
           "integrity": "sha256-FU8VLKtM2J0ZPAMrRV+Ndp2JHEZ/Hn6DQe77vN2Ydbo="
         }
       }
+    },
+    {
+      "name": "package_metadata",
+      "version": "0.0.13",
+      "source": {
+        "urls": [
+          "https://github.com/bazel-contrib/supply-chain/releases/download/package_metadata-0.0.13/package_metadata-0.0.13.tar.gz"
+        ],
+        "integrity": "sha256-dVvWyKN1GYLiVV2WyRPsBwlUyp0B+TVWM5IlXaTrrXI=",
+        "strip_prefix": "package_metadata-0.0.13/metadata",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/package_metadata/0.0.13/MODULE.bazel",
+          "integrity": "sha256-qcx+gWQMHn6spaRlzfS2PIjUFsqZj83tNoAYGxYC7uI="
+        }
+      }
+    },
+    {
+      "name": "tinyxml2",
+      "version": "11.0.0",
+      "source": {
+        "urls": [
+          "https://github.com/leethomason/tinyxml2/archive/refs/tags/11.0.0.tar.gz"
+        ],
+        "integrity": "sha256-VVbetQgfskbukq+uc+/ZQ8iJzvDK/qkrC4JCLWoY8ok=",
+        "strip_prefix": "tinyxml2-11.0.0",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/tinyxml2/11.0.0/patches/xmltest-runfiles.patch",
+            "integrity": "sha256-j4voQvZ4YB6dzsjpCInbTbN4xgNSnDJcrdV9/U4MeyA="
+          }
+        ],
+        "patch_strip": 0,
+        "overlay": [
+          {
+            "path": "BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/tinyxml2/11.0.0/overlay/BUILD.bazel",
+            "integrity": "sha256-2WDMlYx4Lmq6QK3BqXtdYcJ1OOfqyry2CXKDj/ILWjk="
+          }
+        ],
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/tinyxml2/11.0.0/MODULE.bazel",
+          "integrity": "sha256-cPKx1XJCjQu6kIRVvA+D/JPr2kA39e1ByNlyZ4pM9qA="
+        }
+      }
+    },
+    {
+      "name": "aspect_rules_js",
+      "version": "3.5.2",
+      "source": {
+        "urls": [
+          "https://github.com/aspect-build/rules_js/releases/download/v3.5.2/rules_js-v3.5.2.tar.gz"
+        ],
+        "integrity": "sha256-3/UJA60zvgIbx8KK8CVwFVx9kD1J8ZsdMz5V3/wPZY0=",
+        "strip_prefix": "rules_js-3.5.2",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/aspect_rules_js/3.5.2/patches/module_dot_bazel_version.patch",
+            "integrity": "sha256-DuAVCVv77nTp7rRzReqG2ssew8zBf0i0w8GTD2eaNoY="
+          }
+        ],
+        "patch_strip": 1,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/aspect_rules_js/3.5.2/MODULE.bazel",
+          "integrity": "sha256-no5MwlshpRz5M2qnvRoNjBxrUIufCuZj1hesQiPrzbk="
+        }
+      }
+    },
+    {
+      "name": "aspect_rules_py",
+      "version": "1.13.0",
+      "source": {
+        "urls": [
+          "https://github.com/aspect-build/rules_py/releases/download/v1.13.0/rules_py-v1.13.0.tar.gz"
+        ],
+        "integrity": "sha256-NvL1UI0/co/oTbWIVFe7E6919z+hZ1xsSY17j4V5arM=",
+        "strip_prefix": "rules_py-1.13.0",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/aspect_rules_py/1.13.0/patches/remove_dev_deps.patch",
+            "integrity": "sha256-AFv2do7wclZPkLPFLjsMDkG4eP0PGR6vrRYeDkW+IkU="
+          },
+          {
+            "url": "https://bcr.bazel.build/modules/aspect_rules_py/1.13.0/patches/module_dot_bazel_version.patch",
+            "integrity": "sha256-RwZodzO6a5Bm/HlPColts7E+SZRZHkKs5R0hr8O4kW0="
+          }
+        ],
+        "patch_strip": 1,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/aspect_rules_py/1.13.0/MODULE.bazel",
+          "integrity": "sha256-WdyuGYFU2P6LUl+ZNOwBbbUGxTVAXYJu1mGol9MDJG0="
+        }
+      }
+    },
+    {
+      "name": "gazelle",
+      "version": "0.54.0",
+      "source": {
+        "urls": [
+          "https://github.com/bazel-contrib/bazel-gazelle/releases/download/v0.54.0/bazel-gazelle-v0.54.0.tar.gz"
+        ],
+        "integrity": "sha256-na6HwD6gaymQuINiVpCaGDZ+GR+IXVux0DDouoBJG0I=",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/gazelle/0.54.0/patches/module_dot_bazel_version.patch",
+            "integrity": "sha256-apPTVboP+UR4StMT5Fp4GDIKTQALirvGufdhJSth7tk="
+          }
+        ],
+        "patch_strip": 1,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/gazelle/0.54.0/MODULE.bazel",
+          "integrity": "sha256-EGICh731fFXCMh7Vo4et4Rxxh6ukRP3sWDyfIcMmP0U="
+        }
+      }
+    },
+    {
+      "name": "rules_cc",
+      "version": "0.2.27",
+      "source": {
+        "urls": [
+          "https://github.com/bazelbuild/rules_cc/releases/download/0.2.27/rules_cc-0.2.27.tar.gz"
+        ],
+        "integrity": "sha256-a88bRtnmKcvkyW17/Fb2EDTCGTt7FgASASgupQvvXZE=",
+        "strip_prefix": "rules_cc-0.2.27",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/rules_cc/0.2.27/patches/module_dot_bazel_version.patch",
+            "integrity": "sha256-LA0Br9nwHaYMbhVRBrMGtD3+yiK7sLY2Cz+j53yFVoU="
+          }
+        ],
+        "patch_strip": 1,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/rules_cc/0.2.27/MODULE.bazel",
+          "integrity": "sha256-mUg2me66PsEVnpONckE0di50jo3BbdDYy8w9AaPRlEA="
+        }
+      }
+    },
+    {
+      "name": "rules_cc_autoconf",
+      "version": "0.32.0",
+      "source": {
+        "urls": [
+          "https://github.com/periareon/rules_cc_autoconf/releases/download/0.32.0/rules_cc_autoconf-0.32.0.tar.gz"
+        ],
+        "integrity": "sha256-+1cNJlNWrpFRObTYrWyN3FK2ewJvMRlBNwxvG1oknN0=",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/rules_cc_autoconf/0.32.0/MODULE.bazel",
+          "integrity": "sha256-wdyFOjEde850ecAAQd2IjA6D9ENRI//sB2uuf9OZ40I="
+        }
+      }
+    },
+    {
+      "name": "rules_multitool",
+      "version": "1.11.1",
+      "source": {
+        "urls": [
+          "https://github.com/bazel-contrib/rules_multitool/releases/download/v1.11.1/rules_multitool-1.11.1.tar.gz"
+        ],
+        "integrity": "sha256-bQ2fsjHrRQ/7Os7IeaJQ6d6mnHrPyU8TjVMQOqUSPwg=",
+        "strip_prefix": "rules_multitool-1.11.1",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/rules_multitool/1.11.1/MODULE.bazel",
+          "integrity": "sha256-+CbS05To2WTkTrtKdevP5OnNTrFQ4t3NYDmP/rk5aWo="
+        }
+      }
+    },
+    {
+      "name": "rules_python",
+      "version": "2.4.5",
+      "source": {
+        "urls": [
+          "https://github.com/bazel-contrib/rules_python/releases/download/2.4.5/rules_python-2.4.5.tar.gz"
+        ],
+        "integrity": "sha256-BQiEAvo1avCXBk28zXCCoGEXHvOfvXSPq5Rul3X0ahY=",
+        "strip_prefix": "rules_python-2.4.5",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/rules_python/2.4.5/patches/module_dot_bazel_version.patch",
+            "integrity": "sha256-QX+R0y8/Ngj8Z+TgH5Vz/GoQaCnVQ9t6Ou9/nz+R3yM="
+          }
+        ],
+        "patch_strip": 1,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/rules_python/2.4.5/MODULE.bazel",
+          "integrity": "sha256-WgcHlXFMcNmEHCwZiX69EXfUbXSWEZNCVSHaAGlC0yE="
+        }
+      }
+    },
+    {
+      "name": "tar.bzl",
+      "version": "0.10.9",
+      "source": {
+        "urls": [
+          "https://github.com/bazel-contrib/tar.bzl/releases/download/v0.10.9/tar.bzl-v0.10.9.tar.gz"
+        ],
+        "integrity": "sha256-ijt4EgUQli/HS1d6qvUkElN8+8JciKWWo3W9QJ5muYo=",
+        "strip_prefix": "tar.bzl-0.10.9",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/tar.bzl/0.10.9/patches/module_dot_bazel_version.patch",
+            "integrity": "sha256-3WpGuYWnIGlvEE6NN4ekBWAC1deN10wu6DGpPsQDWwQ="
+          }
+        ],
+        "patch_strip": 1,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/tar.bzl/0.10.9/MODULE.bazel",
+          "integrity": "sha256-Rjb19qfDTT0GU2NO2Vo0VgQm1UjFMBxsWSTIhe9ze0Y="
+        }
+      }
+    },
+    {
+      "name": "toolchains_llvm",
+      "version": "1.12.0",
+      "source": {
+        "urls": [
+          "https://github.com/bazel-contrib/toolchains_llvm/releases/download/v1.12.0/toolchains_llvm-v1.12.0.tar.gz"
+        ],
+        "integrity": "sha256-enLv0I0RRB8nB1s/JrBPlQbks8CQVYYcT1kyyuZ3DEU=",
+        "strip_prefix": "toolchains_llvm-v1.12.0",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/toolchains_llvm/1.12.0/patches/module_dot_bazel_version.patch",
+            "integrity": "sha256-zQLF9OPJJeo7GAs+obYiyq67zCMyOj1eUTkwuqhk5Cw="
+          }
+        ],
+        "patch_strip": 1,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/toolchains_llvm/1.12.0/MODULE.bazel",
+          "integrity": "sha256-IpwvOtMtdvae8eg7sbrICYSJODbyeeZE12mPrzBcarc="
+        }
+      }
     }
   ],
   "skipped": []
