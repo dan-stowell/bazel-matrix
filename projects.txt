@@ -2624,3 +2624,68 @@ rules_browsers
   override aspect_bazel_lib 2.22.5  the resolved aspect_bazel_lib's toolchain repos call rule(incompatible_use_toolchain_transition=...), which Bazel 9 removed
 rules_bsx
 rules_build_error
+
+# Chunk i-1: BCR modules (rules_m-rules_proto_grpc).
+rules_mayhem
+  -//examples:factor_mayhemfile  `mayhem init` fails here ("Could not generate a valid mayhemfile from docker image"); presumably it needs Docker, which the executors lack (unconfirmed)
+  -//examples:base64_mayhemfile  `mayhem init` fails here ("Could not generate a valid mayhemfile from docker image"); presumably it needs Docker, which the executors lack (unconfirmed)
+  -//examples:lighttpd_mayhemfile  `mayhem init` fails here ("Could not generate a valid mayhemfile from docker image"); presumably it needs Docker, which the executors lack (unconfirmed)
+  -//examples:run_factor  needs //examples:factor_mayhemfile (above)
+  -//examples:run_base64  needs //examples:base64_mayhemfile (above)
+  -//examples:run_lighttpd  its BUILD sets wait = True without duration, which mayhem_run rejects at analysis ("The 'wait' attribute requires the 'duration' attribute to be set")
+  -//examples:download_mayhemit  `mayhem download` needs a login to a Mayhem server ("This command requires logging in to a Mayhem server")
+  -//examples:validate_factor  needs //examples:factor_mayhemfile (above)
+  -//examples:validate_base64  needs //examples:base64_mayhemfile (above)
+  -//examples:validate_lighttpd  needs //examples:lighttpd_mayhemfile (above)
+rules_mise
+rules_ml_toolchain
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its BUILD files call native cc_*/py_* rules and its .bzl files use the native CcInfo and CcToolchainConfigInfo
+  --incompatible_autoload_externally=+@rules_cc,+@rules_python  autoload the cc and python rules and providers Bazel 9 removed
+  known-failing build  with those autoloads, 70 targets still fail: its CUDA, SYCL, darwin and aarch64 toolchain packages need repos that are empty or undeclared here ("glob pattern 'bin/**' didn't match anything" in @cuda_nvcc, "unknown repo 'oneapi'"), and //cc/config:empty fails analysis ("type 'NoneType' has no operator [](Provider)" on ctx.attr.toolchain_import)
+rules_mojo
+rules_nccl
+  known-failing build  needs a local NCCL install, which the images lack: without one, nccl/private/repositories.bzl symlinks //nccl:templates/BUILD.local_nccl_disabled as @local_nccl's BUILD, but that file is at nccl/private/templates/, so @local_nccl has no BUILD file ("no such package '@@+nccl_dependencie+local_nccl//'") and every target depends on it
+rules_nixpkgs_nodejs
+  known-failing build  its .bazelrc does 'import %workspace%/../../.bazelrc.remote-cache', a file in the rules_nixpkgs monorepo that the module's archive (toolchains/nodejs only) doesn't contain
+rules_node_addon
+  --deleted_packages=examples/full,examples/node_version_pin  separate workspaces (each has its own MODULE.bazel); examples/full loads @aspect_rules_ts, which the root MODULE.bazel doesn't declare
+rules_nu
+rules_ocx
+  -//ocx/tests:dev_tools_test  its shellcheck wrapper execs a binary that the ocx repo rule installed under the inner Bazel's $HOME on the runner (/var/tmp/.../home/.ocx/...), which doesn't exist on the remote executor ("No such file or directory")
+rules_odin
+rules_omniverse
+  --extra_execution_platforms=//tests:fake_gpu_platform  its .bazelrc registers this fake GPU execution platform for `test` only, so `build` finds no execution platform for the gpu targets ("Unable to find an execution platform ... from available execution platforms []")
+  -//tests:nvidia_usd_adapter_cli_test  runs tools/*_adapter.py with `#!/usr/bin/env python3`; the executors' system python3 is older than 3.9, so its list[str] annotations fail ("TypeError: 'type' object is not subscriptable")
+rules_openscad
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its BUILD calls native py_binary and scad.bzl uses the native PyInfo and PyRuntimeInfo
+  --incompatible_autoload_externally=+@rules_python  autoload the python rules and providers Bazel 9 removed
+  -//test_models:cylinder_section_obj  runs openscad, which the executor image lacks (exit 127)
+  -//test_models:hardware_obj  runs openscad, which the executor image lacks (exit 127)
+  -//test_models:hollow_cylinder_obj  runs openscad, which the executor image lacks (exit 127)
+  -//test_models:cylinder_section_test  scad_test hands rules_python's py_binary only its files and transitive sources, not its runfiles, so the binary's _scad_unittest_stage2_bootstrap.py is missing ("Cannot exec() ... file not found")
+  -//test_models:hardware_test  same missing _scad_unittest_stage2_bootstrap.py as cylinder_section_test
+  -//test_models:hollow_cylinder_test  same missing _scad_unittest_stage2_bootstrap.py as cylinder_section_test
+rules_pact
+  -//:docs_diff_test  the stardoc-generated docs.md differs from the checked-in README.md ("files ... differ"); the cause of the drift (Bazel 9, stardoc version) is unconfirmed
+rules_patchelf
+  override hermetic_cc_toolchain 4.3.0  the resolved hermetic_cc_toolchain's toolchain/zig_toolchain.bzl does rule(provides = [CcToolchainConfigInfo]) with the native CcToolchainConfigInfo, which is None under Bazel 9 ("at index 0 of provides, got element of type NoneType, want Provider")
+  --incompatible_autoload_externally=+@rules_cc  the patchelf module's BUILD.bazel calls native cc_binary, which Bazel 9 removed; autoload it
+  -//hooks/...  its pre-commit pip hub asks for a Python 3.10 interpreter that no python.toolchain() registers ("Unable to find interpreter for pip hub 'pre-commit-3.10'")
+rules_periphery
+rules_pkg_providers
+rules_platform
+rules_pmd
+rules_powershell
+rules_prefect
+rules_probe_rs
+  override rules_go 0.65.0  the resolved rules_go's go/private/rules/cgo.bzl uses the native CcInfo symbol, which Bazel 9 removed
+  override aspect_bazel_lib 2.22.5  the resolved aspect_bazel_lib's toolchain repos call rule(incompatible_use_toolchain_transition=...), which Bazel 9 removed
+  -//docs:update_test  the stardoc-generated docs/rules-docgen.md differs from the checked-in docs/rules.md ("files ... differ"); the cause of the drift is unconfirmed
+rules_proto_grpc_buf
+rules_proto_grpc_c
+  known-failing build  its only target, //:proto_plugin, uses @protobuf//upb_generator:protoc-gen-upb, which the protobuf it resolves (33.4; it asks for 27.1) no longer has ("target 'protoc-gen-upb' not declared in package 'upb_generator'")
+rules_proto_grpc_csharp
+  --incompatible_autoload_externally=+@rules_cc,+@com_google_protobuf  the grpc it resolves has BUILD files calling native cc and proto rules, which Bazel 9 removed; autoload them
+  override rules_foreign_cc 0.16.0  the resolved rules_foreign_cc (0.10.1) calls rule(incompatible_use_toolchain_transition=...), which Bazel 9 removed
+  override rules_dotnet 0.22.2  the resolved rules_dotnet's dotnet/private/resolved_toolchain.bzl calls rule(incompatible_use_toolchain_transition=...), which Bazel 9 removed
+rules_proto_grpc_doc
