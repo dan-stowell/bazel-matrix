@@ -6,10 +6,44 @@ project(
     name = "naja",
     targets = [
         "//...",
-        # its test packages use @googletest, which its MODULE.bazel doesn't declare
-        "-//test/...",
-        # //bench:snl_bench uses @google_benchmark, which its MODULE.bazel doesn't declare
-        "-//bench/...",
+        # uses @googletest, which its MODULE.bazel doesn't declare
+        "-//test/bne:bneTests",
+        # uses @googletest, which its MODULE.bazel doesn't declare
+        "-//test/core:najaCoreTests",
+        # uses @googletest, which its MODULE.bazel doesn't declare
+        "-//test/dnl:dnlTests",
+        # uses @googletest, which its MODULE.bazel doesn't declare
+        "-//test/logic_opt:constantPropagationTests",
+        # uses @googletest, which its MODULE.bazel doesn't declare
+        "-//test/logic_opt:loadlessLogicRemoverTests",
+        # uses @googletest, which its MODULE.bazel doesn't declare
+        "-//test/metrics:najaMetricsTests",
+        # uses @googletest, which its MODULE.bazel doesn't declare
+        "-//test/nl/formats/hdl:snlRTLPrimitivesTests",
+        # uses @googletest, which its MODULE.bazel doesn't declare
+        "-//test/nl/formats/liberty:snl_liberty_tests",
+        # uses @googletest, which its MODULE.bazel doesn't declare
+        "-//test/nl/formats/systemverilog/frontend:snlSVConstructorTests",
+        # uses @googletest, which its MODULE.bazel doesn't declare
+        "-//test/nl/formats/verilog/backend:snlVRLDumperTests",
+        # uses @googletest, which its MODULE.bazel doesn't declare
+        "-//test/nl/formats/verilog/frontend:snlVRLConstructorTests",
+        # uses @googletest, which its MODULE.bazel doesn't declare
+        "-//test/nl/netlists:snlNetlistTests",
+        # uses @googletest, which its MODULE.bazel doesn't declare
+        "-//test/nl/pnl:pnlTests",
+        # uses @googletest, which its MODULE.bazel doesn't declare
+        "-//test/nl/python/naja_wrapping:najaPythonPropertyTests",
+        # uses @googletest, which its MODULE.bazel doesn't declare
+        "-//test/nl/snl/decorators:snlDecoratorsTests",
+        # uses @googletest, which its MODULE.bazel doesn't declare
+        "-//test/nl/snl/kernel:snlTests",
+        # uses @googletest, which its MODULE.bazel doesn't declare
+        "-//test/nl/snl/serialization/capnp:snlCapnPTests",
+        # uses @googletest, which its MODULE.bazel doesn't declare
+        "-//test/nl/visual:snl_visual_tests",
+        # uses @google_benchmark, which its MODULE.bazel doesn't declare
+        "-//bench:snl_bench",
     ],
     flags = [
         # its .bazelrc overrides naja-if and naja-verilog with the thirdparty/ git submodules, which the archive has empty ("No MODULE.bazel ... found in external/naja-verilog+"); its registered config uses the registry modules

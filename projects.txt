@@ -2231,7 +2231,7 @@ maliput_sparse
 malloc_guard
 marchingcubecpp
 masorange_rules_helm
-  -//helm/tests/helm_chart:chart_a_stamp_test_values_test_diff_diff  its stamp test expects the values of its stamp.sh, which its .bazelrc passes only under test:ci ($GITHUB_WORKSPACE/stamp.sh); --workspace_status_command=./stamp.sh exits 127 here (cause not identified)
+  --workspace_status_command=$PWD/stamp.sh  its stamp test expects the values its stamp.sh prints, which its .bazelrc passes only under test:ci (as $GITHUB_WORKSPACE/stamp.sh); Bazel runs the command with bash -c in the workspace, so $PWD finds it
 mboworks_bashtest
 mboworks_bzl
 mboworks_mbo
@@ -2250,8 +2250,25 @@ mvfst
   override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
   --cxxopt=-std=c++20  the folly it resolves uses consteval, and the toolchain default is -std=c++17 ("'consteval' does not name a type")
 naja
-  -//test/...  its test packages use @googletest, which its MODULE.bazel doesn't declare
-  -//bench/...  //bench:snl_bench uses @google_benchmark, which its MODULE.bazel doesn't declare
+  -//test/bne:bneTests  uses @googletest, which its MODULE.bazel doesn't declare
+  -//test/core:najaCoreTests  uses @googletest, which its MODULE.bazel doesn't declare
+  -//test/dnl:dnlTests  uses @googletest, which its MODULE.bazel doesn't declare
+  -//test/logic_opt:constantPropagationTests  uses @googletest, which its MODULE.bazel doesn't declare
+  -//test/logic_opt:loadlessLogicRemoverTests  uses @googletest, which its MODULE.bazel doesn't declare
+  -//test/metrics:najaMetricsTests  uses @googletest, which its MODULE.bazel doesn't declare
+  -//test/nl/formats/hdl:snlRTLPrimitivesTests  uses @googletest, which its MODULE.bazel doesn't declare
+  -//test/nl/formats/liberty:snl_liberty_tests  uses @googletest, which its MODULE.bazel doesn't declare
+  -//test/nl/formats/systemverilog/frontend:snlSVConstructorTests  uses @googletest, which its MODULE.bazel doesn't declare
+  -//test/nl/formats/verilog/backend:snlVRLDumperTests  uses @googletest, which its MODULE.bazel doesn't declare
+  -//test/nl/formats/verilog/frontend:snlVRLConstructorTests  uses @googletest, which its MODULE.bazel doesn't declare
+  -//test/nl/netlists:snlNetlistTests  uses @googletest, which its MODULE.bazel doesn't declare
+  -//test/nl/pnl:pnlTests  uses @googletest, which its MODULE.bazel doesn't declare
+  -//test/nl/python/naja_wrapping:najaPythonPropertyTests  uses @googletest, which its MODULE.bazel doesn't declare
+  -//test/nl/snl/decorators:snlDecoratorsTests  uses @googletest, which its MODULE.bazel doesn't declare
+  -//test/nl/snl/kernel:snlTests  uses @googletest, which its MODULE.bazel doesn't declare
+  -//test/nl/snl/serialization/capnp:snlCapnPTests  uses @googletest, which its MODULE.bazel doesn't declare
+  -//test/nl/visual:snl_visual_tests  uses @googletest, which its MODULE.bazel doesn't declare
+  -//bench:snl_bench  uses @google_benchmark, which its MODULE.bazel doesn't declare
   --config=registered  its .bazelrc overrides naja-if and naja-verilog with the thirdparty/ git submodules, which the archive has empty ("No MODULE.bazel ... found in external/naja-verilog+"); its registered config uses the registry modules
 naja-if
 naja-verilog
@@ -2483,3 +2500,62 @@ foxglove_ws_protocol
 fremtind_rules_vitest
   known-failing build  its .bazelrc imports .aspect/bazelrc/performance.bazelrc, which sets --incompatible_remote_results_ignore_disk, which Bazel 9 no longer recognizes ("Unrecognized option")
 fshlib
+
+# Chunk h-2: BCR modules (o-p).
+ofiuco
+  -//lib/private:zipper_test  its test_directory case fails on the executors: the zipped file list has repeated __init__.py and _bazel_site_init.py entries that the directory listing doesn't (cause not identified)
+  --deleted_packages=examples,examples/transitions,examples/transitions/constraint,examples/transitions/toolchains,examples/transitions/toolchains/args,examples/transitions/toolchains/clang,examples/transitions/toolchains/clang/args,examples/transitions/toolchains/clang/tools,examples/transitions/toolchains/gcc,examples/transitions/toolchains/gcc/args,examples/transitions/toolchains/gcc/tools,examples/wheel  (not an exclusion: //... fails on a broken package even when subtracted) examples/transitions and examples/wheel are separate workspaces (own MODULE.bazel; they use @poetry, @gcc-linux-x86_64, @linux_sysroot), and examples/BUILD.bazel's integration tests glob example dirs (airflow, ...) that the release archive lacks ("glob pattern 'airflow/**/*' didn't match anything")
+ogre-next
+  -//:ogre-main-macos  macOS-only sources (Objective-C++ under OgreMain/src/OSX) without target_compatible_with; gcc here can't compile them ("cannot execute 'cc1objplus'")
+  -//:RenderSystem_GL3Plus_macos  macOS-only Cocoa sources without target_compatible_with; gcc here can't compile them ("cannot execute 'cc1objplus'")
+onnxruntime_prebuilt
+openapi_tools_generator_bazel
+  known-failing build  its only target, //internal/test/bcr:pylib, needs @openapi_tools_generator_bazel_cli, which its openapi_gen extension creates only for an openapi_gen.client() tag, and no module in the graph has one ("does not generate repository \"openapi_tools_generator_bazel_cli\"")
+opencl-sdk
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+openconfig_attestz
+openconfig_bootz
+  known-failing build  the openconfig_gnsi it resolves (needed by //proto:bootz_proto) has a bazel/generate_cc.bzl that fails to load under Bazel 9 (attr.label(providers = ...) at line 195: "at index 0 of providers, got element of type string, want sequence")
+openconfig_gnoi
+  known-failing build  the openconfig_gnsi it resolves (via openconfig_bootz) has a bazel/generate_cc.bzl that fails to load under Bazel 9 (attr.label(providers = ...) at line 195: "at index 0 of providers, got element of type string, want sequence")
+openconfig_gnpsi
+  --incompatible_autoload_externally=+@rules_cc  the grpc and glog it resolves have BUILD files calling native cc_library, which Bazel 9 removed; autoload them from rules_cc
+openconfig_gnsi
+  known-failing build  the openconfig_gnmi it resolves (needed by //pathz) has a bazel/generate_cc.bzl that fails to load under Bazel 9 (attr.label(providers = ...) at line 195: "at index 0 of providers, got element of type string, want sequence")
+openconfig_goyang
+  -//pkg/yang:yang_test  TestScanForPathsAndAddModules reads ../../testdata (the root testdata/), but the overlay's data is only pkg/yang/testdata ("lstat ../../testdata: no such file or directory")
+openfhe
+openfpgaloader
+opengrm
+  --per_file_copt=opengrm/string/string-view-fst_test.cc@-fpermissive  gcc 11 rejects string-view-fst.h's static constexpr TokenType() members ("changes meaning of 'TokenType' [-fpermissive]"), which only that test includes
+open-inference-protocol
+  --incompatible_autoload_externally=+@rules_cc,+@rules_python,+@rules_java,+@com_google_protobuf  the grpc it resolves calls native cc and py rules, and its protoc-gen-validate uses the native JavaInfo (bazel/protobuf.bzl), all removed in Bazel 9; autoload them
+  override rules_foreign_cc 0.16.0  the resolved rules_foreign_cc calls rule(incompatible_use_toolchain_transition=...), which Bazel 9 removed, and uses the removed native CcInfo
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed (go/private/rules/cgo.bzl)
+openmesh
+  known-failing build  its BCR source URL (www.graphics.rwth-aachen.de) refuses connections from the runners and this VM ("Connection refused"), and the BCR lists no mirror
+openssh
+p4c
+  -//backends/p4tools:p4testgen_api_test  reads p4include/core.p4 through the source-relative path test/gtest/../../p4include in its runfiles, where it isn't ("Couldn't read standard header ..."); whether it is missing from data is not confirmed
+  --action_env=CC=gcc  its .bazelrc sets --action_env=CC=clang, and the images have only gcc
+  --action_env=CXX=g++  its .bazelrc sets --action_env=CXX=clang++, and the images have only gcc
+  --repo_env=CC=gcc  its .bazelrc sets --repo_env=CC=/usr/bin/clang, and the images have only gcc
+p4_constraints
+  --action_env=CC=gcc  its .bazelrc sets --action_env=CC=clang, and the images have only gcc
+  --action_env=CXX=g++  its .bazelrc sets --action_env=CXX=clang++, and the images have only gcc
+  --repo_env=CC=gcc  its .bazelrc sets --repo_env=CC=clang (build:linux), and the images have only gcc ("Cannot find gcc or CC (clang)")
+p4_infra
+  --incompatible_autoload_externally=+@rules_cc  the grpc it resolves has BUILD files calling native cc_library, which Bazel 9 removed; autoload them from rules_cc
+pahole
+pathkit
+  known-failing build  rules_swift finds no Swift toolchain ("No matching toolchains found" for //:PathKit): the executor image has no Swift
+pbrt_proto
+peregrine
+  --action_env=CC=gcc  its .bazelrc sets --action_env=CC=/usr/bin/clang, and the images have only gcc
+  --action_env=CXX=g++  its .bazelrc sets --action_env=CXX=/usr/bin/clang++, and the images have only gcc
+  --repo_env=CC=gcc  its .bazelrc sets --repo_env=CC=/usr/bin/clang, and the images have only gcc
+  --repo_env=CXX=g++  its .bazelrc sets --repo_env=CXX=/usr/bin/clang++, and the images have only gcc
+  known-failing build  with those flags, its core (rdma, engine, control, api) links -libverbs and includes infiniband/verbs.h, and test/integration includes ncurses.h; the image has neither rdma-core nor ncurses headers ("cannot find -libverbs")
+periphery
+  known-failing build  rules_swift finds no Swift toolchain (no such target '@build_bazel_rules_swift_local_config//:linux-toolchain'): the executor image has no Swift
+phaser_zc_protobuf
