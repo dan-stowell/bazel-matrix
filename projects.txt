@@ -238,3 +238,23 @@ tar.bzl
   -//tar/tests:test25_source_tree_symlink  symlinks reach the tar action as regular files under RBE: the listing has -rwx where the expected one has a symlink
 toolchains_llvm
   -//utils:extra_distributions_test  utils/extra_distributions.sh needs jq, which the executor image lacks
+
+# Chunk 4 (cont.): known-failing projects from the first batch.
+bazel_lib
+  known-failing build  its dev dep local_repository ./lib/tests/external_test_repo isn't in the release archive; without dev deps, tools/* can't load @io_bazel_rules_go
+aspect_bazel_lib
+  known-failing build  its dev dep local_repository ./lib/tests/external_test_repo isn't in the release archive; without dev deps, tools/* can't load @io_bazel_rules_go
+googleapis
+  known-failing build  its .bazelrc sets @aspect_rules_ts//ts:skipLibCheck, but it doesn't depend on aspect_rules_ts
+grpc
+  known-failing build  dozens of packages call rules Bazel 9 removed (native cc_binary in examples/cpp/*, objc_library in third_party/objective_c, rule() configs in third_party/toolchains)
+opentelemetry-cpp
+  known-failing build  its deps opentracing-cpp and prometheus-cpp call native cc_library, which Bazel 9 removed; --incompatible_autoload_externally=+@rules_cc does not fix them
+protoc-gen-validate
+  known-failing build  its re2 dependency calls native cc_library (removed in Bazel 9), and java targets need WORKSPACE repos (@com_google_guava)
+rules_fuzzing
+  known-failing build  needs clang: its .bazelrc sets CC=clang and //fuzzing/private/runtime copies libclang_rt sanitizer runtimes; the images have only gcc
+rules_jvm_external
+  known-failing build  needs an Android SDK: @androidsdk//:aapt2 and friends are undeclared without one
+rules_oci
+  known-failing build  its rules_go dependency uses the native CcInfo symbol, which Bazel 9 removed

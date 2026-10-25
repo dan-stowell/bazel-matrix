@@ -2471,6 +2471,223 @@
           "integrity": "sha256-IpwvOtMtdvae8eg7sbrICYSJODbyeeZE12mPrzBcarc="
         }
       }
+    },
+    {
+      "name": "bazel_lib",
+      "version": "3.7.2",
+      "source": {
+        "urls": [
+          "https://github.com/bazel-contrib/bazel-lib/releases/download/v3.7.2/bazel-lib-v3.7.2.tar.gz"
+        ],
+        "integrity": "sha256-x1+MN1+fLHOlZduhiPkaTo18oW3SthUtOIbCa78cZTI=",
+        "strip_prefix": "bazel-lib-3.7.2",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/bazel_lib/3.7.2/patches/go_dev_dep.patch",
+            "integrity": "sha256-boWp7svEiLDFXEIg6hq70JcTom4rYFNzvwfpCPrusDw="
+          },
+          {
+            "url": "https://bcr.bazel.build/modules/bazel_lib/3.7.2/patches/module_dot_bazel_version.patch",
+            "integrity": "sha256-fTTM8Or2usOzP99CbwztvLtty9uXiSzygA9IRFXoAWg="
+          }
+        ],
+        "patch_strip": 1,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/bazel_lib/3.7.2/MODULE.bazel",
+          "integrity": "sha256-y8kg//AKVbL9Zj1AhQVgpvsX/V7zqfPWy/DTKQjdikA="
+        }
+      }
+    },
+    {
+      "name": "aspect_bazel_lib",
+      "version": "2.22.5",
+      "source": {
+        "urls": [
+          "https://github.com/bazel-contrib/bazel-lib/releases/download/v2.22.5/bazel-lib-v2.22.5.tar.gz"
+        ],
+        "integrity": "sha256-lOGSAzyoAn8m3nHJAApn75xzaVwriOLFWQRRcJF+rQw=",
+        "strip_prefix": "bazel-lib-2.22.5",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.22.5/patches/go_dev_dep.patch",
+            "integrity": "sha256-ljcGZtJnam+xng7XW+SH8unAx6lpwTyySPNhhH/5qB8="
+          },
+          {
+            "url": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.22.5/patches/module_dot_bazel_version.patch",
+            "integrity": "sha256-frSOXuGkpdz5R3esZUt6MCkysonqBryZTaO1VyReaDE="
+          }
+        ],
+        "patch_strip": 1,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.22.5/MODULE.bazel",
+          "integrity": "sha256-AEuokDY9BTcqlySMNyBa5ktvoxBHYpzSwIlanQx3eeg="
+        }
+      }
+    },
+    {
+      "name": "googleapis",
+      "version": "0.0.0-20261020-14a161a9",
+      "source": {
+        "urls": [
+          "https://github.com/googleapis/googleapis/archive/14a161a98ef045be80c12ab69d924504a756f109.zip"
+        ],
+        "integrity": "sha256-iqsZKT8ljVyU1M4uAgYs7g2B1gCe7AwOAfzbaUHpXWU=",
+        "strip_prefix": "googleapis-14a161a98ef045be80c12ab69d924504a756f109",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/googleapis/0.0.0-20261020-14a161a9/patches/module_dot_bazel.patch",
+            "integrity": "sha256-/Y9R+b9Y5VxK5cSh3QlK8es7jTwhX/HEdD/ZFJHwQoY="
+          }
+        ],
+        "patch_strip": 0,
+        "overlay": [
+          {
+            "path": "MODULE.bazel",
+            "url": "https://bcr.bazel.build/modules/googleapis/0.0.0-20261020-14a161a9/overlay/MODULE.bazel",
+            "integrity": "sha256-2BrFXYiZIcw/N7UANkmSLkmaLmhMoTdn4J6ixs3pib4="
+          },
+          {
+            "path": "extensions.bzl",
+            "url": "https://bcr.bazel.build/modules/googleapis/0.0.0-20261020-14a161a9/overlay/extensions.bzl",
+            "integrity": "sha256-59FkoqrMX/a/7t3zkSLDmMkuGnajSeOoZI4FZFIwEuw="
+          },
+          {
+            "path": "tests/bcr/.bazelrc",
+            "url": "https://bcr.bazel.build/modules/googleapis/0.0.0-20261020-14a161a9/overlay/tests/bcr/.bazelrc",
+            "integrity": "sha256-hFZT+gits3VtXcUkKuh3NCEC9FgBNGuNxaOVCuOiFPk="
+          },
+          {
+            "path": "tests/bcr/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/googleapis/0.0.0-20261020-14a161a9/overlay/tests/bcr/BUILD.bazel",
+            "integrity": "sha256-KZzDURLUNDOiMsurUHrnuWYogHPFs7W+Ar9ZrilPLuE="
+          },
+          {
+            "path": "tests/bcr/MODULE.bazel",
+            "url": "https://bcr.bazel.build/modules/googleapis/0.0.0-20261020-14a161a9/overlay/tests/bcr/MODULE.bazel",
+            "integrity": "sha256-4zmBG1uAn7W3ExjUMQChBcrJVSNCE6K8PhIs9SfKy1U="
+          },
+          {
+            "path": "tests/bcr/failure_test.bzl",
+            "url": "https://bcr.bazel.build/modules/googleapis/0.0.0-20261020-14a161a9/overlay/tests/bcr/failure_test.bzl",
+            "integrity": "sha256-AJLzf7NfQOLpWbNIR3TIU28tQMSjd3svlAgh4yCoXm8="
+          }
+        ],
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/googleapis/0.0.0-20261020-14a161a9/MODULE.bazel",
+          "integrity": "sha256-2BrFXYiZIcw/N7UANkmSLkmaLmhMoTdn4J6ixs3pib4="
+        }
+      }
+    },
+    {
+      "name": "grpc",
+      "version": "1.84.0",
+      "source": {
+        "urls": [
+          "https://github.com/grpc/grpc/archive/refs/tags/v1.84.0.tar.gz"
+        ],
+        "integrity": "sha256-F6TSVxf0hx63HP3xkfdJH2alnI68eCq1PVL8v8R4lZ8=",
+        "strip_prefix": "grpc-1.84.0",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/grpc/1.84.0/MODULE.bazel",
+          "integrity": "sha256-4sYMdmy9SLZz4uZuI2Pe25NSCo5qj1DqG0C0SK2mUno="
+        }
+      }
+    },
+    {
+      "name": "opentelemetry-cpp",
+      "version": "1.29.0",
+      "source": {
+        "urls": [
+          "https://github.com/open-telemetry/opentelemetry-cpp/archive/refs/tags/v1.29.0.tar.gz"
+        ],
+        "integrity": "sha256-Y+/8Kwqu8yyVQ72VyMIn8cgNqCSDkqbZfoosP/vPfqE=",
+        "strip_prefix": "opentelemetry-cpp-1.29.0",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/opentelemetry-cpp/1.29.0/MODULE.bazel",
+          "integrity": "sha256-rGgkaHhqd2e18V0/zLqRs40VeY9nfhmlw0baQUsB7Dw="
+        }
+      }
+    },
+    {
+      "name": "protoc-gen-validate",
+      "version": "1.3.3",
+      "source": {
+        "urls": [
+          "https://github.com/bufbuild/protoc-gen-validate/archive/refs/tags/v1.3.3.tar.gz"
+        ],
+        "integrity": "sha256-nkfvQewOJpoXOpS2dmzEvk4aEJj82gQLLwRBxRv7auI=",
+        "strip_prefix": "protoc-gen-validate-1.3.3",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/protoc-gen-validate/1.3.3/patches/bazel_9_fixes.patch",
+            "integrity": "sha256-dSY9Vm27yD5rYu4NGHFxOe1J1pjqa/SI1H3DrOdMkSc="
+          }
+        ],
+        "patch_strip": 1,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/protoc-gen-validate/1.3.3/MODULE.bazel",
+          "integrity": "sha256-LMJeNo5JihDtnYZexJuOhiDc21B730f5r3b5YNLh3fk="
+        }
+      }
+    },
+    {
+      "name": "rules_fuzzing",
+      "version": "0.8.0",
+      "source": {
+        "urls": [
+          "https://github.com/bazel-contrib/rules_fuzzing/releases/download/v0.8.0/rules_fuzzing-v0.8.0.tar.gz"
+        ],
+        "integrity": "sha256-LMg/keMEjSdfPryLYn68pcD8QBs/CTpN45ixHsPiETc=",
+        "strip_prefix": "rules_fuzzing-v0.8.0",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/rules_fuzzing/0.8.0/patches/module_dot_bazel_version.patch",
+            "integrity": "sha256-abauAs0rqJ9p0iQmn9iR4byYZnTGBtYnguweBTvRLLw="
+          }
+        ],
+        "patch_strip": 1,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/rules_fuzzing/0.8.0/MODULE.bazel",
+          "integrity": "sha256-/JJdwHF/6SU41edpgnvgSZ87QLvFpKTkSIDJj1oKvJ4="
+        }
+      }
+    },
+    {
+      "name": "rules_jvm_external",
+      "version": "7.2",
+      "source": {
+        "urls": [
+          "https://github.com/bazel-contrib/rules_jvm_external/releases/download/7.2/rules_jvm_external-7.2.tar.gz"
+        ],
+        "integrity": "sha256-8UdLo2mfBKseq4k4HWTJ+QaVLFd1JOmpyLOUm4dbuqA=",
+        "strip_prefix": "rules_jvm_external-7.2",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/rules_jvm_external/7.2/MODULE.bazel",
+          "integrity": "sha256-5PYKlyeAyiISjVN31hMbT5wACFTovIniEiAmduQeeM4="
+        }
+      }
+    },
+    {
+      "name": "rules_oci",
+      "version": "2.3.0",
+      "source": {
+        "urls": [
+          "https://github.com/bazel-contrib/rules_oci/releases/download/v2.3.0/rules_oci-v2.3.0.tar.gz"
+        ],
+        "integrity": "sha256-6YfKt6NUdcuckGD8PzOKH8iJbCQClaMnKWiyF6zv0Ms=",
+        "strip_prefix": "rules_oci-2.3.0",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/rules_oci/2.3.0/patches/module_dot_bazel_version.patch",
+            "integrity": "sha256-G+ukIHRyIqOBpvY6cBR2vh9dxi89MiFShq/nYmrQa+E="
+          }
+        ],
+        "patch_strip": 1,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/rules_oci/2.3.0/MODULE.bazel",
+          "integrity": "sha256-SQdRl5YMkkwKTXWbfHZcPQCkHS/dSpQ7QoI8HQFqtOw="
+        }
+      }
     }
   ],
   "skipped": []
