@@ -11,6 +11,6 @@ project(
         # its dep doctest calls native cc_library, which Bazel 9 removed; autoload it from rules_cc
         "--incompatible_autoload_externally=+@rules_cc",
     ],
-    # //:lexy_test, its only test: 39 of 329 doctest cases (dsl::ascii, char_class, unicode) fail because doctest::toString(cp) of their code points prints "{?}" (doctest finds no operator<< for them) under the images' gcc
+    # //:lexy_test, its only test: 39 of 329 doctest cases (dsl::ascii, char_class, unicode) fail because doctest::toString(cp) of their code points prints "{?}" (doctest finds no operator<< for them) under the images' gcc; --test_arg=--test-case-exclude=<those cases> was passed but excluded none
     known_failing = "test",
 )

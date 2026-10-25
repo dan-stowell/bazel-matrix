@@ -723,7 +723,7 @@ cxxopts
 fuzztest
   known-failing build  needs clang: its .bazelrc passes --cxxopt=-Wc++17-compat-pedantic and centipede's build_defs pass -gline-tables-only, which gcc (the images' only compiler) rejects
 gdk-pixbuf
-  -//tests:pixbuf-fail  one test binary feeds every image in tests/test-images/fail to the loaders, and one decoder allocates past the executor's 62 GB limit (observed 66.9 GB, EXECUTOR_OOM_KILL); the killed run leaves no log naming the image
+  -//tests:pixbuf-fail  loading tests/test-images/fail/bug793470-crasher.png, gdk-pixbuf's PNG loader allocates past the executor's limit (EXECUTOR_OOM_KILL at 47-62 GB estimated); bisected on RBE, its other 40 images pass, but --test_arg=-s=... to skip it would reach every test in the project and pixbuf-lowmem reads its args as image files
 ghdl
 giflib
   override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
@@ -861,7 +861,7 @@ urdfdom_headers
 # Chunk A14: more BCR modules (a-l).
 gsm
 gz-fuel-tools
-  --strategy=TestRunner=local  //:buildifier.test (buildifier_prebuilt's runner) does `$(readlink <buildifier runfile>)` under set -e, and RBE stages runfiles as regular files, so readlink exits 1 silently; run tests on the runner, where runfiles are symlinks
+  --strategy=TestRunner=local  //:buildifier.test (buildifier_prebuilt's runner) does `$(readlink <buildifier runfile>)` under set -e, and RBE stages runfiles as regular files, so readlink exits 1 silently; run tests on the runner, where runfiles are symlinks (--strategy_regexp=//:buildifier\.test=local didn't take effect for the test action)
 gz-physics
   -//:buildifier.test  buildifier -mode=diff flags MODULE.bazel: the registry's copy (which replaces the archive's) puts compatibility_level before version
 gz-sensors
@@ -879,7 +879,7 @@ javaparser
 lame
 lexy
   --incompatible_autoload_externally=+@rules_cc  its dep doctest calls native cc_library, which Bazel 9 removed; autoload it from rules_cc
-  known-failing test  //:lexy_test, its only test: 39 of 329 doctest cases (dsl::ascii, char_class, unicode) fail because doctest::toString(cp) of their code points prints "{?}" (doctest finds no operator<< for them) under the images' gcc
+  known-failing test  //:lexy_test, its only test: 39 of 329 doctest cases (dsl::ascii, char_class, unicode) fail because doctest::toString(cp) of their code points prints "{?}" (doctest finds no operator<< for them) under the images' gcc; --test_arg=--test-case-exclude=<those cases> was passed but excluded none
 libavif
 libbacktrace
   override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
@@ -890,3 +890,40 @@ libde265
 libepoxy
 libestr
 libfastjson
+
+# Chunk A15: more BCR modules (a-l).
+diffutils
+dtc
+emsdk
+  -//test_external/...  a separate workspace (test_external/MODULE.bazel) using emsdk as a dependency
+  -//test_prebuilt_cache/...  a separate workspace (test_prebuilt_cache/MODULE.bazel) using emsdk as a dependency
+  -//test_secondary_lto_cache/...  a separate workspace (test_secondary_lto_cache/MODULE.bazel) using emsdk as a dependency
+  -//hello-world:hello-world-simd  a plain cc_binary meant only as the cc_target of the wasm_cc_binary targets (still built): natively, gcc finds no wasm_simd128.h
+esaxx
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+fastcdr
+  -//test/...  uses @googletest, which its MODULE.bazel doesn't declare
+fbthrift
+  known-failing build  it resolves libaio 0.3.113.bcr.0, which the BCR yanked ("The tarball link for 0.3.113.bcr.0 is broken"), and 0.3.113.bcr.1's archive returns 404 too
+fcl
+ffnvcodec
+flac
+flann
+foonathan_memory
+  override cmake_configure_file 0.1.5  cmake_configure_file 0.1.0, which it declares, calls native py_binary, which Bazel 9 removed (0.1.1 and later load it from rules_python)
+fp16
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel calls native cc rules without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+freeimage
+fxdiv
+  override rules_foreign_cc 0.16.0  the resolved rules_foreign_cc passes rule(incompatible_use_toolchain_transition) and uses the native CcInfo, both removed in Bazel 9
+  --incompatible_autoload_externally=+@rules_cc  its deps googletest and google_benchmark call native cc_library, which Bazel 9 removed; autoload them from rules_cc
+generate_export_header
+glu
+  known-failing build  its sources include GL/gl.h, which no declared dep provides and the executor image lacks (no OpenGL/Mesa headers)
+google_cloud_cpp
+  --test_tag_filters=-integration-test  skips the tests tagged integration-test (generated *_samples, examples and *_integration_test): they call live Google Cloud APIs and need GOOGLE_CLOUD_PROJECT and credentials, so on RBE they fail (samples with "Missing command")
+  -//generator/integration_tests:tests_golden_kitchen_sink_rest_metadata_decorator_test  CustomHeaders expects header-key1's two values in the order set but gets them reversed ({"header-value2", "header-value1"}): the test assumes an iteration order its header container doesn't guarantee
+graphene
+grpc_ecosystem_grpc_gateway
+gsl
