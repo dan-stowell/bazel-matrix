@@ -130,6 +130,24 @@ class CommandTest(unittest.TestCase):
         self.assertEqual(env["BAZEL_MATRIX_KEY_FILE"], "/k")
 
 
+class ReadBazelversionTest(unittest.TestCase):
+    def read(self, text):
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, ".bazelversion")
+            with open(path, "w") as f:
+                f.write(text)
+            return inner_bazel.read_bazelversion(path)
+
+    def test_plain(self):
+        self.assertEqual(self.read("8.4.2\n"), "8.4.2")
+
+    def test_skips_comments_and_blank_lines(self):
+        self.assertEqual(self.read("# Keep in sync with CI\n\n  7.6.1  \n# trailing\n9.0.0\n"), "7.6.1")
+
+    def test_no_version(self):
+        self.assertIsNone(self.read("# only a comment\n\n"))
+
+
 class OutputBaseTest(unittest.TestCase):
     def test_found_from_cwd(self):
         with tempfile.TemporaryDirectory() as d:

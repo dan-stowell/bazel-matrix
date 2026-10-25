@@ -38,6 +38,14 @@ def _bcr_source_impl(rctx):
         # projects.txt `override` lines, as single_version_override()s.
         rctx.file("MODULE.bazel", rctx.read("MODULE.bazel") + rctx.attr.module_append)
 
+    # Bazel's patch writes a git symlink (mode 120000) as a regular file
+    # holding the target path, with mode 0044 (circl 1.3.8's bazel-bin), which
+    # tar can't read. --mode below sets u+rw on every entry anyway, so this
+    # leaves every other tar's bytes as they were.
+    result = rctx.execute(["chmod", "-R", "u+r", "."])
+    if result.return_code:
+        fail("chmod of %s failed: %s" % (rctx.name, result.stderr))
+
     # A deterministic tar of the patched tree, so the outer action key only
     # changes when the source does.
     entries = [e.basename for e in rctx.path(".").readdir()]
