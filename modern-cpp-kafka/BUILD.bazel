@@ -6,15 +6,33 @@ project(
     name = "modern-cpp-kafka",
     targets = [
         "//...",
+        # links both the boringssl and the openssl in its dependency graph, and ld.gold rejects their duplicate symbols ("multiple definition")
+        "-//examples:kafka_async_producer_copy_payload",
+        # links both the boringssl and the openssl in its dependency graph, and ld.gold rejects their duplicate symbols ("multiple definition")
+        "-//examples:kafka_async_producer_not_copy_payload",
+        # links both the boringssl and the openssl in its dependency graph, and ld.gold rejects their duplicate symbols ("multiple definition")
+        "-//examples:kafka_auto_commit_consumer",
+        # links both the boringssl and the openssl in its dependency graph, and ld.gold rejects their duplicate symbols ("multiple definition")
+        "-//examples:kafka_manual_commit_consumer",
+        # links both the boringssl and the openssl in its dependency graph, and ld.gold rejects their duplicate symbols ("multiple definition")
+        "-//examples:kafka_sync_producer",
+        # links both the boringssl and the openssl in its dependency graph, and ld.gold rejects their duplicate symbols ("multiple definition")
+        "-//tests:kafka-integration-test",
+        # links both the boringssl and the openssl in its dependency graph, and ld.gold rejects their duplicate symbols ("multiple definition")
+        "-//tests:kafka-robustness-test",
+        # links both the boringssl and the openssl in its dependency graph, and ld.gold rejects their duplicate symbols ("multiple definition")
+        "-//tools/console_clients:kafka-console-consumer",
+        # links both the boringssl and the openssl in its dependency graph, and ld.gold rejects their duplicate symbols ("multiple definition")
+        "-//tools/console_clients:kafka-console-producer",
+        # links both the boringssl and the openssl in its dependency graph, and ld.gold rejects their duplicate symbols ("multiple definition")
+        "-//tools/console_clients:kafka-topics",
     ],
     flags = [
         # Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel, examples, tests and tools/console_clients call native cc_* rules without a load()
         "--noincompatible_disable_autoloads_in_main_repo",
         # autoload the cc rules Bazel 9 removed from rules_cc
         "--incompatible_autoload_externally=+@rules_cc",
-        # its .bazelrc sets --copt='-std=c++17', which also reaches C files, and the boringssl it resolves compiles C with -Werror, so GCC's "'-std=c++17' is valid for C++/ObjC++ but not for C" warning fails them; keep it a warning for .c files
-        "--per_file_copt=.*\\.c$@-Wno-error",
+        # its .bazelrc sets --copt='-std=c++17', which also reaches C files, and the boringssl it resolves compiles C with -Werror, so GCC's "'-std=c++17' is valid for C++/ObjC++ but not for C" warning fails them; keep it a warning for boringssl's .c files
+        "--per_file_copt=external/boringssl\\+/.*\\.c$@-Wno-error",
     ],
-    # with those fixes, every binary (examples, tests, tools/console_clients) links both the boringssl and the openssl in its dependency graph, and ld.gold rejects their duplicate symbols ("multiple definition")
-    known_failing = "build",
 )

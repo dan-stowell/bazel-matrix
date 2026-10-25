@@ -23661,7 +23661,7 @@
           "url": "https://bcr.bazel.build/modules/proxy-wasm-cpp-sdk/0.0.0-20260123-894dd29/MODULE.bazel",
           "integrity": "sha256-RWl16mhqGhOuy+J5Oeiph9q1t4A8Fa1k35MTrnGHDPs="
         },
-        "module_append": "\n# bazel-matrix: the emsdk 4.0.13 it declares fails to load under Bazel 9: rule() gets None in provides (\"at index 0 of provides, got element of type NoneType\") and rule(incompatible_use_toolchain_transition=...)\nsingle_version_override(module_name = \"emsdk\", version = \"6.0.13\")\n"
+        "module_append": "\n# bazel-matrix: the emsdk 4.0.13 it declares fails to load under Bazel 9: emscripten_toolchain/toolchain.bzl does rule(provides = [CcToolchainConfigInfo]) with the native CcToolchainConfigInfo, which is None (\"at index 0 of provides, got element of type NoneType\"), and the aspect_bazel_lib it brings calls rule(incompatible_use_toolchain_transition=...); 6.0.13 loads\nsingle_version_override(module_name = \"emsdk\", version = \"6.0.13\")\n"
       }
     },
     {
@@ -30195,6 +30195,640 @@
         "module_file": {
           "url": "https://bcr.bazel.build/modules/freertos/11.1.0.bcr.3/MODULE.bazel",
           "integrity": "sha256-R6PwPABcWZRzx9oQZ/stcO6+Ce2REw5pDLyq3ytg05M="
+        }
+      }
+    },
+    {
+      "name": "opencv",
+      "version": "5.0.0.bcr.9",
+      "source": {
+        "urls": [
+          "https://github.com/opencv/opencv/archive/refs/tags/5.0.0.zip"
+        ],
+        "integrity": "sha256-4quqHqJEP7FjKZNpUGUhUY7gLY5RuIoUShKMTkkhI70=",
+        "strip_prefix": "opencv-5.0.0",
+        "overlay": [
+          {
+            "path": "BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/opencv/5.0.0.bcr.9/overlay/BUILD.bazel",
+            "integrity": "sha256-Zj/Tk7j8R/LnDfG78Rg0TssmkCDNjrgtU6k1CYZUobY="
+          },
+          {
+            "path": "MODULE.bazel",
+            "url": "https://bcr.bazel.build/modules/opencv/5.0.0.bcr.9/overlay/MODULE.bazel",
+            "integrity": "sha256-BJDEYzHSp2B8JP/957kHyzJmb2WSZ02pSlTP7evFzC0="
+          },
+          {
+            "path": "blob2hdr.py",
+            "url": "https://bcr.bazel.build/modules/opencv/5.0.0.bcr.9/overlay/blob2hdr.py",
+            "integrity": "sha256-khIbzjIr/IaGkfttfjASvWWUW2uQ4JdDQeZQe8EVXgU="
+          },
+          {
+            "path": "modules/dnn/src/caffe/opencv-caffe.proto",
+            "url": "https://bcr.bazel.build/modules/opencv/5.0.0.bcr.9/overlay/modules/dnn/src/caffe/opencv-caffe.proto",
+            "integrity": "sha256-WBbQ+ih0u/o8olh4aUeV5TetjsjPslvVcP36YVsrp8A="
+          },
+          {
+            "path": "opencv.bzl",
+            "url": "https://bcr.bazel.build/modules/opencv/5.0.0.bcr.9/overlay/opencv.bzl",
+            "integrity": "sha256-18yI0wiVhMJ792XpePqEULM3s0JezO3xsTrRHym8Hv8="
+          },
+          {
+            "path": "test/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/opencv/5.0.0.bcr.9/overlay/test/BUILD.bazel",
+            "integrity": "sha256-U1EfDc6Q/gd0pP+/wEzpAuYtHvTGZFCTAPXYetQ6Tzc="
+          },
+          {
+            "path": "test/MODULE.bazel",
+            "url": "https://bcr.bazel.build/modules/opencv/5.0.0.bcr.9/overlay/test/MODULE.bazel",
+            "integrity": "sha256-blAvTb+E9sI7yFmjvMs1Ar7bVrwwp3Re/LPkzuIhhe8="
+          },
+          {
+            "path": "test/qt6_smoke_test.cpp",
+            "url": "https://bcr.bazel.build/modules/opencv/5.0.0.bcr.9/overlay/test/qt6_smoke_test.cpp",
+            "integrity": "sha256-xjWbsRR7yDGWs0+mYiI2WvzLLsGT13wI2Tdt3NU3dCs="
+          },
+          {
+            "path": "test/ubuntu-gtk-deps.BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/opencv/5.0.0.bcr.9/overlay/test/ubuntu-gtk-deps.BUILD.bazel",
+            "integrity": "sha256-coCXi1DH9iVC6q8qwiI3qndFVmUkNjtRhpIsSIXC9P0="
+          },
+          {
+            "path": "utils.bzl",
+            "url": "https://bcr.bazel.build/modules/opencv/5.0.0.bcr.9/overlay/utils.bzl",
+            "integrity": "sha256-D4ve8ZSo0vvAZnUbAyQF977J7ayCPhQ7wFGLYaj57ks="
+          }
+        ],
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/opencv/5.0.0.bcr.9/MODULE.bazel",
+          "integrity": "sha256-BJDEYzHSp2B8JP/957kHyzJmb2WSZ02pSlTP7evFzC0="
+        }
+      }
+    },
+    {
+      "name": "openusd",
+      "version": "25.11.bcr.3",
+      "source": {
+        "urls": [
+          "https://github.com/PixarAnimationStudios/OpenUSD/archive/refs/tags/v25.11.tar.gz"
+        ],
+        "integrity": "sha256-w3xjO1A3pFUvYVdGcOzKiDYim3gya9YmIvNCJnEYhmc=",
+        "strip_prefix": "OpenUSD-25.11",
+        "overlay": [
+          {
+            "path": "BUILD",
+            "url": "https://bcr.bazel.build/modules/openusd/25.11.bcr.3/overlay/BUILD",
+            "integrity": "sha256-bERVgxC7++xfOIhG10DDuBXvKGxNx03JN5qFehWVjWo="
+          },
+          {
+            "path": "test_main.cpp",
+            "url": "https://bcr.bazel.build/modules/openusd/25.11.bcr.3/overlay/test_main.cpp",
+            "integrity": "sha256-GUQlXlDP/PoBmCTKaAwUJcgDbqC/x2x4IeGMaKvk/Pg="
+          },
+          {
+            "path": "utils.bzl",
+            "url": "https://bcr.bazel.build/modules/openusd/25.11.bcr.3/overlay/utils.bzl",
+            "integrity": "sha256-EHFLTrTb6XU0lDOiNIVrZVIaFuE5SY0VHHUkDPOGsS4="
+          }
+        ],
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/openusd/25.11.bcr.3/MODULE.bazel",
+          "integrity": "sha256-udrgRPhJ7kgoFatdtHkYA7ffttPJ1c7rUqhvO6MHgs0="
+        }
+      }
+    },
+    {
+      "name": "pcl",
+      "version": "1.15.1.bcr.4",
+      "source": {
+        "urls": [
+          "https://github.com/PointCloudLibrary/pcl/releases/download/pcl-1.15.1/source.tar.gz"
+        ],
+        "integrity": "sha256-8YeyZGQirm+22vfuwtYsU4rn/mJjl+1knA6bWluGK1o=",
+        "strip_prefix": "pcl",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/pcl/1.15.1.bcr.4/patches/no-vtk.diff",
+            "integrity": "sha256-gdekJCx4MNmDKJ4IrhZULgxMdqsIEYlY6wX8ZjreauU="
+          },
+          {
+            "url": "https://bcr.bazel.build/modules/pcl/1.15.1.bcr.4/patches/windows-fix-template-instantiation.diff",
+            "integrity": "sha256-BEOxPTihUffo6q4GjlaRRiz12U1gHu4iUqyOxFoN9LA="
+          },
+          {
+            "url": "https://bcr.bazel.build/modules/pcl/1.15.1.bcr.4/patches/pcl_config.diff",
+            "integrity": "sha256-g59cT8UMNmIiRfWdvRmXGkRZiiwY4gHH7AXW2jq4QLs="
+          }
+        ],
+        "patch_strip": 0,
+        "overlay": [
+          {
+            "path": "BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/pcl/1.15.1.bcr.4/overlay/BUILD.bazel",
+            "integrity": "sha256-gcaNXKBYMvxqfFEO1IBDxl8GfhUgGBmXvLBbYr+pqps="
+          },
+          {
+            "path": "test/BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/pcl/1.15.1.bcr.4/overlay/test/BUILD.bazel",
+            "integrity": "sha256-ZkHTXmzzd1XOiaOqNwYKtRMax6o3Bb6OmyEq/LAfyOs="
+          },
+          {
+            "path": "test/MODULE.bazel",
+            "url": "https://bcr.bazel.build/modules/pcl/1.15.1.bcr.4/overlay/test/MODULE.bazel",
+            "integrity": "sha256-0nRgmhVeAeS18lzqbe6azt+M8lnrOMDzzRH5YjAl+e0="
+          }
+        ],
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/pcl/1.15.1.bcr.4/MODULE.bazel",
+          "integrity": "sha256-N7FRASDSVExcaX/nYsx3BDVaCJzXpO+mjhc8mGKMDxw="
+        }
+      }
+    },
+    {
+      "name": "proxygen",
+      "version": "2026.08.31.00",
+      "source": {
+        "urls": [
+          "https://github.com/facebook/proxygen/releases/download/v2026.08.31.00/proxygen-v2026.08.31.00.tar.gz"
+        ],
+        "integrity": "sha256-XytbBeVtLq/mfHnPQomK2gR9F4K9hLU345tgGL5NHWA=",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/proxygen/2026.08.31.00/patches/bazel_runfiles_paths_for_tests.patch",
+            "integrity": "sha256-xx0zF3dHa216MlIYrmQN7jNLBfuF+Xs1UdZPyPeeO94="
+          },
+          {
+            "url": "https://bcr.bazel.build/modules/proxygen/2026.08.31.00/patches/drop_internal_only_mock_filter.patch",
+            "integrity": "sha256-EgZG6DTDNzpGdF2BDOHGbOhQgUb/0plDGODa5g50rj8="
+          },
+          {
+            "url": "https://bcr.bazel.build/modules/proxygen/2026.08.31.00/patches/fix_worker_thread_gflags.patch",
+            "integrity": "sha256-D43WlQKlgIcq4IRGk901ikYaAGdRT6mzAOSMgNf9Mqo="
+          },
+          {
+            "url": "https://bcr.bazel.build/modules/proxygen/2026.08.31.00/patches/push_sample_use_bazel_runfiles.patch",
+            "integrity": "sha256-6OZokjVe+OBLelpg0HQTy/7N+FVaRXHFqCGFIt7w1Kg="
+          },
+          {
+            "url": "https://bcr.bazel.build/modules/proxygen/2026.08.31.00/patches/test_main_folly_init.patch",
+            "integrity": "sha256-IGMmgwuLALqzK+TfCEneGYkhFDGtr8VvKyff0NVcH6s="
+          }
+        ],
+        "patch_strip": 1,
+        "overlay": [
+          {
+            "path": "BUILD.bazel",
+            "url": "https://bcr.bazel.build/modules/proxygen/2026.08.31.00/overlay/BUILD.bazel",
+            "integrity": "sha256-AEt/WislbAosX0iNJBFxxIXuQiimdRrw0Au+b8eghoI="
+          },
+          {
+            "path": "MODULE.bazel",
+            "url": "https://bcr.bazel.build/modules/proxygen/2026.08.31.00/overlay/MODULE.bazel",
+            "integrity": "sha256-n9FMiftOGIlYGfBrZkzDbt1HFG+SQfvG9ZnRCg62sn4="
+          }
+        ],
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/proxygen/2026.08.31.00/MODULE.bazel",
+          "integrity": "sha256-n9FMiftOGIlYGfBrZkzDbt1HFG+SQfvG9ZnRCg62sn4="
+        },
+        "module_append": "\n# bazel-matrix: rules_cc before 0.2.25 also rejects an external repo's root-package `includes = [\".\"]`: the resolved folly fails analysis (\"resolves to the workspace root\")\nsingle_version_override(module_name = \"rules_cc\", version = \"0.2.27\")\n"
+      }
+    },
+    {
+      "name": "protovalidate-cc",
+      "version": "1.2.0",
+      "source": {
+        "urls": [
+          "https://github.com/bufbuild/protovalidate-cc/releases/download/v1.2.0/protovalidate-cc-1.2.0.tar.gz"
+        ],
+        "integrity": "sha256-ucq/v6PCzaPU2fjWHe1R2IcbZnEYneK5jYDRWTfhhJs=",
+        "strip_prefix": "protovalidate-cc-1.2.0",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/protovalidate-cc/1.2.0/MODULE.bazel",
+          "integrity": "sha256-OA7nPDJvsySAnGjE0gWAoJO4+PKb5YtRz8jkXtOJl3U="
+        }
+      }
+    },
+    {
+      "name": "rules_proto_grpc_cpp",
+      "version": "5.8.0",
+      "source": {
+        "urls": [
+          "https://github.com/rules-proto-grpc/rules_proto_grpc/releases/download/5.8.0/rules_proto_grpc_cpp-5.8.0.tar.gz"
+        ],
+        "integrity": "sha256-OteWm3dYQHPEFgNAe2ZSkBI3HGH0rtHqLzQB4Ga4xBc=",
+        "strip_prefix": "rules_proto_grpc_cpp-5.8.0",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/rules_proto_grpc_cpp/5.8.0/MODULE.bazel",
+          "integrity": "sha256-fWEVHdIvbfX8ge2miwxKCeshyey4zL0q6hrXctU24ng="
+        }
+      }
+    },
+    {
+      "name": "rules_proto_grpc_python",
+      "version": "5.8.0",
+      "source": {
+        "urls": [
+          "https://github.com/rules-proto-grpc/rules_proto_grpc/releases/download/5.8.0/rules_proto_grpc_python-5.8.0.tar.gz"
+        ],
+        "integrity": "sha256-TNDtgWxV6hPS5UyImhzyLRKRAsW0ZJ7sIz9uNRdw57E=",
+        "strip_prefix": "rules_proto_grpc_python-5.8.0",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/rules_proto_grpc_python/5.8.0/MODULE.bazel",
+          "integrity": "sha256-F6uiHmIq4PuBiZEYRFg9AesS1wjmPqOoOjbCevuQjcs="
+        }
+      }
+    },
+    {
+      "name": "rules_proto_grpc_go",
+      "version": "5.8.0",
+      "source": {
+        "urls": [
+          "https://github.com/rules-proto-grpc/rules_proto_grpc/releases/download/5.8.0/rules_proto_grpc_go-5.8.0.tar.gz"
+        ],
+        "integrity": "sha256-uQ4rjKYHXdvrX6xswktX1RAFqQ3jVQbsP+uRL/Mif40=",
+        "strip_prefix": "rules_proto_grpc_go-5.8.0",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/rules_proto_grpc_go/5.8.0/MODULE.bazel",
+          "integrity": "sha256-u+v5kQXtfCx9oBqBNi2gn8DWStclvaNa2xItYbsiWdk="
+        },
+        "module_append": "\n# bazel-matrix: the resolved rules_go's go/private/extensions.bzl calls module_ctx facts .clear(), which Bazel 9's Facts value lacks (\"'Facts' value has no field or method 'clear'\")\nsingle_version_override(module_name = \"rules_go\", version = \"0.65.0\")\n"
+      }
+    },
+    {
+      "name": "rules_proto_grpc_java",
+      "version": "5.8.0",
+      "source": {
+        "urls": [
+          "https://github.com/rules-proto-grpc/rules_proto_grpc/releases/download/5.8.0/rules_proto_grpc_java-5.8.0.tar.gz"
+        ],
+        "integrity": "sha256-tO1CC/XCT16k9LQtGAhloguepkFTkyR8/GV4+Odwzyo=",
+        "strip_prefix": "rules_proto_grpc_java-5.8.0",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/rules_proto_grpc_java/5.8.0/MODULE.bazel",
+          "integrity": "sha256-DiTR1HFrAXr6bIVkm+5HFEBmMQBX+85721Zhrs1SVXE="
+        }
+      }
+    },
+    {
+      "name": "rules_python_gazelle_plugin",
+      "version": "2.4.5",
+      "source": {
+        "urls": [
+          "https://github.com/bazel-contrib/rules_python/releases/download/2.4.5/rules_python-2.4.5.tar.gz"
+        ],
+        "integrity": "sha256-BQiEAvo1avCXBk28zXCCoGEXHvOfvXSPq5Rul3X0ahY=",
+        "strip_prefix": "rules_python-2.4.5/gazelle",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/rules_python_gazelle_plugin/2.4.5/patches/module_dot_bazel_version.patch",
+            "integrity": "sha256-W9XPob4PIQR23jaSeK6frWb5iGRW0DOmf9tGrDQwZaw="
+          }
+        ],
+        "patch_strip": 1,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/rules_python_gazelle_plugin/2.4.5/MODULE.bazel",
+          "integrity": "sha256-c9hgSt1YTTq98Pqhppn67yMNEnfD6u68mAPk+lZy1DI="
+        }
+      }
+    },
+    {
+      "name": "rules_rust_protobuf",
+      "version": "0.69.0",
+      "source": {
+        "urls": [
+          "https://github.com/bazelbuild/rules_rust/releases/download/0.69.0/rules_rust-0.69.0.tar.gz"
+        ],
+        "integrity": "sha256-u8dkwlLQYSgbI1knek1GSA4tz69yr8HObgCtpYzL/Uw=",
+        "strip_prefix": "extensions/protobuf",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/rules_rust_protobuf/0.69.0/MODULE.bazel",
+          "integrity": "sha256-Kj40MO0uMDyF4Bqi1bviVY+nx19KyZnaVeqX0lp7cRY="
+        }
+      }
+    },
+    {
+      "name": "rules_rust_pyo3",
+      "version": "0.74.0",
+      "source": {
+        "urls": [
+          "https://github.com/bazelbuild/rules_rust/releases/download/0.74.0/rules_rust-0.74.0.tar.gz"
+        ],
+        "integrity": "sha256-2LzB4RHpgnDcAxcuIu96+cL5TzJpgBYYorg9IIkPjfU=",
+        "strip_prefix": "extensions/pyo3",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/rules_rust_pyo3/0.74.0/MODULE.bazel",
+          "integrity": "sha256-RgAyaAIMloy2gwlGRH3mDIETzqNQ0b6oCHQ1XhSfinc="
+        }
+      }
+    },
+    {
+      "name": "rules_rust_mdbook",
+      "version": "0.74.0",
+      "source": {
+        "urls": [
+          "https://github.com/bazelbuild/rules_rust/releases/download/0.74.0/rules_rust-0.74.0.tar.gz"
+        ],
+        "integrity": "sha256-2LzB4RHpgnDcAxcuIu96+cL5TzJpgBYYorg9IIkPjfU=",
+        "strip_prefix": "extensions/mdbook",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/rules_rust_mdbook/0.74.0/MODULE.bazel",
+          "integrity": "sha256-bOn3STwbY2Ge/xejZdCpRGcuI+JgdgDtVGOX6QUpklU="
+        }
+      }
+    },
+    {
+      "name": "rules_nixpkgs_core",
+      "version": "0.14.0",
+      "source": {
+        "urls": [
+          "https://github.com/tweag/rules_nixpkgs/releases/download/v0.14.0/rules_nixpkgs-0.14.0.tar.gz"
+        ],
+        "integrity": "sha256-/XnW6Botm848+R+rEzCK3wvhlZ1sZ2oXxwmvmLyoAec=",
+        "strip_prefix": "rules_nixpkgs-0.14.0/core",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/rules_nixpkgs_core/0.14.0/patches/module_dot_bazel_version.patch",
+            "integrity": "sha256-aEToCpBkn/Fi/bibbJ2Jsb1uhLHnVHd6aASSlsKHNgI="
+          }
+        ],
+        "patch_strip": 1,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/rules_nixpkgs_core/0.14.0/MODULE.bazel",
+          "integrity": "sha256-Lqbsm7iadvIXYWG4PEccY63ryL1xL91HDXhI9VsBbgs="
+        }
+      }
+    },
+    {
+      "name": "rules_helm",
+      "version": "0.34.0",
+      "source": {
+        "urls": [
+          "https://github.com/periareon/rules_helm/releases/download/0.34.0/rules_helm-v0.34.0.tar.gz"
+        ],
+        "integrity": "sha256-yqP2rcLMAp4K1QehXFwetzw5OBXIZrALiwOeL0+avTI=",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/rules_helm/0.34.0/MODULE.bazel",
+          "integrity": "sha256-JcJiiHEWZpO9hsbZj2zZpuOp2ez8uowGzbQb8jBYNyA="
+        }
+      }
+    },
+    {
+      "name": "rules_terraform",
+      "version": "0.0.4",
+      "source": {
+        "urls": [
+          "https://github.com/periareon/rules_terraform/releases/download/0.0.4/rules_terraform-0.0.4.tar.gz"
+        ],
+        "integrity": "sha256-/w066v8+rZWuyBqMQxD/KbUEnNtrOCoQLRWRJ07VKBk=",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/rules_terraform/0.0.4/MODULE.bazel",
+          "integrity": "sha256-EXXIGn7OtFNT8YWKcycnsEZEYekWG90+VnhBTPbLt9g="
+        }
+      }
+    },
+    {
+      "name": "rules_elixir",
+      "version": "1.1.0",
+      "source": {
+        "urls": [
+          "https://github.com/rabbitmq/rules_elixir/releases/download/v1.1.0/rules_elixir-1.1.0.tar.gz"
+        ],
+        "integrity": "sha256-vxa68n7U9GkpDDkdzlBFh44cxL9MX/gwEWyXB9PG3q8=",
+        "strip_prefix": "rules_elixir-1.1.0",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/rules_elixir/1.1.0/MODULE.bazel",
+          "integrity": "sha256-ahwH1NV26WFYeXeduGvuDBPc65RXqGG8/b0e3C8sGEk="
+        },
+        "module_append": "\n# bazel-matrix: the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed (go/private/rules/cgo.bzl)\nsingle_version_override(module_name = \"rules_go\", version = \"0.65.0\")\n"
+      }
+    },
+    {
+      "name": "rules_doxygen",
+      "version": "2.7.0",
+      "source": {
+        "urls": [
+          "https://github.com/TendTo/rules_doxygen/releases/download/2.7.0/rules_doxygen-2.7.0.tar.gz"
+        ],
+        "integrity": "sha256-UC/0qzdz/bqTLDx7t918gQg7j6j5R8pH4iL4hZz6J/E=",
+        "strip_prefix": "rules_doxygen-2.7.0",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/rules_doxygen/2.7.0/MODULE.bazel",
+          "integrity": "sha256-h17/K4BHpc0vzXjCQ9iNWuO4rW7Gg2vz+cTuR8l6hzQ="
+        }
+      }
+    },
+    {
+      "name": "rules_graalvm",
+      "version": "0.11.1",
+      "source": {
+        "urls": [
+          "https://github.com/sgammon/rules_graalvm/releases/download/v0.11.1/rules_graalvm-0.11.1.zip"
+        ],
+        "integrity": "sha256-5PonWwYtzQOx7LArsl8B6tUSAjAGqHSl4MLLeLptjnM=",
+        "strip_prefix": "rules_graalvm-0.11.1",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/rules_graalvm/0.11.1/MODULE.bazel",
+          "integrity": "sha256-DKrqLf9gtwuPm5zrblroFbha5hCgOSQzoix1Wy8sJFY="
+        }
+      }
+    },
+    {
+      "name": "rules_jupyter",
+      "version": "0.8.0",
+      "source": {
+        "urls": [
+          "https://github.com/periareon/rules_jupyter/releases/download/0.8.0/rules_jupyter-0.8.0.tar.gz"
+        ],
+        "integrity": "sha256-3VTzdMmjIeIg5g9ruP0cJyN7LJMAWweKp/b9xREuk0c=",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/rules_jupyter/0.8.0/MODULE.bazel",
+          "integrity": "sha256-pB9jmo7Dv7fXdf+GMK/c6okEibUb7IcVF9vUnge4jp4="
+        }
+      }
+    },
+    {
+      "name": "rules_minijinja",
+      "version": "0.2.0",
+      "source": {
+        "urls": [
+          "https://github.com/dududko/rules_minijinja/releases/download/v0.2.0/rules_minijinja-v0.2.0.tar.gz"
+        ],
+        "integrity": "sha256-W47Z9R4agi1Pe8s39KMVpyzqGdO03Hi9M/Gsss8IxYY=",
+        "strip_prefix": "rules_minijinja-0.2.0",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/rules_minijinja/0.2.0/patches/module_dot_bazel_version.patch",
+            "integrity": "sha256-aEqBRkymCgE/G+5rtloxTWveptnnww7IVwJoLyGvcwM="
+          }
+        ],
+        "patch_strip": 1,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/rules_minijinja/0.2.0/MODULE.bazel",
+          "integrity": "sha256-hR3wmDlXJimBG/S4qe0pkDoEctVWFZWQAQVYubItNxU="
+        },
+        "module_append": "\n# bazel-matrix: the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed (go/private/rules/cgo.bzl)\nsingle_version_override(module_name = \"rules_go\", version = \"0.65.0\")\n"
+      }
+    },
+    {
+      "name": "rules_playwright",
+      "version": "0.5.3",
+      "source": {
+        "urls": [
+          "https://github.com/mrmeku/rules_playwright/releases/download/v0.5.3/rules_playwright-v0.5.3.tar.gz"
+        ],
+        "integrity": "sha256-9B265ReI2rU9cSd87ggWn1KU85CgsrKjd+BLzqE0LGc=",
+        "strip_prefix": "rules_playwright-0.5.3",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/rules_playwright/0.5.3/patches/module_dot_bazel_version.patch",
+            "integrity": "sha256-yKA42sg6uia687HSyyL1SNYvlIdtblOkjZcIRFQXWwI="
+          }
+        ],
+        "patch_strip": 1,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/rules_playwright/0.5.3/MODULE.bazel",
+          "integrity": "sha256-EF2wgVij8yMCoDJS5e7F6e4BomdNPs2pStLEGjAAEhc="
+        },
+        "module_append": "\n# bazel-matrix: the resolved aspect_bazel_lib's toolchain repos call rule(incompatible_use_toolchain_transition=...), which Bazel 9 removed; registering them breaks toolchain resolution for every target\nsingle_version_override(module_name = \"aspect_bazel_lib\", version = \"2.22.5\")\n"
+      }
+    },
+    {
+      "name": "rules_poetry",
+      "version": "0.3.6",
+      "source": {
+        "urls": [
+          "https://github.com/oxidase/rules_poetry/releases/download/v0.3.6/rules_poetry-0.3.6.tar.gz"
+        ],
+        "integrity": "sha256-o5P3+O2FebAETerCQb0HXaRm388+FPKhxzjxYuc8MSU=",
+        "strip_prefix": "rules_poetry-0.3.6",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/rules_poetry/0.3.6/patches/module_dot_bazel_version.patch",
+            "integrity": "sha256-Bz4P4Z0GKjOheIBIPHdIfXpP6CliAqjB4SLR543XLs8="
+          }
+        ],
+        "patch_strip": 1,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/rules_poetry/0.3.6/MODULE.bazel",
+          "integrity": "sha256-69DfyxoUKplHVKg8eulI4Fw3ztG9sQO4FVK6dPZ2hbY="
+        }
+      }
+    },
+    {
+      "name": "rules_pkl",
+      "version": "0.17.1",
+      "source": {
+        "urls": [
+          "https://github.com/apple/rules_pkl/releases/download/v0.17.1/rules_pkl-0.17.1.tar.gz"
+        ],
+        "integrity": "sha256-NendKLI0lK1vO4Cs7yQifdnspV4uI+UgavbLNRlM1Rs=",
+        "strip_prefix": "rules_pkl-0.17.1",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/rules_pkl/0.17.1/MODULE.bazel",
+          "integrity": "sha256-wfGGacrYNy23RbKp2RkTCDdov1KfD4Csu3hzPPIh3f0="
+        }
+      }
+    },
+    {
+      "name": "rules_typst",
+      "version": "0.3.0",
+      "source": {
+        "urls": [
+          "https://github.com/periareon/rules_typst/releases/download/0.3.0/rules_typst-0.3.0.tar.gz"
+        ],
+        "integrity": "sha256-QWc78xLEn1drtjsL0AttEJAlGzTO6o4K0pcEVLInyU0=",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/rules_typst/0.3.0/MODULE.bazel",
+          "integrity": "sha256-2Z9kdJRxOTv4yvXXH6emipi0aKeeAj+cqsxpg0xHMag="
+        }
+      }
+    },
+    {
+      "name": "rules_verilator",
+      "version": "1.1.2",
+      "source": {
+        "urls": [
+          "https://github.com/hw-bzl/rules_verilator/releases/download/1.1.2/rules_verilator-1.1.2.tar.gz"
+        ],
+        "integrity": "sha256-9F/A7uDrfDGfuWaKjhgmoAA81j9RqvPc+capTnt3QtI=",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/rules_verilator/1.1.2/MODULE.bazel",
+          "integrity": "sha256-h34OORi26YKzDfZGSpWehb2mBagkDXlvmxpp6ZMNRzU="
+        }
+      }
+    },
+    {
+      "name": "rules_wasm",
+      "version": "2.3.0",
+      "source": {
+        "urls": [
+          "https://github.com/vimana-cloud/rules_wasm/releases/download/v2.3.0/rules_wasm-v2.3.0.tar.gz"
+        ],
+        "integrity": "sha256-wRk7abMrnIN0Yse0DCiQdjdcYUV8kPRdNv9Cx7RL49s=",
+        "strip_prefix": "rules_wasm-2.3.0",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/rules_wasm/2.3.0/MODULE.bazel",
+          "integrity": "sha256-BwHw1MR3tqRwBfeq7BgcNhh2Zg2BrRZOozlb7OajbCw="
+        }
+      }
+    },
+    {
+      "name": "rules_sbom",
+      "version": "0.6.1",
+      "source": {
+        "urls": [
+          "https://github.com/rtbot-dev/rules_sbom/releases/download/v0.6.1/rules_sbom-0.6.1.tar.gz"
+        ],
+        "integrity": "sha256-eKkmWfn2Fm5RgMyQvH1dU8USvmcihkXnhkx2JTZlYnA=",
+        "strip_prefix": "rules_sbom-0.6.1",
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/rules_sbom/0.6.1/MODULE.bazel",
+          "integrity": "sha256-Jppu0WufbkFZFWWXjAel3pWkdWF1TeeEC27fe5sbdRk="
+        }
+      }
+    },
+    {
+      "name": "rules_syft",
+      "version": "0.0.2",
+      "source": {
+        "urls": [
+          "https://github.com/ihavespoons/rules_syft/releases/download/v0.0.2/rules_syft-v0.0.2.tar.gz"
+        ],
+        "integrity": "sha256-AvkaYkDwxU2hJMmeTXkXIHoekAB/xpNA3/K9m5LoyVc=",
+        "strip_prefix": "rules_syft-0.0.2",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/rules_syft/0.0.2/patches/module_dot_bazel_version.patch",
+            "integrity": "sha256-JR0tgLRHCrn+bW5WRQZmG0VBqabU7zv6KNu/7PrEb7g="
+          }
+        ],
+        "patch_strip": 1,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/rules_syft/0.0.2/MODULE.bazel",
+          "integrity": "sha256-aqMzGm5E9Hjnn0AYqm+22cn2JFHj737ehYzSlx/BXvg="
+        },
+        "module_append": "\n# bazel-matrix: the resolved aspect_bazel_lib's toolchain repos call rule(incompatible_use_toolchain_transition=...), which Bazel 9 removed; registering them breaks toolchain resolution for every target\nsingle_version_override(module_name = \"aspect_bazel_lib\", version = \"2.22.5\")\n"
+      }
+    },
+    {
+      "name": "rules_shar",
+      "version": "1.3.0",
+      "source": {
+        "urls": [
+          "https://github.com/filmil/rules_shar/releases/download/v1.3.0/rules_shar-v1.3.0.zip"
+        ],
+        "integrity": "sha256-RwOZ76nkD0ViF3E1odoXYyx4tHhJtinDfkjRo00CQQU=",
+        "patches": [
+          {
+            "url": "https://bcr.bazel.build/modules/rules_shar/1.3.0/patches/module_dot_bazel_version.patch",
+            "integrity": "sha256-xt1jLW0Mzc3AiYmpU67PS8uwXqkdOLQYf3LD/aJZzdg="
+          }
+        ],
+        "patch_strip": 1,
+        "module_file": {
+          "url": "https://bcr.bazel.build/modules/rules_shar/1.3.0/MODULE.bazel",
+          "integrity": "sha256-Sn55bu/bnUerolHG8sw42nBb6XT/TFSgeZYFhVP/CF4="
         }
       }
     }
