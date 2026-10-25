@@ -90,6 +90,21 @@ class ParseLogTest(unittest.TestCase):
         _, _, status = run.parse_log("(command exited with code 0)", "build", {"zlib": "build"})
         self.assertEqual(status, {"zlib": "UNKNOWN"})
 
+    def test_build_failure_summary(self):
+        log = "\n".join([
+            OUTER,
+            "INFO: Found 1 target...",
+            "Target //apple_support:build failed to build",
+            "Use --verbose_failures to see the command lines of failed build steps.",
+            "INFO: Elapsed time: 41.7s, Critical Path: 41.0s",
+            "INFO: 2 processes: 11 action cache hit, 2 internal.",
+            "ERROR: Build did NOT complete successfully",
+            OUTER,
+            "(command exited with code 1)",
+        ])
+        self.assertEqual(run.parse_log(log, "build", {"apple_support": "build"})[2],
+                         {"apple_support": "FAILED"})
+
     def test_build_of_known_failing_test_project(self):
         log = "\n".join([
             OUTER,

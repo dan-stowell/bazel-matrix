@@ -59,7 +59,7 @@ _END = {"build": re.compile(r"^INFO: Elapsed time: "),
         "test": re.compile(r"^Executed \d+ out of \d+ tests?\b")}
 # What the outer summary is made of, read backwards from its end.
 _SUMMARY = re.compile(r"^(\s|$|//|@|Target //|INFO: (Elapsed time|\d+ processes|Build completed)|"
-                      r"ERROR: Build did NOT|FAILED: Build did NOT)")
+                      r"ERROR: Build did NOT|FAILED: Build did NOT|Use --verbose_failures )")
 
 _procs, _lock = [], threading.Lock()
 

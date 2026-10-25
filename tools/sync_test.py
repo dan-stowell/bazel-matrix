@@ -27,11 +27,27 @@ class ParseProjectsTxtTest(unittest.TestCase):
     def test_override(self):
         p = sync.parse_projects_txt("m\n  override rules_cc 0.2.27  drops the root includes check\n")[0]
         self.assertEqual(p["overrides"], [("rules_cc", "0.2.27", "drops the root includes check")])
-        self.assertEqual(sync.module_append(p["overrides"]),
+        self.assertEqual(sync.module_append(p["overrides"], 'module(name = "m")\n'),
                          '\n# bazel-matrix: drops the root includes check\n'
                          'single_version_override(module_name = "rules_cc", version = "0.2.27")\n')
         with self.assertRaises(ValueError):
             sync.parse_projects_txt("m\n  override rules_cc 0.2.27\n")
+
+    def test_override_conflicts(self):
+        o = [("rules_cc", "0.2.27", "r")]
+        with self.assertRaisesRegex(ValueError, "listed twice for rules_cc"):
+            sync.module_append(o + [("rules_cc", "0.2.26", "r")], "")
+        with self.assertRaisesRegex(ValueError, "already has single_version_override for rules_cc"):
+            sync.module_append(o, 'single_version_override(\n    version = "1",\n    module_name = "rules_cc",\n)\n')
+        with self.assertRaisesRegex(ValueError, "already has git_override"):
+            sync.module_append(o, 'git_override(module_name = "rules_cc", remote = "x", commit = "y")')
+        with self.assertRaisesRegex(ValueError, "isn't a string literal"):
+            sync.module_append(o, 'N = "rules_cc"\nsingle_version_override(module_name = N, version = "1")\n')
+        with self.assertRaisesRegex(ValueError, "include"):
+            sync.module_append(o, 'include("//:deps.MODULE.bazel")\n')
+        # Other modules' overrides and commented-out ones are fine.
+        sync.module_append(o, 'single_version_override(module_name = "zlib", version = "1")\n'
+                              '# single_version_override(module_name = "rules_cc", version = "1")\n')
 
     def test_known_failing(self):
         projects = sync.parse_projects_txt(
