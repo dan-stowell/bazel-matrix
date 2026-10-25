@@ -7,6 +7,4 @@ project(
     targets = [
         "//...",
     ],
-    # its sources include tcmalloc/internal/config.h, which stops 1710 compiles with #error "GCC 12.1 or higher is required.": the executor image has gcc 11 (the overrides below get it past analysis)
-    known_failing = "build",
 )

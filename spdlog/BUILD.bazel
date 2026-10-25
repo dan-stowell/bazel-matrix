@@ -6,7 +6,5 @@ project(
     name = "spdlog",
     targets = [
         "//...",
-        # tests/test_systemd.cpp needs systemd/sd-journal.h, which the executor image lacks
-        "-//:spdlog_test",
     ],
 )

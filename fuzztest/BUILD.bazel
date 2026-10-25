@@ -7,6 +7,4 @@ project(
     targets = [
         "//...",
     ],
-    # needs clang: its .bazelrc passes --cxxopt=-Wc++17-compat-pedantic and centipede's build_defs pass -gline-tables-only, which gcc (the images' only compiler) rejects
-    known_failing = "build",
 )

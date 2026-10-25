@@ -6,8 +6,6 @@ project(
     name = "glib",
     targets = [
         "//...",
-        # test_GDateTime_equal: 'tz' should not be NULL (needs tzdata, which the executor image lacks)
-        "-//glib/tests:gdatetime",
         # test_cleanup_handles_errors chmods the runtime dir to 0 so cleanup can't delete it, but the executors run tests as root: cleanup deletes it and g_chmod (runtime_dir, 0755) fails with ENOENT
         "-//glib/tests:utils-isolated",
     ],

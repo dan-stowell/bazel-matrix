@@ -7,6 +7,4 @@ project(
     targets = [
         "//...",
     ],
-    # its .bazelrc passes clang-only warning flags (-Wmost, -Wthread-safety) to every compile, and the images have only gcc
-    known_failing = "build",
 )

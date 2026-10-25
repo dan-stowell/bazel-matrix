@@ -14,16 +14,12 @@
 
 zlib
 abseil-cpp
-  -//absl/time:time_test  needs tzdata (/usr/share/zoneinfo), which the executor image lacks
-  -//absl/time/internal/cctz:time_zone_format_test  needs tzdata, which the executor image lacks
-  -//absl/time/internal/cctz:time_zone_lookup_test  needs tzdata, which the executor image lacks
 re2
   --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: app/BUILD.bazel calls native cc_binary without a load()
   --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
   -//app/...  an emscripten app (app/_re2.cc includes emscripten/bind.h), which needs an emsdk the image lacks
 protobuf
   -//build_defs:cc_proto_blacklist_test  fails: expects the well-known types' cc_proto targets to provide no files, gets 4 each
-  -//python:well_known_types_test  needs the tzdata Python module or system tzdata, which the executor image lacks
   -//ruby/...  rules_ruby needs a system ruby, which the runner image lacks
   -//conformance/ruby/...  rules_ruby needs a system ruby, which the runner image lacks
   -//csharp/...  needs dotnet; unittest_deep_dependencies refers to Google-internal net/proto2
@@ -55,7 +51,6 @@ google_benchmark
   --incompatible_autoload_externally=+@rules_cc  its dev deps (an old googletest) call native cc_library/cc_test, which Bazel 9 removed; autoload them from rules_cc
 fmt
 spdlog
-  -//:spdlog_test  tests/test_systemd.cpp needs systemd/sd-journal.h, which the executor image lacks
 nlohmann_json
 boringssl
 openssl
@@ -157,7 +152,6 @@ snappy
   -//:snappy_benchmark  needs //:snappy-test (above)
   -//:snappy_unittest  needs //:snappy-test (above)
 xz
-  -//:ossfuzz  needs -fsanitize=fuzzer (clang); the executors' gcc rejects it
 yaml-cpp
 flatbuffers
   -//swift/...  no Swift toolchain on Linux here
@@ -196,8 +190,6 @@ gazelle
   -//tools/convert-go-deps-test-case:convert-go-deps-test-case_test  every TestRoundTrip subtest: "go: cannot find GOROOT directory: 'go' binary is trimmed and GOROOT is not set"
 rules_cc
   -//tests/system_library:system_library_test  runs `bazel`, which isn't on the test's PATH (bazel: command not found)
-  -//tests/integration:lto_tests  needs clang: prints "clang not installed. Skipping test." and exits nonzero
-  -//tests/integration:ftime_trace_tests  needs clang: prints "clang/clang++ not installed. Skipping test." and exits nonzero
 rules_cc_autoconf
   -//gnulib/tests/compat/dprintf-gnu:dprintf-gnu_test_gnu_conformance  GNU autoconf and Bazel disagree on config.h/subst.h on the executors
   -//gnulib/tests/compat/dprintf-posix:dprintf-posix_test_gnu_conformance  GNU autoconf and Bazel disagree on config.h/subst.h on the executors
@@ -238,7 +230,6 @@ tar.bzl
   --spawn_strategy=local  test_17_after_processing and test23-25 need symlinks kept in action inputs (preserve_symlinks readlinks them): they fail under RBE (symlinks staged as regular files) and under linux-sandbox, pass with local
   --noremote_accept_cached  with --spawn_strategy=local: don't reuse outputs that remote execution produced for the same action keys
 toolchains_llvm
-  -//utils:extra_distributions_test  utils/extra_distributions.sh needs jq, which the executor image lacks
 
 # Chunk 4 (cont.): known-failing projects from the first batch.
 bazel_lib
@@ -254,7 +245,6 @@ opentelemetry-cpp
 protoc-gen-validate
   known-failing build  its re2 dependency calls native cc_library (removed in Bazel 9), and java targets need WORKSPACE repos (@com_google_guava)
 rules_fuzzing
-  known-failing build  needs clang: its .bazelrc sets CC=clang and //fuzzing/private/runtime copies libclang_rt sanitizer runtimes; the images have only gcc
 rules_jvm_external
   known-failing build  needs an Android SDK: @androidsdk//:aapt2 and friends are undeclared without one
 rules_oci
@@ -278,7 +268,6 @@ boost.container_hash
 libx11
 aspect_tools_telemetry
 glib
-  -//glib/tests:gdatetime  test_GDateTime_equal: 'tz' should not be NULL (needs tzdata, which the executor image lacks)
   -//glib/tests:utils-isolated  test_cleanup_handles_errors chmods the runtime dir to 0 so cleanup can't delete it, but the executors run tests as root: cleanup deletes it and g_chmod (runtime_dir, 0755) fails with ENOENT
 gz-utils
   --strategy=TestRunner=local  //:buildifier.test (buildifier_prebuilt's runner) does `$(readlink <buildifier runfile>)` under set -e, and RBE stages runfiles as regular files, so readlink exits 1 silently; run tests on the runner, where runfiles are symlinks
@@ -534,15 +523,9 @@ j2cl
   known-failing build  dozens of its packages call native proto_library/java_proto_library without a load() (main-repo autoloads would fix those), but junit/.../j2cl_junit_integration_test.bzl uses an undefined kotlin_and_j2cl_library and rules_jvm_external's coursier needs a host java ("exec: java: not found")
 imgui
   --incompatible_autoload_externally=+@rules_cc  its deps (glfw) call native cc_library, which Bazel 9 removed; autoload them from rules_cc
-  -//backends:renderer-opengl3  links -lGL, which the images lack
-  -//backends:platform-glfw  its dep glfw includes X11/Xlib.h, which the images lack
-  -//examples/example_glfw_opengl3/...  uses //backends:platform-glfw and //backends:renderer-opengl3 (X11 headers, -lGL)
 gz-plugin
   --strategy=TestRunner=local  //:buildifier.test (buildifier_prebuilt's runner) does `$(readlink <buildifier runfile>)` under set -e, and RBE stages runfiles as regular files, so readlink exits 1 silently; run tests on the runner, where runfiles are symlinks
 gutil
-  --action_env=CC=gcc  its .bazelrc sets --action_env=CC=clang, and the images have only gcc
-  --action_env=CXX=g++  its .bazelrc sets --action_env=CXX=clang++, and the images have only gcc
-  --repo_env=CC=gcc  its .bazelrc sets --repo_env=CC=/usr/bin/clang, and the images have only gcc
 gperf
 fribidi
 cython
@@ -639,7 +622,6 @@ grpc-proto
 glpk
   known-failing build  its overlay's cc_library adds -I$(package path)/src, which as the main repo is "/src": "The include path '/src' references a path outside of the execution root"
 gloop
-  known-failing build  its .bazelrc passes clang-only warning flags (-Wmost, -Wthread-safety) to every compile, and the images have only gcc
 geographiclib
 doctest
 darts-clone
@@ -724,7 +706,6 @@ cpp-httplib
 cpu_features
 cxxopts
 fuzztest
-  known-failing build  needs clang: its .bazelrc passes --cxxopt=-Wc++17-compat-pedantic and centipede's build_defs pass -gline-tables-only, which gcc (the images' only compiler) rejects
 gdk-pixbuf
   -//tests:pixbuf-fail  tests/test-images/fail/bug793470-crasher.png declares 935820x854554 pixels (~2.4 TB as RGB), and the PNG loader allocates for it instead of rejecting it until the executor OOM-kills the test (observed 55-67 GB); bisected on RBE, the other 40 images pass, but a --test_arg=-s=... skip would reach every test in the project, and pixbuf-lowmem reads its args as image files
 ghdl
@@ -830,11 +811,6 @@ lz4-erlang
 # Chunk b-5: more reverse-dep modules (m-z).
 squashfs-tools
 rules_rust_wasm_bindgen
-  -//test:hello_world_bundler_wasm_bindgen_test  its hermetic Firefox (@firefox_linux_x86_64) fails to start under webdriver: libmozgtk.so needs libgtk-3.so.0, which the executor image lacks
-  -//test:hello_world_deno_wasm_bindgen_test  its hermetic Firefox (@firefox_linux_x86_64) fails to start under webdriver: libmozgtk.so needs libgtk-3.so.0, which the executor image lacks
-  -//test:hello_world_nodejs_wasm_bindgen_test  its hermetic Firefox (@firefox_linux_x86_64) fails to start under webdriver: libmozgtk.so needs libgtk-3.so.0, which the executor image lacks
-  -//test:hello_world_nomodules_wasm_bindgen_test  its hermetic Firefox (@firefox_linux_x86_64) fails to start under webdriver: libmozgtk.so needs libgtk-3.so.0, which the executor image lacks
-  -//test:hello_world_web_wasm_bindgen_test  its hermetic Firefox (@firefox_linux_x86_64) fails to start under webdriver: libmozgtk.so needs libgtk-3.so.0, which the executor image lacks
 rules_closure
   known-failing build  closure/compiler/test and third_party/phantomjs call native sh_test/sh_binary without a load() (main-repo autoloads fix those), but @maven fails: rules_jvm_external's coursier needs a host java ("exec: java: not found"); its resolved rules_go uses the removed native CcInfo
 rules_dart
@@ -923,7 +899,6 @@ fxdiv
   --incompatible_autoload_externally=+@rules_cc  its deps googletest and google_benchmark call native cc_library, which Bazel 9 removed; autoload them from rules_cc
 generate_export_header
 glu
-  known-failing build  its sources include GL/gl.h, which no declared dep provides and the executor image lacks (no OpenGL/Mesa headers)
 google_cloud_cpp
   --test_tag_filters=-integration-test  skips the tests tagged integration-test (generated *_samples, examples and *_integration_test): they call live Google Cloud APIs and need GOOGLE_CLOUD_PROJECT and credentials, so on RBE they fail (samples with "Missing command")
   -//generator/integration_tests:tests_golden_kitchen_sink_rest_metadata_decorator_test  CustomHeaders expects header-key1's two values in the order set but gets them reversed ({"header-value2", "header-value1"}): the test assumes an iteration order its header container doesn't guarantee
@@ -967,7 +942,6 @@ tomlplusplus
 thrift
 tink_cc
 tcmalloc
-  known-failing build  its sources include tcmalloc/internal/config.h, which stops 1710 compiles with #error "GCC 12.1 or higher is required.": the executor image has gcc 11 (the overrides below get it past analysis)
   override aspect_bazel_lib 2.22.5  the resolved aspect_bazel_lib's toolchain repos call rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
   override aspect_rules_esbuild 0.27.1  the resolved aspect_rules_esbuild calls rule() with incompatible_use_toolchain_transition (esbuild/private/resolved_toolchain.bzl), which Bazel 9 removed
 utf8proc
@@ -1042,11 +1016,7 @@ sse2neon
 sdl3
 sfml
   -//bazel_test/...  a separate workspace (bazel_test/MODULE.bazel, the BCR test module); from the root its smoke_test depends on //:sfml (above)
-  -//:window  links the system libudev and includes libudev.h (see its BUILD.bazel), which the executor image lacks
-  -//:graphics  depends on //:window (above)
-  -//:sfml  depends on //:window (above)
 seastar
-  known-failing build  its core library //:seastar includes system headers the executor image lacks (valgrind/valgrind.h, hwloc.h, netinet/sctp.h) and uses std::hardware_destructive_interference_size, which the image's gcc 11 libstdc++ lacks (the flags below get it to compile)
   --cxxopt=-std=c++20  it needs C++20 (std::source_location, std::convertible_to, requires), and the default is C++17
   --host_cxxopt=-std=c++20  it needs C++20 (std::source_location, std::convertible_to, requires), and the default is C++17
   --incompatible_autoload_externally=+@rules_cc  the yaml-cpp 0.8.0 it resolves has a BUILD.bazel calling native cc_library, which Bazel 9 removed; autoload it from rules_cc

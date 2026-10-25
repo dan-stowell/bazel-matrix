@@ -6,7 +6,5 @@ project(
     name = "xz",
     targets = [
         "//...",
-        # needs -fsanitize=fuzzer (clang); the executors' gcc rejects it
-        "-//:ossfuzz",
     ],
 )

@@ -7,6 +7,4 @@ project(
     targets = [
         "//...",
     ],
-    # its sources include GL/gl.h, which no declared dep provides and the executor image lacks (no OpenGL/Mesa headers)
-    known_failing = "build",
 )

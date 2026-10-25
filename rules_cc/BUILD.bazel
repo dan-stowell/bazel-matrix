@@ -8,9 +8,5 @@ project(
         "//...",
         # runs `bazel`, which isn't on the test's PATH (bazel: command not found)
         "-//tests/system_library:system_library_test",
-        # needs clang: prints "clang not installed. Skipping test." and exits nonzero
-        "-//tests/integration:lto_tests",
-        # needs clang: prints "clang/clang++ not installed. Skipping test." and exits nonzero
-        "-//tests/integration:ftime_trace_tests",
     ],
 )

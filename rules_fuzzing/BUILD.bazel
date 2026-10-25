@@ -7,6 +7,4 @@ project(
     targets = [
         "//...",
     ],
-    # needs clang: its .bazelrc sets CC=clang and //fuzzing/private/runtime copies libclang_rt sanitizer runtimes; the images have only gcc
-    known_failing = "build",
 )

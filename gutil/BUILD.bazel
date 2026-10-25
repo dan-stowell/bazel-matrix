@@ -7,12 +7,4 @@ project(
     targets = [
         "//...",
     ],
-    flags = [
-        # its .bazelrc sets --action_env=CC=clang, and the images have only gcc
-        "--action_env=CC=gcc",
-        # its .bazelrc sets --action_env=CXX=clang++, and the images have only gcc
-        "--action_env=CXX=g++",
-        # its .bazelrc sets --repo_env=CC=/usr/bin/clang, and the images have only gcc
-        "--repo_env=CC=gcc",
-    ],
 )

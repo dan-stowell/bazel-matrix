@@ -6,7 +6,5 @@ project(
     name = "toolchains_llvm",
     targets = [
         "//...",
-        # utils/extra_distributions.sh needs jq, which the executor image lacks
-        "-//utils:extra_distributions_test",
     ],
 )
