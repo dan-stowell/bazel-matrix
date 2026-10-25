@@ -1311,7 +1311,7 @@ rules_mypy
 rules_tar
   override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed
   override aspect_bazel_lib 2.22.5  the resolved aspect_bazel_lib's toolchain repos call rule(incompatible_use_toolchain_transition=...), which Bazel 9 removed; registering them breaks toolchain resolution for every target
-  override hermetic_cc_toolchain 4.3.0  the resolved hermetic_cc_toolchain's toolchain/private/cc_toolchains.bzl fails to load under Bazel 9: a rule() there gets None in provides ("at index 0 of provides, got element of type NoneType, want Provider")
+  override hermetic_cc_toolchain 4.3.0  the hermetic_cc_toolchain 3.1.0 it declares (dev dep) has toolchain/zig_toolchain.bzl do rule(provides = [CcToolchainConfigInfo]) with the native CcToolchainConfigInfo, which is None under Bazel 9 ("at index 0 of provides, got element of type NoneType, want Provider")
 # Chunk D3: more BCR modules (s-z).
 zipkin-api
 zenlib
@@ -1502,3 +1502,86 @@ su-exec
 textforge
   --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel calls native py_library/py_test without a load()
   --incompatible_autoload_externally=+@rules_python  autoload the python rules Bazel 9 removed from rules_python
+
+# Chunk b-9: more libraries, tools and rulesets (m-r).
+modern-cpp-kafka
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: its root BUILD.bazel, examples, tests and tools/console_clients call native cc_* rules without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+  --per_file_copt=.*\.c$@-Wno-error  its .bazelrc sets --copt='-std=c++17', which also reaches C files, and the boringssl it resolves compiles C with -Werror, so GCC's "'-std=c++17' is valid for C++/ObjC++ but not for C" warning fails them; keep it a warning for .c files
+  known-failing build  with those fixes, every binary (examples, tests, tools/console_clients) links both the boringssl and the openssl in its dependency graph, and ld.gold rejects their duplicate symbols ("multiple definition")
+mujoco
+  -//test/user:user_cache_test  test/user/user_cache_test.cc declares constexpr std::string constants, which the executor's GCC (older than 12) rejects ("the type 'const string' of 'constexpr' variable ... is not literal")
+  -//test/sample:compile_test  its script runs third_party/mujoco/sample/compile, a path that isn't in its runfiles ("No such file or directory")
+  -//test/sample:testspeed_test  its script runs third_party/mujoco/sample/testspeed, a path that isn't in its runfiles ("No such file or directory")
+ode
+onednn
+open62541pp
+openblas
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+opencensus-cpp
+  --incompatible_autoload_externally=+@rules_cc,+@com_google_protobuf  the civetweb, curl, grpc and opencensus-proto it resolves have BUILD files calling native cc and proto rules, which Bazel 9 removed; autoload them
+openjph
+openmp
+openvdb
+  --incompatible_autoload_externally=+@rules_cc  the onetbb it resolves has a BUILD.bazel calling native cc rules, which Bazel 9 removed; autoload them from rules_cc
+or-tools
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: examples/contrib/BUILD.bazel calls native rules without a load()
+  --incompatible_autoload_externally=+@rules_cc,+@rules_python,+@rules_java  autoload the cc, python and java rules Bazel 9 removed (also called by the pybind11_bazel and swig it resolves)
+  override rules_go 0.65.0  the resolved rules_go uses the native CcInfo symbol, which Bazel 9 removed (go/private/rules/cgo.bzl)
+  known-failing build  with those fixes, gazelle's go_repository_tools fails ("go.work requires go >= 1.24.12 (running go 1.22.4)": its Go SDK is too old), and @maven's coursier needs a host java ("exec: java: not found")
+osqp-eigen
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: tests/BUILD.bazel calls native cc_test without a load()
+  --incompatible_autoload_externally=+@rules_cc  autoload the cc rules Bazel 9 removed from rules_cc
+  override rules_cuda 0.2.5  the resolved rules_cuda 0.2.4 uses the native CcInfo symbol, which Bazel 9 removed (cuda/private/rules/cuda_library.bzl)
+  -//tests/...  tests/BUILD.bazel selects on @platforms//os, and its MODULE.bazel doesn't declare platforms
+papilo
+  --incompatible_autoload_externally=+@rules_cc  the bzip2, zstr and boost.iostreams it resolves have BUILD files calling native cc rules, which Bazel 9 removed; autoload them from rules_cc
+patch
+pict
+pinocchio
+  --incompatible_autoload_externally=+@rules_cc  the sdformat it resolves has a BUILD.bazel calling native cc rules, which Bazel 9 removed; autoload them from rules_cc
+  -//:all-joints_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+  -//:cartesian-product-liegroups_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+  -//:constraint_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+  -//:eigen-basic-op_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+  -//:eigen-tensor_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+  -//:explog_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+  -//:joint-free-flyer_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+  -//:joint-generic_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+  -//:joint-mimic_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+  -//:joint-prismatic_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+  -//:liegroups_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+  -//:macros_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+  -//:quaternion_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+  -//:rotation_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+  -//:rpy_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+  -//:symmetric_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+  -//:vector_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+  -//:version_test  aborts at exit after all its cases pass ("*** No errors detected", then "free(): invalid pointer"); the cause is not yet known
+plthook
+  override rules_cc 0.2.27  rules_cc before 0.2.25 rejects its root-package `includes = ["."]` when it is the main repo ("resolves to the workspace root")
+poppler
+portaudio
+postgres
+proxy-wasm-cpp-sdk
+  override emsdk 6.0.13  the emsdk 4.0.13 it declares fails to load under Bazel 9: rule() gets None in provides ("at index 0 of provides, got element of type NoneType") and rule(incompatible_use_toolchain_transition=...)
+  --incompatible_autoload_externally=+@rules_cc  the re2 it resolves has a BUILD.bazel calling native cc rules, which Bazel 9 removed; autoload them from rules_cc
+remotery
+rsync
+rules_ruby
+  -//tools/generate_portable_ruby_checksums:generate_portable_ruby_checksums_test  generate_portable_ruby_checksums.sh runs jq, which the executor image lacks ("jq: command not found")
+  -//tools/generate_portable_ruby_checksums:generate_portable_ruby_checksums_integration_test  generate_portable_ruby_checksums.sh runs jq, which the executor image lacks ("jq: command not found")
+  -//docs:update_1_test  docs/repository_rules.md is out of date for Bazel 9.3.1's stardoc output (the generated docs drop the WORKSPACE-only repo_mapping attribute)
+rules_jni
+  -//docs/...  //docs:rules.extract (stardoc) fails analysis: missing bzl_library targets for @rules_cc's compatibility proxy modules
+rules_pex
+  known-failing build  its .bazelrc sets --incompatible_merge_fixed_and_default_shell_env, which Bazel 9 no longer recognizes ("Unrecognized option")
+rules_cue
+  known-failing build  its CUE actions' runner script joins $PWD with input paths that are already absolute ("stat <execroot>/var/tmp/.../src/test/testdata/injection/injection.cue: no such file", and /buildbuddy-execroot twice on RBE), so every cue_export/cue_def action fails
+rules_kustomize
+rules_sh
+  --noincompatible_disable_autoloads_in_main_repo  Bazel 9 defaults --incompatible_disable_autoloads_in_main_repo to true: sh/docs/BUILD.bazel calls native sh_binary without a load()
+  --incompatible_autoload_externally=+@rules_shell  autoload the sh rules Bazel 9 removed from rules_shell
+rules_shellspec
+  --lockfile_mode=off  its MODULE.bazel.lock has a version Bazel 9.3.1 doesn't support ("The version of MODULE.bazel.lock is not supported")
+  known-failing build  its resolved gazelle and aspect_rules_lint load toolchain code calling rule(incompatible_use_toolchain_transition=...), which Bazel 9 removed, and its rules_go uses the removed native CcInfo
