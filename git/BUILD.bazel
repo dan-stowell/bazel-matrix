@@ -6,7 +6,5 @@ project(
     name = "git",
     targets = [
         "//...",
-        # every t/tNNNN-* sh_test fails "file 't/bazel-test-wrapper.sh' is not executable": the registry overlay file is downloaded without the executable bit (as http_archive does)
-        "-//t:all",
     ],
 )

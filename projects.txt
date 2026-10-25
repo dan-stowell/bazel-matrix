@@ -1082,7 +1082,6 @@ gazelle_cc
   -//language/cc/testdata:cc_grpc_library_index_only_compilation  same: its compilation-test repo loads grpc 1.70.1's bazel/generate_cc.bzl, which Bazel 9 rejects
 gcem
 git
-  -//t:all  every t/tNNNN-* sh_test fails "file 't/bazel-test-wrapper.sh' is not executable": the registry overlay file is downloaded without the executable bit (as http_archive does)
 glew
   known-failing build  glu's GL/glu.h includes GL/gl.h, which no declared dep provides and the executor image lacks (no OpenGL/Mesa headers)
 gperftools

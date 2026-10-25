@@ -24,7 +24,9 @@ def _bcr_source_impl(rctx):
     # registry's patches, then the registry's MODULE.bazel.
     for path, url_integrity in rctx.attr.overlay.items():
         url, integrity = url_integrity.split(" ")
-        rctx.download(url = url, output = path, integrity = integrity)
+        # Executable, as http_archive's remote_file_urls: overlaid files
+        # may be shell scripts (git's t/bazel-test-wrapper.sh).
+        rctx.download(url = url, output = path, integrity = integrity, executable = True)
     for i, (url, integrity) in enumerate(rctx.attr.patches.items()):
         patch = ".bazel_matrix_patch_%d" % i
         rctx.download(url = url, output = patch, integrity = integrity)
