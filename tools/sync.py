@@ -44,11 +44,12 @@ KNOWN_FAILING = ("build", "test")
 def parse_projects_txt(text):
     """[{name, version, exclude: [(pattern, reason)], flags: [(flag, reason)],
     bazel: (version, reason) or None, known_failing: (build|test, reason) or
-    None}] from projects.txt.
+    None, overrides: [(module, version, reason)]}] from projects.txt.
 
     A project line is `module` or `module@version`. Indented lines below it
-    are `-//pattern reason`, `--flag reason`, `bazel <version> reason` or
-    `known-failing build|test reason`; every one needs a reason.
+    are `-//pattern reason`, `--flag reason`, `bazel <version> reason`,
+    `known-failing build|test reason` or `override <module> <version>
+    reason`; every one needs a reason.
     """
     projects, errors = [], []
     for n, raw in enumerate(text.splitlines(), 1):
@@ -64,15 +65,17 @@ def parse_projects_txt(text):
                 errors.append("line %d: %s listed twice" % (n, name))
             projects.append({"name": name, "version": version or None,
                              "exclude": [], "flags": [], "bazel": None,
-                             "known_failing": None})
+                             "known_failing": None, "overrides": []})
             continue
         if not projects:
             errors.append("line %d: indented line before any project" % n)
             continue
-        two_words = line.startswith(("bazel ", "known-failing "))
-        parts = line.split(None, 2 if two_words else 1)
+        words = {"bazel": 2, "known-failing": 2, "override": 3}.get(line.split()[0], 1)
+        parts = line.split(None, words)
         p = projects[-1]
-        if parts[0] == "bazel" and len(parts) == 3:
+        if parts[0] == "override" and len(parts) == 4 and re.fullmatch(r"[a-z][a-z0-9._-]*", parts[1]):
+            p["overrides"].append((parts[1], parts[2], parts[3]))
+        elif parts[0] == "bazel" and len(parts) == 3:
             p["bazel"] = (parts[1], parts[2])
         elif parts[0] == "known-failing" and len(parts) == 3 and parts[1] in KNOWN_FAILING:
             if p["known_failing"]:
@@ -85,8 +88,9 @@ def parse_projects_txt(text):
         elif parts[0].startswith("--"):
             p["flags"].append((parts[0], parts[1]))
         else:
-            errors.append("line %d: expected -//pattern, --flag, bazel <version> or "
-                          "known-failing build|test, each with a reason: %r" % (n, line))
+            errors.append("line %d: expected -//pattern, --flag, bazel <version>, "
+                          "known-failing build|test or override <module> <version>, each with a "
+                          "reason: %r" % (n, line))
     if errors:
         raise ValueError("projects.txt:\n  " + "\n  ".join(errors))
     return projects
@@ -168,6 +172,12 @@ def integrity(data):
     return "sha256-" + base64.b64encode(hashlib.sha256(data).digest()).decode()
 
 
+def module_append(overrides):
+    """Lines appended to a project's MODULE.bazel for its `override` lines."""
+    return "".join("\n# bazel-matrix: %s\nsingle_version_override(module_name = %s, version = %s)\n"
+                   % (reason, _q(m), _q(v)) for m, v, reason in overrides)
+
+
 def source_entry(name, version, source, module_file):
     """projects.json's `source` for a BCR source.json and MODULE.bazel (bytes).
 
@@ -239,6 +249,7 @@ def counts(projects, skipped):
         "known_failing_test": kf.count("test"),
         "exclusions": sum(len(p["exclude"]) for p in projects),
         "flags": sum(len(p["flags"]) for p in projects),
+        "overrides": sum(len(p.get("overrides", [])) for p in projects),
         "skipped": len(skipped),
     }
 
@@ -246,7 +257,7 @@ def counts(projects, skipped):
 def status_line(c):
     return ("%(projects)d projects: %(known_failing_build)d known-failing build, "
             "%(known_failing_test)d known-failing test, %(exclusions)d target exclusions, "
-            "%(flags)d extra flags, %(skipped)d skipped by sync" % c)
+            "%(flags)d extra flags, %(overrides)d module overrides, %(skipped)d skipped by sync" % c)
 
 
 def default_inner_bazel(versions_bzl):
@@ -343,6 +354,8 @@ def main():
             continue
         try:
             entry = source_entry(p["name"], version, source, module_file)
+            if p["overrides"]:
+                entry["module_append"] = module_append(p["overrides"])
         except ValueError as e:
             skipped.append({"name": p["name"], "reason": str(e)})
             continue

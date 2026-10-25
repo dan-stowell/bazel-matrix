@@ -32,6 +32,9 @@ def _bcr_source_impl(rctx):
         rctx.delete(patch)
     rctx.delete("MODULE.bazel")
     rctx.download(url = rctx.attr.module_file[0], output = "MODULE.bazel", integrity = rctx.attr.module_file[1])
+    if rctx.attr.module_append:
+        # projects.txt `override` lines, as single_version_override()s.
+        rctx.file("MODULE.bazel", rctx.read("MODULE.bazel") + rctx.attr.module_append)
 
     # A deterministic tar of the patched tree, so the outer action key only
     # changes when the source does.
@@ -70,6 +73,8 @@ bcr_source = repository_rule(
         "integrity": attr.string(mandatory = True),
         # [url, integrity] of the registry's MODULE.bazel.
         "module_file": attr.string_list(mandatory = True),
+        # Appended to MODULE.bazel; see tools/sync.py's module_append.
+        "module_append": attr.string(),
         # path -> "url integrity"
         "overlay": attr.string_dict(),
         "patch_strip": attr.int(),
@@ -113,6 +118,7 @@ def _projects_impl(mctx):
             patch_strip = s.get("patch_strip", 0),
             overlay = {x["path"]: x["url"] + " " + x["integrity"] for x in s.get("overlay", [])},
             module_file = [s["module_file"]["url"], s["module_file"]["integrity"]],
+            module_append = s.get("module_append", ""),
         )
         names.append(p["name"])
     for v, info in INNER_BAZELS.items():
