@@ -7,6 +7,8 @@ project(
     targets = [
         "//...",
     ],
-    # the grpc it resolves has BUILD files calling native cc rules (no grpc_python_plugin), its rules_foreign_cc uses the removed native CcInfo, and its toolchains call rule(incompatible_use_toolchain_transition=...), all removed in Bazel 9
-    known_failing = "build",
+    flags = [
+        # the grpc it resolves has BUILD files calling native cc and proto rules, which Bazel 9 removed; autoload them
+        "--incompatible_autoload_externally=+@rules_cc,+@com_google_protobuf",
+    ],
 )
