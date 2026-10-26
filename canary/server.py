@@ -305,8 +305,8 @@ def is_pass(status):
 
 
 def regressions(images, lat, rows):
-    """{(candidate name, arch, row)}: rows (step, target or None) a candidate
-    column fails while a baseline of its release and arch passes them.
+    """{(candidate name, arch, row)}: subset rows (step, target or None) a
+    candidate column fails while a baseline of its release and arch passes them.
     images are columns (see columns())."""
     out = set()
     for c in images:
@@ -315,6 +315,8 @@ def regressions(images, lat, rows):
         bases = [b for b in images if b.get("role") == "baseline" and b.get("release") == c.get("release")
                  and arch_of(b) == arch_of(c)]
         for row in rows:
+            if row[0] == "probe":
+                continue  # probe checks count in verdicts(), eMudhra ones under Rejects only
             st, _ = cell_status(lat, c, *row)
             if st is None or is_pass(st):
                 continue
@@ -622,7 +624,11 @@ class Runner(threading.Thread):
                 copier.join(60)
             with open(log_path, errors="replace") as f:
                 text = f.read()
-            rec.update(exit_code=code, invocations=invocation_links(text), targets=target_results(text))
+            # Only the requested labels: a failing project's log embeds its
+            # inner Bazel's summary, which a killed run may end with.
+            wanted = {x for x in args if x.startswith("//")}
+            rec.update(exit_code=code, invocations=invocation_links(text),
+                       targets={t: st for t, st in target_results(text).items() if t in wanted})
             if rec["step"] == "probe":
                 rec["checks"] = {t: summarize_failures(f) for t, f in probe_failures(text).items()}
                 rec["probe_checks"] = probe_checks(text)
@@ -680,6 +686,7 @@ th { font-weight:600; } .mut { color:var(--mut); } .wrap { overflow-x:auto; }
 .passed,.PASSED,.FLAKY { background:var(--pass); }
 .failed,.FAILED,.TIMEOUT,.timeout,.runner_failed,.error,.FAILED_TO_BUILD,.REMOTE_FAILURE,.INCOMPLETE,.NO_STATUS { background:var(--fail); }
 .running { background:var(--run); } .interrupted,.skipped,.UNKNOWN { background:var(--warn); } .none { background:var(--none); }
+.emudhra { background:var(--warn); }
 .checks { font-size:12px; margin:2px 0 0 0; padding-left:14px; }
 .reg { outline:2px solid var(--reg); outline-offset:-2px; font-weight:600; } .reg::after { content:" regression"; color:var(--reg); font-size:11px; }
 code { font-size:12px; }
@@ -747,8 +754,12 @@ def render(cfg, runs, current):
                "(see the emudhra checks). Red <b>Works for customers</b> on a candidate = a regression vs. the "
                "baseline of its release and arch: a non-eMudhra probe check fails, or a project that passes on "
                "the baseline fails. Baselines trust eMudhra by design.</p>")
-    out.append('<p class="mut">Branch %s; inner salt %s. %d regression(s).</p>' % (
-        esc(cfg["repo_branch"]), "on" if cfg.get("salt_inner", True) else "off", len(regs)))
+    cands = [c for c in images if c.get("role") == "candidate"]
+    v = [verdicts(cfg, images, lat, c) for c in cands]
+    out.append('<p class="mut">Branch %s; inner salt %s. Candidate columns: %d of %d still trust eMudhra, '
+               '%d of %d don\'t work for customers.</p>' % (
+                   esc(cfg["repo_branch"]), "on" if cfg.get("salt_inner", True) else "off",
+                   sum(1 for x in v if x[0][0] == "no"), len(v), sum(1 for x in v if x[1][0] == "no"), len(v)))
     # Grid.
     out.append('<h2>Latest results</h2><div class="wrap"><table><tr><th rowspan="2">step / target</th>')
     releases = []
@@ -769,6 +780,8 @@ def render(cfg, runs, current):
         for im in images:
             state, reasons = verdicts(cfg, images, lat, im)[idx]
             klass = {"yes": "passed", "no": "failed", "baseline": "none", "pending": "skipped"}[state]
+            if idx == 0 and state == "no":
+                klass = "emudhra"
             body = "<b>%s</b>" % esc(state)
             if reasons:
                 body += '<ul class="checks">%s</ul>' % "".join("<li>%s</li>" % esc(x) for x in reasons)
@@ -801,8 +814,13 @@ def render(cfg, runs, current):
             else:
                 fails = []
             detail = '<ul class="checks">%s</ul>' % "".join("<li>%s</li>" % esc(f) for f in fails) if fails else ""
+            klass = cls(st)
+            pc = r.get("probe_checks") or {}
+            failing = [c for c, (x, _) in pc.items() if x == "FAIL"]
+            if step == "probe" and not is_pass(st) and failing and all(is_emudhra(c) for c in failing):
+                klass = "emudhra"  # only eMudhra checks fail: see Rejects eMudhra
             out.append('<td class="%s%s" title="cycle %s, %s">%s %s <a href="/logs/%s">log</a>%s</td>' % (
-                cls(st), reg, esc(r["cycle"]), esc(r["end"]), esc(st), link(r), esc(r["log"]), detail))
+                klass, reg, esc(r["cycle"]), esc(r["end"]), esc(st), link(r), esc(r["log"]), detail))
         out.append("</tr>")
     out.append("</table></div>")
     # History.

@@ -200,8 +200,8 @@ class RegressionTest(unittest.TestCase):
         got = server.regressions(self.IMAGES, server.latest(runs), rows)
         # c24's //a:test fails, but no 24.04 baseline ran it (its step as a
         # whole still regressed); //b:test fails on both.
-        self.assertEqual(got, {("c22", "amd64", ("subset", "//a:test")), ("c22", "amd64", ("probe", None)),
-                               ("c24", "amd64", ("subset", None)), ("c24", "arm64", ("probe", None))})
+        # Probe rows never count here (see verdicts()).
+        self.assertEqual(got, {("c22", "amd64", ("subset", "//a:test")), ("c24", "amd64", ("subset", None))})
 
     def test_ignores_other_digests_and_running(self):
         runs = [run("b22", "subset", "passed", "1", {"//a:test": "PASSED"}, ref="old"),
