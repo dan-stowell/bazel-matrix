@@ -308,32 +308,59 @@ def is_pass(status):
     return status in PASSING
 
 
-def latest_complete(runs, image, step, subset=None, rev=None):
-    """The newest run of the column's exact image (name, ref, role, arch)
-    that ran to the end (and for a subset, of exactly that subset; with rev,
-    at that repo revision)."""
+def newest(runs, image, step, subset=None):
+    """The newest finished (not running) run of the column's exact image
+    (name, ref, role, arch) and step (for a subset, of exactly that subset)."""
     for r in reversed(runs):
         im = r["image"]
-        if (r["step"] != step or r["status"] not in COMPLETE or im["name"] != image["name"]
+        if (r["step"] != step or r["status"] == "running" or im["name"] != image["name"]
                 or im["ref"] != image["ref"] or im.get("role") != image.get("role")
                 or arch_of(im) != arch_of(image)):
             continue
-        if step == "probe" and not r.get("probe"):
-            continue
         if step == "subset" and r.get("subset") != subset:
-            continue
-        if rev is not None and r.get("rev") != rev:
             continue
         return r
     return None
 
 
+def complete(r):
+    return r is not None and r["status"] in COMPLETE and (r["step"] != "probe" or bool(r.get("probe")))
+
+
+def latest_complete(runs, image, step, subset=None, rev=None):
+    """newest() if it ran to the end (and, with rev, at that repo revision);
+    None otherwise: an older success never stands in for a newer run that
+    didn't finish."""
+    r = newest(runs, image, step, subset)
+    if not complete(r) or (rev is not None and r.get("rev") != rev):
+        return None
+    return r
+
+
+def current_rev(runs):
+    """The repo revision of the newest run (the one the current cycle uses)."""
+    return next((r["rev"] for r in reversed(runs) if r.get("rev")), None)
+
+
+def last_note(runs, image, step, subset=None):
+    """"last: <status>, <age>" for pending cells; "" when there's no run."""
+    r = newest(runs, image, step, subset)
+    if r is None:
+        return ""
+    try:
+        age = datetime.datetime.now(datetime.timezone.utc) - datetime.datetime.fromisoformat(r.get("end") or r["start"])
+        ago = "%dh%02dm ago" % (age.total_seconds() // 3600, age.total_seconds() % 3600 // 60)
+    except (TypeError, ValueError):
+        ago = "?"
+    return "last: %s%s, %s" % (r["status"], "" if complete(r) else " (incomplete)", ago)
+
+
 def protected(runs, col):
     """("yes"|"no"|"pending", [reasons], probe run): every emudhra* check
     passes in distrusted mode."""
-    r = latest_complete(runs, col, "probe")
+    r = latest_complete(runs, col, "probe", rev=current_rev(runs))
     if r is None:
-        return "pending", ["no complete probe result for this image yet"], None
+        return "pending", [last_note(runs, col, "probe") or "not run yet"], None
     p = r["probe"]
     em = {c: v for c, v in p["checks"].items() if is_emudhra(c)}
     if p["expect"] != "distrusted" or not em:
@@ -347,7 +374,7 @@ def protected(runs, col):
 
 def probe_others(runs, col):
     """The probe's non-eMudhra checks that don't pass (FAIL or NETERR)."""
-    r = latest_complete(runs, col, "probe")
+    r = latest_complete(runs, col, "probe", rev=current_rev(runs))
     if r is None:
         return None
     return ["%s %s: %s" % (st, c, m) for c, (st, m) in sorted(r["probe"]["checks"].items())
@@ -372,9 +399,9 @@ def compare_subset(cfg, runs, images, col, live=None):
     if not subset:
         return "no ruleset projects for this release and arch", {}, None, None
     targets = ["//%s:test" % p for p in subset]
-    sub = live or latest_complete(runs, col, "subset", subset)
+    sub = live or latest_complete(runs, col, "subset", subset, rev=current_rev(runs))
     if sub is None:
-        return "not run yet", {}, None, None
+        return last_note(runs, col, "subset", subset) or "not run yet", {}, None, None
     missing = [t for t in targets if t not in sub.get("targets", {})]
     if missing and not live:
         return "no result for %s" % ", ".join(missing), {}, sub, None
@@ -392,6 +419,7 @@ def group_cell(cfg, pair, group):
     for a ruleset group: its projects that passed on the baseline must pass
     on the candidate."""
     pending, table = pair[0], pair[1]
+    live = pair[2] is not None and pair[2].get("status") == "running"
     projects = ["//%s:test" % p for p in group]
     if pending is not None:
         return ("n/a" if pending.startswith("no ruleset") else "pending"), 0, 0, [pending], 0
@@ -405,9 +433,10 @@ def group_cell(cfg, pair, group):
     done = len(reference) - len(running)
     if not reference:
         return "n/a", 0, 0, ["none passed on the baseline"], 0
-    if running:
-        return ("no" if failing else "running"), len(ok), len(reference), failing + [
-            "running: " + ", ".join(running)], done
+    if running or live:
+        # Not green until the run's final summary is in.
+        return ("no" if failing else "running"), len(ok), len(reference), failing + (
+            ["running: " + ", ".join(running)] if running else ["finishing"]), done
     return ("no" if failing else "yes"), len(ok), len(reference), failing, done
 
 
@@ -683,6 +712,11 @@ class Runner(threading.Thread):
                 rec.update(status="error", end=now(), error="%s: %s" % (type(e).__name__, e))
                 self.store.append(rec)
                 return
+            # A BEP file of this run's own, so live results never come from another run.
+            bep = os.path.join(cfg["output_root"], "bep-%s.json" % rec["id"])
+            args = [("--build_event_json_file=" + bep) if a.startswith("--build_event_json_file=") else a for a in args]
+            if os.path.exists(bep):
+                os.remove(bep)
             rec["command"] = args
             self.current = rec
             self.store.append(rec)
@@ -758,6 +792,17 @@ class Runner(threading.Thread):
         except Exception as e:
             rec.update(status="error", error="%s: %s" % (type(e).__name__, e))
         finally:
+            p = self.proc
+            if p is not None and p.poll() is None:
+                # Failed after launching: don't leave the build running.
+                try:
+                    kill_group(p)
+                    p.wait(60)
+                    subprocess.run([cfg["bazel"], "--output_base=" + args[1].split("=", 1)[1], "shutdown"],
+                                   cwd=self.work, env=env, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+                                   stderr=subprocess.DEVNULL, timeout=300)
+                except Exception as e2:
+                    print("cleanup: %s: %s" % (type(e2).__name__, e2), file=sys.stderr)
             self.proc = None
             rec["end"] = now()
 
@@ -862,10 +907,16 @@ def render(cfg, runs, current):
             title = ("fails: " + ", ".join(failing)) if st == "no" else "; ".join(failing) or ", ".join(
                 t for t in ("//%s:test" % p for p in projects) if t in pair[1])
             text = "%d/%d" % (ok, ref) if ref else ""
-            built_only = [t for t in ("//%s:test" % p for p in projects) if t in ((pair[2] or {}).get("no_tests") or [])]
+            table = pair[1]
+            ok_targets = [t for t in ("//%s:test" % p for p in projects) if t in table and
+                          (is_pass(table[t][0]) or table[t][0] == VALIDATED) and is_pass(table[t][1])]
+            built_only = [t for t in ok_targets if t in ((pair[2] or {}).get("no_tests") or [])]
             if built_only and st in ("yes", "no"):
-                text += ", %d tested" % (ok - len(built_only))
+                text += ", %d tested" % (len(ok_targets) - len(built_only))
                 title += "; built, no tests: " + ", ".join(built_only)
+            if st in ("yes", "no", "running") and pair[3] is None and table:
+                text += " vs validated list"
+                title += "; no baseline run at this revision yet: compared with the projects validated on it"
             if st == "running" or (st == "no" and live):
                 text = "%d/%d done, %d ok" % (done, ref, ok)
             out.append(cell(st, text, href if st in ("yes", "no", "running") else "", title))

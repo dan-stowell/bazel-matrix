@@ -218,6 +218,10 @@ class VerdictTest(unittest.TestCase):
         cur = run(c, "subset", "running", {"//a:test": "PASSED"})
         got = server.group_cell(CFG, server.compare_subset(CFG, [], IMAGES, c, cur), ["a", "b"])
         self.assertEqual(got, ("running", 1, 2, ["running: //b:test"], 1))
+        # Every target done, but no final summary yet: still not green.
+        cur["targets"]["//b:test"] = "PASSED"
+        self.assertEqual(server.group_cell(CFG, server.compare_subset(CFG, [], IMAGES, c, cur), ["a", "b"])[0],
+                         "running")
         cur["targets"]["//b:test"] = "FAILED"
         self.assertEqual(server.group_cell(CFG, server.compare_subset(CFG, [], IMAGES, c, cur), ["a", "b"])[0], "no")
 
@@ -238,6 +242,20 @@ class VerdictTest(unittest.TestCase):
                  json.dumps({"id": {"testResult": {"label": "//x:y"}}, "testResult": {"status": "PASSED"}}),
                  "{truncated"]
         self.assertEqual(server.bep_results(lines, {"//a:test"}), {"//a:test": "FLAKY"})
+
+    def test_newest_run_decides(self):
+        b, c = COLS
+        # An older success doesn't stand in for a newer run that didn't finish.
+        runs = [run(c, "probe", "passed", checks=GOOD), run(c, "probe", "error", checks=None)]
+        state, why, _ = server.protected(runs, c)
+        self.assertEqual(state, "pending")
+        self.assertTrue(why[0].startswith("last: error (incomplete), "), why)
+        runs = [run(b, "subset", "passed", BASE_SUB), run(c, "subset", "passed", BASE_SUB),
+                run(c, "subset", "timeout", {})]
+        self.assertEqual(builds(CFG, runs, IMAGES, c)[0], "pending")
+        # Results from an older repo revision than the current cycle's: pending.
+        runs = [run(c, "probe", "passed", checks=GOOD, rev="r0"), run(b, "probe", "passed", checks=GOOD, rev="r1")]
+        self.assertEqual(server.protected(runs, c)[0], "pending")
 
     def test_not_covered(self):
         c = COLS[1]
