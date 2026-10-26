@@ -1,5 +1,6 @@
 load("@rules_python//python:py_binary.bzl", "py_binary")
 load("@rules_python//python:py_test.bzl", "py_test")
+load("@rules_shell//shell:sh_binary.bzl", "sh_binary")
 load("@projects//:modules.bzl", "GENERATED", "MODULES")
 load(":versions.bzl", "INNER_BAZELS")
 
@@ -57,14 +58,13 @@ py_binary(
     srcs = ["inner_bazel.py"],
 )
 
-# tools/inner_bazel.py for a test running on RBE (--//:inner_remote).
-py_binary(
+# tools/inner_bazel.py for a test running on RBE (--//:inner_remote). Run
+# with the image's python3, not as a py_binary: rules_python's py_binary
+# needs a zipper built for the executor, so a C++ toolchain for arm64.
+sh_binary(
     name = "remote_inner_bazel",
-    srcs = [
-        "inner_bazel.py",
-        "remote_inner_bazel.py",
-    ],
-    imports = ["."],
+    srcs = ["remote_inner_bazel.py"],
+    data = ["inner_bazel.py"],
 )
 
 # The runner of the projects' :test.
