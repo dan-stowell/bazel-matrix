@@ -1,6 +1,6 @@
 # Root package. Projects live in //<module>/; see README.md.
 
-load("//tools:project.bzl", "string_list_setting", "string_setting")
+load("//tools:project.bzl", "bool_setting", "string_list_setting", "string_setting")
 load("//tools:versions.bzl", "DEFAULT_INNER_BAZEL")
 
 exports_files(
@@ -24,5 +24,13 @@ string_list_setting(
 string_setting(
     name = "inner_bazel_version",
     build_setting_default = DEFAULT_INNER_BAZEL,
+    visibility = ["//visibility:public"],
+)
+
+# Run each project's :test on an RBE executor (in the image and arch under
+# test) instead of on the machine running the outer Bazel; see README.md.
+bool_setting(
+    name = "inner_remote",
+    build_setting_default = False,
     visibility = ["//visibility:public"],
 )

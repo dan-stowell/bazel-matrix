@@ -15,3 +15,18 @@ common --lockfile_mode=off
 # inner build would; don't also run the inner builds.
 test --build_tests_only
 test --test_output=errors
+
+# Inner Bazels on RBE (README.md, "Inner Bazels on RBE"): each project's
+# :test runs on an executor in the image of tools/remote.bazelrc. Also pass
+# the API key header from a 0600 rc file outside the repo (README.md).
+common:inner-remote --//:inner_remote
+common:inner-remote --remote_default_exec_properties=EstimatedCPU=4
+common:inner-remote --remote_default_exec_properties=EstimatedMemory=8GB
+common:inner-remote --remote_default_exec_properties=EstimatedFreeDiskBytes=20GB
+# The same on arm64 executors: the outer targets (and runs the tests on)
+# arm64, and so do the inner Bazels' actions.
+common:inner-remote-arm64 --config=inner-remote
+common:inner-remote-arm64 --platforms=//tools:linux_arm64
+common:inner-remote-arm64 --extra_execution_platforms=//tools:linux_arm64
+common:inner-remote-arm64 --remote_default_exec_properties=Arch=arm64
+common:inner-remote-arm64 --//:inner_flags=--remote_default_exec_properties=Arch=arm64

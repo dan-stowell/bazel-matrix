@@ -131,7 +131,8 @@ def _hub_impl(rctx):
     rctx.file("REPO.bazel", "")
     rctx.file("BUILD.bazel", "".join(
         [_alias(name, "@src_%s//:source.tar" % name) for name in rctx.attr.names] +
-        [_alias("bazel_" + v, "@%s//file" % _bazel_repo(v)) for v in INNER_BAZELS],
+        [_alias("bazel_" + v, "@%s//file" % _bazel_repo(v)) for v in INNER_BAZELS] +
+        [_alias("bazel_%s_arm64" % v, "@%s_arm64//file" % _bazel_repo(v)) for v, i in INNER_BAZELS.items() if i.arm64_sha256],
     ))
     # For tools/BUILD.bazel's generated_test: the fetched modules, and the
     # packages with a generated BUILD.bazel (which must be the same).
@@ -185,6 +186,14 @@ def _projects_impl(mctx):
             sha256 = info.sha256,
             urls = ["https://github.com/bazelbuild/bazel/releases/download/%s/bazel-%s-linux-x86_64" % (v, v)],
         )
+        if info.arm64_sha256:
+            http_file(
+                name = _bazel_repo(v) + "_arm64",
+                downloaded_file_path = "bazel",
+                executable = True,
+                sha256 = info.arm64_sha256,
+                urls = ["https://github.com/bazelbuild/bazel/releases/download/%s/bazel-%s-linux-arm64" % (v, v)],
+            )
     _hub(name = "projects", names = names, generated = _generated(mctx))
     return mctx.extension_metadata(
         root_module_direct_deps = ["projects"],

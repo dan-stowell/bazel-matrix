@@ -18,9 +18,62 @@ exports_files([
     for v in INNER_BAZELS
 ]
 
+# The same, when the target cpu is aarch64: the linux-arm64 inner Bazel.
+[
+    config_setting(
+        name = "inner_bazel_%s_arm64" % v,
+        constraint_values = ["@platforms//cpu:aarch64"],
+        flag_values = {"//:inner_bazel_version": v},
+    )
+    for v, info in INNER_BAZELS.items()
+    if info.arm64_sha256
+]
+
+config_setting(
+    name = "aarch64",
+    constraint_values = ["@platforms//cpu:aarch64"],
+)
+
+# --//:inner_remote: the projects' tests run on RBE; see README.md.
+config_setting(
+    name = "inner_remote",
+    flag_values = {"//:inner_remote": "true"},
+)
+
+# An arm64 executor, for --config=inner-remote-arm64 (target and execution
+# platform). No exec_properties: those would replace
+# --remote_default_exec_properties (the image of tools/remote.bazelrc), so
+# the config adds Arch=arm64 there instead.
+platform(
+    name = "linux_arm64",
+    constraint_values = [
+        "@platforms//cpu:aarch64",
+        "@platforms//os:linux",
+    ],
+)
+
 py_binary(
     name = "inner_bazel",
     srcs = ["inner_bazel.py"],
+)
+
+# tools/inner_bazel.py for a test running on RBE (--//:inner_remote).
+py_binary(
+    name = "remote_inner_bazel",
+    srcs = [
+        "inner_bazel.py",
+        "remote_inner_bazel.py",
+    ],
+    imports = ["."],
+)
+
+# The runner of the projects' :test.
+alias(
+    name = "test_runner",
+    actual = select({
+        ":inner_remote": ":remote_inner_bazel",
+        "//conditions:default": ":inner_bazel",
+    }),
 )
 
 py_test(

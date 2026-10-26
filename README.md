@@ -102,6 +102,42 @@ unset (`tools/credentials.bzl`); `tools/inner_bazel.py` finds it from its
 working directory. Neither the key nor its location is an action input or
 environment variable, so the outer cache is shared across checkouts.
 
+## Inner Bazels on RBE
+
+Opt-in, and off by default (the matrix above is unchanged by it): with
+`--config=inner-remote` (root `.bazelrc`) each project's `:test` runs on an
+RBE executor, in the image of `tools/remote.bazelrc`, instead of on the
+machine running the outer Bazel. Its inner Bazel's host is then the image
+and arch under test, so an autodetected C++ toolchain matches the
+executors, and inner Bazels run in parallel on RBE rather than on one
+machine. `--config=inner-remote-arm64` does the same on arm64 executors: the
+outer targets `//tools:linux_arm64` (also its execution platform, so the
+test runs the linux-arm64 inner Bazel of `tools/versions.bzl` and the
+aarch64 Python), with `Arch=arm64` for outer and inner actions. `:build`
+stays local (and has no arm64 variant).
+
+```sh
+bazel test //zlib:test --config=remote-minimal --config=inner-remote-arm64 \
+  --credential_helper=*.buildbuddy.io=$PWD/tools/remote_exec_credential_helper.py
+```
+
+That runs the outer Bazel itself rather than through `bb remote` (whose
+runners can't target arm64); use the Bazel binary, not the bb CLI, which
+puts the key in Bazel's argv. `--//:inner_remote` drops the test's
+`no-remote-exec`/`no-sandbox`/`requires-network` and runs
+`tools/remote_inner_bazel.py`; the config also asks for 4 CPUs, 8 GB and
+20 GB of disk (BuildBuddy may size the task by its own prediction).
+
+The key: `tools/remote_exec_credential_helper.py` (with
+`$BAZEL_MATRIX_KEY_FILE` naming a 0600 file with the key) adds the header
+`x-buildbuddy-platform.env-overrides: BUILDBUDDY_API_KEY=<key>`, which
+BuildBuddy sets in the remote test's environment but keeps out of the
+action key and redacts. `tools/remote_inner_bazel.py` moves it into a 0600
+file for the inner Bazel's credential helper. As a helper's header it isn't
+on Bazel's command line, so not in its logs or build event files (a
+`--remote_exec_header` flag would be). Bazel caches helper results in its
+server: after switching helpers, `bazel shutdown`.
+
 ## Layout
 
 - `projects.txt`: the projects, and per project the inner targets to leave

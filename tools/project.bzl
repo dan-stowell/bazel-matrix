@@ -12,12 +12,18 @@ Both pass the inner Bazel the same flags; anything that changes them
 changes the outer action key. tools/remote.bazelrc, an input of both, pins
 the executor image by digest, the same image the runner must run (see
 tools/bb.sh), so the image is part of the key too.
+
+With --//:inner_remote (see README.md, "Inner Bazels on RBE"), `test` runs
+on an RBE executor instead, so its inner Bazel's host is the executor's
+image and arch; it then runs tools/remote_inner_bazel.py, and the inner
+Bazel is the one for the target cpu (linux-arm64 under
+--platforms=//tools:linux_arm64).
 """
 
 load(":versions.bzl", "INNER_BAZELS")
 
-def _repo(version):
-    return "@projects//:bazel_" + version
+def _repo(version, arm64 = False):
+    return "@projects//:bazel_" + version + ("_arm64" if arm64 else "")
 
 InnerSettingInfo = provider(fields = ["value"])
 
@@ -33,6 +39,19 @@ string_setting = rule(
     implementation = _setting_impl,
     build_setting = config.string(flag = True),
 )
+
+bool_setting = rule(
+    implementation = _setting_impl,
+    build_setting = config.bool(flag = True),
+)
+
+# The test's execution requirements when it runs on the outer machine (not
+# with --//:inner_remote); see project().
+_LOCAL_TEST = {
+    "no-remote-exec": "1",
+    "no-sandbox": "1",
+    "requires-network": "1",
+}
 
 def _inputs(ctx):
     return [
@@ -106,7 +125,11 @@ def _test_impl(ctx):
         is_executable = True,
     )
     runfiles = ctx.runfiles(files = _inputs(ctx)).merge(runner.default_runfiles)
-    return [DefaultInfo(executable = script, runfiles = runfiles)]
+    remote = ctx.attr._inner_remote[InnerSettingInfo].value
+    return [
+        DefaultInfo(executable = script, runfiles = runfiles),
+        testing.ExecutionInfo({} if remote else _LOCAL_TEST),
+    ]
 
 _ATTRS = {
     "bazel": attr.label(allow_single_file = True, mandatory = True),
@@ -134,7 +157,8 @@ inner_test = rule(
     implementation = _test_impl,
     test = True,
     attrs = _ATTRS | {
-        "_runner": attr.label(default = "//tools:inner_bazel", cfg = "target"),
+        "_inner_remote": attr.label(default = "//:inner_remote"),
+        "_runner": attr.label(default = "//tools:test_runner", cfg = "target"),
     },
 )
 
@@ -155,12 +179,18 @@ def project(name, targets, flags = [], bazel_version = None, known_failing = Non
     # For //tools:generated_test, which checks it against projects.txt.
     native.exports_files(["BUILD.bazel"], visibility = ["//tools:__pkg__"])
     manual = ["manual"] if known_failing else []
+    # The linux-arm64 inner Bazel when the target cpu is aarch64 (the test
+    # runs it on an arm64 executor), else linux-x86_64.
     if bazel_version:
-        bazel = _repo(bazel_version)
+        bazel = select({
+            "//tools:aarch64": _repo(bazel_version, arm64 = True),
+            "//conditions:default": _repo(bazel_version),
+        }) if INNER_BAZELS[bazel_version].arm64_sha256 else _repo(bazel_version)
         version = bazel_version
     else:
         bazel = select(
-            {"//tools:inner_bazel_" + v: _repo(v) for v in INNER_BAZELS},
+            {"//tools:inner_bazel_" + v: _repo(v) for v in INNER_BAZELS} |
+            {"//tools:inner_bazel_%s_arm64" % v: _repo(v, arm64 = True) for v, i in INNER_BAZELS.items() if i.arm64_sha256},
             no_match_error = "--//:inner_bazel_version must be one of " + ", ".join(INNER_BAZELS),
         )
         version = select({"//tools:inner_bazel_" + v: v for v in INNER_BAZELS})
@@ -177,10 +207,9 @@ def project(name, targets, flags = [], bazel_version = None, known_failing = Non
         name = "test",
         size = "enormous",
         timeout = "eternal",
+        # no-remote-exec, no-sandbox and requires-network come from the
+        # rule (_LOCAL_TEST), unless --//:inner_remote.
         tags = [
-            "no-remote-exec",
-            "no-sandbox",
-            "requires-network",
             "resources:cpu:2",
             "resources:memory:2500",
         ] + manual,
