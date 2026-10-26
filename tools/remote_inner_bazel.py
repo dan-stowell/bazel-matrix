@@ -13,9 +13,10 @@ The work dir (the inner output root) goes under $TEST_TMPDIR, in the
 action's workspace, whose disk the executor accounts for, not the
 container's /var/tmp.
 
-A wrapper killed from outside (OOM, a lost executor, a signal) leaves no
-DONE_MARKER line in its log, and the test.xml written first, whose one
-testcase is INFRA_CASE (see README.md, "Inner Bazels on RBE").
+A wrapper killed from outside (OOM, a lost executor, a signal), or whose
+inner Bazel was (it exited on a signal before its timeout), leaves no
+DONE_MARKER line in its log, and a test.xml whose one testcase is
+INFRA_CASE (see README.md, "Inner Bazels on RBE").
 """
 
 import os
@@ -44,14 +45,24 @@ def key_dir(key):
     return root
 
 
-def infra_xml(project):
+def one_case_xml(project, name, message, text):
     suite = ET.Element("testsuite", name=project, tests="1", failures="1")
-    case = ET.SubElement(suite, "testcase", name=INFRA_CASE, classname=project)
-    ET.SubElement(case, "failure", message="INFRA_KILLED").text = (
-        "the test wrapper was killed before its inner Bazel finished")
+    case = ET.SubElement(suite, "testcase", name=name, classname=project)
+    ET.SubElement(case, "failure", message=message).text = text
     root = ET.Element("testsuites")
     root.append(suite)
     return ET.tostring(root, encoding="unicode") + "\n"
+
+
+def infra_xml(project):
+    return one_case_xml(project, INFRA_CASE, "INFRA_KILLED",
+                        "the test wrapper or its inner Bazel was killed before it finished")
+
+
+def write_xml(text):
+    if os.environ.get("XML_OUTPUT_FILE"):
+        with open(os.environ["XML_OUTPUT_FILE"], "w") as f:
+            f.write(text)
 
 
 def project_of(argv):
@@ -67,21 +78,37 @@ def main(argv):
         print("BUILDBUDDY_API_KEY is not set: pass the env-overrides header (README.md)",
               file=sys.stderr)
         return 1
-    if os.environ.get("XML_OUTPUT_FILE"):
-        with open(os.environ["XML_OUTPUT_FILE"], "w") as f:
-            f.write(infra_xml(project_of(argv)))
+    project = project_of(argv)
+    write_xml(infra_xml(project))
     if os.environ.get("TEST_TMPDIR"):
         inner_bazel.WORK_ROOT = os.path.join(os.environ["TEST_TMPDIR"], "work")
     root = key_dir(key)
     inner_bazel.output_base = lambda _cwd: root
+    # The inner Bazel's process, and whether it exited before the timeout.
+    waits = []
+    wait_exit = inner_bazel.wait_exit
+
+    def recording_wait_exit(proc, timeout):
+        exited = wait_exit(proc, timeout)
+        waits.append((proc, exited))
+        return exited
+
+    inner_bazel.wait_exit = recording_wait_exit
     try:
         code = inner_bazel.main(argv)
-    except Exception:
+    except Exception as e:
         # A failure of the wrapper itself, not a kill.
+        write_xml(one_case_xml(project, "wrapper_error", "WRAPPER_ERROR", "%s: %s" % (type(e).__name__, e)))
         print("%s (exception)" % DONE_MARKER, flush=True)
         raise
     finally:
+        inner_bazel.wait_exit = wait_exit
         shutil.rmtree(root, ignore_errors=True)
+    if waits and waits[-1][1] and (waits[-1][0].returncode or 0) < 0:
+        # Killed by a signal, not by inner_bazel.py's timeout.
+        write_xml(infra_xml(project))
+        print("inner bazel killed by signal %d" % -waits[-1][0].returncode, flush=True)
+        return 1
     print("%s (exit %d)" % (DONE_MARKER, code), flush=True)
     return code
 

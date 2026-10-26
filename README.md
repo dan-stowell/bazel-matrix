@@ -148,8 +148,9 @@ which `EstimatedFreeDiskBytes` covers), and the inner Bazel gets
 `--local_resources=cpu=4,memory=6000` rather than sizing itself from the
 executor host. A wrapper that ran to the end prints
 `bazel-matrix: inner bazel finished (exit N)` last; one killed from outside
-(OOM, lost executor, signal) doesn't, and its test.xml is the one written
-first, whose only testcase is `infra_killed`. Count such a run as an
+(OOM, lost executor, signal), or whose inner Bazel died on a signal before
+its timeout, doesn't, and its test.xml's only testcase is `infra_killed`
+(`wrapper_error` when the wrapper itself raised). Count such a run as an
 infrastructure failure, not the project's, and retry it. (BuildBuddy itself
 reruns a task whose executor was lost: one aspect_rules_js test action had
 three inner invocations, the first two cut off.)

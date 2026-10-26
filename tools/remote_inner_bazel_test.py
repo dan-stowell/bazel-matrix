@@ -60,6 +60,42 @@ class RemoteInnerBazelTest(unittest.TestCase):
         self.assertEqual(code, ("exit", 143))
         self.assertNotIn(r.DONE_MARKER, out)
 
+    def test_inner_killed_by_signal_is_infra(self):
+        def inner(argv):
+            proc = mock.Mock(returncode=-9)
+            inner_bazel.wait_exit(proc, 10)
+            with open(os.environ["XML_OUTPUT_FILE"], "w") as f:
+                f.write("<testsuites/>")
+            return 1
+        with mock.patch.object(inner_bazel, "wait_exit", lambda proc, t: True):
+            code, _, out, tmp = self.run_main(inner)
+            with open(os.path.join(tmp, "test.xml")) as f:
+                xml = f.read()
+        self.assertEqual(code, 1)
+        self.assertNotIn(r.DONE_MARKER, out)
+        self.assertIn('name="%s"' % r.INFRA_CASE, xml)
+
+    def test_inner_timeout_is_not_infra(self):
+        def inner(argv):
+            inner_bazel.wait_exit(mock.Mock(returncode=-15), 10)
+            return 1
+        with mock.patch.object(inner_bazel, "wait_exit", lambda proc, t: False):
+            code, _, out, _ = self.run_main(inner)
+        self.assertIn(r.DONE_MARKER + " (exit 1)", out)
+
+    def test_exception_is_wrapper_error(self):
+        def inner(argv):
+            raise OSError("no tar")
+        tmp_xml = {}
+        def run():
+            try:
+                self.run_main(inner)
+            except OSError:
+                pass
+        with mock.patch.object(r, "write_xml", lambda text: tmp_xml.setdefault("last", []).append(text)):
+            run()
+        self.assertIn("wrapper_error", tmp_xml["last"][-1])
+
     def test_no_key(self):
         with mock.patch.dict(os.environ, {}, clear=True):
             self.assertEqual(r.main([]), 1)
