@@ -23,6 +23,10 @@ common:inner-remote --//:inner_remote
 common:inner-remote --remote_default_exec_properties=EstimatedCPU=4
 common:inner-remote --remote_default_exec_properties=EstimatedMemory=8GB
 common:inner-remote --remote_default_exec_properties=EstimatedFreeDiskBytes=20GB
+# The inner Bazel would size its local resources from the executor host's
+# /proc, not the task's share of it.
+common:inner-remote --//:inner_flags=--local_resources=cpu=4
+common:inner-remote --//:inner_flags=--local_resources=memory=6000
 # The same on arm64 executors: the outer targets (and runs the tests on)
 # arm64, and so do the inner Bazels' actions.
 common:inner-remote-arm64 --config=inner-remote

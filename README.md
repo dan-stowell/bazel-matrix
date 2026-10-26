@@ -114,7 +114,8 @@ machine. `--config=inner-remote-arm64` does the same on arm64 executors: the
 outer targets `//tools:linux_arm64` (also its execution platform, so the
 test runs the linux-arm64 inner Bazel of `tools/versions.bzl`), with
 `Arch=arm64` for outer and inner actions. `:build`
-stays local (and has no arm64 variant).
+stays local, so it is incompatible (skipped) when targeting arm64, and a
+pinned inner Bazel without a linux-arm64 binary fails analysis there.
 
 ```sh
 bazel test //zlib:test --config=remote-minimal --config=inner-remote-arm64 \
@@ -137,7 +138,21 @@ action key and redacts. `tools/remote_inner_bazel.py` moves it into a 0600
 file for the inner Bazel's credential helper. As a helper's header it isn't
 on Bazel's command line, so not in its logs or build event files (a
 `--remote_exec_header` flag would be). Bazel caches helper results in its
-server: after switching helpers, `bazel shutdown`.
+server: after switching helpers, `bazel shutdown`. The header reaches
+every remote action of the invocation, so run only `//<project>:test`
+targets with these configs: the tests of `//tools` and `//canary` are
+incompatible under `--//:inner_remote`.
+
+Remotely the inner work dir is under `$TEST_TMPDIR` (the action's disk,
+which `EstimatedFreeDiskBytes` covers), and the inner Bazel gets
+`--local_resources=cpu=4,memory=6000` rather than sizing itself from the
+executor host. A wrapper that ran to the end prints
+`bazel-matrix: inner bazel finished (exit N)` last; one killed from outside
+(OOM, lost executor, signal) doesn't, and its test.xml is the one written
+first, whose only testcase is `infra_killed`. Count such a run as an
+infrastructure failure, not the project's, and retry it. (BuildBuddy itself
+reruns a task whose executor was lost: one aspect_rules_js test action had
+three inner invocations, the first two cut off.)
 
 ## Layout
 

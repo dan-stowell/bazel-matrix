@@ -67,6 +67,9 @@ def _args(ctx, mode, path):
     version = ctx.attr.bazel_version
     if version not in INNER_BAZELS:
         fail("unknown inner Bazel version %s; known: %s" % (version, ", ".join(INNER_BAZELS)))
+    aarch64 = ctx.attr._aarch64[platform_common.ConstraintValueInfo]
+    if ctx.target_platform_has_constraint(aarch64) and not INNER_BAZELS[version].arm64_sha256:
+        fail("%s: inner Bazel %s has no linux-arm64 binary in tools/versions.bzl" % (ctx.attr.project, version))
     flags = ctx.attr.flags + ctx.attr._inner_flags[InnerSettingInfo].value
     return [
         "--mode=" + mode,
@@ -138,6 +141,7 @@ _ATTRS = {
     "project": attr.string(mandatory = True),
     "source": attr.label(allow_single_file = True, mandatory = True),
     "targets": attr.string_list(mandatory = True),
+    "_aarch64": attr.label(default = "@platforms//cpu:aarch64"),
     "_credential_helper": attr.label(allow_single_file = True, default = "//tools:buildbuddy_credential_helper.py"),
     # Not the key: a constant marker that makes the key file exist.
     "_credentials": attr.label(allow_single_file = True, default = "@buildbuddy_credentials//:marker"),
@@ -202,7 +206,17 @@ def project(name, targets, flags = [], bazel_version = None, known_failing = Non
         targets = targets,
         flags = flags,
     )
-    inner_build(name = "build", tags = manual if known_failing == "build" else [], **common)
+    inner_build(
+        name = "build",
+        tags = manual if known_failing == "build" else [],
+        # It runs on the outer machine, which can't run an arm64 inner
+        # Bazel (--config=inner-remote-arm64 runs only :test remotely).
+        target_compatible_with = select({
+            "//tools:aarch64": ["@platforms//:incompatible"],
+            "//conditions:default": [],
+        }),
+        **common
+    )
     inner_test(
         name = "test",
         size = "enormous",
@@ -215,3 +229,11 @@ def project(name, targets, flags = [], bazel_version = None, known_failing = Non
         ] + manual,
         **common
     )
+
+# For target_compatible_with of tests that must not share an invocation with
+# --//:inner_remote, whose env-overrides header puts the API key in the
+# environment of every remote action (README.md, "Inner Bazels on RBE").
+NOT_WITH_INNER_REMOTE = select({
+    "//tools:inner_remote": ["@platforms//:incompatible"],
+    "//conditions:default": [],
+})

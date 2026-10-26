@@ -2,6 +2,7 @@ load("@rules_python//python:py_binary.bzl", "py_binary")
 load("@rules_python//python:py_test.bzl", "py_test")
 load("@rules_shell//shell:sh_binary.bzl", "sh_binary")
 load("@projects//:modules.bzl", "GENERATED", "MODULES")
+load(":project.bzl", "NOT_WITH_INNER_REMOTE")
 load(":versions.bzl", "INNER_BAZELS")
 
 exports_files([
@@ -67,6 +68,17 @@ sh_binary(
     data = ["inner_bazel.py"],
 )
 
+py_test(
+    name = "remote_inner_bazel_test",
+    target_compatible_with = NOT_WITH_INNER_REMOTE,
+    srcs = [
+        "inner_bazel.py",
+        "remote_inner_bazel.py",
+        "remote_inner_bazel_test.py",
+    ],
+    imports = ["."],
+)
+
 # The runner of the projects' :test.
 alias(
     name = "test_runner",
@@ -78,6 +90,7 @@ alias(
 
 py_test(
     name = "inner_bazel_test",
+    target_compatible_with = NOT_WITH_INNER_REMOTE,
     srcs = [
         "inner_bazel.py",
         "inner_bazel_test.py",
@@ -87,6 +100,7 @@ py_test(
 
 py_test(
     name = "sync_test",
+    target_compatible_with = NOT_WITH_INNER_REMOTE,
     srcs = [
         "sync.py",
         "sync_test.py",
@@ -98,6 +112,7 @@ py_test(
 # don't match projects.txt, i.e. when sync wasn't re-run.
 py_test(
     name = "generated_test",
+    target_compatible_with = NOT_WITH_INNER_REMOTE,
     srcs = [
         "generated_test.py",
         "sync.py",
@@ -112,6 +127,7 @@ py_test(
 
 py_test(
     name = "buildbuddy_credential_helper_test",
+    target_compatible_with = NOT_WITH_INNER_REMOTE,
     srcs = [
         "buildbuddy_credential_helper.py",
         "buildbuddy_credential_helper_test.py",
@@ -121,6 +137,7 @@ py_test(
 
 py_test(
     name = "run_test",
+    target_compatible_with = NOT_WITH_INNER_REMOTE,
     srcs = [
         "run.py",
         "run_test.py",

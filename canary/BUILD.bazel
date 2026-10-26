@@ -4,6 +4,7 @@
 
 load("@rules_python//python:py_test.bzl", "py_test")
 load("@rules_shell//shell:sh_test.bzl", "sh_test")
+load("//tools:project.bzl", "NOT_WITH_INNER_REMOTE")
 
 # tls_probe_test runs on an RBE executor, in the container-image of
 # tools/remote.bazelrc; tls_probe_runner_test on the bb remote runner, in
@@ -11,6 +12,7 @@ load("@rules_shell//shell:sh_test.bzl", "sh_test")
 [
     sh_test(
         name = name,
+        target_compatible_with = NOT_WITH_INNER_REMOTE,
         size = "medium",
         srcs = ["tls_probe.sh"],
         data = [
@@ -31,6 +33,7 @@ load("@rules_shell//shell:sh_test.bzl", "sh_test")
 
 py_test(
     name = "tls_probe_unit_test",
+    target_compatible_with = NOT_WITH_INNER_REMOTE,
     srcs = [
         "tls_probe.py",
         "tls_probe_unit_test.py",
@@ -41,6 +44,7 @@ py_test(
 # Unit tests of server.py, the app that runs the canary.
 py_test(
     name = "server_test",
+    target_compatible_with = NOT_WITH_INNER_REMOTE,
     srcs = [
         "server.py",
         "server_test.py",
