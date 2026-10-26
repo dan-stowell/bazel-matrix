@@ -240,6 +240,30 @@ class VerdictTest(unittest.TestCase):
                 f.write(xml)
         self.assertEqual(server.no_tests(d, ["//a:test", "//b:test", "//c:test"]), ["//a:test"])
 
+    def test_infra(self):
+        b, c = COLS
+        d = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, d)
+        for pkg, xml in (("a", '<testcase name="infra_killed"/>'), ("b", '<testcase name="wrapper_error"/>'),
+                         ("c", '<testcase name="//x:y_test"><failure/></testcase>')):
+            path = os.path.join(d, "execroot/_main/bazel-out/aarch64-fastbuild/testlogs", pkg, "test")
+            os.makedirs(path)
+            with open(os.path.join(path, "test.xml"), "w") as f:
+                f.write(xml)
+        self.assertEqual(server.infra_killed(d, ["//a:test", "//b:test", "//c:test", "//d:test"]),
+                         ["//a:test", "//b:test"])
+        # An infra kill on the candidate isn't a failure; on the baseline it
+        # doesn't excuse the candidate.
+        runs = [run(b, "subset", "failed", {"//a:test": "PASSED", "//b:test": "INFRA"}),
+                run(c, "subset", "failed", {"//a:test": "INFRA", "//b:test": "FAILED"})]
+        got = server.group_cell(CFG, server.compare_subset(CFG, runs, IMAGES, c), ["a", "b"])
+        self.assertEqual(got[0], "pending")
+        runs = [run(b, "subset", "passed", {"//a:test": "PASSED", "//b:test": "PASSED"}),
+                run(c, "subset", "failed", {"//a:test": "INFRA", "//b:test": "PASSED"})]
+        got = server.group_cell(CFG, server.compare_subset(CFG, runs, IMAGES, c), ["a", "b"])
+        self.assertEqual(got[:3], ("yes", 1, 1))
+        self.assertIn("infra (not counted): //a:test", got[3])
+
     def test_bep(self):
         lines = [json.dumps({"id": {"testResult": {"label": "//a:test", "run": 1}}, "testResult": {"status": "FAILED"}}),
                  json.dumps({"id": {"testSummary": {"label": "//a:test"}}, "testSummary": {"overallStatus": "FLAKY"}}),

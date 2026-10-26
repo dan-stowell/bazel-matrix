@@ -274,23 +274,34 @@ def bep_results(lines, wanted):
 def no_tests(output_base, targets):
     """The //p:test targets whose test.xml (tools/inner_bazel.py's) says the
     inner `bazel test` found no tests (NO_TESTS): they built, but tested nothing."""
-    out = []
-    for t in targets:
-        pkg, _, name = t[2:].partition(":")
-        out_dir = os.path.join(output_base, "execroot", "_main", "bazel-out")
+    return sorted(t for t in targets if 'message="NO_TESTS"' in test_xml(output_base, t))
+
+
+INFRA = "INFRA"
+
+
+def test_xml(output_base, target):
+    """The text of a //p:test target's test.xml, "" if missing."""
+    pkg, _, name = target[2:].partition(":")
+    out_dir = os.path.join(output_base, "execroot", "_main", "bazel-out")
+    try:
+        configs = os.listdir(out_dir)
+    except OSError:
+        return ""
+    for c in configs:
         try:
-            configs = os.listdir(out_dir)
+            with open(os.path.join(out_dir, c, "testlogs", pkg, name, "test.xml"), errors="replace") as f:
+                return f.read()
         except OSError:
-            configs = []
-        for c in configs:
-            try:
-                with open(os.path.join(out_dir, c, "testlogs", pkg, name, "test.xml"), errors="replace") as f:
-                    if 'message="NO_TESTS"' in f.read():
-                        out.append(t)
-                        break
-            except OSError:
-                pass
-    return sorted(out)
+            pass
+    return ""
+
+
+def infra_killed(output_base, targets):
+    """The targets whose wrapper was killed by infrastructure (or raised):
+    their test.xml has an infra_killed or wrapper_error testcase
+    (tools/remote_inner_bazel.py)."""
+    return sorted(t for t in targets if re.search(r'name="(infra_killed|wrapper_error)"', test_xml(output_base, t)))
 
 
 def is_emudhra(check):
@@ -437,18 +448,22 @@ def group_cell(cfg, pair, group):
         ok = [t for t in mine if is_pass(table[t][1])]
         done = sum(1 for t in mine if table[t][1] is not None)
         return ("running" if live else "pending"), len(ok), len(mine), [NO_BASELINE], done
-    reference = [t for t in mine if is_pass(table[t][0])]
+    # Infra-killed projects count neither way: not as a candidate failure,
+    # nor (on the baseline) as a failure that excuses the candidate.
+    infra = [t for t in mine if is_pass(table[t][0]) and table[t][1] == INFRA]
+    reference = [t for t in mine if is_pass(table[t][0]) and t not in infra]
     ok = [t for t in reference if is_pass(table[t][1])]
     running = [t for t in reference if table[t][1] is None]
     failing = [t for t in reference if t not in ok and t not in running]
     done = len(reference) - len(running)
+    notes = ["infra (not counted): " + ", ".join(infra)] if infra else []
     if not reference:
-        return "n/a", 0, 0, ["none passed on the baseline"], 0
+        return ("pending", 0, 0, notes, 0) if infra else ("n/a", 0, 0, ["none passed on the baseline"], 0)
     if running or live:
         # Not green until the run's final summary is in.
         return ("no" if failing else "running"), len(ok), len(reference), failing + (
-            ["running: " + ", ".join(running)] if running else ["finishing"]), done
-    return ("no" if failing else "yes"), len(ok), len(reference), failing, done
+            ["running: " + ", ".join(running)] if running else ["finishing"]) + notes, done
+    return ("no" if failing else "yes"), len(ok), len(reference), failing + notes, done
 
 
 # --- run store --------------------------------------------------------------
@@ -748,60 +763,92 @@ class Runner(threading.Thread):
             self.current = None
             self.store.append(rec)
 
+    def invoke(self, rec, args, env, key, log, log_path, deadline):
+        """Runs one Bazel invocation, its output appended (redacted) to log
+        and its test results streamed into rec["targets"] from its BEP file.
+        Returns (exit code, timed out)."""
+        timed_out = False
+        self.proc = subprocess.Popen(args, cwd=self.work, env=env, stdout=subprocess.PIPE,
+                                     stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, start_new_session=True)
+        # Redacted on the way in, in case anything echoes the key.
+        copier = threading.Thread(target=copy_redacted, args=(self.proc.stdout, log, key), daemon=True)
+        copier.start()
+        wanted = {x for x in args if x.startswith("//") and ":" in x}
+        bep = next((x.split("=", 1)[1] for x in args if x.startswith("--build_event_json_file=")), None)
+        bep_pos, bep_buf = 0, ""
+        while self.proc.poll() is None:
+            if self.stopping.is_set() or time.time() > deadline:
+                timed_out = not self.stopping.is_set()
+                kill_group(self.proc)
+                break
+            if bep:
+                # Results as each target finishes, for the page.
+                try:
+                    with open(bep) as f:
+                        f.seek(bep_pos)
+                        bep_buf += f.read()
+                        bep_pos = f.tell()
+                    *done, bep_buf = bep_buf.split("\n")
+                    rec["targets"].update(bep_results(done, wanted))
+                except OSError:
+                    pass
+            if not rec["invocations"]:
+                with open(log_path, errors="replace") as f:
+                    rec["invocations"] = invocation_links(f.read(1 << 16))
+            time.sleep(2)
+        code = self.proc.wait()
+        copier.join(60)
+        if bep:
+            try:
+                os.remove(bep)
+            except OSError:
+                pass
+        return code, timed_out
+
     def execute(self, rec, cfg, args, env, key):
         log_path = os.path.join(self.store.logs, rec["log"])
-        timeout = cfg.get("step_timeout_s", DEFAULT_TIMEOUT)
+        deadline = time.time() + cfg.get("step_timeout_s", DEFAULT_TIMEOUT)
+        output_base = args[1].split("=", 1)[1]
         timed_out = False
         try:
+            wanted = [x for x in args if x.startswith("//") and ":" in x]
             with open(log_path, "w") as log:
-                self.proc = subprocess.Popen(args, cwd=self.work, env=env, stdout=subprocess.PIPE,
-                                             stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL,
-                                             start_new_session=True)
-                # Redacted on the way in, in case anything echoes the key.
-                copier = threading.Thread(target=copy_redacted, args=(self.proc.stdout, log, key), daemon=True)
-                copier.start()
-                deadline = time.time() + timeout
-                wanted = {x for x in args if x.startswith("//") and ":" in x}
-                bep = next((x.split("=", 1)[1] for x in args if x.startswith("--build_event_json_file=")), None)
-                bep_pos, bep_buf = 0, ""
-                while self.proc.poll() is None:
-                    if self.stopping.is_set() or time.time() > deadline:
-                        timed_out = not self.stopping.is_set()
-                        kill_group(self.proc)
-                        break
-                    if bep:
-                        # Results as each target finishes, for the page.
-                        try:
-                            with open(bep) as f:
-                                f.seek(bep_pos)
-                                bep_buf += f.read()
-                                bep_pos = f.tell()
-                            *done, bep_buf = bep_buf.split("\n")
-                            rec["targets"].update(bep_results(done, wanted))
-                        except OSError:
-                            pass
-                    if not rec["invocations"]:
-                        with open(log_path, errors="replace") as f:
-                            rec["invocations"] = invocation_links(f.read(1 << 16))
-                    time.sleep(2)
-                code = self.proc.wait()
-                copier.join(60)
+                code, timed_out = self.invoke(rec, args, env, key, log, log_path, deadline)
+            with open(log_path, errors="replace") as f:
+                text = f.read()
+            targets = target_results(text, set(wanted))
+            infra = []
+            if rec["step"] == "subset" and not self.stopping.is_set() and not timed_out:
+                infra = infra_killed(output_base, [t for t in wanted if not is_pass(targets.get(t))])
+                if infra:
+                    # Killed by infrastructure, not failed: once more, alone.
+                    first = args.index(wanted[0])
+                    flags = [a for a in args[first:] if a not in wanted]
+                    retry = args[:first] + infra + [
+                        (a + "-retry") if a.startswith("--build_event_json_file=") else a for a in flags]
+                    with open(log_path, "a") as log:
+                        log.write("\n=== canary: retrying infra-killed %s\n" % " ".join(infra))
+                        log.flush()
+                        start = log.tell()
+                        code2, timed_out = self.invoke(rec, retry, env, key, log, log_path, deadline)
+                    with open(log_path, errors="replace") as f:
+                        f.seek(start)
+                        targets.update(target_results(f.read(), set(infra)))
+                    infra = infra_killed(output_base, [t for t in infra if not is_pass(targets.get(t))])
+                    if all(is_pass(targets.get(t)) or t in infra for t in wanted):
+                        code = 0  # only infra kills, if anything, are left
+                for t in infra:
+                    targets[t] = INFRA
             if timed_out or self.stopping.is_set():
                 # The Bazel server may still run the build; stop it.
-                subprocess.run([cfg["bazel"], "--output_base=" + args[1].split("=", 1)[1], "shutdown"],
+                subprocess.run([cfg["bazel"], "--output_base=" + output_base, "shutdown"],
                                cwd=self.work, env=env, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
                                stderr=subprocess.DEVNULL, timeout=300)
             with open(log_path, errors="replace") as f:
                 text = f.read()
-            if bep:
-                try:
-                    os.remove(bep)
-                except OSError:
-                    pass
-            rec.update(exit_code=code, invocations=invocation_links(text), targets=target_results(text, wanted))
+            rec.update(exit_code=code, invocations=invocation_links(text), targets=targets, infra=infra)
             if rec["step"] == "subset":
-                rec["no_tests"] = no_tests(args[1].split("=", 1)[1], [t for t, st in rec["targets"].items()
-                                                                       if is_pass(st)])
+                rec["no_tests"] = no_tests(output_base, [t for t, st in targets.items() if is_pass(st)])
             if rec["step"] == "probe":
                 rec["probe"] = probe_result(text)
             if self.stopping.is_set():
@@ -822,7 +869,7 @@ class Runner(threading.Thread):
                 try:
                     kill_group(p)
                     p.wait(60)
-                    subprocess.run([cfg["bazel"], "--output_base=" + args[1].split("=", 1)[1], "shutdown"],
+                    subprocess.run([cfg["bazel"], "--output_base=" + output_base, "shutdown"],
                                    cwd=self.work, env=env, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
                                    stderr=subprocess.DEVNULL, timeout=300)
                 except Exception as e2:
@@ -945,6 +992,9 @@ def render(cfg, runs, current):
             if built_only and st in ("yes", "no"):
                 text += ", %d tested" % (len(ok_targets) - len(built_only))
                 title += "; built, no tests: " + ", ".join(built_only)
+            infra_t = [t for t in ("//%s:test" % p for p in projects) if table.get(t, (None, None))[1] == INFRA]
+            if infra_t and st in ("yes", "no", "pending"):
+                text += ", %d infra" % len(infra_t)
             if flaky and st in ("yes", "no"):
                 text += ", %d flaky%s" % (len(flaky), " (candidate only)" if only_cand else "")
                 title += "; flaky: %s" % ", ".join(
