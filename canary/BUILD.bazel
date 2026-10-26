@@ -37,3 +37,14 @@ py_test(
     ],
     imports = ["."],
 )
+
+# Unit tests of server.py, the app that runs the canary.
+py_test(
+    name = "server_test",
+    srcs = [
+        "server.py",
+        "server_test.py",
+    ],
+    data = ["//tools:remote.bazelrc"],
+    imports = ["."],
+)
