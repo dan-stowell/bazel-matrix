@@ -112,8 +112,8 @@ and arch under test, so an autodetected C++ toolchain matches the
 executors, and inner Bazels run in parallel on RBE rather than on one
 machine. `--config=inner-remote-arm64` does the same on arm64 executors: the
 outer targets `//tools:linux_arm64` (also its execution platform, so the
-test runs the linux-arm64 inner Bazel of `tools/versions.bzl` and the
-aarch64 Python), with `Arch=arm64` for outer and inner actions. `:build`
+test runs the linux-arm64 inner Bazel of `tools/versions.bzl`), with
+`Arch=arm64` for outer and inner actions. `:build`
 stays local (and has no arm64 variant).
 
 ```sh
@@ -125,7 +125,8 @@ That runs the outer Bazel itself rather than through `bb remote` (whose
 runners can't target arm64); use the Bazel binary, not the bb CLI, which
 puts the key in Bazel's argv. `--//:inner_remote` drops the test's
 `no-remote-exec`/`no-sandbox`/`requires-network` and runs
-`tools/remote_inner_bazel.py`; the config also asks for 4 CPUs, 8 GB and
+`tools/remote_inner_bazel.py` with the image's `python3` (a py_binary
+would need a zipper, so a C++ toolchain, built for the executor); the config also asks for 4 CPUs, 8 GB and
 20 GB of disk (BuildBuddy may size the task by its own prediction).
 
 The key: `tools/remote_exec_credential_helper.py` (with
