@@ -1,17 +1,22 @@
 #!/usr/bin/env python3
-"""RBE image canary: runs the probe and a project subset on BuildBuddy prod
-RBE against each configured executor image and arch, one step at a time,
-forever, and serves the results on http://0.0.0.0:8000. Python 3 stdlib only.
+"""RBE image canary: answers, for each candidate image and arch, "is it
+protected from the eMudhra compromise?" and "do popular rulesets still build
+on it?", by running the TLS probe and a ruleset subset on BuildBuddy prod RBE
+against it and its baseline, one step at a time, forever. Serves the answers
+on http://0.0.0.0:8000. Python 3 stdlib only.
 
     python3 canary/server.py [--port 8000] [--data-dir ~/canary-data] [--work-dir ~/canary-work]
 
 Data dir: config.json (hand-edited, re-read each cycle; seeded if missing),
-runs.jsonl (one JSON line per step start and end; the last line for a run id
-wins) and logs/ (each step's full output). Work dir: a clone of the repo,
-reset to origin/<repo_branch> each cycle; per image only the container-image
-line of tools/remote.bazelrc is rewritten (uncommitted), and Bazel runs here
-(one output base per arch under ~/canary-out) with its actions on RBE, using
-$BUILDBUDDY_API_KEY (never written to the runs, logs or UI). See canary/README.md.
+runs.jsonl (a JSON line per step start and end; the last line per run id
+wins; compacted to the newest MAX_RUNS runs) and logs/ (each step's output,
+kept LOG_DAYS days). Work dir: a clone of the repo, reset to
+origin/<repo_branch> each cycle; per image only the container-image line of
+tools/remote.bazelrc is rewritten (uncommitted), and Bazel runs here (one
+output base per arch under ~/canary-out) with its actions on RBE. The API key
+($BUILDBUDDY_API_KEY) reaches Bazel through tools/buildbuddy_credential_helper.py
+and a 0600 key file, never argv, the runs, the logs or the page. See
+canary/README.md.
 """
 
 import argparse
@@ -32,37 +37,35 @@ import urllib.parse
 
 REPO_URL = "https://github.com/dan-stowell/bazel-matrix.git"
 
-# Today's images, pinned by digest. The 22.04 one is tools/remote.bazelrc's
-# (server_test checks); 24.04 is rbe-ubuntu24-04:latest as of 2026-10-26.
+# Today's images, pinned by digest (multi-arch indexes). The 22.04 one is
+# tools/remote.bazelrc's (server_test checks); 24.04 is rbe-ubuntu24-04:latest
+# as of 2026-10-26.
 BASELINE_2204 = ("docker://gcr.io/flame-public/rbe-ubuntu22-04@sha256:"
                  "0d84a80bb0fc36ba5381942adcf6493249594dcc9044845c617b78c9b621cae3")
 BASELINE_2404 = ("docker://gcr.io/flame-public/rbe-ubuntu24-04@sha256:"
                  "f7db0d4791247f032fdb4451b7c3ba90e567923a341cc6dc43abfc283436791a")
-
-# The new images that distrust the eMudhra roots (multi-arch indexes).
+# The 2026-10-26.1 images that distrust the eMudhra roots.
 CANDIDATE_2204 = ("docker://gcr.io/flame-public/rbe-ubuntu22-04@sha256:"
-                  "37fb0e3f1af1d95b8f41c2204e2de405e883f484b5e2c6a124e45058431206e7")
+                  "c3ea6288672add20a50fafbbeba27752731b24fe6cd4d20bac6c755a0619cc80")
 CANDIDATE_2404 = ("docker://gcr.io/flame-public/rbe-ubuntu24-04@sha256:"
-                  "9b3f4dbfd576b9e80f9915d4377b3435054011c5ac4c0516ffc9749129c5a63c")
+                  "be9853fc45092d2cf2bda3abed30d22182881659a50bf35c7125161d7cfc8a75")
 
-# Projects (not known-failing) covering C++, Go/gazelle, Python, Rust, JVM,
-# JS and shell/pkg that passed `tools/bb.sh test` on that baseline.
-SUBSET_2204 = [
-    "zlib", "abseil-cpp", "googletest", "protobuf", "re2", "rules_cc",  # C++
-    "gazelle", "rules_go", "buildozer",  # Go, gazelle go_deps
-    "rules_python", "aspect_rules_py",  # Python, pip
-    "rules_rust",  # Rust, crates
-    "rules_kotlin", "rules_scala",  # JVM
-    "aspect_rules_js", "rules_nodejs",  # JS, npm
-    "rules_shell", "rules_pkg", "bazel_skylib", "rules_img",  # shell, packaging, OCI
-]
-SUBSET_2404 = []
+# Popular rulesets, as projects of projects.txt, that pass on the baseline of
+# that release and arch with Bazel on this machine (see README.md, "The
+# subset"). Keys: "<release>" for amd64, "<release>/<arch>" otherwise; a
+# column without one is "not covered".
+SUBSETS = {}
+# Rulesets left out, and why (shown on the page).
+SUBSET_NOTES = []
 
 PROBE = "//canary:tls_probe_test"
-PROBE_TARGETS = [PROBE]
 ARCHS = ["amd64", "arm64"]
 DEFAULT_TIMEOUT = 3 * 3600
 PASSING = {"PASSED", "FLAKY"}
+MAX_RUNS = 200
+LOG_DAYS = 3
+WORK_ROOT = "/var/tmp/bazel-matrix/work"  # tools/inner_bazel.py's
+COMPLETE = ("passed", "failed")  # statuses of a run that ran to the end
 
 
 def seed_config():
@@ -80,12 +83,13 @@ def seed_config():
             {"name": "ubuntu24-04", "ref": BASELINE_2404, "role": "baseline", "release": "24.04"},
             {"name": "ubuntu24-04-candidate", "ref": CANDIDATE_2404, "role": "candidate", "release": "24.04"},
         ],
-        "subset": {"22.04": list(SUBSET_2204), "24.04": list(SUBSET_2404)},
+        "subset": {k: list(v) for k, v in SUBSETS.items()},
     }
 
 
 def load_config(data_dir):
-    """The config, written from seed_config() first if missing."""
+    """The config (seeded first if missing), with defaults for missing keys
+    and for missing subset entries."""
     path = os.path.join(data_dir, "config.json")
     if not os.path.exists(path):
         os.makedirs(data_dir, exist_ok=True)
@@ -95,11 +99,12 @@ def load_config(data_dir):
         os.replace(path + ".tmp", path)
     with open(path) as f:
         cfg = json.load(f)
-    for k, v in seed_config().items():
+    seed = seed_config()
+    for k, v in seed.items():
         if k not in ("images", "subset"):
             cfg.setdefault(k, v)
     cfg.setdefault("images", [])
-    cfg.setdefault("subset", {})
+    cfg["subset"] = dict(seed["subset"], **cfg.get("subset", {}))
     return cfg
 
 
@@ -119,18 +124,18 @@ def arch_of(image):
 
 
 def subset_of(cfg, image):
-    """The image's subset: cfg["subset"]["<release>"] on amd64,
-    ["<release>/<arch>"] on another arch; None when there is none."""
+    """The column's subset (a list, maybe empty), None when not configured."""
     rel, arch = image.get("release"), arch_of(image)
-    return cfg["subset"].get(rel if arch == "amd64" else "%s/%s" % (rel, arch)) or None
+    return cfg["subset"].get(rel if arch == "amd64" else "%s/%s" % (rel, arch))
 
 
 def schedule(cfg):
     """[(column, step)] for a cycle: candidates' probes first (fast), then
-    baselines' probes, then the subsets of the columns that have one."""
+    baselines' probes, then the subsets (baselines first) of columns with one."""
     cols = columns(cfg["images"])
-    probes = [c for c in cols if c.get("role") == "candidate"] + [c for c in cols if c.get("role") != "candidate"]
-    return [(c, "probe") for c in probes] + [(c, "subset") for c in cols if subset_of(cfg, c)]
+    cands = [c for c in cols if c.get("role") == "candidate"]
+    bases = [c for c in cols if c.get("role") != "candidate"]
+    return [(c, "probe") for c in cands + bases] + [(c, "subset") for c in bases + cands if subset_of(cfg, c)]
 
 
 # --- tools/remote.bazelrc ---------------------------------------------------
@@ -159,6 +164,9 @@ _RESULT = re.compile(r"^((?://|@)\S*:\S+)\s+(?:\(cached\)\s+)?"
 _END = re.compile(r"^Executed \d+ out of \d+ tests?\b")
 _SUMMARY = re.compile(r"^(\s|$|//|@|Target //|INFO: (Elapsed time|\d+ processes|Build completed)|"
                       r"ERROR: Build did NOT|FAILED: Build did NOT|Use --verbose_failures )")
+_TEST_OUTPUT = re.compile(r"^=+ Test output for (\S+):")
+_CHECK = re.compile(r"^(PASS|FAIL|NETERR|INFO|SKIP)\s+(\S+): (.*)$")
+_PROBE_SUMMARY = re.compile(r"^=== tls_probe summary \(CANARY_EXPECT=(\w+)[^)]*\): (\d+) checks\b")
 
 
 def clean_lines(text):
@@ -166,7 +174,7 @@ def clean_lines(text):
 
 
 def invocation_links(text):
-    """Every distinct invocation link printed, in order."""
+    """Every distinct BuildBuddy invocation link printed, in order."""
     out = []
     for l in clean_lines(text):
         m = _STREAM.search(l)
@@ -175,93 +183,50 @@ def invocation_links(text):
     return out
 
 
-def target_results(text):
-    """{label: status} from the outer Bazel's final test summary only (a
-    failing test's log may contain inner result lines of its own)."""
+def target_results(text, wanted):
+    """{label: status} for the labels in `wanted`, from the final test
+    summary only (a failing project's log embeds its inner summary)."""
     lines = clean_lines(text)
     ends = [i for i, l in enumerate(lines) if _END.match(l)]
     if not ends:
         return {}
-    end = ends[-1]
-    start = end
+    start = end = ends[-1]
     while start > 0 and _SUMMARY.match(lines[start - 1]):
         start -= 1
     out = {}
     for l in lines[start:end]:
         m = _RESULT.match(l)
-        if m:
+        if m and m.group(1) in wanted:
             out[m.group(1)] = m.group(2)
     return out
 
 
-_TEST_OUTPUT = re.compile(r"^=+ Test output for (\S+):")
-_PROBE_SUMMARY = re.compile(r"^=== tls_probe summary\b")
-_PROBE_FAIL = re.compile(r"^\s+(FAIL|NETERR)\s+(\S+): (.*)$")
-
-
-def probe_failures(text):
-    """{probe target: [(status, check, message)]} from each tls_probe
-    summary block (needs --test_output=all for passing targets' output)."""
-    out, target, in_summary = {}, None, False
+def probe_result(text):
+    """The probe's last complete output: {"expect", "total", "checks":
+    {check: [status, message]}}, None unless its summary line was printed
+    and every check it counts was seen."""
+    res, target, checks = None, None, {}
     for l in clean_lines(text):
         m = _TEST_OUTPUT.match(l)
         if m:
-            target, in_summary = m.group(1), False
-            out.setdefault(target, [])
+            target, checks = m.group(1), {}
             continue
-        if _PROBE_SUMMARY.match(l):
-            in_summary = target is not None
-            if in_summary:
-                out[target] = []  # a retried test prints it again
+        if target != PROBE:
             continue
-        if in_summary:
-            m = _PROBE_FAIL.match(l)
-            if m:
-                out[target].append((m.group(1), m.group(2), m.group(3)))
-            elif not l.startswith(" "):
-                in_summary = False
-    return {t: f for t, f in out.items() if t in PROBE_TARGETS}
-
-
-_CHECK = re.compile(r"^(PASS|FAIL|NETERR|INFO|SKIP)\s+(\S+): (.*)$")
-
-
-def probe_checks(text):
-    """{check: [status, message]} from the probe's output (its check lines,
-    not the indented summary), for the last run of PROBE in the log."""
-    out, target = {}, None
-    for l in clean_lines(text):
-        m = _TEST_OUTPUT.match(l)
+        m = _PROBE_SUMMARY.match(l)
         if m:
-            target = m.group(1)
-            if target == PROBE:
-                out = {}
+            total = int(m.group(2))
+            res = {"expect": m.group(1), "total": total, "checks": checks} if len(checks) == total else None
+            target = None
             continue
         m = _CHECK.match(l)
-        if m and target == PROBE:
-            out[m.group(2)] = [m.group(1), m.group(3)]
-    return out
+        if m:
+            checks[m.group(2)] = [m.group(1), m.group(3)]
+    return res
 
 
 def is_emudhra(check):
     return check.split("/")[0].startswith("emudhra")
-
-
-def summarize_failures(failures, width=70):
-    """Short lines for a cell: checks grouped by their first path part, e.g.
-    "emudhra_online x3: verified, TLSv1.3"; the message is its last part."""
-    groups = {}
-    for status, check, msg in failures:
-        groups.setdefault(check.split("/")[0], []).append((status, check, msg))
-    lines = []
-    for top, items in groups.items():
-        status, check, msg = items[0]
-        short = msg.rsplit(": ", 1)[-1]
-        if len(short) > width:
-            short = short[:width - 3] + "..."
-        name = check if len(items) == 1 else "%s x%d" % (top, len(items))
-        lines.append("%s%s: %s" % ("" if status == "FAIL" else status + " ", name, short))
-    return lines
 
 
 def classify(code):
@@ -277,134 +242,92 @@ def redact(text, secret):
     return text.replace(secret, "<REDACTED>") if secret else text
 
 
-# --- regressions ------------------------------------------------------------
-
-def latest(runs):
-    """{(image name, ref, arch, step): the newest finished run}."""
-    out = {}
-    for r in runs:
-        if r.get("status") in ("running", "interrupted", "skipped"):
-            continue
-        key = (r["image"]["name"], r["image"]["ref"], arch_of(r["image"]), r["step"])
-        if key not in out or r["start"] >= out[key]["start"]:
-            out[key] = r
-    return out
-
-
-def cell_status(lat, image, step, target=None):
-    r = lat.get((image["name"], image["ref"], arch_of(image), step))
-    if r is None:
-        return None, None
-    if target is None:
-        return r["status"], r
-    return r.get("targets", {}).get(target), r
-
+# --- verdicts ---------------------------------------------------------------
 
 def is_pass(status):
-    return status in PASSING or status == "passed"
+    return status in PASSING
 
 
-def regressions(images, lat, rows):
-    """{(candidate name, arch, row)}: subset rows (step, target or None) a
-    candidate column fails while a baseline of its release and arch passes them.
-    images are columns (see columns())."""
-    out = set()
-    for c in images:
-        if c.get("role") != "candidate":
+def latest_complete(runs, image, step, subset=None, rev=None):
+    """The newest run of the column's exact image (name, ref, role, arch)
+    that ran to the end (and for a subset, of exactly that subset; with rev,
+    at that repo revision)."""
+    for r in reversed(runs):
+        im = r["image"]
+        if (r["step"] != step or r["status"] not in COMPLETE or im["name"] != image["name"]
+                or im["ref"] != image["ref"] or im.get("role") != image.get("role")
+                or arch_of(im) != arch_of(image)):
             continue
-        bases = [b for b in images if b.get("role") == "baseline" and b.get("release") == c.get("release")
-                 and arch_of(b) == arch_of(c)]
-        for row in rows:
-            if row[0] == "probe":
-                continue  # probe checks count in verdicts(), eMudhra ones under Rejects only
-            st, _ = cell_status(lat, c, *row)
-            if st is None or is_pass(st):
-                continue
-            if any(is_pass(cell_status(lat, b, *row)[0]) for b in bases):
-                out.add((c["name"], arch_of(c), row))
-    return out
+        if step == "probe" and not r.get("probe"):
+            continue
+        if step == "subset" and r.get("subset") != subset:
+            continue
+        if rev is not None and r.get("rev") != rev:
+            continue
+        return r
+    return None
 
 
-def verdicts(cfg, images, lat, col):
-    """(rejects, works) for a column, each (state, [reasons]) with state
-    yes | no | pending | baseline.
+def protected(runs, col):
+    """("yes"|"no"|"pending", [reasons], probe run): every emudhra* check
+    passes in distrusted mode."""
+    r = latest_complete(runs, col, "probe")
+    if r is None:
+        return "pending", ["no complete probe result for this image yet"], None
+    p = r["probe"]
+    em = {c: v for c, v in p["checks"].items() if is_emudhra(c)}
+    if p["expect"] != "distrusted" or not em:
+        return "pending", ["probe ran without eMudhra checks in distrusted mode"], r
+    bad = ["%s: %s" % (c, m) for c, (st, m) in sorted(em.items()) if st == "FAIL"]
+    if bad:
+        return "no", bad, r
+    unsure = ["%s %s: %s" % (st, c, m) for c, (st, m) in sorted(em.items()) if st not in ("PASS", "INFO")]
+    return ("pending", unsure, r) if unsure else ("yes", [], r)
 
-    rejects: the probe's emudhra* checks all pass (a candidate runs them with
-    CANARY_EXPECT=distrusted, so passing means it rejects eMudhra). works: the
-    probe's other checks pass and the subset has no target that fails while
-    a baseline of the same release and arch passes it.
-    """
-    _, probe = cell_status(lat, col, "probe")
-    checks = (probe or {}).get("probe_checks") or {}
-    if probe is not None and probe["status"] not in ("passed", "failed"):
-        checks = {}  # an interrupted or broken probe proves nothing
-    fails = lambda keep: ["%s: %s" % (c, m) for c, (st, m) in sorted(checks.items()) if keep(c) and st == "FAIL"]
-    unsure = lambda keep: ["%s %s: %s" % (st, c, m) for c, (st, m) in sorted(checks.items())
-                           if keep(c) and st not in ("PASS", "FAIL", "INFO")]
-    em_checks = [c for c in checks if is_emudhra(c)]
-    if probe is None or not em_checks:
-        rejects = ("pending", ["no probe result yet"] if probe is None else
-                   ["probe %s, no eMudhra checks parsed" % probe["status"]])
+
+def builds(cfg, runs, images, col):
+    """("yes"|"no"|"pending"|"not covered", [reasons], "N/M" or "", details):
+    the probe's non-eMudhra checks pass, and every subset project that
+    passed on the same release+arch baseline (same subset, same repo
+    revision) also passes on the candidate."""
+    reasons, state = [], "yes"
+    pr = latest_complete(runs, col, "probe")
+    if pr is None:
+        state, reasons = "pending", ["no complete probe result yet"]
     else:
-        em = fails(is_emudhra)
-        if col.get("role") == "baseline":
-            rejects = ("baseline", em or ["trusts eMudhra (expected)"])
-        elif em:
-            rejects = ("no", em)
-        else:
-            rejects = ("pending", unsure(is_emudhra)) if unsure(is_emudhra) else ("yes", [])
-    other = lambda c: not is_emudhra(c)
-    reasons = fails(other) if checks else []
-    if not checks:
-        state = "pending"
-        reasons = ["no probe result yet"] if probe is None else ["probe %s, no checks parsed" % probe["status"]]
-    elif reasons:
+        other = {c: v for c, v in pr["probe"]["checks"].items() if not is_emudhra(c)}
+        bad = ["%s: %s" % (c, m) for c, (st, m) in sorted(other.items()) if st == "FAIL"]
+        unsure = ["%s %s: %s" % (st, c, m) for c, (st, m) in sorted(other.items()) if st not in ("PASS", "INFO", "FAIL")]
+        if bad:
+            state, reasons = "no", bad
+        elif unsure:
+            state, reasons = "pending", unsure
+    subset = subset_of(cfg, col)
+    if not subset:
+        return ("no" if state == "no" else "not covered"), reasons + ["no ruleset subset for this release and arch"], "", {}
+    targets = ["//%s:test" % p for p in subset]
+    sub = latest_complete(runs, col, "subset", subset)
+    if sub is None:
+        return ("no" if state == "no" else "pending"), reasons + ["ruleset builds not run yet"], "", {}
+    if any(t not in sub.get("targets", {}) for t in targets):
+        missing = [t for t in targets if t not in sub.get("targets", {})]
+        return ("no" if state == "no" else "pending"), reasons + ["no result for %s" % ", ".join(missing)], "", {}
+    bases = [b for b in columns(images) if b.get("role") == "baseline" and b.get("release") == col.get("release")
+             and arch_of(b) == arch_of(col)]
+    base = next((x for x in (latest_complete(runs, b, "subset", subset, rev=sub.get("rev")) for b in bases) if x), None)
+    if base is None or any(t not in base.get("targets", {}) for t in targets):
+        return ("no" if state == "no" else "pending"), reasons + ["no complete baseline result at the same revision"], "", {}
+    reference = [t for t in targets if is_pass(base["targets"][t])]
+    ok = [t for t in reference if is_pass(sub["targets"][t])]
+    details = {t: (base["targets"][t], sub["targets"][t]) for t in targets}
+    if len(ok) < len(reference):
         state = "no"
-    elif unsure(other):
-        state, reasons = "pending", unsure(other)
-    else:
-        state = "yes"
-    if subset_of(cfg, col):
-        _, sub = cell_status(lat, col, "subset")
-        if sub is None:
-            state = "no" if state == "no" else "pending"
-            reasons = reasons + ["subset not run yet"]
-        elif col.get("role") == "baseline":
-            bad = sorted(t for t, st in sub.get("targets", {}).items() if not is_pass(st))
-            if sub["status"] != "passed":
-                state = "no"
-                reasons = reasons + (["fails %s" % ", ".join(bad)] if bad else ["subset %s" % sub["status"]])
-        else:
-            bases = [b for b in images if b.get("role") == "baseline" and b.get("release") == col.get("release")
-                     and arch_of(b) == arch_of(col)]
-            regs, unknown = [], []
-            for t, st in sorted(sub.get("targets", {}).items()):
-                if is_pass(st):
-                    continue
-                base = [cell_status(lat, b, "subset", t)[0] for b in bases]
-                if any(is_pass(x) for x in base):
-                    regs.append(t)
-                elif not any(base):
-                    unknown.append(t)
-            if regs:
-                state = "no"
-                reasons = reasons + ["regresses %s" % ", ".join(regs)]
-            elif sub["status"] != "passed" and not sub.get("targets"):
-                # No per-target results (e.g. the build failed first): a
-                # regression if a baseline's subset passed.
-                if any(cell_status(lat, b, "subset")[0] == "passed" for b in bases):
-                    state = "no"
-                    reasons = reasons + ["subset %s (baseline passed)" % sub["status"]]
-                elif state == "yes":
-                    state = "pending"
-                    reasons = reasons + ["subset %s" % sub["status"]]
-            elif unknown and state == "yes":
-                state = "pending"
-                reasons = reasons + ["no baseline result for %s" % ", ".join(unknown)]
-            elif sub["status"] in ("error", "timeout") and state == "yes":
-                state = "pending"
-                reasons = reasons + ["subset %s" % sub["status"]]
-    return rejects, (state, reasons)
+        reasons = reasons + ["fails on the candidate but passes on the baseline: %s" % ", ".join(
+            t for t in reference if t not in ok)]
+    elif not reference:
+        state = "no" if state == "no" else "pending"
+        reasons = reasons + ["nothing passed on the baseline"]
+    return state, reasons, "%d/%d" % (len(ok), len(reference)), details
 
 
 # --- run store --------------------------------------------------------------
@@ -426,9 +349,6 @@ class Store:
         try:
             with open(self.path) as f:
                 for line in f:
-                    line = line.strip()
-                    if not line:
-                        continue
                     try:
                         rec = json.loads(line)
                     except ValueError:
@@ -444,17 +364,36 @@ class Store:
                 r.update(status="interrupted", end=r.get("end") or now())
                 self.append(r)
 
-    def backfill_checks(self):
-        """Adds probe check summaries to finished probe runs recorded without them."""
-        for r in self.runs():
-            path = os.path.join(self.logs, r["log"])
-            if (r["step"] == "probe" and "probe_checks" not in r and r["status"] != "running"
-                    and os.path.exists(path)):
-                with open(path, errors="replace") as f:
-                    text = f.read()
-                r["checks"] = {t: summarize_failures(x) for t, x in probe_failures(text).items()}
-                r["probe_checks"] = probe_checks(text)
-                self.append(r)
+    def compact(self, keep=MAX_RUNS, log_days=LOG_DAYS):
+        """Keeps the newest `keep` runs (one line each) and deletes logs older
+        than log_days that no kept run names."""
+        with self.lock:
+            runs = []
+            try:
+                by_id = {}
+                with open(self.path) as f:
+                    for line in f:
+                        try:
+                            rec = json.loads(line)
+                        except ValueError:
+                            continue
+                        by_id[rec["id"]] = rec
+                runs = sorted(by_id.values(), key=lambda r: (r["start"], r["id"]))[-keep:]
+            except FileNotFoundError:
+                pass
+            with open(self.path + ".tmp", "w") as f:
+                for r in runs:
+                    f.write(json.dumps(r, sort_keys=True) + "\n")
+            os.replace(self.path + ".tmp", self.path)
+        named = {r["log"] for r in runs}
+        cutoff = time.time() - log_days * 86400
+        for name in os.listdir(self.logs):
+            path = os.path.join(self.logs, name)
+            try:
+                if name not in named and os.path.getmtime(path) < cutoff:
+                    os.remove(path)
+            except OSError:
+                pass
 
     def next_cycle(self):
         return max([r["cycle"] for r in self.runs()] or [0]) + 1
@@ -462,6 +401,34 @@ class Store:
 
 def now():
     return datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")
+
+
+def pid_alive(pid):
+    try:
+        os.kill(pid, 0)
+        return True
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+
+
+def prune_work(root=WORK_ROOT):
+    """Removes inner work dirs whose pid file names a dead process."""
+    try:
+        entries = os.listdir(root)
+    except OSError:
+        return
+    for d in entries:
+        path = os.path.join(root, d)
+        try:
+            with open(os.path.join(path, "pid")) as f:
+                pid = int(f.read())
+        except (OSError, ValueError):
+            continue
+        if not pid_alive(pid):
+            subprocess.run(["chmod", "-R", "u+rwx", path], stderr=subprocess.DEVNULL)
+            shutil.rmtree(path, ignore_errors=True)
 
 
 # --- runner -----------------------------------------------------------------
@@ -476,8 +443,9 @@ class Runner(threading.Thread):
         self.lock = threading.Lock()  # one step at a time in the work dir
 
     def git(self, *args):
-        subprocess.run(["git", "-C", self.work] + list(args), check=True, timeout=600,
-                       stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL)
+        return subprocess.run(["git", "-C", self.work] + list(args), check=True, timeout=600,
+                              stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                              stdin=subprocess.DEVNULL).stdout.decode().strip()
 
     def prepare(self, branch):
         if not os.path.isdir(os.path.join(self.work, ".git")):
@@ -486,6 +454,7 @@ class Runner(threading.Thread):
         self.git("fetch", "--quiet", "origin", branch)
         self.git("reset", "--quiet", "--hard", "FETCH_HEAD")
         self.git("clean", "-fdq")
+        return self.git("rev-parse", "HEAD")
 
     def run(self):
         while not self.stopping.is_set():
@@ -500,6 +469,7 @@ class Runner(threading.Thread):
     def cycle(self):
         cfg = load_config(self.data_dir)
         cycle = self.store.next_cycle()
+        self.store.compact()
         # Two servers must not share a work dir: hold its lock for the cycle.
         with open(self.work.rstrip("/") + ".lock", "w") as lk:
             try:
@@ -507,14 +477,50 @@ class Runner(threading.Thread):
             except BlockingIOError:
                 raise RuntimeError("another server holds %s.lock" % self.work.rstrip("/"))
             with self.lock:
-                self.prepare(cfg["repo_branch"])
+                rev = self.prepare(cfg["repo_branch"])
             for image, step in schedule(cfg):
                 if self.stopping.is_set():
                     return
-                self.free_disk(cfg)
-                self.step(cfg, cycle, image, step)
+                self.housekeeping(cfg)
+                self.step(cfg, cycle, rev, image, step)
         # Not a hot loop when every step is skipped or fails at once.
         self.stopping.wait(cfg.get("cycle_pause_s", 60))
+
+    def output_base(self, cfg, image):
+        # One per arch: the Arch flag would otherwise discard the analysis
+        # cache at every switch. Steps run one at a time, so never two
+        # Bazels on one output base.
+        return os.path.join(cfg["output_root"], arch_of(image))
+
+    def housekeeping(self, cfg):
+        """Prunes dead inner work dirs; when disk runs low, `bazel clean
+        --expunge`s this server's own output bases (no step is running).
+        Never fails the cycle."""
+        try:
+            prune_work()
+            root = cfg["output_root"]
+            os.makedirs(root, exist_ok=True)
+            if shutil.disk_usage(root).free >= cfg.get("min_free_gb", 15) * 2**30:
+                return
+            for arch in ARCHS:
+                base = os.path.join(root, arch)
+                if os.path.isdir(base):
+                    print("low disk: cleaning %s" % base, file=sys.stderr)
+                    subprocess.run([cfg["bazel"], "--output_base=" + base, "clean", "--expunge"],
+                                   cwd=self.work, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+                                   stderr=subprocess.DEVNULL, timeout=1800)
+        except Exception as e:
+            print("housekeeping: %s: %s" % (type(e).__name__, e), file=sys.stderr)
+
+    def key_file(self, cfg, key):
+        """A 0600 file with the key, for tools/buildbuddy_credential_helper.py."""
+        path = os.path.join(cfg["output_root"], ".api-key")
+        os.makedirs(cfg["output_root"], exist_ok=True)
+        fd = os.open(path + ".tmp", os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+        with os.fdopen(fd, "w") as f:
+            f.write(key)
+        os.replace(path + ".tmp", path)
+        return path
 
     def new_record(self, cycle, image, step):
         stamp = datetime.datetime.now().strftime("%Y%m%dT%H%M%S")
@@ -524,26 +530,9 @@ class Runner(threading.Thread):
                 "end": None, "exit_code": None, "status": "running", "invocations": [],
                 "targets": {}, "log": rid + ".log", "command": []}
 
-    def output_base(self, cfg, image):
-        # One per arch: the Arch flag would otherwise discard the analysis
-        # cache at every switch. Steps run one at a time, so never two
-        # Bazels on one output base.
-        return os.path.join(cfg["output_root"], arch_of(image))
-
-    def free_disk(self, cfg):
-        """`bazel clean --expunge` of every output base when disk runs low."""
-        root = cfg["output_root"]
-        os.makedirs(root, exist_ok=True)
-        if shutil.disk_usage(root).free >= cfg.get("min_free_gb", 15) * 2**30:
-            return
-        for arch in sorted(os.listdir(root)):
-            print("low disk: cleaning %s" % os.path.join(root, arch), file=sys.stderr)
-            subprocess.run([cfg["bazel"], "--output_base=" + os.path.join(root, arch), "clean", "--expunge"],
-                           cwd=self.work, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
-                           stderr=subprocess.DEVNULL, timeout=1800)
-
-    def command(self, cfg, cycle, image, step, key):
-        """The Bazel command line for a step, None if it has nothing to run.
+    def command(self, cfg, cycle, image, step):
+        """The Bazel command line for a step (no secrets), None if it has
+        nothing to run.
 
         Bazel runs here, its actions on RBE in the image of the rewritten
         tools/remote.bazelrc. The projects' :test actions are no-remote-exec,
@@ -551,12 +540,13 @@ class Runner(threading.Thread):
         """
         arch = arch_of(image)
         arch_flags = [] if arch == "amd64" else ["--remote_default_exec_properties=Arch=" + arch]
+        helper = os.path.join(self.work, "tools", "buildbuddy_credential_helper.py")
         head = [cfg["bazel"], "--output_base=" + self.output_base(cfg, image), "test"]
-        tail = ["--config=remote-minimal", "--remote_header=x-buildbuddy-api-key=" + key,
+        tail = ["--config=remote-minimal", "--credential_helper=*.buildbuddy.io=" + helper,
                 "--nocache_test_results"] + arch_flags
         if step == "probe":
             expect = "trusted" if image.get("role") == "baseline" else "distrusted"
-            return head + PROBE_TARGETS + tail + ["--test_output=all", "--test_env=CANARY_EXPECT=" + expect]
+            return head + [PROBE] + tail + ["--test_output=all", "--test_env=CANARY_EXPECT=" + expect]
         subset = subset_of(cfg, image)
         if not subset:
             return None
@@ -566,25 +556,21 @@ class Runner(threading.Thread):
             args.append("--//:inner_flags=--remote_instance_name=canary-%d" % cycle)
         return args
 
-    def step(self, cfg, cycle, image, step):
+    def step(self, cfg, cycle, rev, image, step):
         rec = self.new_record(cycle, image, step)
+        rec["rev"] = rev
+        if step == "subset":
+            rec["subset"] = subset_of(cfg, image)
         key = os.environ.get("BUILDBUDDY_API_KEY", "")
         if not key:
             rec.update(status="error", end=now(), error="BUILDBUDDY_API_KEY is not set")
             self.store.append(rec)
             return
-        args = self.command(cfg, cycle, image, step, key)
+        args = self.command(cfg, cycle, image, step)
         with self.lock:
-            build = os.path.join(self.work, "canary", "BUILD.bazel")
-            no_probe = step == "probe" and not (
-                os.path.exists(build) and "tls_probe_test" in open(build).read())
-            if args is None or no_probe:
-                rec.update(status="skipped", end=now(),
-                           error="no subset for this release" if args is None else "no //canary probe on this branch")
-                self.store.append(rec)
-                return
             rc = os.path.join(self.work, "tools", "remote.bazelrc")
             try:
+                env = dict(os.environ, BAZEL_MATRIX_KEY_FILE=self.key_file(cfg, key))
                 self.git("checkout", "--", "tools/remote.bazelrc")
                 with open(rc) as f:
                     text = rewrite_image(f.read(), image["ref"])
@@ -594,23 +580,23 @@ class Runner(threading.Thread):
                 rec.update(status="error", end=now(), error="%s: %s" % (type(e).__name__, e))
                 self.store.append(rec)
                 return
-            rec["command"] = [redact(a, key) for a in args]
+            rec["command"] = args
             self.current = rec
             self.store.append(rec)
-            self.execute(rec, cfg, args, key)
+            self.execute(rec, cfg, args, env, key)
             self.current = None
             self.store.append(rec)
 
-    def execute(self, rec, cfg, args, key):
+    def execute(self, rec, cfg, args, env, key):
         log_path = os.path.join(self.store.logs, rec["log"])
         timeout = cfg.get("step_timeout_s", DEFAULT_TIMEOUT)
         timed_out = False
         try:
             with open(log_path, "w") as log:
-                self.proc = subprocess.Popen(args, cwd=self.work, stdout=subprocess.PIPE,
+                self.proc = subprocess.Popen(args, cwd=self.work, env=env, stdout=subprocess.PIPE,
                                              stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL,
                                              start_new_session=True)
-                # The key never reaches the log file, even mid-run.
+                # Redacted on the way in, in case anything echoes the key.
                 copier = threading.Thread(target=copy_redacted, args=(self.proc.stdout, log, key), daemon=True)
                 copier.start()
                 deadline = time.time() + timeout
@@ -622,22 +608,26 @@ class Runner(threading.Thread):
                     time.sleep(1)
                 code = self.proc.wait()
                 copier.join(60)
+            if timed_out:
+                # The server may still run the build; stop it.
+                subprocess.run([cfg["bazel"], "--output_base=" + args[1].split("=", 1)[1], "shutdown"],
+                               cwd=self.work, env=env, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+                               stderr=subprocess.DEVNULL, timeout=300)
             with open(log_path, errors="replace") as f:
                 text = f.read()
-            # Only the requested labels: a failing project's log embeds its
-            # inner Bazel's summary, which a killed run may end with.
-            wanted = {x for x in args if x.startswith("//")}
-            rec.update(exit_code=code, invocations=invocation_links(text),
-                       targets={t: st for t, st in target_results(text).items() if t in wanted})
+            wanted = {x for x in args if x.startswith("//") and ":" in x}
+            rec.update(exit_code=code, invocations=invocation_links(text), targets=target_results(text, wanted))
             if rec["step"] == "probe":
-                rec["checks"] = {t: summarize_failures(f) for t, f in probe_failures(text).items()}
-                rec["probe_checks"] = probe_checks(text)
+                rec["probe"] = probe_result(text)
             if self.stopping.is_set():
                 rec["status"] = "interrupted"
             elif timed_out:
                 rec["status"] = "timeout"
             else:
                 rec["status"] = classify(code)
+                if rec["step"] == "probe" and rec["probe"] is None:
+                    rec["status"] = "error"
+                    rec["error"] = "no complete tls_probe summary in the output"
         except Exception as e:
             rec.update(status="error", error="%s: %s" % (type(e).__name__, e))
         finally:
@@ -659,15 +649,18 @@ def copy_redacted(src, dst, key):
 
 
 def kill_group(proc, grace=30):
-    """SIGINT the process group (the Bazel client cancels the build), then SIGKILL."""
+    """SIGINT the process group (the Bazel client cancels the build), then
+    SIGKILL the group if it outlives the grace period."""
     try:
         os.killpg(proc.pid, signal.SIGINT)
+    except ProcessLookupError:
+        return
+    try:
         proc.wait(grace)
     except subprocess.TimeoutExpired:
-        try:
-            os.killpg(proc.pid, signal.SIGKILL)
-        except ProcessLookupError:
-            pass
+        pass
+    try:
+        os.killpg(proc.pid, signal.SIGKILL)  # stragglers in the group too
     except ProcessLookupError:
         pass
 
@@ -675,30 +668,40 @@ def kill_group(proc, grace=30):
 # --- UI ---------------------------------------------------------------------
 
 CSS = """
-:root { color-scheme: light dark; --bg:#fff; --fg:#1b1b1b; --mut:#666; --line:#ddd;
-  --pass:#d7f5dd; --fail:#fbd5d5; --warn:#fdecc8; --run:#d6e6fb; --none:#f2f2f2; --reg:#c00; }
-@media (prefers-color-scheme: dark) { :root { --bg:#16181b; --fg:#e6e6e6; --mut:#999; --line:#333;
-  --pass:#1e4d2b; --fail:#5c2020; --warn:#5a4513; --run:#1f3b5e; --none:#24272b; --reg:#ff6b6b; } }
-body { background:var(--bg); color:var(--fg); font:14px/1.4 system-ui,sans-serif; margin:16px; }
-a { color:inherit; } h1 { font-size:20px; } h2 { font-size:16px; margin-top:24px; }
-table { border-collapse:collapse; } td, th { border:1px solid var(--line); padding:3px 6px; text-align:left; vertical-align:top; }
-th { font-weight:600; } .mut { color:var(--mut); } .wrap { overflow-x:auto; }
-.passed,.PASSED,.FLAKY { background:var(--pass); }
-.failed,.FAILED,.TIMEOUT,.timeout,.runner_failed,.error,.FAILED_TO_BUILD,.REMOTE_FAILURE,.INCOMPLETE,.NO_STATUS { background:var(--fail); }
-.running { background:var(--run); } .interrupted,.skipped,.UNKNOWN { background:var(--warn); } .none { background:var(--none); }
-.emudhra { background:var(--warn); }
-.checks { font-size:12px; margin:2px 0 0 0; padding-left:14px; }
-.reg { outline:2px solid var(--reg); outline-offset:-2px; font-weight:600; } .reg::after { content:" regression"; color:var(--reg); font-size:11px; }
-code { font-size:12px; }
+:root { color-scheme: light dark; --bg:#fff; --fg:#1b1b1b; --mut:#666; --line:#ddd; --card:#fafafa;
+  --yes:#1a7f37; --no:#cf222e; --pend:#9a6700; --yesbg:#dafbe1; --nobg:#ffebe9; --pendbg:#fff8c5; }
+@media (prefers-color-scheme: dark) { :root { --bg:#16181b; --fg:#e6e6e6; --mut:#9a9a9a; --line:#333; --card:#1e2125;
+  --yes:#3fb950; --no:#f85149; --pend:#d29922; --yesbg:#12261a; --nobg:#2d1416; --pendbg:#2b2411; } }
+body { background:var(--bg); color:var(--fg); font:15px/1.45 system-ui,sans-serif; margin:16px auto; max-width:1100px; padding:0 16px; }
+h1 { font-size:22px; margin:0 0 4px; } a { color:inherit; } .mut { color:var(--mut); font-size:13px; }
+.cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px; margin:16px 0; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px; }
+.card h2 { font-size:16px; margin:0 0 10px; }
+.q { margin:10px 0; padding:10px; border-radius:8px; }
+.q .a { font-size:26px; font-weight:700; } .q .t { font-size:13px; }
+.yes { background:var(--yesbg); } .yes .a { color:var(--yes); }
+.no { background:var(--nobg); } .no .a { color:var(--no); }
+.pending, .not_covered { background:var(--pendbg); } .pending .a, .not_covered .a { color:var(--pend); }
+details { margin:6px 0; font-size:13px; } summary { cursor:pointer; }
+table { border-collapse:collapse; font-size:13px; } td, th { border:1px solid var(--line); padding:2px 6px; text-align:left; }
+ul { margin:4px 0; padding-left:18px; } code { font-size:12px; }
 """
+
+PROTECT_TEXT = {
+    "yes": "This image rejects certificates that chain to the eMudhra roots.",
+    "no": "This image still trusts eMudhra: see details.",
+    "pending": "No complete probe result for this image yet.",
+}
+BUILD_TEXT = {
+    "yes": "Every ruleset build that works on today's image also works on this one.",
+    "no": "Something that works on today's image breaks on this one: see details.",
+    "pending": "Waiting for complete results on this image and its baseline.",
+    "not covered": "No ruleset builds are checked for this release and arch.",
+}
 
 
 def esc(s):
     return html.escape(str(s), quote=True)
-
-
-def cls(status):
-    return re.sub(r"\W", "_", status or "none")
 
 
 def elapsed(start, end=None):
@@ -711,137 +714,106 @@ def elapsed(start, end=None):
     return "%dh%02dm%02ds" % (s // 3600, s % 3600 // 60, s % 60)
 
 
-def link(r):
-    inv = r.get("invocations") or []
-    return " ".join('<a href="%s">%s</a>' % (esc(u), "runner" if "app.buildbuddy" in u else "invocation")
-                    for u in inv)
+def links(r):
+    if not r:
+        return ""
+    return " ".join('<a href="%s">invocation</a>' % esc(u) for u in r.get("invocations") or []) + \
+        ' <a href="/logs/%s">log</a>' % esc(r["log"])
 
 
-def grid_rows(cfg, runs, images):
-    rows = [("probe", None)] + [("probe", t) for t in PROBE_TARGETS] + [("subset", None)]
-    targets = []
-    for im in images:
-        targets += ["//%s:test" % p for p in subset_of(cfg, im) or []]
-    for r in runs:
-        if r["step"] == "subset":
-            targets += list(r.get("targets", {}))
-    seen = []
-    for t in targets:
-        if t not in seen:
-            seen.append(t)
-    return rows + [("subset", t) for t in sorted(seen)]
+def lis(items):
+    return "<ul>%s</ul>" % "".join("<li>%s</li>" % esc(x) for x in items) if items else ""
+
+
+def answer(question, state, text, extra=""):
+    return '<div class="q %s"><div class="t">%s</div><div class="a">%s%s</div><div class="t">%s</div></div>' % (
+        esc(state.replace(" ", "_")), esc(question), esc(state.upper()), extra, esc(text))
+
+
+def card(cfg, runs, images, col):
+    p_state, p_why, p_run = protected(runs, col)
+    b_state, b_why, ratio, table = builds(cfg, runs, images, col)
+    out = ['<div class="card"><h2>Ubuntu %s candidate &middot; %s</h2>' % (esc(col.get("release")), esc(arch_of(col))),
+           answer("Protected from the eMudhra compromise?", p_state, PROTECT_TEXT[p_state]),
+           answer("Do popular rulesets still build?", b_state, BUILD_TEXT[b_state],
+                  " &nbsp;<span style=\"font-size:16px\">%s</span>" % esc(ratio) if ratio else "")]
+    det = []
+    det.append('<p class="mut">%s<br>%s</p>' % (esc(col["name"]), esc(col["ref"])))
+    if p_why:
+        det.append("<b>eMudhra</b>%s" % lis(p_why))
+    if b_why:
+        det.append("<b>Builds</b>%s" % lis(b_why))
+    if p_run:
+        checks = p_run["probe"]["checks"]
+        store = ["%s: %s" % (c, m) for c, (st, m) in sorted(checks.items()) if c.startswith("trust_store")]
+        if store:
+            det.append("<b>CA store vs baseline</b> (informational)%s" % lis(store))
+        bad = ["%s %s: %s" % (st, c, m) for c, (st, m) in sorted(checks.items()) if st != "PASS"]
+        det.append("<b>Probe</b>: %d checks%s %s" % (len(checks), ", not passing:" if bad else ", all pass", links(p_run)))
+        det.append(lis(bad))
+    if table:
+        det.append("<b>Rulesets</b> (baseline &rarr; candidate)<table>%s</table>" % "".join(
+            "<tr><td><code>%s</code></td><td>%s</td><td>%s</td></tr>" % (esc(t), esc(b), esc(c))
+            for t, (b, c) in sorted(table.items())))
+    out.append("<details><summary>details</summary>%s</details></div>" % "".join(det))
+    return "".join(out)
 
 
 def render(cfg, runs, current):
-    images = columns(cfg["images"])
-    lat = latest(runs)
-    rows = grid_rows(cfg, runs, images)
-    regs = regressions(images, lat, rows)
+    images = cfg["images"]
+    cols = columns(images)
     out = ['<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="30">',
            '<meta name="viewport" content="width=device-width,initial-scale=1">',
            "<title>RBE image canary</title><style>%s</style></head><body>" % CSS,
-           "<h1>RBE image canary</h1>"]
+           "<h1>RBE image canary</h1>",
+           '<p class="mut">The new RBE images, checked on BuildBuddy against today\'s images. '
+           "Refreshes every 30 s.</p>",
+           '<div class="cards">']
+    out += [card(cfg, runs, images, c) for c in cols if c.get("role") == "candidate"]
+    out.append("</div>")
+    det = []
     if current:
-        out.append('<p class="running">Running: cycle %s, <b>%s</b> (%s, %s, %s) step <b>%s</b>, %s elapsed. '
-                   '<a href="/logs/%s?tail=200">log tail</a> &middot; <a href="/logs/%s">full log</a></p>' % (
-                       esc(current["cycle"]), esc(current["image"]["name"]), esc(current["image"].get("role")),
-                       esc(arch_of(current["image"])),
-                       esc(current["image"].get("release")), esc(current["step"]), elapsed(current["start"]),
-                       esc(current["log"]), esc(current["log"])))
+        det.append("<p>Running: %s %s %s, %s elapsed. <a href=\"/logs/%s?tail=200\">log tail</a></p>" % (
+            esc(current["image"]["name"]), esc(arch_of(current["image"])), esc(current["step"]),
+            elapsed(current["start"]), esc(current["log"])))
     else:
-        out.append('<p class="mut">Idle (between steps).</p>')
-    out.append("<p><b>Rejects eMudhra</b> &ldquo;no&rdquo; on a candidate = the image still trusts eMudhra "
-               "(see the emudhra checks). Red <b>Works for customers</b> on a candidate = a regression vs. the "
-               "baseline of its release and arch: a non-eMudhra probe check fails, or a project that passes on "
-               "the baseline fails. Baselines trust eMudhra by design.</p>")
-    cands = [c for c in images if c.get("role") == "candidate"]
-    v = [verdicts(cfg, images, lat, c) for c in cands]
-    out.append('<p class="mut">Branch %s; inner salt %s. Candidate columns: %d of %d still trust eMudhra, '
-               '%d of %d don\'t work for customers.</p>' % (
-                   esc(cfg["repo_branch"]), "on" if cfg.get("salt_inner", True) else "off",
-                   sum(1 for x in v if x[0][0] == "no"), len(v), sum(1 for x in v if x[1][0] == "no"), len(v)))
-    # Grid.
-    out.append('<h2>Latest results</h2><div class="wrap"><table><tr><th rowspan="2">step / target</th>')
-    releases = []
-    for im in images:
-        if im.get("release") not in releases:
-            releases.append(im.get("release"))
-    for rel in releases:
-        n = sum(1 for im in images if im.get("release") == rel)
-        out.append('<th colspan="%d">Ubuntu %s</th>' % (n, esc(rel)))
-    out.append("</tr><tr>")
-    for im in images:
-        out.append('<th title="%s">%s<br>%s<br><span class="mut">%s &middot; %s</span></th>' % (
-            esc(im["ref"]), esc(im["name"]), esc(arch_of(im)), esc(im.get("role")),
-            esc(im["ref"].rsplit("@sha256:", 1)[-1][:12])))
-    out.append("</tr>")
-    for label, idx in (("Rejects eMudhra", 0), ("Works for customers", 1)):
-        out.append("<tr><td><b>%s</b></td>" % label)
-        for im in images:
-            state, reasons = verdicts(cfg, images, lat, im)[idx]
-            klass = {"yes": "passed", "no": "failed", "baseline": "none", "pending": "skipped"}[state]
-            if idx == 0 and state == "no":
-                klass = "emudhra"
-            body = "<b>%s</b>" % esc(state)
-            if reasons:
-                body += '<ul class="checks">%s</ul>' % "".join("<li>%s</li>" % esc(x) for x in reasons)
-            if idx == 0:
-                _, probe = cell_status(lat, im, "probe")
-                diff = ["%s: %s" % (c, m) for c, (st, m) in sorted(((probe or {}).get("probe_checks") or {}).items())
-                        if c.startswith("trust_store")]
-                if diff:
-                    body += "<details><summary>CA store vs baseline</summary><ul class=\"checks\">%s</ul></details>" % (
-                        "".join("<li>%s</li>" % esc(d) for d in diff))
-            out.append('<td class="%s">%s</td>' % (klass, body))
-        out.append("</tr>")
-    for row in rows:
-        step, target = row
-        label = "<b>%s</b>" % step if target is None else "&nbsp;&nbsp;<code>%s</code>" % esc(target)
-        out.append("<tr><td>%s</td>" % label)
-        for im in images:
-            if step == "subset" and not subset_of(cfg, im):
-                out.append('<td class="none mut">n/a</td>')
-                continue
-            st, r = cell_status(lat, im, step, target)
-            if r is None or (target is not None and st is None):
-                out.append('<td class="none"></td>')
-                continue
-            reg = " reg" if (im["name"], arch_of(im), row) in regs else ""
-            if step == "probe":
-                checks = r.get("checks", {})
-                fails = checks.get(target, []) if target else [
-                    "%s: %d failing check(s)" % (t.split(":")[-1], len(c)) for t, c in sorted(checks.items()) if c]
-            else:
-                fails = []
-            detail = '<ul class="checks">%s</ul>' % "".join("<li>%s</li>" % esc(f) for f in fails) if fails else ""
-            klass = cls(st)
-            pc = r.get("probe_checks") or {}
-            failing = [c for c, (x, _) in pc.items() if x == "FAIL"]
-            if step == "probe" and not is_pass(st) and failing and all(is_emudhra(c) for c in failing):
-                klass = "emudhra"  # only eMudhra checks fail: see Rejects eMudhra
-            out.append('<td class="%s%s" title="cycle %s, %s">%s %s <a href="/logs/%s">log</a>%s</td>' % (
-                klass, reg, esc(r["cycle"]), esc(r["end"]), esc(st), link(r), esc(r["log"]), detail))
-        out.append("</tr>")
-    out.append("</table></div>")
-    # History.
-    out.append("<h2>Recent runs</h2><div class=\"wrap\"><table><tr><th>cycle</th><th>image</th><th>step</th>"
-               "<th>start</th><th>took</th><th>status</th><th>exit</th><th>targets</th><th>links</th></tr>")
-    for r in list(reversed(runs))[:100]:
-        tg = r.get("targets", {})
-        bad = sum(1 for s in tg.values() if not is_pass(s))
-        out.append('<tr><td>%s</td><td>%s <span class="mut">%s %s %s</span></td><td>%s</td><td>%s</td><td>%s</td>'
-                   '<td class="%s">%s%s</td><td>%s</td><td>%s</td><td>%s <a href="/logs/%s">log</a></td></tr>' % (
-                       esc(r["cycle"]), esc(r["image"]["name"]), esc(r["image"].get("role", "")),
-                       esc(r["image"].get("release", "")), esc(arch_of(r["image"])), esc(r["step"]), esc(r["start"]),
-                       elapsed(r["start"], r.get("end")), cls(r["status"]), esc(r["status"]),
-                       (' <span class="mut">%s</span>' % esc(r["error"])) if r.get("error") else "",
-                       esc(r.get("exit_code")), "%d/%d failing" % (bad, len(tg)) if tg else "",
-                       link(r), esc(r["log"])))
-    out.append("</table></div></body></html>")
+        det.append("<p>Idle between steps.</p>")
+    base_rows = []
+    for b in cols:
+        if b.get("role") != "baseline":
+            continue
+        pr = latest_complete(runs, b, "probe")
+        sr = latest_complete(runs, b, "subset", subset_of(cfg, b)) if subset_of(cfg, b) else None
+        base_rows.append("<tr><td>%s %s</td><td>probe %s %s</td><td>%s</td></tr>" % (
+            esc(b["name"]), esc(arch_of(b)), esc(pr["status"]) if pr else "none", links(pr),
+            ("rulesets %d/%d passed %s" % (sum(1 for s in sr["targets"].values() if is_pass(s)), len(sr["targets"]),
+                                          links(sr))) if sr else "rulesets: none"))
+    det.append("<b>Baselines</b> (the reference)<table>%s</table>" % "".join(base_rows))
+    det.append("<p><b>Rulesets checked</b>: %s</p>" % "; ".join(
+        "%s: %s" % (esc(k), esc(", ".join(v) or "none")) for k, v in sorted(cfg["subset"].items())))
+    if SUBSET_NOTES:
+        det.append("<p><b>Not included</b>%s</p>" % lis(SUBSET_NOTES))
+    hist = []
+    for r in list(reversed(runs))[:30]:
+        hist.append("<tr><td>%s</td><td>%s %s</td><td>%s</td><td>%s</td><td>%s%s</td><td>%s</td></tr>" % (
+            esc(r["cycle"]), esc(r["image"]["name"]), esc(arch_of(r["image"])), esc(r["step"]), esc(r["start"]),
+            esc(r["status"]), (" (%s)" % esc(r["error"])) if r.get("error") else "", links(r)))
+    det.append("<b>Recent runs</b><table>%s</table>" % "".join(hist))
+    out.append("<details><summary>details</summary>%s</details></body></html>" % "".join(det))
     return "".join(out)
 
 
 _LOG_NAME = re.compile(r"^[A-Za-z0-9_][A-Za-z0-9._-]*$")
+
+
+def read_tail(path, n, max_bytes=1 << 20):
+    """The last n lines of a file, reading at most max_bytes from its end."""
+    with open(path, "rb") as f:
+        f.seek(0, os.SEEK_END)
+        size = f.tell()
+        f.seek(max(0, size - max_bytes))
+        data = f.read().decode("utf-8", "replace")
+    return "\n".join(data.splitlines()[-n:]) + "\n"
 
 
 def make_handler(data_dir, store, runner):
@@ -858,23 +830,24 @@ def make_handler(data_dir, store, runner):
             url = urllib.parse.urlsplit(self.path)
             path = urllib.parse.unquote(url.path)
             q = urllib.parse.parse_qs(url.query)
+            key = os.environ.get("BUILDBUDDY_API_KEY", "")
             try:
                 if path == "/":
                     cfg = load_config(data_dir)
                     self.send(200, render(cfg, store.runs(), runner.current if runner else None), "text/html")
                 elif path == "/api/runs":
-                    self.send(200, json.dumps(store.runs(), indent=1), "application/json")
+                    self.send(200, redact(json.dumps(store.runs(), indent=1), key), "application/json")
                 elif path.startswith("/logs/"):
                     name = path[len("/logs/"):]
                     full = os.path.join(store.logs, name)
                     if not _LOG_NAME.match(name) or not os.path.isfile(full):
                         return self.send(404, "not found\n", "text/plain")
-                    with open(full, errors="replace") as f:
-                        text = redact(f.read(), os.environ.get("BUILDBUDDY_API_KEY", ""))
                     if "tail" in q:
-                        n = int(q["tail"][0])
-                        text = "\n".join(text.splitlines()[-n:]) + "\n"
-                    self.send(200, text, "text/plain")
+                        text = read_tail(full, max(1, min(int(q["tail"][0]), 10000)))
+                    else:
+                        with open(full, errors="replace") as f:
+                            text = f.read()
+                    self.send(200, redact(text, key), "text/plain")
                 else:
                     self.send(404, "not found\n", "text/plain")
             except Exception as e:
@@ -896,7 +869,6 @@ def main(argv=None):
     load_config(args.data_dir)
     store = Store(args.data_dir)
     store.mark_interrupted()
-    store.backfill_checks()
     runner = Runner(args.data_dir, args.work_dir, store)
     server = http.server.ThreadingHTTPServer((args.host, args.port), make_handler(args.data_dir, store, runner))
 
