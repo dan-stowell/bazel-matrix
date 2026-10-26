@@ -99,6 +99,9 @@ class ProbeTest(unittest.TestCase):
         self.assertIsNone(server.probe_result(PROBE_LOG[:PROBE_LOG.index("=== tls_probe")]))
         # Summary counts a check that wasn't printed.
         self.assertIsNone(server.probe_result(PROBE_LOG.replace("PASS    tools: found /bin/curl\n", "")))
+        # A simulated distrust, or a probe cut short by its deadline.
+        self.assertIsNone(server.probe_result(PROBE_LOG.replace("distrusted):", "distrusted, simulated):")))
+        self.assertIsNone(server.probe_result(PROBE_LOG.replace("PASS    tools: found /bin/curl", "FAIL    deadline: hit")))
         # Another target's output doesn't count.
         self.assertIsNone(server.probe_result(PROBE_LOG.replace("//canary:tls_probe_test", "//x:y")))
 
@@ -240,6 +243,16 @@ class ScheduleTest(unittest.TestCase):
             "--//:inner_flags=--remote_default_exec_properties=Arch=arm64",
             "--//:inner_flags=--remote_instance_name=canary-7"])
         self.assertIsNone(runner.command(dict(cfg, subset={}), 7, arm, "subset"))
+
+    def test_kill_group(self):
+        import subprocess
+        p = subprocess.Popen(["sh", "-c", "trap '' INT; sleep 60 & wait"], start_new_session=True)
+        time.sleep(0.5)
+        t0 = time.time()
+        server.kill_group(p, grace=1)
+        self.assertEqual(p.wait(10), -9)
+        self.assertLess(time.time() - t0, 10)
+        server.kill_group(p)  # already reaped: a no-op
 
     def test_key_file(self):
         d = tempfile.mkdtemp()

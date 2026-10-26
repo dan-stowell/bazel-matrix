@@ -185,7 +185,7 @@ _SUMMARY = re.compile(r"^(\s|$|//|@|Target //|INFO: (Elapsed time|\d+ processes|
                       r"ERROR: Build did NOT|FAILED: Build did NOT|Use --verbose_failures )")
 _TEST_OUTPUT = re.compile(r"^=+ Test output for (\S+):")
 _CHECK = re.compile(r"^(PASS|FAIL|NETERR|INFO|SKIP)\s+(\S+): (.*)$")
-_PROBE_SUMMARY = re.compile(r"^=== tls_probe summary \(CANARY_EXPECT=(\w+)[^)]*\): (\d+) checks\b")
+_PROBE_SUMMARY = re.compile(r"^=== tls_probe summary \(CANARY_EXPECT=(\w+)([^)]*)\): (\d+) checks\b")
 
 
 def clean_lines(text):
@@ -234,8 +234,12 @@ def probe_result(text):
             continue
         m = _PROBE_SUMMARY.match(l)
         if m:
-            total = int(m.group(2))
-            res = {"expect": m.group(1), "total": total, "checks": checks} if len(checks) == total else None
+            total = int(m.group(3))
+            # A simulated distrust (CANARY_SIMULATE_DISTRUST) says nothing
+            # about the image, and a probe cut short by its deadline (a
+            # "deadline" check) didn't run every check.
+            done = len(checks) == total and "simulated" not in m.group(2) and "deadline" not in checks
+            res = {"expect": m.group(1), "total": total, "checks": checks} if done else None
             target = None
             continue
         m = _CHECK.match(l)
@@ -653,8 +657,8 @@ class Runner(threading.Thread):
                     time.sleep(1)
                 code = self.proc.wait()
                 copier.join(60)
-            if timed_out:
-                # The server may still run the build; stop it.
+            if timed_out or self.stopping.is_set():
+                # The Bazel server may still run the build; stop it.
                 subprocess.run([cfg["bazel"], "--output_base=" + args[1].split("=", 1)[1], "shutdown"],
                                cwd=self.work, env=env, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
                                stderr=subprocess.DEVNULL, timeout=300)
@@ -693,21 +697,24 @@ def copy_redacted(src, dst, key):
     src.close()
 
 
+_kill_lock = threading.Lock()
+
+
 def kill_group(proc, grace=30):
     """SIGINT the process group (the Bazel client cancels the build), then
-    SIGKILL the group if it outlives the grace period."""
-    try:
+    SIGKILL it if the leader outlives the grace period. Only signals while
+    the leader is unreaped, so the group id can't have been reused."""
+    with _kill_lock:
+        if proc.poll() is not None:
+            return
         os.killpg(proc.pid, signal.SIGINT)
-    except ProcessLookupError:
-        return
-    try:
-        proc.wait(grace)
-    except subprocess.TimeoutExpired:
-        pass
-    try:
-        os.killpg(proc.pid, signal.SIGKILL)  # stragglers in the group too
-    except ProcessLookupError:
-        pass
+        deadline = time.time() + grace
+        while time.time() < deadline:
+            # Leader still a child (unreaped) means its pgid is still ours.
+            if os.waitid(os.P_PID, proc.pid, os.WEXITED | os.WNOHANG | os.WNOWAIT) is not None:
+                return
+            time.sleep(0.5)
+        os.killpg(proc.pid, signal.SIGKILL)
 
 
 # --- UI ---------------------------------------------------------------------
