@@ -96,6 +96,21 @@ class OpensslCnfTest(unittest.TestCase):
             self.assertEqual(tls_probe.cnf_line(line), (None, None), line)
 
 
+class EmudhraTest(unittest.TestCase):
+    def pem(self, der):
+        return "-----BEGIN CERTIFICATE-----\n%s\n-----END CERTIFICATE-----\n" % base64.b64encode(der).decode()
+
+    def test_prefilter(self):
+        self.assertTrue(tls_probe.mentions_emudhra(self.pem(b"0\x10....emSign Root")))
+        self.assertTrue(tls_probe.mentions_emudhra(self.pem(b"0\x10..eMudhra Inc")))
+        self.assertFalse(tls_probe.mentions_emudhra(self.pem(b"0\x10..ISRG Root X1")))
+
+    def test_names(self):
+        self.assertRegex("subject=C = IN, O = eMudhra Technologies Limited, CN = x", tls_probe.EMUDHRA_RE)
+        self.assertRegex("issuer=C = US, CN = emSign ECC Root CA - C3", tls_probe.EMUDHRA_RE)
+        self.assertNotRegex("subject=C = US, O = ISRG, CN = ISRG Root X1", tls_probe.EMUDHRA_RE)
+
+
 class CapathNameTest(unittest.TestCase):
     def test_names(self):
         self.assertEqual(tls_probe.capath_name("4042bcee.0"), "ok")

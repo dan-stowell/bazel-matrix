@@ -13,20 +13,25 @@ on the `bb remote` runner (`tools/bb.sh` passes the same image as
   git config (`http.ssl*`, `url.*.insteadOf`), `~/.curlrc` or `openssl.cnf`
   directive redirects or disables verification, and python's default verify
   paths resolve to `/etc/ssl/certs`; so the checks below test what clients load.
-- `trust_store/bundle`: the SHA-256 fingerprints of
-  `/etc/ssl/certs/ca-certificates.crt` equal `roots/<VERSION_ID>.txt`, or with
-  `CANARY_EXPECT=distrusted` that minus `emudhra.txt` exactly.
+- `trust_store/bundle`: trusted: the SHA-256 fingerprints of
+  `/etc/ssl/certs/ca-certificates.crt` equal `roots/<VERSION_ID>.txt`;
+  distrusted: informational, lists the roots removed and added vs that.
   `trust_store/capath`: the hashed CApath has valid names (subject hash,
-  contiguous indices) and the same certs as the bundle.
-- `emudhra_fixture`: `openssl verify -attime` (2026-11-01) of
+  canonical `hash.N`, contiguous) and the same certs as the bundle.
+- `emudhra/store_absent` (distrusted only): no root in the bundle or CApath
+  is in `emudhra.txt` or has an eMudhra/emSign subject or issuer.
+- `emudhra/fixture`: `openssl verify -attime` (2026-11-01) of
   `emudhra_chain.pem` against the bundle: verifies when trusted; when
   distrusted must fail at depth 2 for want of emSign Root CA - G1.
-- `emudhra_online/www.internet2.edu/{python,curl,git}`: the live emSign chain
+- `emudhra/online/www.internet2.edu/{python,curl,git}`: the live emSign chain
   must verify when trusted and be rejected for its certificate when distrusted.
 - `host/<host>/{python,curl}` for hosts builds hit, `git_ls_remote`,
   `github_release_asset` (follows the redirect): must verify.
 - `control/{expired,untrusted-root}.badssl.com/{python,curl,git}`: must be
   rejected for the certificate (a network error fails these).
+
+`emudhra/*` answers "does the image reject eMudhra"; everything else "does it
+still work for customers".
 
 DNS, connect, timeout and transient TLS/HTTP errors (after one retry) are
 `NETERR`, a JUnit `<error>` rather than `<failure>`, so a red run says

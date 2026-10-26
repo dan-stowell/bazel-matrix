@@ -15,6 +15,7 @@ import base64
 import concurrent.futures
 import hashlib
 import os
+import platform
 import pwd
 import re
 import shutil
@@ -216,30 +217,36 @@ def dump():
 
 
 def check_integrity(expect, store):
+    """trusted: the bundle is exactly the baseline. distrusted: the diff vs
+    the baseline is informational (candidates may ship a newer
+    ca-certificates); emudhra/store_absent is what counts."""
     rel = release()
     roots_file = os.path.join(HERE, "roots", rel + ".txt")
-    if not os.path.exists(roots_file):
-        record("trust_store/bundle", "FAIL", "no canary/roots/%s.txt for this release" % rel)
-        return
-    baseline = read_fps(roots_file)
-    want = dict(baseline)
-    if expect == "distrusted":
-        for fp in read_fps(os.path.join(HERE, "emudhra.txt")):
-            want.pop(fp, None)
     bundle = bundle_certs(store["file"])
-    names = dict(baseline)
-    names.update({fp: subject(p) for fp, p in bundle.items() if fp not in names})
-    missing, added = sorted(set(want) - set(bundle)), sorted(set(bundle) - set(want))
-    text = "\n".join(["missing %s %s" % (fp, names.get(fp, "")) for fp in missing] +
-                     ["added %s %s" % (fp, names.get(fp, "")) for fp in added])
-    what = "canary/roots/%s.txt%s" % (rel, " minus emudhra.txt" if expect == "distrusted" else "")
-    if missing or added:
-        record("trust_store/bundle", "FAIL", "vs %s: %d missing, %d added (want %d, have %d)" % (
-            what, len(missing), len(added), len(want), len(bundle)), text)
-    else:
-        record("trust_store/bundle", "PASS", "%d certs match %s" % (len(want), what))
-
     capath, problems = capath_certs(store["dir"])
+    if expect == "distrusted":
+        check_emudhra_absent(bundle, capath)
+    if not os.path.exists(roots_file):
+        record("trust_store/bundle", "FAIL" if expect == "trusted" else "PASS",
+               "no canary/roots/%s.txt for this release" % rel)
+    else:
+        baseline = read_fps(roots_file)
+        names = dict(baseline)
+        names.update({fp: subject(p) for fp, p in bundle.items() if fp not in names})
+        missing, added = sorted(set(baseline) - set(bundle)), sorted(set(bundle) - set(baseline))
+        text = "\n".join(["removed %s %s" % (fp, names.get(fp, "")) for fp in missing] +
+                         ["added %s %s" % (fp, names.get(fp, "")) for fp in added])
+        what = "canary/roots/%s.txt" % rel
+        if not (missing or added):
+            record("trust_store/bundle", "PASS", "%d certs match %s" % (len(baseline), what))
+        elif expect == "trusted":
+            record("trust_store/bundle", "FAIL", "vs %s: %d missing, %d added (want %d, have %d)" % (
+                what, len(missing), len(added), len(baseline), len(bundle)), text)
+        else:
+            record("trust_store/bundle", "PASS", "informational: vs %s %d removed, %d added (%d -> %d): %s" % (
+                what, len(missing), len(added), len(baseline), len(bundle),
+                "; ".join(l.split(" ", 1)[0] + " " + cn(l.split(" ", 2)[2]) for l in text.splitlines())), text)
+
     only_c, only_b = sorted(set(capath) - set(bundle)), sorted(set(bundle) - set(capath))
     problems += ["only in CApath: %s" % fp for fp in only_c] + ["only in bundle: %s" % fp for fp in only_b]
     if problems:
@@ -248,6 +255,40 @@ def check_integrity(expect, store):
     else:
         record("trust_store/capath", "PASS", "%d hashed certs, names and indices valid, same set as the bundle"
                % len(capath))
+
+
+def cn(subj):
+    m = re.search(r"CN=([^,]*)", subj)
+    return m.group(1) if m else subj
+
+
+EMUDHRA_RE = re.compile(r"O ?= ?eMudhra|CN ?= ?[^,\n]*emSign")
+
+
+def mentions_emudhra(pem):
+    """Cheap prefilter: the DER has "eMudhra" or "emSign" somewhere."""
+    der = base64.b64decode("".join(PEM_RE.search(pem).group(2).split()))
+    return b"eMudhra" in der or b"emSign" in der
+
+
+def check_emudhra_absent(bundle, capath):
+    """No eMudhra root in bundle or CApath: by emudhra.txt fingerprint, or by
+    subject or issuer (O=eMudhra..., CN=emSign...), so a re-issued one counts."""
+    known = read_fps(os.path.join(HERE, "emudhra.txt"))
+    found = []
+    for where, certs in (("bundle", bundle), ("capath", capath)):
+        for fp, pem in sorted(certs.items()):
+            hit = fp.split("+")[0] in known
+            if hit or mentions_emudhra(pem):
+                _, names = run(["openssl", "x509", "-noout", "-subject", "-issuer"], input=pem)
+                if hit or EMUDHRA_RE.search(names):
+                    found.append("%s: %s %s" % (where, fp[:16], " ".join(names.split())))
+    if found:
+        record("emudhra/store_absent", "FAIL", "%d eMudhra certs still trusted: %s" % (
+            len(found), "; ".join(found)), "\n".join(found))
+    else:
+        record("emudhra/store_absent", "PASS", "no eMudhra/emSign root in bundle (%d) or CApath (%d)" % (
+            len(bundle), len(capath)))
 
 
 def check_fixture(expect, store):
@@ -269,7 +310,7 @@ def check_fixture(expect, store):
     shutil.rmtree(tmp)
     print("openssl verify: " + " | ".join(out.strip().splitlines()))
     ok = code == 0 and ": OK" in out
-    name = "emudhra_fixture"
+    name = "emudhra/fixture"
     if expect == "trusted":
         if ok:
             record(name, "PASS", "eMudhra chain verifies", out)
@@ -566,7 +607,8 @@ def main():
     signal.signal(signal.SIGTERM, on_sigterm)
     signal.signal(signal.SIGALRM, on_sigterm)
     signal.alarm(DEADLINE + 20)  # backstop for setup and offline checks too
-    print("tls_probe: Ubuntu %s, CANARY_EXPECT=%s, host %s" % (release(), want, socket.gethostname()))
+    print("tls_probe: Ubuntu %s, %s, CANARY_EXPECT=%s, host %s" % (
+        release(), platform.machine(), want, socket.gethostname()))
 
     missing = [t for t in TOOLS if not shutil.which(t)]
     record("tools", "FAIL" if missing else "PASS",
@@ -597,9 +639,9 @@ def main():
         jobs.append(("control/%s/python" % host, cert, py_check, (host,)))
         jobs.append(("control/%s/curl" % host, cert, curl_check, ("https://%s/" % host,)))
         jobs.append(("control/%s/git" % host, cert, git_check, ("https://%s/" % host,)))
-    jobs.append(("emudhra_online/%s/python" % EMUDHRA_HOST, emudhra, py_check, (EMUDHRA_HOST,)))
-    jobs.append(("emudhra_online/%s/curl" % EMUDHRA_HOST, emudhra, curl_check, ("https://%s/" % EMUDHRA_HOST,)))
-    jobs.append(("emudhra_online/%s/git" % EMUDHRA_HOST, emudhra, git_check, ("https://%s/" % EMUDHRA_HOST, True)))
+    jobs.append(("emudhra/online/%s/python" % EMUDHRA_HOST, emudhra, py_check, (EMUDHRA_HOST,)))
+    jobs.append(("emudhra/online/%s/curl" % EMUDHRA_HOST, emudhra, curl_check, ("https://%s/" % EMUDHRA_HOST,)))
+    jobs.append(("emudhra/online/%s/git" % EMUDHRA_HOST, emudhra, git_check, ("https://%s/" % EMUDHRA_HOST, True)))
 
     pool = concurrent.futures.ThreadPoolExecutor(max_workers=8)
     futures = [pool.submit(check, *args) for _, _, check, args in jobs]
