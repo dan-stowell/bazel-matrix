@@ -268,6 +268,23 @@ def bep_results(lines, wanted):
     return out
 
 
+def no_tests(output_base, targets):
+    """The //p:test targets whose test.xml (tools/inner_bazel.py's) says the
+    inner `bazel test` found no tests (NO_TESTS): they built, but tested nothing."""
+    out = []
+    for t in targets:
+        pkg, _, name = t[2:].partition(":")
+        path = os.path.join(output_base, "execroot", "_main", "bazel-out", "k8-fastbuild", "testlogs", pkg, name,
+                            "test.xml")
+        try:
+            with open(path, errors="replace") as f:
+                if 'message="NO_TESTS"' in f.read():
+                    out.append(t)
+        except OSError:
+            pass
+    return sorted(out)
+
+
 def is_emudhra(check):
     return check.split("/")[0].startswith("emudhra")
 
@@ -724,6 +741,9 @@ class Runner(threading.Thread):
                 except OSError:
                     pass
             rec.update(exit_code=code, invocations=invocation_links(text), targets=target_results(text, wanted))
+            if rec["step"] == "subset":
+                rec["no_tests"] = no_tests(args[1].split("=", 1)[1], [t for t, st in rec["targets"].items()
+                                                                       if is_pass(st)])
             if rec["step"] == "probe":
                 rec["probe"] = probe_result(text)
             if self.stopping.is_set():
@@ -842,6 +862,10 @@ def render(cfg, runs, current):
             title = ("fails: " + ", ".join(failing)) if st == "no" else "; ".join(failing) or ", ".join(
                 t for t in ("//%s:test" % p for p in projects) if t in pair[1])
             text = "%d/%d" % (ok, ref) if ref else ""
+            built_only = [t for t in ("//%s:test" % p for p in projects) if t in ((pair[2] or {}).get("no_tests") or [])]
+            if built_only and st in ("yes", "no"):
+                text += ", %d tested" % (ok - len(built_only))
+                title += "; built, no tests: " + ", ".join(built_only)
             if st == "running" or (st == "no" and live):
                 text = "%d/%d done, %d ok" % (done, ref, ok)
             out.append(cell(st, text, href if st in ("yes", "no", "running") else "", title))

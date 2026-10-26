@@ -221,6 +221,17 @@ class VerdictTest(unittest.TestCase):
         cur["targets"]["//b:test"] = "FAILED"
         self.assertEqual(server.group_cell(CFG, server.compare_subset(CFG, [], IMAGES, c, cur), ["a", "b"])[0], "no")
 
+    def test_no_tests(self):
+        d = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, d)
+        for pkg, xml in (("a", '<testcase name="no tests"><skipped message="NO_TESTS"/></testcase>'),
+                         ("b", '<testcase name="//x:y_test"/>')):
+            path = os.path.join(d, "execroot/_main/bazel-out/k8-fastbuild/testlogs", pkg, "test")
+            os.makedirs(path)
+            with open(os.path.join(path, "test.xml"), "w") as f:
+                f.write(xml)
+        self.assertEqual(server.no_tests(d, ["//a:test", "//b:test", "//c:test"]), ["//a:test"])
+
     def test_bep(self):
         lines = [json.dumps({"id": {"testResult": {"label": "//a:test", "run": 1}}, "testResult": {"status": "FAILED"}}),
                  json.dumps({"id": {"testSummary": {"label": "//a:test"}}, "testSummary": {"overallStatus": "FLAKY"}}),
