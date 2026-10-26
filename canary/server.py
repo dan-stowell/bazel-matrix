@@ -837,6 +837,8 @@ def render(cfg, runs, current):
         href = first_link(pair[2])
         for g, projects in GROUPS.items():
             st, ok, ref, failing, done = group_cell(cfg, pair, projects)
+            if not set(projects) & set(subset_of(cfg, c) or []):
+                st, failing = "n/a", []
             title = ("fails: " + ", ".join(failing)) if st == "no" else "; ".join(failing) or ", ".join(
                 t for t in ("//%s:test" % p for p in projects) if t in pair[1])
             text = "%d/%d" % (ok, ref) if ref else ""
