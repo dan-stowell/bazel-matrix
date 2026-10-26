@@ -290,7 +290,7 @@ class ScheduleTest(unittest.TestCase):
         self.assertIn("--test_env=CANARY_EXPECT=distrusted",
                       runner.command(cfg, 7, dict(images[1], arch="amd64"), "probe"))
         inner = ["--credential_helper=*.buildbuddy.io=/w/tools/remote_exec_credential_helper.py",
-                 "--nocache_test_results", "--remote_download_regex=.*/testlogs/.*/test\\.xml$"]
+                 "--nocache_test_results", "--flaky_test_attempts=2", "--remote_download_regex=.*/testlogs/.*/test\\.xml$"]
         self.assertEqual(runner.command(cfg, 7, dict(images[0], arch="amd64"), "subset"), [
             "bazel", "--output_base=/out/amd64-inner", "test", "//zlib:test", "--config=remote-minimal",
             "--config=inner-remote"] + inner + [

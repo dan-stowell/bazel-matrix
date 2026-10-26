@@ -700,6 +700,9 @@ class Runner(threading.Thread):
         args += ["//%s:test" % p for p in subset]
         args += ["--config=remote-minimal", "--config=inner-remote" + ("" if arch == "amd64" else "-" + arch),
                  "--credential_helper=*.buildbuddy.io=" + remote_helper, "--nocache_test_results",
+                 # Once more after a failure: a wrapper killed by infra
+                 # passes the second time (FLAKY, which counts as a pass).
+                 "--flaky_test_attempts=2",
                  "--remote_download_regex=.*/testlogs/.*/test\\.xml$", "--build_event_json_file=" + bep]
         if cfg.get("salt_inner", True):
             args.append("--//:inner_flags=--remote_instance_name=canary-%d" % cycle)
