@@ -442,6 +442,16 @@ class StoreAndUiTest(unittest.TestCase):
             self.assertEqual(e.exception.code, 404)
             e.exception.close()
 
+        # A project that passed only on the retry is shown as flaky.
+        self.store.append(run(c, "subset", "passed", {"//a:test": "FLAKY", "//b:test": "FAILED"}))
+        server.GROUPS = {"ab": ["a", "b"]}
+        try:
+            page = get("/")
+        finally:
+            server.GROUPS = orig
+        self.assertIn("1/1, 1 flaky (candidate only)", page)
+        self.assertIn("//a:test (only on the candidate)", page)
+
 
 if __name__ == "__main__":
     unittest.main()

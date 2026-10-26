@@ -931,9 +931,18 @@ def render(cfg, runs, current):
             ok_targets = [t for t in ("//%s:test" % p for p in projects) if t in table and
                           (is_pass(table[t][0]) or table[t][0] == NO_BASELINE) and is_pass(table[t][1])]
             built_only = [t for t in ok_targets if t in ((pair[2] or {}).get("no_tests") or [])]
+            # Passed only on the retry: flaky on both is the project's own
+            # flakiness, flaky only on the candidate is worth a look.
+            flaky = [t for t in ok_targets if table[t][1] == "FLAKY"]
+            only_cand = [t for t in flaky if table[t][0] != "FLAKY"]
             if built_only and st in ("yes", "no"):
                 text += ", %d tested" % (len(ok_targets) - len(built_only))
                 title += "; built, no tests: " + ", ".join(built_only)
+            if flaky and st in ("yes", "no"):
+                text += ", %d flaky%s" % (len(flaky), " (candidate only)" if only_cand else "")
+                title += "; flaky: %s" % ", ".join(
+                    "%s (%s)" % (t, "only on the candidate" if t in only_cand else "also on the baseline")
+                    for t in flaky)
             if st == "running" or (st == "no" and live):
                 text = "%d/%d done, %d ok" % (done, ref, ok)
             if pair[3] is None and table and ref:
