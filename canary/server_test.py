@@ -199,14 +199,14 @@ class VerdictTest(unittest.TestCase):
             [run(c, "subset", "interrupted", BASE_SUB)],
         ):
             self.assertEqual(builds(CFG, probes + runs, IMAGES, c)[0], "pending", runs)
-        # Without a complete baseline run at the same revision and digest,
-        # every subset project is the reference (they're baseline passers).
+        # Without a complete baseline run at the same revision and digest:
+        # the candidate's counts, but no verdict.
         for runs in (
             [run(b, "subset", "passed", BASE_SUB, rev="r0"), run(c, "subset", "failed", BASE_SUB)],
             [run(dict(b, ref="old"), "subset", "passed", BASE_SUB), run(c, "subset", "failed", BASE_SUB)],
             [run(b, "subset", "interrupted", BASE_SUB), run(c, "subset", "failed", BASE_SUB)],
         ):
-            self.assertEqual(builds(CFG, probes + runs, IMAGES, c), ("no", 1, 2, ["//b:test"]), runs)
+            self.assertEqual(builds(CFG, probes + runs, IMAGES, c), ("pending", 1, 2, [server.NO_BASELINE]), runs)
         # A NO STATUS baseline target doesn't excuse a candidate failure and
         # isn't counted: only baseline passes are the reference.
         runs = probes + [run(b, "subset", "failed", {"//a:test": "NO STATUS", "//b:test": "PASSED"}),
@@ -215,15 +215,19 @@ class VerdictTest(unittest.TestCase):
 
     def test_live(self):
         b, c = COLS
+        base = [run(b, "subset", "passed", {"//a:test": "PASSED", "//b:test": "PASSED"})]
         cur = run(c, "subset", "running", {"//a:test": "PASSED"})
-        got = server.group_cell(CFG, server.compare_subset(CFG, [], IMAGES, c, cur), ["a", "b"])
+        got = server.group_cell(CFG, server.compare_subset(CFG, base, IMAGES, c, cur), ["a", "b"])
         self.assertEqual(got, ("running", 1, 2, ["running: //b:test"], 1))
+        # No baseline yet: running, with the counts so far.
+        self.assertEqual(server.group_cell(CFG, server.compare_subset(CFG, [], IMAGES, c, cur), ["a", "b"]),
+                         ("running", 1, 2, [server.NO_BASELINE], 1))
         # Every target done, but no final summary yet: still not green.
         cur["targets"]["//b:test"] = "PASSED"
-        self.assertEqual(server.group_cell(CFG, server.compare_subset(CFG, [], IMAGES, c, cur), ["a", "b"])[0],
+        self.assertEqual(server.group_cell(CFG, server.compare_subset(CFG, base, IMAGES, c, cur), ["a", "b"])[0],
                          "running")
         cur["targets"]["//b:test"] = "FAILED"
-        self.assertEqual(server.group_cell(CFG, server.compare_subset(CFG, [], IMAGES, c, cur), ["a", "b"])[0], "no")
+        self.assertEqual(server.group_cell(CFG, server.compare_subset(CFG, base, IMAGES, c, cur), ["a", "b"])[0], "no")
 
     def test_no_tests(self):
         d = tempfile.mkdtemp()
@@ -285,13 +289,16 @@ class ScheduleTest(unittest.TestCase):
             "--remote_default_exec_properties=Arch=arm64", "--test_output=all", "--test_env=CANARY_EXPECT=trusted"])
         self.assertIn("--test_env=CANARY_EXPECT=distrusted",
                       runner.command(cfg, 7, dict(images[1], arch="amd64"), "probe"))
+        inner = ["--credential_helper=*.buildbuddy.io=/w/tools/remote_exec_credential_helper.py",
+                 "--nocache_test_results", "--remote_download_regex=.*/testlogs/.*/test\\.xml$"]
         self.assertEqual(runner.command(cfg, 7, dict(images[0], arch="amd64"), "subset"), [
-            "bazel", "--output_base=/out/amd64", "test", "//zlib:test"] + rbe + [
+            "bazel", "--output_base=/out/amd64-inner", "test", "//zlib:test", "--config=remote-minimal",
+            "--config=inner-remote"] + inner + [
             "--build_event_json_file=/out/bep-amd64.json", "--//:inner_flags=--remote_instance_name=canary-7"])
-        self.assertEqual(runner.command(cfg, 7, arm, "subset")[-4:], [
-            "--remote_default_exec_properties=Arch=arm64", "--build_event_json_file=/out/bep-arm64.json",
-            "--//:inner_flags=--remote_default_exec_properties=Arch=arm64",
-            "--//:inner_flags=--remote_instance_name=canary-7"])
+        self.assertEqual(runner.command(cfg, 7, arm, "subset"), [
+            "bazel", "--output_base=/out/arm64-inner", "test", "//rules_go:test", "--config=remote-minimal",
+            "--config=inner-remote-arm64"] + inner + [
+            "--build_event_json_file=/out/bep-arm64.json", "--//:inner_flags=--remote_instance_name=canary-7"])
         self.assertIsNone(runner.command(dict(cfg, subset={}), 7, arm, "subset"))
 
     def test_kill_group(self):
@@ -326,7 +333,8 @@ class ConfigTest(unittest.TestCase):
     def test_seed(self):
         cfg = server.load_config(self.dir)
         self.assertTrue(os.path.exists(os.path.join(self.dir, "config.json")))
-        self.assertEqual(cfg["repo_branch"], "rbe-image-canary")
+        self.assertEqual(cfg["repo_branch"], "canary-server")
+        self.assertEqual(sorted(cfg["subset"]), ["22.04", "22.04/arm64", "24.04", "24.04/arm64"])
         self.assertEqual([(i["release"], i["role"]) for i in cfg["images"]],
                          [("22.04", "baseline"), ("22.04", "candidate"), ("24.04", "baseline"),
                           ("24.04", "candidate")])

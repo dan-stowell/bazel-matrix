@@ -62,17 +62,20 @@ GROUPS = {
     "rules_rust": ["rules_rust", "rules_rust_mdbook", "gazelle_rust"],
     "rules_js": ["aspect_rules_js", "aspect_rules_terser", "aspect_rules_esbuild", "rules_nodejs",
                  "aspect_rules_rollup"],
-    "protobuf/grpc": ["protobuf", "zipkin-api", "bazel_worker_api", "rules_proto", "toolchains_protoc", "rules_buf"],
-    "rules_cc": ["rules_cc", "argparse", "cli11"],
-    "rules_oci": [],
+    "protobuf/grpc": ["protobuf", "zipkin-api", "bazel_worker_api", "rules_proto", "toolchains_protoc", "rules_buf",
+                      "openconfig_gnpsi", "p4runtime"],
+    "rules_cc": ["rules_cc", "zlib", "abseil-cpp", "googletest", "re2", "argparse", "cli11"],
+    "rules_oci": ["rules_docker_compose_test", "masorange_rules_helm"],
     "rules_pkg": ["rules_pkg", "rules_shar", "gotopt2"],
     "rules_shell": ["rules_shell", "buildozer", "helly25_bashtest"],
     "bazel_skylib": ["bazel_skylib", "bazel_features", "sha256.bzl"],
 }
-# The GROUPS projects that pass on the baseline of that release and arch
-# with Bazel on this machine (see README.md, "The subset"). Keys:
-# "<release>" for amd64, "<release>/<arch>" otherwise.
-SUBSETS = {}
+# Every GROUPS project, on every release and arch. Each :test runs on RBE in
+# the image (--config=inner-remote[-arm64]); a project that fails on the
+# baseline isn't counted for the candidate. Keys: "<release>" for amd64,
+# "<release>/<arch>" otherwise.
+ALL_PROJECTS = [p for g in GROUPS.values() for p in g]
+SUBSETS = {k: list(ALL_PROJECTS) for k in ("22.04", "22.04/arm64", "24.04", "24.04/arm64")}
 
 PROBE = "//canary:tls_probe_test"
 ARCHS = ["amd64", "arm64"]
@@ -86,7 +89,7 @@ COMPLETE = ("passed", "failed")  # statuses of a run that ran to the end
 
 def seed_config():
     return {
-        "repo_branch": "rbe-image-canary",
+        "repo_branch": "canary-server",
         "salt_inner": True,
         "step_timeout_s": DEFAULT_TIMEOUT,
         "cycle_pause_s": 60,
@@ -274,14 +277,19 @@ def no_tests(output_base, targets):
     out = []
     for t in targets:
         pkg, _, name = t[2:].partition(":")
-        path = os.path.join(output_base, "execroot", "_main", "bazel-out", "k8-fastbuild", "testlogs", pkg, name,
-                            "test.xml")
+        out_dir = os.path.join(output_base, "execroot", "_main", "bazel-out")
         try:
-            with open(path, errors="replace") as f:
-                if 'message="NO_TESTS"' in f.read():
-                    out.append(t)
+            configs = os.listdir(out_dir)
         except OSError:
-            pass
+            configs = []
+        for c in configs:
+            try:
+                with open(os.path.join(out_dir, c, "testlogs", pkg, name, "test.xml"), errors="replace") as f:
+                    if 'message="NO_TESTS"' in f.read():
+                        out.append(t)
+                        break
+            except OSError:
+                pass
     return sorted(out)
 
 
@@ -381,7 +389,7 @@ def probe_others(runs, col):
             if not is_emudhra(c) and st not in ("PASS", "INFO")]
 
 
-VALIDATED = "PASSED (validated)"
+NO_BASELINE = "no baseline result yet"
 
 
 def compare_subset(cfg, runs, images, col, live=None):
@@ -392,8 +400,7 @@ def compare_subset(cfg, runs, images, col, live=None):
     with the results so far) or the newest complete subset run with a result
     for every configured target. The baseline side is a complete baseline
     run (same release and arch, same subset, same repo revision); without
-    one, every subset project counts as passing on the baseline
-    (VALIDATED): the subset is chosen from baseline passers.
+    one, NO_BASELINE (the candidate's results show, but no verdict).
     """
     subset = subset_of(cfg, col)
     if not subset:
@@ -410,7 +417,7 @@ def compare_subset(cfg, runs, images, col, live=None):
     base = next((x for x in (latest_complete(runs, b, "subset", subset, rev=sub.get("rev")) for b in bases) if x), None)
     if base is not None and any(t not in base.get("targets", {}) for t in targets):
         base = None
-    ref = (lambda t: base["targets"][t]) if base else (lambda t: VALIDATED)
+    ref = (lambda t: base["targets"][t]) if base else (lambda t: NO_BASELINE)
     return None, {t: (ref(t), sub.get("targets", {}).get(t)) for t in targets}, sub, base
 
 
@@ -426,7 +433,11 @@ def group_cell(cfg, pair, group):
     mine = [t for t in projects if t in table]
     if not mine:
         return "n/a", 0, 0, [], 0
-    reference = [t for t in mine if is_pass(table[t][0]) or table[t][0] == VALIDATED]
+    if any(table[t][0] == NO_BASELINE for t in mine):
+        ok = [t for t in mine if is_pass(table[t][1])]
+        done = sum(1 for t in mine if table[t][1] is not None)
+        return ("running" if live else "pending"), len(ok), len(mine), [NO_BASELINE], done
+    reference = [t for t in mine if is_pass(table[t][0])]
     ok = [t for t in reference if is_pass(table[t][1])]
     running = [t for t in reference if table[t][1] is None]
     failing = [t for t in reference if t not in ok and t not in running]
@@ -633,8 +644,7 @@ class Runner(threading.Thread):
             os.makedirs(root, exist_ok=True)
             if shutil.disk_usage(root).free >= cfg.get("min_free_gb", 15) * 2**30:
                 return
-            for arch in ARCHS:
-                base = os.path.join(root, arch)
+            for base in [os.path.join(root, a + sfx) for a in ARCHS for sfx in ("", "-inner")]:
                 if os.path.isdir(base):
                     print("low disk: cleaning %s" % base, file=sys.stderr)
                     subprocess.run([cfg["bazel"], "--output_base=" + base, "clean", "--expunge"],
@@ -681,9 +691,16 @@ class Runner(threading.Thread):
         subset = subset_of(cfg, image)
         if not subset:
             return None
+        # Each project's :test runs on RBE in the image (its inner Bazel's host
+        # is the image and arch under test). Its own output base: the
+        # credential helper differs, and Bazel caches helper results.
+        remote_helper = os.path.join(self.work, "tools", "remote_exec_credential_helper.py")
         bep = os.path.join(cfg["output_root"], "bep-%s.json" % arch)
-        args = head + ["//%s:test" % p for p in subset] + tail + ["--build_event_json_file=" + bep]
-        args += ["--//:inner_flags=" + f for f in arch_flags]
+        args = [cfg["bazel"], "--output_base=" + self.output_base(cfg, image) + "-inner", "test"]
+        args += ["//%s:test" % p for p in subset]
+        args += ["--config=remote-minimal", "--config=inner-remote" + ("" if arch == "amd64" else "-" + arch),
+                 "--credential_helper=*.buildbuddy.io=" + remote_helper, "--nocache_test_results",
+                 "--remote_download_regex=.*/testlogs/.*/test\\.xml$", "--build_event_json_file=" + bep]
         if cfg.get("salt_inner", True):
             args.append("--//:inner_flags=--remote_instance_name=canary-%d" % cycle)
         return args
@@ -909,17 +926,16 @@ def render(cfg, runs, current):
             text = "%d/%d" % (ok, ref) if ref else ""
             table = pair[1]
             ok_targets = [t for t in ("//%s:test" % p for p in projects) if t in table and
-                          (is_pass(table[t][0]) or table[t][0] == VALIDATED) and is_pass(table[t][1])]
+                          (is_pass(table[t][0]) or table[t][0] == NO_BASELINE) and is_pass(table[t][1])]
             built_only = [t for t in ok_targets if t in ((pair[2] or {}).get("no_tests") or [])]
             if built_only and st in ("yes", "no"):
                 text += ", %d tested" % (len(ok_targets) - len(built_only))
                 title += "; built, no tests: " + ", ".join(built_only)
-            if st in ("yes", "no", "running") and pair[3] is None and table:
-                text += " vs validated list"
-                title += "; no baseline run at this revision yet: compared with the projects validated on it"
             if st == "running" or (st == "no" and live):
                 text = "%d/%d done, %d ok" % (done, ref, ok)
-            out.append(cell(st, text, href if st in ("yes", "no", "running") else "", title))
+            if pair[3] is None and table and ref:
+                text = ("%d/%d done, %d ok" % (done, ref, ok) if live else "%d/%d ok" % (ok, ref)) + ", baseline pending"
+            out.append(cell(st, text, href if (st in ("yes", "no", "running") or table) else "", title))
         out.append("</tr>")
     out.append("</table>")
     det = []
