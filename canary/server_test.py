@@ -153,8 +153,8 @@ GOOD = {"emudhra/fixture": ["PASS", "rejected"], "host/x": ["PASS", "ok"],
 BASE_SUB = {"//a:test": "PASSED", "//b:test": "FAILED"}
 
 
-def builds(cfg, runs, images, col, group=("a", "b")):
-    return server.group_cell(cfg, server.compare_subset(cfg, runs, images, col), list(group))
+def builds(cfg, runs, images, col, group=("a", "b"), live=None):
+    return server.group_cell(cfg, server.compare_subset(cfg, runs, images, col, live), list(group))[:4]
 
 
 class VerdictTest(unittest.TestCase):
@@ -195,17 +195,38 @@ class VerdictTest(unittest.TestCase):
         probes = [run(c, "probe", "passed", checks=GOOD)]
         for runs in (
             [run(b, "subset", "passed", BASE_SUB), run(c, "subset", "failed", {"//a:test": "PASSED"})],
-            [run(b, "subset", "passed", BASE_SUB, rev="r0"), run(c, "subset", "failed", BASE_SUB)],
             [run(b, "subset", "passed", BASE_SUB), run(c, "subset", "failed", BASE_SUB, subset=("a",))],
+            [run(c, "subset", "interrupted", BASE_SUB)],
+        ):
+            self.assertEqual(builds(CFG, probes + runs, IMAGES, c)[0], "pending", runs)
+        # Without a complete baseline run at the same revision and digest,
+        # every subset project is the reference (they're baseline passers).
+        for runs in (
+            [run(b, "subset", "passed", BASE_SUB, rev="r0"), run(c, "subset", "failed", BASE_SUB)],
             [run(dict(b, ref="old"), "subset", "passed", BASE_SUB), run(c, "subset", "failed", BASE_SUB)],
             [run(b, "subset", "interrupted", BASE_SUB), run(c, "subset", "failed", BASE_SUB)],
         ):
-            self.assertEqual(builds(CFG, probes + runs, IMAGES, c)[0], "pending", runs)
+            self.assertEqual(builds(CFG, probes + runs, IMAGES, c), ("no", 1, 2, ["//b:test"]), runs)
         # A NO STATUS baseline target doesn't excuse a candidate failure and
         # isn't counted: only baseline passes are the reference.
         runs = probes + [run(b, "subset", "failed", {"//a:test": "NO STATUS", "//b:test": "PASSED"}),
                          run(c, "subset", "failed", {"//a:test": "FAILED", "//b:test": "PASSED"})]
         self.assertEqual(builds(CFG, runs, IMAGES, c), ("yes", 1, 1, []))
+
+    def test_live(self):
+        b, c = COLS
+        cur = run(c, "subset", "running", {"//a:test": "PASSED"})
+        got = server.group_cell(CFG, server.compare_subset(CFG, [], IMAGES, c, cur), ["a", "b"])
+        self.assertEqual(got, ("running", 1, 2, ["running: //b:test"], 1))
+        cur["targets"]["//b:test"] = "FAILED"
+        self.assertEqual(server.group_cell(CFG, server.compare_subset(CFG, [], IMAGES, c, cur), ["a", "b"])[0], "no")
+
+    def test_bep(self):
+        lines = [json.dumps({"id": {"testResult": {"label": "//a:test", "run": 1}}, "testResult": {"status": "FAILED"}}),
+                 json.dumps({"id": {"testSummary": {"label": "//a:test"}}, "testSummary": {"overallStatus": "FLAKY"}}),
+                 json.dumps({"id": {"testResult": {"label": "//x:y"}}, "testResult": {"status": "PASSED"}}),
+                 "{truncated"]
+        self.assertEqual(server.bep_results(lines, {"//a:test"}), {"//a:test": "FLAKY"})
 
     def test_not_covered(self):
         c = COLS[1]
@@ -223,8 +244,8 @@ class ScheduleTest(unittest.TestCase):
                "salt_inner": True, "bazel": "bazel", "output_root": "/out"}
         got = [(c["name"], c["arch"], step) for c, step in server.schedule(cfg)]
         self.assertEqual(got, [
-            ("c22", "amd64", "probe"), ("b22", "amd64", "probe"), ("b22", "arm64", "probe"),
-            ("b22", "amd64", "subset"), ("b22", "arm64", "subset"), ("c22", "amd64", "subset"),
+            ("c22", "amd64", "probe"), ("c22", "amd64", "subset"), ("b22", "amd64", "probe"),
+            ("b22", "arm64", "probe"), ("b22", "amd64", "subset"), ("b22", "arm64", "subset"),
         ])
         runner = server.Runner("/nonexistent", "/w", None)
         rbe = ["--config=remote-minimal", "--credential_helper=*.buildbuddy.io=/w/tools/buildbuddy_credential_helper.py",
@@ -237,9 +258,9 @@ class ScheduleTest(unittest.TestCase):
                       runner.command(cfg, 7, dict(images[1], arch="amd64"), "probe"))
         self.assertEqual(runner.command(cfg, 7, dict(images[0], arch="amd64"), "subset"), [
             "bazel", "--output_base=/out/amd64", "test", "//zlib:test"] + rbe + [
-            "--//:inner_flags=--remote_instance_name=canary-7"])
-        self.assertEqual(runner.command(cfg, 7, arm, "subset")[-3:], [
-            "--remote_default_exec_properties=Arch=arm64",
+            "--build_event_json_file=/out/bep-amd64.json", "--//:inner_flags=--remote_instance_name=canary-7"])
+        self.assertEqual(runner.command(cfg, 7, arm, "subset")[-4:], [
+            "--remote_default_exec_properties=Arch=arm64", "--build_event_json_file=/out/bep-arm64.json",
             "--//:inner_flags=--remote_default_exec_properties=Arch=arm64",
             "--//:inner_flags=--remote_instance_name=canary-7"])
         self.assertIsNone(runner.command(dict(cfg, subset={}), 7, arm, "subset"))

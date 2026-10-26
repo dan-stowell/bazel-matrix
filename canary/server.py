@@ -149,12 +149,15 @@ def subset_of(cfg, image):
 
 
 def schedule(cfg):
-    """[(column, step)] for a cycle: candidates' probes first (fast), then
-    baselines' probes, then the subsets (baselines first) of columns with one."""
+    """[(column, step)] for a cycle: candidates first, probes (fast) then
+    subsets, then baselines likewise. Until a baseline run pairs with it, a
+    candidate is compared with the subset, which is chosen from baseline
+    passers."""
     cols = columns(cfg["images"])
     cands = [c for c in cols if c.get("role") == "candidate"]
     bases = [c for c in cols if c.get("role") != "candidate"]
-    return [(c, "probe") for c in cands + bases] + [(c, "subset") for c in bases + cands if subset_of(cfg, c)]
+    return ([(c, "probe") for c in cands] + [(c, "subset") for c in cands if subset_of(cfg, c)]
+            + [(c, "probe") for c in bases] + [(c, "subset") for c in bases if subset_of(cfg, c)])
 
 
 # --- tools/remote.bazelrc ---------------------------------------------------
@@ -248,6 +251,23 @@ def probe_result(text):
     return res
 
 
+def bep_results(lines, wanted):
+    """{label: status} from Build Event Protocol JSON lines (testResult and
+    testSummary events) for the labels in `wanted`."""
+    out = {}
+    for line in lines:
+        try:
+            ev = json.loads(line)
+        except ValueError:
+            continue
+        ident = ev.get("id", {})
+        for kind, field in (("testResult", "status"), ("testSummary", "overallStatus")):
+            label = ident.get(kind, {}).get("label")
+            if label in wanted and field in ev.get(kind, {}):
+                out[label] = ev[kind][field]
+    return out
+
+
 def is_emudhra(check):
     return check.split("/")[0].startswith("emudhra")
 
@@ -317,45 +337,61 @@ def probe_others(runs, col):
             if not is_emudhra(c) and st not in ("PASS", "INFO")]
 
 
-def compare_subset(cfg, runs, images, col):
-    """(pending reason or None, {target: (baseline status, candidate status)},
-    candidate run, baseline run): the newest complete subset run of the
-    column with a result for every configured target, paired with a complete
-    baseline run (same release and arch, same subset, same repo revision)."""
+VALIDATED = "PASSED (validated)"
+
+
+def compare_subset(cfg, runs, images, col, live=None):
+    """(pending reason or None, {target: (baseline status, candidate status
+    or None while running)}, candidate run, baseline run).
+
+    The candidate side is `live` (the running subset step of this column,
+    with the results so far) or the newest complete subset run with a result
+    for every configured target. The baseline side is a complete baseline
+    run (same release and arch, same subset, same repo revision); without
+    one, every subset project counts as passing on the baseline
+    (VALIDATED): the subset is chosen from baseline passers.
+    """
     subset = subset_of(cfg, col)
     if not subset:
         return "no ruleset projects for this release and arch", {}, None, None
     targets = ["//%s:test" % p for p in subset]
-    sub = latest_complete(runs, col, "subset", subset)
+    sub = live or latest_complete(runs, col, "subset", subset)
     if sub is None:
         return "not run yet", {}, None, None
     missing = [t for t in targets if t not in sub.get("targets", {})]
-    if missing:
+    if missing and not live:
         return "no result for %s" % ", ".join(missing), {}, sub, None
     bases = [b for b in columns(images) if b.get("role") == "baseline" and b.get("release") == col.get("release")
              and arch_of(b) == arch_of(col)]
     base = next((x for x in (latest_complete(runs, b, "subset", subset, rev=sub.get("rev")) for b in bases) if x), None)
-    if base is None or any(t not in base.get("targets", {}) for t in targets):
-        return "no complete baseline result at the same revision", {}, sub, None
-    return None, {t: (base["targets"][t], sub["targets"][t]) for t in targets}, sub, base
+    if base is not None and any(t not in base.get("targets", {}) for t in targets):
+        base = None
+    ref = (lambda t: base["targets"][t]) if base else (lambda t: VALIDATED)
+    return None, {t: (ref(t), sub.get("targets", {}).get(t)) for t in targets}, sub, base
 
 
 def group_cell(cfg, pair, group):
-    """("yes"|"no"|"pending"|"n/a", ok, reference, [failing]) for a ruleset
-    group: its projects that passed on the baseline must pass on the candidate."""
+    """("yes"|"no"|"running"|"pending"|"n/a", ok, reference, [notes], done)
+    for a ruleset group: its projects that passed on the baseline must pass
+    on the candidate."""
     pending, table = pair[0], pair[1]
     projects = ["//%s:test" % p for p in group]
     if pending is not None:
-        return ("n/a" if pending.startswith("no ruleset") else "pending"), 0, 0, [pending]
+        return ("n/a" if pending.startswith("no ruleset") else "pending"), 0, 0, [pending], 0
     mine = [t for t in projects if t in table]
     if not mine:
-        return "n/a", 0, 0, []
-    reference = [t for t in mine if is_pass(table[t][0])]
+        return "n/a", 0, 0, [], 0
+    reference = [t for t in mine if is_pass(table[t][0]) or table[t][0] == VALIDATED]
     ok = [t for t in reference if is_pass(table[t][1])]
-    failing = [t for t in reference if t not in ok]
+    running = [t for t in reference if table[t][1] is None]
+    failing = [t for t in reference if t not in ok and t not in running]
+    done = len(reference) - len(running)
     if not reference:
-        return "n/a", 0, 0, ["none passed on the baseline"]
-    return ("no" if failing else "yes"), len(ok), len(reference), failing
+        return "n/a", 0, 0, ["none passed on the baseline"], 0
+    if running:
+        return ("no" if failing else "running"), len(ok), len(reference), failing + [
+            "running: " + ", ".join(running)], done
+    return ("no" if failing else "yes"), len(ok), len(reference), failing, done
 
 
 # --- run store --------------------------------------------------------------
@@ -599,7 +635,8 @@ class Runner(threading.Thread):
         subset = subset_of(cfg, image)
         if not subset:
             return None
-        args = head + ["//%s:test" % p for p in subset] + tail
+        bep = os.path.join(cfg["output_root"], "bep-%s.json" % arch)
+        args = head + ["//%s:test" % p for p in subset] + tail + ["--build_event_json_file=" + bep]
         args += ["--//:inner_flags=" + f for f in arch_flags]
         if cfg.get("salt_inner", True):
             args.append("--//:inner_flags=--remote_instance_name=canary-%d" % cycle)
@@ -649,12 +686,29 @@ class Runner(threading.Thread):
                 copier = threading.Thread(target=copy_redacted, args=(self.proc.stdout, log, key), daemon=True)
                 copier.start()
                 deadline = time.time() + timeout
+                wanted = {x for x in args if x.startswith("//") and ":" in x}
+                bep = next((x.split("=", 1)[1] for x in args if x.startswith("--build_event_json_file=")), None)
+                bep_pos, bep_buf = 0, ""
                 while self.proc.poll() is None:
                     if self.stopping.is_set() or time.time() > deadline:
                         timed_out = not self.stopping.is_set()
                         kill_group(self.proc)
                         break
-                    time.sleep(1)
+                    if bep:
+                        # Results as each target finishes, for the page.
+                        try:
+                            with open(bep) as f:
+                                f.seek(bep_pos)
+                                bep_buf += f.read()
+                                bep_pos = f.tell()
+                            *done, bep_buf = bep_buf.split("\n")
+                            rec["targets"].update(bep_results(done, wanted))
+                        except OSError:
+                            pass
+                    if not rec["invocations"]:
+                        with open(log_path, errors="replace") as f:
+                            rec["invocations"] = invocation_links(f.read(1 << 16))
+                    time.sleep(2)
                 code = self.proc.wait()
                 copier.join(60)
             if timed_out or self.stopping.is_set():
@@ -664,7 +718,11 @@ class Runner(threading.Thread):
                                stderr=subprocess.DEVNULL, timeout=300)
             with open(log_path, errors="replace") as f:
                 text = f.read()
-            wanted = {x for x in args if x.startswith("//") and ":" in x}
+            if bep:
+                try:
+                    os.remove(bep)
+                except OSError:
+                    pass
             rec.update(exit_code=code, invocations=invocation_links(text), targets=target_results(text, wanted))
             if rec["step"] == "probe":
                 rec["probe"] = probe_result(text)
@@ -721,8 +779,8 @@ def kill_group(proc, grace=30):
 
 CSS = "body{font-family:sans-serif;margin:16px} table{border-collapse:collapse} " \
       "td,th{border:1px solid #ccc;padding:4px 8px;text-align:left;vertical-align:top} " \
-      ".yes{color:#1a7f37} .no{color:#cf222e;font-weight:bold} .pending,.na{color:#777}"
-MARK = {"yes": "&#10003;", "no": "&#10007;", "pending": "pending", "n/a": "n/a"}
+      ".yes{color:#1a7f37} .no{color:#cf222e;font-weight:bold} .pending,.na,.running{color:#777}"
+MARK = {"yes": "&#10003;", "no": "&#10007;", "pending": "pending", "n/a": "n/a", "running": "running"}
 
 
 def esc(s):
@@ -773,13 +831,18 @@ def render(cfg, runs, current):
             esc(c.get("release")), esc(arch_of(c)), esc(c["ref"]), esc(digest), note))
         state, why, pr = protected(runs, c)
         out.append(cell(state, "", first_link(pr), "; ".join(why)))
-        pair = compare_subset(cfg, runs, images, c)
+        live = current if (current and current["step"] == "subset" and current["image"].get("name") == c["name"]
+                           and current["image"].get("ref") == c["ref"] and arch_of(current["image"]) == arch_of(c)) else None
+        pair = compare_subset(cfg, runs, images, c, live)
         href = first_link(pair[2])
         for g, projects in GROUPS.items():
-            st, ok, ref, failing = group_cell(cfg, pair, projects)
+            st, ok, ref, failing, done = group_cell(cfg, pair, projects)
             title = ("fails: " + ", ".join(failing)) if st == "no" else "; ".join(failing) or ", ".join(
                 t for t in ("//%s:test" % p for p in projects) if t in pair[1])
-            out.append(cell(st, "%d/%d" % (ok, ref) if ref else "", href if st in ("yes", "no") else "", title))
+            text = "%d/%d" % (ok, ref) if ref else ""
+            if st == "running" or (st == "no" and live):
+                text = "%d/%d done, %d ok" % (done, ref, ok)
+            out.append(cell(st, text, href if st in ("yes", "no", "running") else "", title))
         out.append("</tr>")
     out.append("</table>")
     det = []
