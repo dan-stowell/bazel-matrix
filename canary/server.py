@@ -87,15 +87,18 @@ CC_RULES = {"rules_cc", "rules_foreign_cc"}
 POPULAR = ["rules_go", "gazelle", "rules_python", "rules_java", "rules_jvm_external", "rules_kotlin", "rules_rust",
            "aspect_rules_js", "rules_nodejs", "protobuf", "grpc", "rules_proto", "rules_oci", "rules_pkg",
            "rules_shell", "rules_cc"]
-TIER_NAMES = {1: "tier 1: image toolchains (C/C++)", 2: "tier 2: popular rulesets", 3: "tier 3: the rest"}
+TIER_NAMES = {1: "tier 1: rules_cc / C/C++-library deps", 2: "tier 2: popular rulesets", 3: "tier 3: the rest"}
 TIER_HEURISTIC = (
     "Tiers come from each project's bazel_dep lines (its BCR MODULE.bazel at the projects.json version, "
-    "in canary/deps.json). Tier 1, the image's own toolchains: not a ruleset (no rules_/aspect_rules_/"
+    "in canary/deps.json). Tier 1, meant to catch what builds with the image's own gcc: not a ruleset (no rules_/aspect_rules_/"
     "toolchains_/gazelle prefix, no .bzl suffix), no hermetic C++ toolchain dep (%s), and a direct dep on "
     "rules_cc or rules_foreign_cc, or on another tier-1 project (a C/C++ library), so its inner Bazel "
     "autodetects the image's gcc. Tier 2: one of %s or a direct dep on one. Tier 3: the rest (including "
     "C/C++ projects that use native cc rules without any such dep, which MODULE.bazel can't show). "
-    "System python3/perl/shell use isn't visible in MODULE.bazel, so it doesn't promote a project."
+    "System python3/perl/shell use isn't visible in MODULE.bazel, so it doesn't promote a project. "
+    "Caveat: most BCR modules depend on rules_cc (dev deps included), so tier 1 is broad (about 870): it "
+    "holds most of what uses the image's gcc, but also projects that only load rules_cc for a toolchain "
+    "or a small helper."
 ) % (", ".join(sorted(HERMETIC_CC)), ", ".join(POPULAR))
 MATRIX = "MATRIX"  # reference: the matrix's own record (not known-failing in projects.txt) says it passes
 
@@ -597,13 +600,17 @@ def batch_done(runs, col, rev, cycle, step, names):
 
 
 def done_projects(runs, col, rev, cycle):
-    """The projects with a result from a finished batch of this cycle at rev."""
+    """The projects with a result (in RAN) from a finished batch of this cycle
+    at rev, or that two finished batches (timed out, say) left without one."""
     out = set()
+    tries = {}
     for r in runs:
         if (r["step"] == "batch" and r.get("cycle") == cycle and r.get("rev") == rev and r["status"] in DONE
                 and same_column(r["image"], col)):
             out.update(t[2:-5] for t, st in (r.get("targets") or {}).items() if st in RAN)
-    return out
+            for p in r.get("subset") or []:
+                tries[p] = tries.get(p, 0) + 1
+    return out | {p for p, n in tries.items() if n >= 2}
 
 
 def remaining(runs, group, rev, cycle):
@@ -630,7 +637,7 @@ def project_results(runs, col, rev, lives=()):
     """{target: (status, run)}: per project, a running batch's result, else
     the newest finished batch's at rev, else RUNNING while a batch runs it."""
     out = {}
-    running = {}
+    running, later = {}, {}
     for r in lives:
         if r.get("step") == "batch" and same_column(r["image"], col):
             for p in r.get("subset") or []:
@@ -644,8 +651,12 @@ def project_results(runs, col, rev, lives=()):
         if r["step"] != "batch" or r.get("rev") != rev or r["status"] not in DONE or not same_column(r["image"], col):
             continue
         for t, st in (r.get("targets") or {}).items():
-            out.setdefault(t, (st, r))
-    for t, v in running.items():
+            if st in RAN:
+                out.setdefault(t, (st, r))
+            else:
+                # NO STATUS and the like: only when no run has a real result.
+                later.setdefault(t, (st, r))
+    for t, v in list(running.items()) + list(later.items()):
         out.setdefault(t, v)
     return out
 
@@ -670,7 +681,7 @@ def project_table(cfg, runs, col, targets, lives=()):
     out = {}
     for t in targets:
         ref = base.get(t, (None,))[0]
-        if ref is None or ref == RUNNING:
+        if ref not in RAN:  # none, running, or NO STATUS and the like: not a reference
             ref = MATRIX if matrix else NO_BASELINE
         c = cand.get(t)
         out[t] = (ref, c[0] if c else None, c[1] if c else None)
@@ -682,11 +693,15 @@ def ref_passes(ref):
 
 
 def kind(ref, st):
-    """pass | flaky | regression | fail | infra | running | pending, for a candidate result."""
+    """pass | flaky | regression | fail | infra | running | pending | unknown,
+    for a candidate result. Statuses outside RAN (NO STATUS, INCOMPLETE,
+    SKIPPED, REMOTE FAILURE) say the project didn't run: unknown."""
     if st is None:
         return "pending"
     if st == RUNNING:
         return "running"
+    if st not in RAN:
+        return "unknown"
     if st == INFRA:
         return "infra"
     if st == "FLAKY":
@@ -698,7 +713,7 @@ def kind(ref, st):
 
 def tally(table, targets):
     """Counts of kind() over the targets in table, plus "total" and "ok" (pass + flaky)."""
-    c = {k: 0 for k in ("pass", "flaky", "regression", "fail", "infra", "running", "pending")}
+    c = {k: 0 for k in ("pass", "flaky", "regression", "fail", "infra", "unknown", "running", "pending")}
     for t in targets:
         if t in table:
             c[kind(table[t][0], table[t][1])] += 1
@@ -1160,7 +1175,9 @@ class Runner(threading.Thread):
                 code, timed_out = self.invoke(rec, args, env, key, log, log_path, deadline, holder)
             with open(log_path, errors="replace") as f:
                 text = f.read()
-            targets = target_results(text, set(wanted))
+            # The log's final summary, else what the BEP file said (a
+            # timed-out build prints no summary).
+            targets = dict(rec["targets"], **target_results(text, set(wanted)))
             infra = []
             if rec["step"] in ("subset", "batch") and not self.stopping.is_set() and not timed_out:
                 infra = infra_killed(output_base, [t for t in wanted if not is_pass(targets.get(t))])
@@ -1265,10 +1282,10 @@ def kill_group(proc, grace=30):
 CSS = "body{font-family:sans-serif;margin:16px;background:#fff;color:#000} table{border-collapse:collapse;margin-bottom:16px} " \
       "td,th{border:1px solid #ccc;padding:3px 6px;text-align:left;vertical-align:top} " \
       ".yes,.pass{color:#1a7f37} .no,.regression{color:#cf222e;font-weight:bold} .fail{color:#9a3412} " \
-      ".pending,.na,.running,.infra,.flaky,.small{color:#777} .small{font-size:85%}"
+      ".pending,.na,.running,.infra,.flaky,.unknown,.small{color:#777} .small{font-size:85%}"
 MARK = {"yes": "&#10003;", "no": "&#10007;", "pending": "pending", "n/a": "n/a", "running": "running"}
 PMARK = {"pass": "&#10003;", "flaky": "flaky", "regression": "&#10007;", "fail": "&#10007;", "infra": "infra",
-         "running": "running", "pending": "pending"}
+         "running": "running", "pending": "pending", "unknown": "didn't run"}
 
 
 def esc(s):
@@ -1313,7 +1330,8 @@ def tally_html(c, label=True):
     parts = ["%d/%d ok" % (c["ok"], c["total"])]
     if c["regression"]:
         parts.append('<span class="regression">%d regression%s</span>' % (c["regression"], "s" if c["regression"] > 1 else ""))
-    for k, name in (("fail", "failing"), ("flaky", "flaky"), ("infra", "infra"), ("running", "running"),
+    for k, name in (("fail", "failing"), ("flaky", "flaky"), ("infra", "infra"), ("unknown", "didn't run"),
+                    ("running", "running"),
                     ("pending", "pending")):
         if c[k]:
             parts.append('<span class="%s">%d %s</span>' % (k if k != "fail" else "fail", c[k], name))
@@ -1392,7 +1410,9 @@ def render(cfg, runs, lives=(), info=None):
             out.append('<td title="%s">%s%s</td>' % (
                 esc(("regressions: " + ", ".join(regs)) if regs else ""), tally_html(n),
                 ('<br><span class="small">ETA %s</span>' % esc(e)) if e and (n["pending"] or n["running"]) else ""))
-        out.append("<td>%s</td></tr>" % esc(ref_label(table) if table else ""))
+        cyc = sorted({v[2]["cycle"] for v in table.values() if v[2] is not None and v[2].get("cycle") is not None})
+        out.append("<td>%s%s</td></tr>" % (esc(ref_label(table) if table else ""), esc(
+            "" if not cyc else "; cycle %d" % cyc[0] if len(cyc) == 1 else "; mixed cycles %d-%d" % (cyc[0], cyc[-1]))))
     out.append("</table>")
     # Per ruleset.
     out.append("<h2>Popular rulesets</h2><p class=\"small\">Each ruleset and a few small dependents "

@@ -218,6 +218,24 @@ class VerdictTest(unittest.TestCase):
         t = table(base + [old, newer], c)
         self.assertEqual([server.kind(*t[x][:2]) for x in sorted(t)], ["pass", "regression"])
 
+    def test_did_not_run(self):
+        b, c = COLS
+        # NO STATUS is neither a failure nor a reference.
+        runs = [run(b, "batch", "failed", {"//a:test": "NO STATUS", "//b:test": "PASSED"}),
+                run(c, "batch", "failed", {"//a:test": "PASSED", "//b:test": "NO STATUS"})]
+        t = table(runs, c)
+        self.assertEqual(t["//a:test"][0], server.MATRIX)
+        self.assertEqual(server.kind(*t["//b:test"][:2]), "unknown")
+        self.assertEqual(server.tally(t, sorted(t))["regression"], 0)
+        # A newer NO STATUS doesn't hide an older real result.
+        t = table(runs[:1] + [run(c, "batch", "failed", {"//b:test": "FAILED"})] + runs[1:], c)
+        self.assertEqual(t["//b:test"][1], "FAILED")
+        # Re-queued after a batch without a result, given up after two.
+        b1 = [(c, "batch", (1, 0, ["a", "z"]))]
+        tout = run(c, "batch", "timeout", {"//a:test": "PASSED"}, subset=("a", "z"))
+        self.assertEqual(server.remaining([tout], b1, "r1", 1), [(c, "batch", (1, 0, ["z"]))])
+        self.assertEqual(server.remaining([tout, dict(tout, id="t2")], b1, "r1", 1), [])
+
     def test_no_tests(self):
         d = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, d)
@@ -572,7 +590,7 @@ class StoreAndUiTest(unittest.TestCase):
         # Summary: tier 1 has a regression (//a) and a flaky pass; tier 2 is pending.
         self.assertIn('1/2 ok, <span class="regression">1 regression</span>, <span class="flaky">1 flaky</span>', page)
         self.assertIn('0/1 ok, <span class="pending">1 pending</span>', page)
-        self.assertIn("<td>vs baseline</td>", page)
+        self.assertIn("<td>vs baseline; cycle 1</td>", page)
         self.assertIn('<span class="na">n/a</span>', page)
         # Projects: the regression first, then the rest by tier.
         rows = re.findall(r"<tr><td>([a-z])</td><td", page)
