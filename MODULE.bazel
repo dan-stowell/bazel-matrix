@@ -1,6 +1,7 @@
 module(name = "bazel_matrix")
 
 bazel_dep(name = "rules_python", version = "2.4.5")
+bazel_dep(name = "rules_shell", version = "0.6.1")
 
 # One source repo per project in projects.json; see tools/sources.bzl.
 projects = use_extension("//tools:sources.bzl", "projects")

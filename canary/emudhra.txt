@@ -1,0 +1,6 @@
+# The eMudhra/emSign roots in both baseline stores (subject matches emSign|eMudhra);
+# a candidate image must lack exactly these. <sha256 of DER> <subject>.
+125609aa301da0a249b97a8239cb6a34216f44dcac9f3954b14292f2e8c8608f CN=emSign Root CA - C1,O=eMudhra Inc,OU=emSign PKI,C=US
+40f6af0346a99aa1cd1d555a4e9cce62c7f9634603ee406615833dc8c8d00367 CN=emSign Root CA - G1,O=eMudhra Technologies Limited,OU=emSign PKI,C=IN
+86a1ecba089c4a8d3bbe2734c612ba341d813e043cf9e8a862cd5c57a36bbe6b CN=emSign ECC Root CA - G3,O=eMudhra Technologies Limited,OU=emSign PKI,C=IN
+bc4d809b15189d78db3e1d8cf4f9726a795da1643ca5f1358e1ddb0edc0d7eb3 CN=emSign ECC Root CA - C3,O=eMudhra Inc,OU=emSign PKI,C=US

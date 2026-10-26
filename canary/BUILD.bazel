@@ -1,0 +1,28 @@
+# The RBE image canary; see README.md. Not a project package: both tests are
+# manual, so //... and the matrix skip them.
+
+load("@rules_shell//shell:sh_test.bzl", "sh_test")
+
+# tls_probe_test runs on an RBE executor, in the container-image of
+# tools/remote.bazelrc; tls_probe_runner_test on the bb remote runner, in
+# its --container_image (tools/bb.sh passes the same image).
+[
+    sh_test(
+        name = name,
+        size = "medium",
+        srcs = ["tls_probe.sh"],
+        data = [
+            "emudhra.txt",
+            "emudhra_chain.pem",
+            "tls_probe.py",
+        ] + glob(["roots/*.txt"]),
+        tags = [
+            "external",
+            "manual",
+        ] + extra_tags,
+    )
+    for name, extra_tags in [
+        ("tls_probe_test", []),
+        ("tls_probe_runner_test", ["no-remote-exec"]),
+    ]
+]

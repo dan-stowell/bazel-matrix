@@ -1,5 +1,5 @@
 # Run everything on BuildBuddy RBE with --config=remote-minimal; see
-# README.md. tools/sync.py reads the image from tools/remote.bazelrc.
+# README.md. tools/bb.sh reads the image from tools/remote.bazelrc.
 import %workspace%/tools/remote.bazelrc
 
 # Keep reproducible repos (the project sources) in the remote cache.
