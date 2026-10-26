@@ -9,20 +9,29 @@ on the `bb remote` runner (`tools/bb.sh` passes the same image as
 `tls_probe.py` with the image's own `/usr/bin/python3`, `curl`, `openssl` and
 `git` (a missing one fails) and write one JUnit testcase per check:
 
-- `trust_store/*`: the SHA-256 fingerprints of
-  `/etc/ssl/certs/ca-certificates.crt` and of the hashed CApath certs equal
-  `roots/<VERSION_ID>.txt`, or with `CANARY_EXPECT=distrusted` that minus
-  `emudhra.txt` exactly.
-- `emudhra_fixture/*`: `openssl verify -attime` (2026-11-01) of
-  `emudhra_chain.pem` against the bundle and the CApath: verifies when
-  trusted; when distrusted must fail with an untrusted-issuer error.
-- `host/<host>/{python,curl,openssl}` for hosts builds hit, `git_ls_remote`,
+- `env`: no variable (`SSL_CERT_FILE`, `CURL_CA_BUNDLE`, `GIT_SSL_*`, ...),
+  git config (`http.ssl*`, `url.*.insteadOf`), `~/.curlrc` or `openssl.cnf`
+  directive redirects or disables verification, and python's default verify
+  paths resolve to `/etc/ssl/certs`; so the checks below test what clients load.
+- `trust_store/bundle`: the SHA-256 fingerprints of
+  `/etc/ssl/certs/ca-certificates.crt` equal `roots/<VERSION_ID>.txt`, or with
+  `CANARY_EXPECT=distrusted` that minus `emudhra.txt` exactly.
+  `trust_store/capath`: the hashed CApath has valid names (subject hash,
+  contiguous indices) and the same certs as the bundle.
+- `emudhra_fixture`: `openssl verify -attime` (2026-11-01) of
+  `emudhra_chain.pem` against the bundle: verifies when trusted; when
+  distrusted must fail at depth 2 for want of emSign Root CA - G1.
+- `emudhra_online/www.internet2.edu/{python,curl,git}`: the live emSign chain
+  must verify when trusted and be rejected for its certificate when distrusted.
+- `host/<host>/{python,curl}` for hosts builds hit, `git_ls_remote`,
   `github_release_asset` (follows the redirect): must verify.
-- `control/*`: expired.badssl.com and untrusted-root.badssl.com must fail
-  verification. `emudhra_online/www.internet2.edu` is informational.
+- `control/{expired,untrusted-root}.badssl.com/{python,curl,git}`: must be
+  rejected for the certificate (a network error fails these).
 
-DNS, connect and timeout errors (after one retry) are `NETERR`: a JUnit
-`<error>`, not a failure, unless every host check got one.
+DNS, connect, timeout and transient TLS/HTTP errors (after one retry) are
+`NETERR`, a JUnit `<error>`, not a failure, unless every host check got one.
+Online checks run 8 at a time; the probe stops at 200s (the test timeout is
+300s) and fails what hasn't finished.
 
 ```sh
 tools/bb.sh test //canary:tls_probe_test //canary:tls_probe_runner_test \
@@ -31,8 +40,10 @@ tools/bb.sh test //canary:tls_probe_test //canary:tls_probe_runner_test \
 
 For another image, edit the `container-image` line of `tools/remote.bazelrc`
 without committing: `bb remote` sends uncommitted and untracked changes.
-`--test_env=CANARY_SIMULATE_DISTRUST=1` checks against a copy of the store
-without the `emudhra.txt` roots, a stand-in for a candidate image.
+`--test_env=CANARY_SIMULATE_DISTRUST=1` points every client at a copy of the
+store without the `emudhra.txt` roots (`SSL_CERT_FILE`/`DIR`, `GIT_SSL_CAINFO`/
+`CAPATH`; curl needs `--cacert` and `--capath`, as it keeps its compiled-in
+default for whichever one its variables don't set), a stand-in for a candidate.
 
 `roots/22.04.txt` is from `gcr.io/flame-public/rbe-ubuntu22-04@sha256:0d84a80b...`
 (the pinned baseline), `roots/24.04.txt` from
