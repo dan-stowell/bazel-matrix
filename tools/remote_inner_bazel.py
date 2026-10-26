@@ -104,10 +104,11 @@ def main(argv):
     finally:
         inner_bazel.wait_exit = wait_exit
         shutil.rmtree(root, ignore_errors=True)
-    if waits and waits[-1][1] and (waits[-1][0].returncode or 0) < 0:
+    # The first wait is main()'s for the timeout; kill() waits again.
+    if waits and waits[0][1] and (waits[0][0].returncode or 0) < 0:
         # Killed by a signal, not by inner_bazel.py's timeout.
         write_xml(infra_xml(project))
-        print("inner bazel killed by signal %d" % -waits[-1][0].returncode, flush=True)
+        print("inner bazel killed by signal %d" % -waits[0][0].returncode, flush=True)
         return 1
     print("%s (exit %d)" % (DONE_MARKER, code), flush=True)
     return code

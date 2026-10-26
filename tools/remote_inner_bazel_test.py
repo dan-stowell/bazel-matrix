@@ -77,9 +77,12 @@ class RemoteInnerBazelTest(unittest.TestCase):
 
     def test_inner_timeout_is_not_infra(self):
         def inner(argv):
-            inner_bazel.wait_exit(mock.Mock(returncode=-15), 10)
+            proc = mock.Mock(returncode=-15)
+            inner_bazel.wait_exit(proc, 10)  # main()'s: timed out
+            inner_bazel.wait_exit(proc, 5)   # kill()'s: exited on SIGTERM
             return 1
-        with mock.patch.object(inner_bazel, "wait_exit", lambda proc, t: False):
+        results = iter([False, True])
+        with mock.patch.object(inner_bazel, "wait_exit", lambda proc, t: next(results)):
             code, _, out, _ = self.run_main(inner)
         self.assertIn(r.DONE_MARKER + " (exit 1)", out)
 
