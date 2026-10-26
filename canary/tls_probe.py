@@ -6,10 +6,9 @@ summary. CANARY_EXPECT=trusted (default) expects the baseline store;
 distrusted expects the baseline minus the eMudhra/emSign roots. See
 canary/README.md.
 
-Results: PASS; FAIL (counts); NETERR (DNS, connect, timeout or a transient
-TLS/HTTP error after one retry: says nothing about the store, so it doesn't
-fail the test, except on a negative control or when no host check got
-through at all).
+Results: PASS; FAIL; NETERR (DNS, connect, timeout or a transient TLS/HTTP
+error after one retry: says nothing about the store, but also fails the
+test, as every check is needed for evidence either way).
 """
 
 import base64
@@ -64,7 +63,7 @@ DEADLINE = 200  # seconds for the whole probe; the test (size medium) gets 300
 START = time.time()
 
 results = []  # (name, status, message, output)
-lock = threading.Lock()
+lock = threading.RLock()  # also taken by the signal handler
 xml_path = os.environ.get("XML_OUTPUT_FILE", "/dev/null")
 curl_sim_flags = []  # set by simulate()
 
@@ -134,24 +133,36 @@ def bundle_certs(path):
 
 def capath_certs(path):
     """({key: pem}, [problems]): problems are hashed names whose cert's
-    subject hash differs, files with other than one cert, and gaps in the
-    collision indices."""
-    certs, problems, indices = {}, [], {}
+    subject hash differs (per one `openssl rehash` of a copy), files with
+    other than one cert, and gaps in the collision indices."""
+    certs, problems, indices, names = {}, [], {}, []
+    tmp = tempfile.mkdtemp()
     for name in sorted(os.listdir(path)):
         m = re.match(r"^([0-9a-f]{8})\.([0-9]+)$", name)
         if not m:
             continue
         indices.setdefault(m.group(1), []).append(int(m.group(2)))
-        full = os.path.join(path, name)
-        with open(full) as f:
+        with open(os.path.join(path, name)) as f:
             found = certs_in(f.read())
         if len(found) != 1:
             problems.append("%s: %d certs" % (name, len(found)))
         for key, pem in found:
             certs[key] = pem
-        _, h = run(["openssl", "x509", "-noout", "-subject_hash", "-in", full])
-        if h.strip() != m.group(1):
-            problems.append("%s: subject hash is %s" % (name, h.strip()))
+        if found:
+            with open(os.path.join(tmp, "f%d.pem" % len(names)), "w") as f:
+                f.write(found[0][1] + "\n")
+            names.append(name)
+    code, out = run(["openssl", "rehash", "-v", tmp])
+    shutil.rmtree(tmp)
+    linked = dict(re.findall(r"^link f(\d+)\.pem -> ([0-9a-f]{8})\.\d+$", out, re.M))
+    for i, name in enumerate(names):
+        h = linked.get(str(i))
+        if h is None:
+            problems.append("%s: openssl rehash didn't link it (duplicate?)" % name)
+        elif h != name[:8]:
+            problems.append("%s: subject hash is %s" % (name, h))
+    if code != 0:
+        problems.append("openssl rehash exit %d: %s" % (code, last_line(out)))
     for h, idx in sorted(indices.items()):
         if sorted(idx) != list(range(len(idx))):
             problems.append("%s: collision indices %s not 0..n-1" % (h, sorted(idx)))
@@ -270,6 +281,49 @@ def subject_issuer(pem):
 
 # ---- environment -----------------------------------------------------------
 
+CURLRC_BAD = r"(?im)^\s*(-k\b|(--)?(proxy-)?(insecure|cacert|capath|ca-native|ssl-no-revoke)\b)"
+
+
+def curlrc_candidates():
+    """The places curl looks for its config file, as in curl's
+    tool_findfile.c: $CURL_HOME, $XDG_CONFIG_HOME, $HOME, the passwd home,
+    each for .curlrc (XDG also curlrc)."""
+    dirs = [os.environ.get("CURL_HOME"), os.environ.get("XDG_CONFIG_HOME"), os.environ.get("HOME"),
+            pwd.getpwuid(os.getuid()).pw_dir]
+    out = []
+    for d in dirs:
+        if d:
+            out.append(os.path.join(d, ".curlrc"))
+    for d in (os.environ.get("XDG_CONFIG_HOME"), os.path.join(os.environ.get("HOME", "/"), ".config")):
+        if d:
+            out += [os.path.join(d, "curlrc"), os.path.join(d, ".curlrc")]
+    return sorted(set(out))
+
+
+def scan_openssl_cnf(path, base, seen):
+    """Verify-location directives in an openssl.cnf and the files and
+    directories it .includes."""
+    path = os.path.join(base, path)
+    if path in seen:
+        return []
+    seen.add(path)
+    if os.path.isdir(path):
+        return sum((scan_openssl_cnf(os.path.join(path, n), base, seen)
+                    for n in sorted(os.listdir(path)) if n.endswith(".cnf")), [])
+    problems = []
+    try:
+        with open(path) as f:
+            for line in f:
+                inc = re.match(r"\s*\.include\s*=?\s*(\S+)", line)
+                if inc:
+                    problems += scan_openssl_cnf(inc.group(1), os.environ.get("OPENSSL_CONF_INCLUDE", base), seen)
+                elif re.match(r"(?i)\s*(Verify|Chain|Request)CA(File|Path|Store)|\s*VerifyMode", line):
+                    problems.append("%s: %s" % (path, line.strip()))
+    except OSError as e:
+        problems.append("%s: %s" % (path, e))
+    return problems
+
+
 def check_env():
     """Fails when the environment or config redirects or disables
     verification, so the checks below test the store clients really load."""
@@ -288,23 +342,18 @@ def check_env():
     for line in out.splitlines():
         if re.search(r"(?i)\s(http\.(.*\.)?ssl(verify|cainfo|capath|backend)|url\..*\.insteadof)=", line):
             problems.append("git config: " + line)
-    homes = {os.path.expanduser("~"), pwd.getpwuid(os.getuid()).pw_dir}
-    for home in sorted(homes):
-        for rc in (".curlrc", os.path.join(".config", ".curlrc")):
-            p = os.path.join(home, rc)
-            if os.path.exists(p):
-                with open(p, errors="replace") as f:
-                    problems.append("%s exists: %s" % (p, " | ".join(f.read().split("\n")[:5])))
+    for p in curlrc_candidates():
+        if os.path.isfile(p):
+            with open(p, errors="replace") as f:
+                text = f.read()
+            if re.search(CURLRC_BAD, text):
+                problems.append("%s: %s" % (p, " | ".join(l for l in text.splitlines() if re.search(CURLRC_BAD, l))))
+            else:
+                print("note: %s exists (curl runs with -q here)" % p)
     _, d = run(["openssl", "version", "-d"])
     m = re.search(r'"(.*)"', d)
-    cnf = os.path.join(m.group(1), "openssl.cnf") if m else "/etc/ssl/openssl.cnf"
-    try:
-        with open(cnf) as f:
-            for line in f:
-                if re.match(r"(?i)\s*(Verify|Chain|Request)CA(File|Path|Store)|\s*VerifyMode", line):
-                    problems.append("%s: %s" % (cnf, line.strip()))
-    except OSError as e:
-        problems.append("%s: %s" % (cnf, e))
+    openssldir = m.group(1) if m else "/usr/lib/ssl"
+    problems += scan_openssl_cnf(os.path.join(openssldir, "openssl.cnf"), openssldir, set())
     if problems:
         record("env", "FAIL", "%d settings redirect or disable verification; first: %s" % (
             len(problems), problems[0]), "\n".join(problems))
@@ -348,43 +397,53 @@ CURL_NET = {5: "proxy", 6: "dns", 7: "connect", 16: "http2", 28: "timeout", 35: 
 CURL_CERT = {60: "peer cert verify", 51: "hostname", 83: "issuer"}
 
 
+def curl_classify(code, out):
+    """(status, message) for curl's exit code and output (stderr, then the
+    `-w "%{http_code} %{url_effective}"` line)."""
+    tail = re.sub(r"\?\S*", "", " ".join(out.split()))[:300]
+    if code == 0:
+        return "OK", "verified, " + tail
+    if code in CURL_CERT:
+        return "CERT", "curl %d (%s): %s" % (code, CURL_CERT[code], tail)
+    if code in CURL_NET or code == -1:
+        return "NETERR", "curl %d (%s): %s" % (code, CURL_NET.get(code, "timeout"), tail)
+    http = re.search(r"(?m)^(\d{3}) \S+$", out)
+    if code == 22 and http and (http.group(1) == "429" or http.group(1).startswith("5")):
+        return "NETERR", "HTTP %s (server side): %s" % (http.group(1), tail)
+    return "ERROR", "curl %d: %s" % (code, tail)  # incl. 77/58: CA/client cert setup
+
+
 def curl_check(url, extra=()):
     def check():
         code, out = run(["curl", "-q", "-sS", "-o", "/dev/null", "--max-time", str(TIMEOUT), "-w",
                          "%{http_code} %{url_effective}\n"] + list(extra) + curl_sim_flags + [url])
-        tail = re.sub(r"\?\S*", "", " ".join(out.split()))[:300]
-        if code == 0:
-            return "OK", "verified, " + tail, out
-        if code in CURL_CERT:
-            return "CERT", "curl %d (%s): %s" % (code, CURL_CERT[code], tail), out
-        if code in CURL_NET or code == -1:
-            return "NETERR", "curl %d (%s): %s" % (code, CURL_NET.get(code, "timeout"), tail), out
-        http = re.search(r"^(\d{3}) ", tail)
-        if code == 22 and http and (http.group(1) == "429" or http.group(1).startswith("5")):
-            return "NETERR", "HTTP %s (server side)" % http.group(1), out
-        return "ERROR", "curl %d: %s" % (code, tail), out  # incl. 77/58: CA/client cert setup
+        return curl_classify(code, out) + (out,)
     return retried(check)
 
 
+def git_classify(code, out, tls_only=False):
+    """(status, message) for `git ls-remote`; tls_only: any failure after the
+    TLS handshake is OK (the URL is not a git repo)."""
+    if code == 0:
+        return "OK", "ls-remote OK " + out[:12]
+    if re.search(r"(?i)SSL certificate problem|certificate verification failed|certificate verify|"
+                 r"issuer certificate|self.signed|certificate has expired", out):
+        return "CERT", last_line(out)
+    if code == -1 or re.search(r"(?i)could not resolve|failed to connect|timed out|connection refused|"
+                               r"unreachable|connection reset|gnutls_handshake\(\) failed|"
+                               r"Operation too slow|HTTP/2 stream", out):
+        return "NETERR", last_line(out)
+    if tls_only and re.search(r"(?i)not found|not valid|HTTP \d{3}|repository|unexpected|bad line", out):
+        return "OK", "TLS verified (then: %s)" % last_line(out)
+    return "ERROR", "git exit %d: %s" % (code, last_line(out)[-300:])
+
+
 def git_check(url, tls_only=False):
-    """git ls-remote; tls_only: any failure after the TLS handshake passes
-    (url is not a git repo)."""
     def check():
         env = dict(os.environ, GIT_TERMINAL_PROMPT="0")
         code, out = run(["git", "-c", "http.lowSpeedLimit=1000", "-c", "http.lowSpeedTime=%d" % TIMEOUT,
                          "ls-remote", url, "HEAD"], env=env)
-        if code == 0:
-            return "OK", "ls-remote OK " + out[:12], out
-        if re.search(r"(?i)SSL certificate problem|certificate verification failed|certificate verify|"
-                     r"issuer certificate|self.signed|certificate has expired", out):
-            return "CERT", last_line(out), out
-        if code == -1 or re.search(r"(?i)could not resolve|failed to connect|timed out|connection refused|"
-                                   r"unreachable|connection reset|gnutls_handshake\(\) failed|"
-                                   r"Operation too slow|HTTP/2 stream", out):
-            return "NETERR", last_line(out), out
-        if tls_only and re.search(r"(?i)not found|not valid|HTTP \d{3}|repository|unexpected|bad line", out):
-            return "OK", "TLS verified (then: %s)" % last_line(out), out
-        return "ERROR", "git exit %d: %s" % (code, last_line(out)[-300:]), out
+        return git_classify(code, out, tls_only) + (out,)
     return retried(check)
 
 
@@ -394,7 +453,7 @@ def expect(want):
         status, msg, out = r
         if status == want:
             record(name, "PASS", msg if want == "OK" else "rejected as expected: " + msg, out)
-        elif status == "NETERR" and not name.startswith("control/"):
+        elif status == "NETERR":
             record(name, "NETERR", msg, out)
         else:
             record(name, "FAIL", "want %s, got %s: %s" % (want, status, msg), out)
@@ -450,9 +509,6 @@ def write_junit():
 
 def finish(simulated):
     """Writes JUnit and the summary; the exit code."""
-    host = [r for r in results if r[0].startswith("host/")]
-    if host and all(r[1] == "NETERR" for r in host):
-        record("connectivity", "FAIL", "every host check failed on the network; nothing verified")
     write_junit()
     counts = {s: sum(r[1] == s for r in results) for s in ("PASS", "FAIL", "NETERR")}
     print("\n=== tls_probe summary (CANARY_EXPECT=%s%s): %d checks, %d PASS, %d FAIL, %d NETERR, %.0fs" % (
@@ -462,12 +518,15 @@ def finish(simulated):
         if status != "PASS":
             print("  %-7s %s: %s" % (status, name, msg))
     sys.stdout.flush()
-    return 1 if counts["FAIL"] else 0
+    if counts["NETERR"] and not counts["FAIL"]:
+        print("  (fails on network errors only: no evidence either way about the CA store)")
+    return 1 if counts["FAIL"] or counts["NETERR"] else 0
 
 
 def on_sigterm(signum, frame):
-    record("deadline", "FAIL", "killed (signal %d) before finishing" % signum)
-    write_junit()
+    what = "the probe's %ds deadline" % (DEADLINE + 20) if signum == signal.SIGALRM else "signal %d" % signum
+    record("deadline", "FAIL", "stopped by %s before finishing" % what)
+    finish(os.environ.get("CANARY_SIMULATE_DISTRUST") == "1")
     os._exit(1)
 
 
@@ -479,6 +538,8 @@ def main():
     if want not in ("trusted", "distrusted"):
         sys.exit("CANARY_EXPECT must be trusted or distrusted, not %r" % want)
     signal.signal(signal.SIGTERM, on_sigterm)
+    signal.signal(signal.SIGALRM, on_sigterm)
+    signal.alarm(DEADLINE + 20)  # backstop for setup and offline checks too
     print("tls_probe: Ubuntu %s, CANARY_EXPECT=%s, host %s" % (release(), want, socket.gethostname()))
 
     missing = [t for t in TOOLS if not shutil.which(t)]

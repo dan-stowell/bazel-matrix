@@ -1,6 +1,8 @@
-# The RBE image canary; see README.md. Not a project package: both tests are
-# manual, so //... and the matrix skip them.
+# The RBE image canary; see README.md. Not a project package: the probes are
+# manual, so //... and the matrix skip them; tls_probe_unit_test is a plain
+# unit test of the probe's parsing.
 
+load("@rules_python//python:py_test.bzl", "py_test")
 load("@rules_shell//shell:sh_test.bzl", "sh_test")
 
 # tls_probe_test runs on an RBE executor, in the container-image of
@@ -26,3 +28,12 @@ load("@rules_shell//shell:sh_test.bzl", "sh_test")
         ("tls_probe_runner_test", ["no-remote-exec"]),
     ]
 ]
+
+py_test(
+    name = "tls_probe_unit_test",
+    srcs = [
+        "tls_probe.py",
+        "tls_probe_unit_test.py",
+    ],
+    imports = ["."],
+)

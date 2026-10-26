@@ -29,9 +29,12 @@ on the `bb remote` runner (`tools/bb.sh` passes the same image as
   rejected for the certificate (a network error fails these).
 
 DNS, connect, timeout and transient TLS/HTTP errors (after one retry) are
-`NETERR`, a JUnit `<error>`, not a failure, unless every host check got one.
-Online checks run 8 at a time; the probe stops at 200s (the test timeout is
-300s) and fails what hasn't finished.
+`NETERR`, a JUnit `<error>` rather than `<failure>`, so a red run says
+"network, not CA"; they still fail the test, which otherwise would pass on no
+evidence. Online checks run 8 at a time; the probe stops at 200s (220s for
+setup and offline checks; the test timeout is 300s) and fails what hasn't
+finished. `env` also reads every curlrc curl would (`-q` skips them in the
+probe) and `openssl.cnf` with its `.include`s.
 
 ```sh
 tools/bb.sh test //canary:tls_probe_test //canary:tls_probe_runner_test \
