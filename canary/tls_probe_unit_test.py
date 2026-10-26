@@ -78,6 +78,33 @@ class CurlrcTest(unittest.TestCase):
             self.assertRegex(line, tls_probe.CURLRC_BAD)
         self.assertNotRegex("user-agent = x", tls_probe.CURLRC_BAD)
 
+    def test_config_include_fails(self):
+        for line in ("config = /x", "--config /x", "-K /x"):
+            self.assertRegex(line, tls_probe.CURLRC_BAD)
+
+
+class OpensslCnfTest(unittest.TestCase):
+    def test_include(self):
+        self.assertEqual(tls_probe.cnf_line('.include "/etc/ssl/openssl.cnf.d"'),
+                         ("include", "/etc/ssl/openssl.cnf.d"))
+        self.assertEqual(tls_probe.cnf_line(".include = /x/y.conf"), ("include", "/x/y.conf"))
+
+    def test_directives(self):
+        for line in ("VerifyCAFile = /x", "1.VerifyCAFile = /x", "  ChainCAPath=/x", "VerifyMode = None"):
+            self.assertEqual(tls_probe.cnf_line(line)[0], "bad", line)
+        for line in ("CipherString = DEFAULT", "openssl_conf = openssl_init", "# VerifyCAFile = /x"):
+            self.assertEqual(tls_probe.cnf_line(line), (None, None), line)
+
+
+class CapathNameTest(unittest.TestCase):
+    def test_names(self):
+        self.assertEqual(tls_probe.capath_name("4042bcee.0"), "ok")
+        self.assertEqual(tls_probe.capath_name("4042bcee.12"), "ok")
+        self.assertEqual(tls_probe.capath_name("4042bcee.00"), "noncanonical")
+        self.assertEqual(tls_probe.capath_name("4042bcee.01"), "noncanonical")
+        self.assertIsNone(tls_probe.capath_name("ISRG_Root_X1.pem"))
+        self.assertIsNone(tls_probe.capath_name("4042bcee.r0"))
+
 
 if __name__ == "__main__":
     unittest.main()

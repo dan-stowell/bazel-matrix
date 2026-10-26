@@ -131,6 +131,16 @@ def bundle_certs(path):
         return dict(certs_in(f.read()))
 
 
+def capath_name(name):
+    """"ok" for a hashed name (`1234abcd.0`), "noncanonical" for one OpenSSL
+    wouldn't look up (`1234abcd.00`), else None."""
+    if re.match(r"^[0-9a-f]{8}\.(0|[1-9][0-9]*)$", name):
+        return "ok"
+    if re.match(r"^[0-9a-f]{8}\.[0-9]+$", name):
+        return "noncanonical"
+    return None
+
+
 def capath_certs(path):
     """({key: pem}, [problems]): problems are hashed names whose cert's
     subject hash differs (per one `openssl rehash` of a copy), files with
@@ -138,10 +148,12 @@ def capath_certs(path):
     certs, problems, indices, names = {}, [], {}, []
     tmp = tempfile.mkdtemp()
     for name in sorted(os.listdir(path)):
-        m = re.match(r"^([0-9a-f]{8})\.([0-9]+)$", name)
-        if not m:
+        kind = capath_name(name)
+        if kind == "noncanonical":
+            problems.append("%s: not a canonical hash.N name" % name)
+        if kind != "ok":
             continue
-        indices.setdefault(m.group(1), []).append(int(m.group(2)))
+        indices.setdefault(name[:8], []).append(int(name[9:]))
         with open(os.path.join(path, name)) as f:
             found = certs_in(f.read())
         if len(found) != 1:
@@ -281,7 +293,8 @@ def subject_issuer(pem):
 
 # ---- environment -----------------------------------------------------------
 
-CURLRC_BAD = r"(?im)^\s*(-k\b|(--)?(proxy-)?(insecure|cacert|capath|ca-native|ssl-no-revoke)\b)"
+# config/-K: another file, which isn't followed (it fails instead).
+CURLRC_BAD = r"(?im)^\s*(-k\b|-K\b|(--)?(proxy-)?(insecure|cacert|capath|ca-native|ssl-no-revoke|config)\b)"
 
 
 def curlrc_candidates():
@@ -300,6 +313,17 @@ def curlrc_candidates():
     return sorted(set(out))
 
 
+def cnf_line(line):
+    """("include", path), ("bad", line) for a verify-location directive
+    (also prefixed, as in `1.VerifyCAFile`), or (None, None)."""
+    inc = re.match(r"\s*\.include\s*=?\s*(\S+)", line)
+    if inc:
+        return "include", inc.group(1).strip("\"'")
+    if re.match(r"(?i)\s*([^\s=]*\.)?((Verify|Chain|Request)CA(File|Path|Store)|VerifyMode)\s*=", line):
+        return "bad", line.strip()
+    return None, None
+
+
 def scan_openssl_cnf(path, base, seen):
     """Verify-location directives in an openssl.cnf and the files and
     directories it .includes."""
@@ -309,16 +333,16 @@ def scan_openssl_cnf(path, base, seen):
     seen.add(path)
     if os.path.isdir(path):
         return sum((scan_openssl_cnf(os.path.join(path, n), base, seen)
-                    for n in sorted(os.listdir(path)) if n.endswith(".cnf")), [])
+                    for n in sorted(os.listdir(path)) if n.endswith((".cnf", ".conf"))), [])
     problems = []
     try:
         with open(path) as f:
             for line in f:
-                inc = re.match(r"\s*\.include\s*=?\s*(\S+)", line)
-                if inc:
-                    problems += scan_openssl_cnf(inc.group(1), os.environ.get("OPENSSL_CONF_INCLUDE", base), seen)
-                elif re.match(r"(?i)\s*(Verify|Chain|Request)CA(File|Path|Store)|\s*VerifyMode", line):
-                    problems.append("%s: %s" % (path, line.strip()))
+                kind, value = cnf_line(line)
+                if kind == "include":
+                    problems += scan_openssl_cnf(value, os.environ.get("OPENSSL_CONF_INCLUDE", base), seen)
+                elif kind == "bad":
+                    problems.append("%s: %s" % (path, value))
     except OSError as e:
         problems.append("%s: %s" % (path, e))
     return problems
@@ -525,9 +549,11 @@ def finish(simulated):
 
 def on_sigterm(signum, frame):
     what = "the probe's %ds deadline" % (DEADLINE + 20) if signum == signal.SIGALRM else "signal %d" % signum
-    record("deadline", "FAIL", "stopped by %s before finishing" % what)
-    finish(os.environ.get("CANARY_SIMULATE_DISTRUST") == "1")
-    os._exit(1)
+    try:
+        record("deadline", "FAIL", "stopped by %s before finishing" % what)
+        finish(os.environ.get("CANARY_SIMULATE_DISTRUST") == "1")
+    finally:
+        os._exit(1)
 
 
 def main():
