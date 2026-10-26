@@ -48,6 +48,16 @@ class ParseTest(unittest.TestCase):
             "https://buildbuddy.buildbuddy.io/invocation/4e88c7fc-6514-4c26-9796-a1fdc3bc4b48",
         ])
 
+    def test_links_are_buildbuddy_https_only(self):
+        self.assertEqual(server.invocation_links(
+            "Streaming build results to: javascript:alert(1)//invocation/abcd\n"), [])
+
+    def test_copy_redacted(self):
+        import io
+        out = io.StringIO()
+        server.copy_redacted(io.BytesIO(b"a KEY b\nc\n"), out, "KEY")
+        self.assertEqual(out.getvalue(), "a <REDACTED> b\nc\n")
+
     def test_target_results_only_outer_summary(self):
         self.assertEqual(server.target_results(LOG), {
             "//abseil-cpp:test": "PASSED",
@@ -267,6 +277,24 @@ class VerdictTest(unittest.TestCase):
                                   ("no", ["host/x: curl 60", "regresses //a:test"])))
         none = server.verdicts(cfg, cols, {}, cols[1])
         self.assertEqual([none[0][0], none[1][0]], ["pending", "pending"])
+
+    def test_unproven_is_pending_and_build_failure_regresses(self):
+        cfg = {"subset": {"22.04": ["a"]}, "images": []}
+        cols = server.columns([
+            {"name": "b", "ref": "r", "role": "baseline", "release": "22.04", "archs": ["amd64"]},
+            {"name": "c", "ref": "r", "role": "candidate", "release": "22.04", "archs": ["amd64"]},
+        ])
+        p = run("c", "probe", "failed", "1")
+        p["probe_checks"] = {"emudhra/fixture": ["NETERR", "timeout"], "host/x": ["NETERR", "timeout"]}
+        runs = [run("b", "subset", "passed", "1", {"//a:test": "PASSED"}), p,
+                run("c", "subset", "failed", "1", {})]
+        rejects, works = server.verdicts(cfg, cols, server.latest(runs), cols[1])
+        self.assertEqual(rejects, ("pending", ["NETERR emudhra/fixture: timeout"]))
+        self.assertEqual(works, ("no", ["NETERR host/x: timeout", "subset failed (baseline passed)"]))
+        # A timed-out probe with a few PASS lines proves nothing.
+        p.update(status="timeout", probe_checks={"tools": ["PASS", "found"]})
+        rejects, works = server.verdicts({"subset": {}}, cols, server.latest(runs), cols[1])
+        self.assertEqual((rejects[0], works[0]), ("pending", "pending"))
 
 
 class ConfigTest(unittest.TestCase):

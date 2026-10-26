@@ -151,7 +151,8 @@ def rewrite_image(text, ref):
 # --- output parsing -----------------------------------------------------------
 
 _ANSI = re.compile(r"\x1b\[[0-9;]*[A-Za-z]|\[\d+(?:;\d+)*m")
-_STREAM = re.compile(r"Streaming (?:remote runner logs|build results) to: (\S+/invocation/[0-9a-f-]+)")
+_STREAM = re.compile(r"Streaming (?:remote runner logs|build results) to: "
+                     r"(https://(?:app|buildbuddy)\.buildbuddy\.io/invocation/[0-9a-f-]+)")
 _RESULT = re.compile(r"^((?://|@)\S*:\S+)\s+(?:\(cached\)\s+)?"
                      r"(PASSED|FAILED TO BUILD|FAILED|TIMEOUT|FLAKY|NO STATUS|INCOMPLETE|"
                      r"REMOTE FAILURE|SKIPPED)\b")
@@ -333,21 +334,38 @@ def verdicts(cfg, images, lat, col):
     """
     _, probe = cell_status(lat, col, "probe")
     checks = (probe or {}).get("probe_checks") or {}
+    if probe is not None and probe["status"] not in ("passed", "failed"):
+        checks = {}  # an interrupted or broken probe proves nothing
     fails = lambda keep: ["%s: %s" % (c, m) for c, (st, m) in sorted(checks.items()) if keep(c) and st == "FAIL"]
-    if probe is None or not checks:
-        rejects = ("pending", ["no probe result yet"] if probe is None else ["probe %s, no checks parsed" % probe["status"]])
+    unsure = lambda keep: ["%s %s: %s" % (st, c, m) for c, (st, m) in sorted(checks.items())
+                           if keep(c) and st not in ("PASS", "FAIL", "INFO")]
+    em_checks = [c for c in checks if is_emudhra(c)]
+    if probe is None or not em_checks:
+        rejects = ("pending", ["no probe result yet"] if probe is None else
+                   ["probe %s, no eMudhra checks parsed" % probe["status"]])
     else:
         em = fails(is_emudhra)
         if col.get("role") == "baseline":
             rejects = ("baseline", em or ["trusts eMudhra (expected)"])
+        elif em:
+            rejects = ("no", em)
         else:
-            rejects = ("no", em) if em else ("yes", [])
-    reasons = fails(lambda c: not is_emudhra(c)) if checks else []
-    state = "pending" if not checks else ("no" if reasons else "yes")
+            rejects = ("pending", unsure(is_emudhra)) if unsure(is_emudhra) else ("yes", [])
+    other = lambda c: not is_emudhra(c)
+    reasons = fails(other) if checks else []
+    if not checks:
+        state = "pending"
+        reasons = ["no probe result yet"] if probe is None else ["probe %s, no checks parsed" % probe["status"]]
+    elif reasons:
+        state = "no"
+    elif unsure(other):
+        state, reasons = "pending", unsure(other)
+    else:
+        state = "yes"
     if subset_of(cfg, col):
         _, sub = cell_status(lat, col, "subset")
         if sub is None:
-            state = "no" if reasons else "pending"
+            state = "no" if state == "no" else "pending"
             reasons = reasons + ["subset not run yet"]
         elif col.get("role") == "baseline":
             bad = sorted(t for t, st in sub.get("targets", {}).items() if not is_pass(st))
@@ -357,13 +375,30 @@ def verdicts(cfg, images, lat, col):
         else:
             bases = [b for b in images if b.get("role") == "baseline" and b.get("release") == col.get("release")
                      and arch_of(b) == arch_of(col)]
-            regs = []
+            regs, unknown = [], []
             for t, st in sorted(sub.get("targets", {}).items()):
-                if not is_pass(st) and any(is_pass(cell_status(lat, b, "subset", t)[0]) for b in bases):
+                if is_pass(st):
+                    continue
+                base = [cell_status(lat, b, "subset", t)[0] for b in bases]
+                if any(is_pass(x) for x in base):
                     regs.append(t)
+                elif not any(base):
+                    unknown.append(t)
             if regs:
                 state = "no"
                 reasons = reasons + ["regresses %s" % ", ".join(regs)]
+            elif sub["status"] != "passed" and not sub.get("targets"):
+                # No per-target results (e.g. the build failed first): a
+                # regression if a baseline's subset passed.
+                if any(cell_status(lat, b, "subset")[0] == "passed" for b in bases):
+                    state = "no"
+                    reasons = reasons + ["subset %s (baseline passed)" % sub["status"]]
+                elif state == "yes":
+                    state = "pending"
+                    reasons = reasons + ["subset %s" % sub["status"]]
+            elif unknown and state == "yes":
+                state = "pending"
+                reasons = reasons + ["no baseline result for %s" % ", ".join(unknown)]
             elif sub["status"] in ("error", "timeout") and state == "yes":
                 state = "pending"
                 reasons = reasons + ["subset %s" % sub["status"]]
@@ -439,12 +474,12 @@ class Runner(threading.Thread):
         self.lock = threading.Lock()  # one step at a time in the work dir
 
     def git(self, *args):
-        subprocess.run(["git", "-C", self.work] + list(args), check=True,
+        subprocess.run(["git", "-C", self.work] + list(args), check=True, timeout=600,
                        stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL)
 
     def prepare(self, branch):
         if not os.path.isdir(os.path.join(self.work, ".git")):
-            subprocess.run(["git", "clone", "--quiet", REPO_URL, self.work], check=True,
+            subprocess.run(["git", "clone", "--quiet", REPO_URL, self.work], check=True, timeout=600,
                            stdin=subprocess.DEVNULL)
         self.git("fetch", "--quiet", "origin", branch)
         self.git("reset", "--quiet", "--hard", "FETCH_HEAD")
@@ -463,13 +498,19 @@ class Runner(threading.Thread):
     def cycle(self):
         cfg = load_config(self.data_dir)
         cycle = self.store.next_cycle()
-        with self.lock:
-            self.prepare(cfg["repo_branch"])
-        for image, step in schedule(cfg):
-            if self.stopping.is_set():
-                return
-            self.free_disk(cfg)
-            self.step(cfg, cycle, image, step)
+        # Two servers must not share a work dir: hold its lock for the cycle.
+        with open(self.work.rstrip("/") + ".lock", "w") as lk:
+            try:
+                fcntl.flock(lk, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError:
+                raise RuntimeError("another server holds %s.lock" % self.work.rstrip("/"))
+            with self.lock:
+                self.prepare(cfg["repo_branch"])
+            for image, step in schedule(cfg):
+                if self.stopping.is_set():
+                    return
+                self.free_disk(cfg)
+                self.step(cfg, cycle, image, step)
         # Not a hot loop when every step is skipped or fails at once.
         self.stopping.wait(cfg.get("cycle_pause_s", 60))
 
@@ -497,7 +538,7 @@ class Runner(threading.Thread):
             print("low disk: cleaning %s" % os.path.join(root, arch), file=sys.stderr)
             subprocess.run([cfg["bazel"], "--output_base=" + os.path.join(root, arch), "clean", "--expunge"],
                            cwd=self.work, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
-                           stderr=subprocess.DEVNULL)
+                           stderr=subprocess.DEVNULL, timeout=1800)
 
     def command(self, cfg, cycle, image, step, key):
         """The Bazel command line for a step, None if it has nothing to run.
@@ -563,12 +604,13 @@ class Runner(threading.Thread):
         timeout = cfg.get("step_timeout_s", DEFAULT_TIMEOUT)
         timed_out = False
         try:
-            # Exclusive across processes too: two servers must not share a work dir.
-            with open(os.path.join(self.work, ".git", "canary.lock"), "w") as lk, open(log_path, "w") as log:
-                fcntl.flock(lk, fcntl.LOCK_EX)
-                self.proc = subprocess.Popen(args, cwd=self.work, stdout=log,
+            with open(log_path, "w") as log:
+                self.proc = subprocess.Popen(args, cwd=self.work, stdout=subprocess.PIPE,
                                              stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL,
                                              start_new_session=True)
+                # The key never reaches the log file, even mid-run.
+                copier = threading.Thread(target=copy_redacted, args=(self.proc.stdout, log, key), daemon=True)
+                copier.start()
                 deadline = time.time() + timeout
                 while self.proc.poll() is None:
                     if self.stopping.is_set() or time.time() > deadline:
@@ -577,12 +619,9 @@ class Runner(threading.Thread):
                         break
                     time.sleep(1)
                 code = self.proc.wait()
+                copier.join(60)
             with open(log_path, errors="replace") as f:
                 text = f.read()
-            if key in text:
-                text = redact(text, key)
-                with open(log_path, "w") as f:
-                    f.write(text)
             rec.update(exit_code=code, invocations=invocation_links(text), targets=target_results(text))
             if rec["step"] == "probe":
                 rec["checks"] = {t: summarize_failures(f) for t, f in probe_failures(text).items()}
@@ -604,6 +643,13 @@ class Runner(threading.Thread):
         p = self.proc
         if p is not None and p.poll() is None:
             kill_group(p)
+
+
+def copy_redacted(src, dst, key):
+    for line in iter(src.readline, b""):
+        dst.write(redact(line.decode("utf-8", "replace"), key))
+        dst.flush()
+    src.close()
 
 
 def kill_group(proc, grace=30):
