@@ -610,13 +610,16 @@ class Runner(threading.Thread):
     def cycle(self):
         cfg = load_config(self.data_dir)
         cycle = self.store.next_cycle()
-        self.store.compact()
         # Two servers must not share a work dir: hold its lock for the cycle.
         with open(self.work.rstrip("/") + ".lock", "w") as lk:
             try:
                 fcntl.flock(lk, fcntl.LOCK_EX | fcntl.LOCK_NB)
             except BlockingIOError:
-                raise RuntimeError("another server holds %s.lock" % self.work.rstrip("/"))
+                # A server being replaced (canary/restart.sh) is finishing up.
+                print("waiting for %s.lock" % self.work.rstrip("/"), file=sys.stderr)
+                self.stopping.wait(10)
+                return
+            self.store.compact()  # under the lock: no other server is appending
             with self.lock:
                 rev = self.prepare(cfg["repo_branch"])
                 cfg["bazel"] = resolve_bazel(cfg, self.work)
@@ -626,7 +629,8 @@ class Runner(threading.Thread):
                 self.housekeeping(cfg)
                 self.step(cfg, cycle, rev, image, step)
         # Not a hot loop when every step is skipped or fails at once.
-        self.stopping.wait(cfg.get("cycle_pause_s", 60))
+        if not self.stopping.is_set():
+            self.stopping.wait(cfg.get("cycle_pause_s", 60))
 
     def output_base(self, cfg, image):
         # One per arch: the Arch flag would otherwise discard the analysis
@@ -848,16 +852,19 @@ def kill_group(proc, grace=30):
     SIGKILL it if the leader outlives the grace period. Only signals while
     the leader is unreaped, so the group id can't have been reused."""
     with _kill_lock:
-        if proc.poll() is not None:
-            return
-        os.killpg(proc.pid, signal.SIGINT)
-        deadline = time.time() + grace
-        while time.time() < deadline:
-            # Leader still a child (unreaped) means its pgid is still ours.
-            if os.waitid(os.P_PID, proc.pid, os.WEXITED | os.WNOHANG | os.WNOWAIT) is not None:
+        try:
+            if proc.poll() is not None:
                 return
-            time.sleep(0.5)
-        os.killpg(proc.pid, signal.SIGKILL)
+            os.killpg(proc.pid, signal.SIGINT)
+            deadline = time.time() + grace
+            while time.time() < deadline:
+                # Leader still a child (unreaped) means its pgid is still ours.
+                if os.waitid(os.P_PID, proc.pid, os.WEXITED | os.WNOHANG | os.WNOWAIT) is not None:
+                    return
+                time.sleep(0.5)
+            os.killpg(proc.pid, signal.SIGKILL)
+        except (ChildProcessError, ProcessLookupError):
+            pass  # reaped meanwhile (by the runner's wait()): nothing left to signal
 
 
 # --- UI ---------------------------------------------------------------------
@@ -1049,16 +1056,18 @@ def main(argv=None):
     server = http.server.ThreadingHTTPServer((args.host, args.port), make_handler(args.data_dir, store, runner))
 
     def shutdown(signum, _frame):
-        runner.stop()
+        # Release the port first (a replacement can bind it at once), then
+        # stop the running step in the background.
         threading.Thread(target=server.shutdown, daemon=True).start()
+        threading.Thread(target=runner.stop, daemon=True).start()
 
     signal.signal(signal.SIGTERM, shutdown)
     signal.signal(signal.SIGINT, shutdown)
     runner.start()
     print("serving on http://%s:%d" % (args.host, args.port), file=sys.stderr)
     server.serve_forever()
-    runner.join(60)  # lets the running step record its end
     server.server_close()
+    runner.join(120)  # lets the running step record its end
 
 
 if __name__ == "__main__":

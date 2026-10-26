@@ -77,7 +77,13 @@ table on port 8000:
 mkdir -p ~/canary-data
 nohup python3 canary/server.py >>~/canary-data/server.log 2>&1 &  # http://0.0.0.0:8000
 # flags: --port, --data-dir (~/canary-data), --work-dir (~/canary-work)
+canary/restart.sh --between   # pick up new code once the running step ends
 ```
+
+`canary/restart.sh` frees the port first and starts the new server at once.
+The old process finishes its running step in the background (without
+`--between`, it interrupts that step), and the new runner waits for the work
+dir's lock.
 
 It needs `BUILDBUDDY_API_KEY` in its environment. For this app only, Bazel
 runs on this machine, not through `bb remote`. It runs in its own clone,
