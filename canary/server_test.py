@@ -150,15 +150,19 @@ GOOD = {"emudhra/fixture": ["PASS", "rejected"], "host/x": ["PASS", "ok"],
 BASE_SUB = {"//a:test": "PASSED", "//b:test": "FAILED"}
 
 
+def builds(cfg, runs, images, col, group=("a", "b")):
+    return server.group_cell(cfg, server.compare_subset(cfg, runs, images, col), list(group))
+
+
 class VerdictTest(unittest.TestCase):
     def test_yes(self):
         b, c = COLS
         runs = [run(b, "probe", "passed", checks=GOOD, expect="trusted"), run(c, "probe", "passed", checks=GOOD),
                 run(b, "subset", "failed", BASE_SUB), run(c, "subset", "failed", BASE_SUB)]
         self.assertEqual(server.protected(runs, c)[:2], ("yes", []))
-        state, why, ratio, _ = server.builds(CFG, runs, IMAGES, c)
         # //b:test fails on the baseline too: not counted.
-        self.assertEqual((state, why, ratio), ("yes", [], "1/1"))
+        self.assertEqual(builds(CFG, runs, IMAGES, c), ("yes", 1, 1, []))
+        self.assertEqual(server.probe_others(runs, c), [])
 
     def test_no(self):
         b, c = COLS
@@ -166,16 +170,17 @@ class VerdictTest(unittest.TestCase):
         runs = [run(c, "probe", "passed", checks=bad), run(b, "subset", "passed", {"//a:test": "PASSED", "//b:test": "PASSED"}),
                 run(c, "subset", "failed", {"//a:test": "FAILED", "//b:test": "PASSED"})]
         self.assertEqual(server.protected(runs, c)[:2], ("no", ["emudhra/fixture: still verifies"]))
-        state, why, ratio, _ = server.builds(CFG, runs, IMAGES, c)
-        self.assertEqual(state, "no")
-        self.assertEqual(ratio, "1/2")
-        self.assertIn("host/x: curl 60", why)
+        self.assertEqual(builds(CFG, runs, IMAGES, c), ("no", 1, 2, ["//a:test"]))
+        self.assertEqual(builds(CFG, runs, IMAGES, c, group=["b"]), ("yes", 1, 1, []))
+        self.assertEqual(builds(CFG, runs, IMAGES, c, group=["zzz"])[0], "n/a")
+        self.assertEqual(server.probe_others(runs, c), ["FAIL host/x: curl 60"])
 
     def test_pending(self):
         b, c = COLS
         # Nothing yet.
         self.assertEqual(server.protected([], c)[0], "pending")
-        self.assertEqual(server.builds(CFG, [], IMAGES, c)[0], "pending")
+        self.assertEqual(builds(CFG, [], IMAGES, c)[0], "pending")
+        self.assertIsNone(server.probe_others([], c))
         # An interrupted probe, or one without a complete summary, proves nothing.
         runs = [run(c, "probe", "interrupted", checks=GOOD), run(c, "probe", "error", checks=None)]
         self.assertEqual(server.protected(runs, c)[0], "pending")
@@ -192,17 +197,17 @@ class VerdictTest(unittest.TestCase):
             [run(dict(b, ref="old"), "subset", "passed", BASE_SUB), run(c, "subset", "failed", BASE_SUB)],
             [run(b, "subset", "interrupted", BASE_SUB), run(c, "subset", "failed", BASE_SUB)],
         ):
-            self.assertEqual(server.builds(CFG, probes + runs, IMAGES, c)[0], "pending", runs)
+            self.assertEqual(builds(CFG, probes + runs, IMAGES, c)[0], "pending", runs)
         # A NO STATUS baseline target doesn't excuse a candidate failure and
         # isn't counted: only baseline passes are the reference.
         runs = probes + [run(b, "subset", "failed", {"//a:test": "NO STATUS", "//b:test": "PASSED"}),
                          run(c, "subset", "failed", {"//a:test": "FAILED", "//b:test": "PASSED"})]
-        self.assertEqual(server.builds(CFG, runs, IMAGES, c)[:3:2], ("yes", "1/1"))
+        self.assertEqual(builds(CFG, runs, IMAGES, c), ("yes", 1, 1, []))
 
     def test_not_covered(self):
         c = COLS[1]
         runs = [run(c, "probe", "passed", checks=GOOD)]
-        self.assertEqual(server.builds({"subset": {}}, runs, IMAGES, c)[0], "not covered")
+        self.assertEqual(builds({"subset": {}}, runs, IMAGES, c)[0], "n/a")
 
 
 class ScheduleTest(unittest.TestCase):
@@ -243,6 +248,11 @@ class ScheduleTest(unittest.TestCase):
         self.assertEqual(oct(os.stat(path).st_mode & 0o777), "0o600")
         with open(path) as f:
             self.assertEqual(f.read(), "KEY")
+
+
+class ResolveBazelTest(unittest.TestCase):
+    def test_explicit(self):
+        self.assertEqual(server.resolve_bazel({"bazel": "/x/bazel"}, "/nonexistent"), "/x/bazel")
 
 
 class ConfigTest(unittest.TestCase):
@@ -343,10 +353,15 @@ class StoreAndUiTest(unittest.TestCase):
             with urllib.request.urlopen(base + path) as resp:
                 return resp.read().decode()
 
-        page = get("/")
-        self.assertIn("Protected from the eMudhra compromise?", page)
-        self.assertIn('<div class="a">YES</div>', page)
-        self.assertIn("1/1", page)
+        orig = server.GROUPS
+        server.GROUPS = {"ab": ["a", "b"], "none": []}
+        try:
+            page = get("/")
+        finally:
+            server.GROUPS = orig
+        self.assertIn("<th>eMudhra protected</th><th>ab</th><th>none</th>", page)
+        self.assertIn('<span class="yes">&#10003;</span> 1/1', page)
+        self.assertIn('<span class="na">n/a</span>', page)
         self.assertIn('http-equiv="refresh" content="30"', page)
         self.assertEqual(len(json.loads(get("/api/runs"))), 4)
         self.assertEqual(get("/logs/x.log?tail=1"), "line3\n")

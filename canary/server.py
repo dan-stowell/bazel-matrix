@@ -50,13 +50,29 @@ CANDIDATE_2204 = ("docker://gcr.io/flame-public/rbe-ubuntu22-04@sha256:"
 CANDIDATE_2404 = ("docker://gcr.io/flame-public/rbe-ubuntu24-04@sha256:"
                   "be9853fc45092d2cf2bda3abed30d22182881659a50bf35c7125161d7cfc8a75")
 
-# Popular rulesets, as projects of projects.txt, that pass on the baseline of
-# that release and arch with Bazel on this machine (see README.md, "The
-# subset"). Keys: "<release>" for amd64, "<release>/<arch>" otherwise; a
-# column without one is "not covered".
+# Popular rulesets, each with projects from projects.txt that build with
+# it: the ruleset module itself (when it isn't known-failing) and small
+# dependents (by the bazel_dep lines of their BCR MODULE.bazel). One column
+# per group on the page.
+GROUPS = {
+    "rules_go": ["rules_go", "gazelle", "rpmpack", "circl", "jsonnet_go", "brotli_go"],
+    "rules_python": ["rules_python", "abseil-py", "fire"],
+    "rules_java": ["javaparser", "javacc", "bazel_jar_jar", "stardoc"],
+    "rules_kotlin": ["rules_kotlin"],
+    "rules_rust": ["rules_rust", "rules_rust_mdbook", "gazelle_rust"],
+    "rules_js": ["aspect_rules_js", "aspect_rules_terser", "aspect_rules_esbuild", "rules_nodejs",
+                 "aspect_rules_rollup"],
+    "protobuf/grpc": ["protobuf", "zipkin-api", "bazel_worker_api", "rules_proto", "toolchains_protoc", "rules_buf"],
+    "rules_cc": ["rules_cc", "argparse", "cli11"],
+    "rules_oci": [],
+    "rules_pkg": ["rules_pkg", "rules_shar", "gotopt2"],
+    "rules_shell": ["rules_shell", "buildozer", "helly25_bashtest"],
+    "bazel_skylib": ["bazel_skylib", "bazel_features", "sha256.bzl"],
+}
+# The GROUPS projects that pass on the baseline of that release and arch
+# with Bazel on this machine (see README.md, "The subset"). Keys:
+# "<release>" for amd64, "<release>/<arch>" otherwise.
 SUBSETS = {}
-# Rulesets left out, and why (shown on the page).
-SUBSET_NOTES = []
 
 PROBE = "//canary:tls_probe_test"
 ARCHS = ["amd64", "arm64"]
@@ -74,7 +90,10 @@ def seed_config():
         "salt_inner": True,
         "step_timeout_s": DEFAULT_TIMEOUT,
         "cycle_pause_s": 60,
-        "bazel": "bazel",
+        # The Bazel binary; "" picks the one bazelisk downloaded for the
+        # clone's .bazelversion. Not `bazel`/`bb` on this VM: the bb CLI adds
+        # --remote_header=x-buildbuddy-api-key=<key> to Bazel's argv.
+        "bazel": "",
         "output_root": os.path.expanduser("~/canary-out"),
         "min_free_gb": 15,
         "images": [
@@ -285,49 +304,54 @@ def protected(runs, col):
     return ("pending", unsure, r) if unsure else ("yes", [], r)
 
 
-def builds(cfg, runs, images, col):
-    """("yes"|"no"|"pending"|"not covered", [reasons], "N/M" or "", details):
-    the probe's non-eMudhra checks pass, and every subset project that
-    passed on the same release+arch baseline (same subset, same repo
-    revision) also passes on the candidate."""
-    reasons, state = [], "yes"
-    pr = latest_complete(runs, col, "probe")
-    if pr is None:
-        state, reasons = "pending", ["no complete probe result yet"]
-    else:
-        other = {c: v for c, v in pr["probe"]["checks"].items() if not is_emudhra(c)}
-        bad = ["%s: %s" % (c, m) for c, (st, m) in sorted(other.items()) if st == "FAIL"]
-        unsure = ["%s %s: %s" % (st, c, m) for c, (st, m) in sorted(other.items()) if st not in ("PASS", "INFO", "FAIL")]
-        if bad:
-            state, reasons = "no", bad
-        elif unsure:
-            state, reasons = "pending", unsure
+def probe_others(runs, col):
+    """The probe's non-eMudhra checks that don't pass (FAIL or NETERR)."""
+    r = latest_complete(runs, col, "probe")
+    if r is None:
+        return None
+    return ["%s %s: %s" % (st, c, m) for c, (st, m) in sorted(r["probe"]["checks"].items())
+            if not is_emudhra(c) and st not in ("PASS", "INFO")]
+
+
+def compare_subset(cfg, runs, images, col):
+    """(pending reason or None, {target: (baseline status, candidate status)},
+    candidate run, baseline run): the newest complete subset run of the
+    column with a result for every configured target, paired with a complete
+    baseline run (same release and arch, same subset, same repo revision)."""
     subset = subset_of(cfg, col)
     if not subset:
-        return ("no" if state == "no" else "not covered"), reasons + ["no ruleset subset for this release and arch"], "", {}
+        return "no ruleset projects for this release and arch", {}, None, None
     targets = ["//%s:test" % p for p in subset]
     sub = latest_complete(runs, col, "subset", subset)
     if sub is None:
-        return ("no" if state == "no" else "pending"), reasons + ["ruleset builds not run yet"], "", {}
-    if any(t not in sub.get("targets", {}) for t in targets):
-        missing = [t for t in targets if t not in sub.get("targets", {})]
-        return ("no" if state == "no" else "pending"), reasons + ["no result for %s" % ", ".join(missing)], "", {}
+        return "not run yet", {}, None, None
+    missing = [t for t in targets if t not in sub.get("targets", {})]
+    if missing:
+        return "no result for %s" % ", ".join(missing), {}, sub, None
     bases = [b for b in columns(images) if b.get("role") == "baseline" and b.get("release") == col.get("release")
              and arch_of(b) == arch_of(col)]
     base = next((x for x in (latest_complete(runs, b, "subset", subset, rev=sub.get("rev")) for b in bases) if x), None)
     if base is None or any(t not in base.get("targets", {}) for t in targets):
-        return ("no" if state == "no" else "pending"), reasons + ["no complete baseline result at the same revision"], "", {}
-    reference = [t for t in targets if is_pass(base["targets"][t])]
-    ok = [t for t in reference if is_pass(sub["targets"][t])]
-    details = {t: (base["targets"][t], sub["targets"][t]) for t in targets}
-    if len(ok) < len(reference):
-        state = "no"
-        reasons = reasons + ["fails on the candidate but passes on the baseline: %s" % ", ".join(
-            t for t in reference if t not in ok)]
-    elif not reference:
-        state = "no" if state == "no" else "pending"
-        reasons = reasons + ["nothing passed on the baseline"]
-    return state, reasons, "%d/%d" % (len(ok), len(reference)), details
+        return "no complete baseline result at the same revision", {}, sub, None
+    return None, {t: (base["targets"][t], sub["targets"][t]) for t in targets}, sub, base
+
+
+def group_cell(cfg, pair, group):
+    """("yes"|"no"|"pending"|"n/a", ok, reference, [failing]) for a ruleset
+    group: its projects that passed on the baseline must pass on the candidate."""
+    pending, table = pair[0], pair[1]
+    projects = ["//%s:test" % p for p in group]
+    if pending is not None:
+        return ("n/a" if pending.startswith("no ruleset") else "pending"), 0, 0, [pending]
+    mine = [t for t in projects if t in table]
+    if not mine:
+        return "n/a", 0, 0, []
+    reference = [t for t in mine if is_pass(table[t][0])]
+    ok = [t for t in reference if is_pass(table[t][1])]
+    failing = [t for t in reference if t not in ok]
+    if not reference:
+        return "n/a", 0, 0, ["none passed on the baseline"]
+    return ("no" if failing else "yes"), len(ok), len(reference), failing
 
 
 # --- run store --------------------------------------------------------------
@@ -401,6 +425,26 @@ class Store:
 
 def now():
     return datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")
+
+
+def resolve_bazel(cfg, work):
+    """cfg["bazel"], or the bazelisk-downloaded Bazel matching work/.bazelversion."""
+    if cfg.get("bazel"):
+        return cfg["bazel"]
+    with open(os.path.join(work, ".bazelversion")) as f:
+        want = f.read().strip()
+    root = os.path.expanduser("~/.cache/bazelisk/downloads")
+    for dirpath, _, files in os.walk(root):
+        if "bazel" in files and dirpath.endswith("/bin"):
+            path = os.path.join(dirpath, "bazel")
+            try:
+                out = subprocess.run([path, "--version"], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+                                     timeout=30).stdout.decode()
+            except (OSError, subprocess.SubprocessError):
+                continue
+            if out.split() == ["bazel", want]:
+                return path
+    raise RuntimeError("no Bazel %s under %s; run bazelisk once in %s" % (want, root, work))
 
 
 def pid_alive(pid):
@@ -478,6 +522,7 @@ class Runner(threading.Thread):
                 raise RuntimeError("another server holds %s.lock" % self.work.rstrip("/"))
             with self.lock:
                 rev = self.prepare(cfg["repo_branch"])
+                cfg["bazel"] = resolve_bazel(cfg, self.work)
             for image, step in schedule(cfg):
                 if self.stopping.is_set():
                     return
@@ -667,37 +712,10 @@ def kill_group(proc, grace=30):
 
 # --- UI ---------------------------------------------------------------------
 
-CSS = """
-:root { color-scheme: light dark; --bg:#fff; --fg:#1b1b1b; --mut:#666; --line:#ddd; --card:#fafafa;
-  --yes:#1a7f37; --no:#cf222e; --pend:#9a6700; --yesbg:#dafbe1; --nobg:#ffebe9; --pendbg:#fff8c5; }
-@media (prefers-color-scheme: dark) { :root { --bg:#16181b; --fg:#e6e6e6; --mut:#9a9a9a; --line:#333; --card:#1e2125;
-  --yes:#3fb950; --no:#f85149; --pend:#d29922; --yesbg:#12261a; --nobg:#2d1416; --pendbg:#2b2411; } }
-body { background:var(--bg); color:var(--fg); font:15px/1.45 system-ui,sans-serif; margin:16px auto; max-width:1100px; padding:0 16px; }
-h1 { font-size:22px; margin:0 0 4px; } a { color:inherit; } .mut { color:var(--mut); font-size:13px; }
-.cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px; margin:16px 0; }
-.card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px; }
-.card h2 { font-size:16px; margin:0 0 10px; }
-.q { margin:10px 0; padding:10px; border-radius:8px; }
-.q .a { font-size:26px; font-weight:700; } .q .t { font-size:13px; }
-.yes { background:var(--yesbg); } .yes .a { color:var(--yes); }
-.no { background:var(--nobg); } .no .a { color:var(--no); }
-.pending, .not_covered { background:var(--pendbg); } .pending .a, .not_covered .a { color:var(--pend); }
-details { margin:6px 0; font-size:13px; } summary { cursor:pointer; }
-table { border-collapse:collapse; font-size:13px; } td, th { border:1px solid var(--line); padding:2px 6px; text-align:left; }
-ul { margin:4px 0; padding-left:18px; } code { font-size:12px; }
-"""
-
-PROTECT_TEXT = {
-    "yes": "This image rejects certificates that chain to the eMudhra roots.",
-    "no": "This image still trusts eMudhra: see details.",
-    "pending": "No complete probe result for this image yet.",
-}
-BUILD_TEXT = {
-    "yes": "Every ruleset build that works on today's image also works on this one.",
-    "no": "Something that works on today's image breaks on this one: see details.",
-    "pending": "Waiting for complete results on this image and its baseline.",
-    "not covered": "No ruleset builds are checked for this release and arch.",
-}
+CSS = "body{font-family:sans-serif;margin:16px} table{border-collapse:collapse} " \
+      "td,th{border:1px solid #ccc;padding:4px 8px;text-align:left;vertical-align:top} " \
+      ".yes{color:#1a7f37} .no{color:#cf222e;font-weight:bold} .pending,.na{color:#777}"
+MARK = {"yes": "&#10003;", "no": "&#10007;", "pending": "pending", "n/a": "n/a"}
 
 
 def esc(s):
@@ -714,91 +732,74 @@ def elapsed(start, end=None):
     return "%dh%02dm%02ds" % (s // 3600, s % 3600 // 60, s % 60)
 
 
-def links(r):
-    if not r:
-        return ""
-    return " ".join('<a href="%s">invocation</a>' % esc(u) for u in r.get("invocations") or []) + \
-        ' <a href="/logs/%s">log</a>' % esc(r["log"])
+def first_link(r):
+    inv = (r or {}).get("invocations") or []
+    return inv[0] if inv else ("/logs/" + r["log"] if r else "")
 
 
-def lis(items):
-    return "<ul>%s</ul>" % "".join("<li>%s</li>" % esc(x) for x in items) if items else ""
-
-
-def answer(question, state, text, extra=""):
-    return '<div class="q %s"><div class="t">%s</div><div class="a">%s%s</div><div class="t">%s</div></div>' % (
-        esc(state.replace(" ", "_")), esc(question), esc(state.upper()), extra, esc(text))
-
-
-def card(cfg, runs, images, col):
-    p_state, p_why, p_run = protected(runs, col)
-    b_state, b_why, ratio, table = builds(cfg, runs, images, col)
-    out = ['<div class="card"><h2>Ubuntu %s candidate &middot; %s</h2>' % (esc(col.get("release")), esc(arch_of(col))),
-           answer("Protected from the eMudhra compromise?", p_state, PROTECT_TEXT[p_state]),
-           answer("Do popular rulesets still build?", b_state, BUILD_TEXT[b_state],
-                  " &nbsp;<span style=\"font-size:16px\">%s</span>" % esc(ratio) if ratio else "")]
-    det = []
-    det.append('<p class="mut">%s<br>%s</p>' % (esc(col["name"]), esc(col["ref"])))
-    if p_why:
-        det.append("<b>eMudhra</b>%s" % lis(p_why))
-    if b_why:
-        det.append("<b>Builds</b>%s" % lis(b_why))
-    if p_run:
-        checks = p_run["probe"]["checks"]
-        store = ["%s: %s" % (c, m) for c, (st, m) in sorted(checks.items()) if c.startswith("trust_store")]
-        if store:
-            det.append("<b>CA store vs baseline</b> (informational)%s" % lis(store))
-        bad = ["%s %s: %s" % (st, c, m) for c, (st, m) in sorted(checks.items()) if st != "PASS"]
-        det.append("<b>Probe</b>: %d checks%s %s" % (len(checks), ", not passing:" if bad else ", all pass", links(p_run)))
-        det.append(lis(bad))
-    if table:
-        det.append("<b>Rulesets</b> (baseline &rarr; candidate)<table>%s</table>" % "".join(
-            "<tr><td><code>%s</code></td><td>%s</td><td>%s</td></tr>" % (esc(t), esc(b), esc(c))
-            for t, (b, c) in sorted(table.items())))
-    out.append("<details><summary>details</summary>%s</details></div>" % "".join(det))
-    return "".join(out)
+def cell(state, text, href, title):
+    body = '<span class="%s">%s</span>%s' % ("na" if state == "n/a" else state, MARK.get(state, esc(state)),
+                                             (" " + esc(text)) if text else "")
+    if href:
+        body = '<a href="%s">%s</a>' % (esc(href), body)
+    return '<td title="%s">%s</td>' % (esc(title), body)
 
 
 def render(cfg, runs, current):
     images = cfg["images"]
     cols = columns(images)
     out = ['<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="30">',
-           '<meta name="viewport" content="width=device-width,initial-scale=1">',
            "<title>RBE image canary</title><style>%s</style></head><body>" % CSS,
            "<h1>RBE image canary</h1>",
-           '<p class="mut">The new RBE images, checked on BuildBuddy against today\'s images. '
-           "Refreshes every 30 s.</p>",
-           '<div class="cards">']
-    out += [card(cfg, runs, images, c) for c in cols if c.get("role") == "candidate"]
-    out.append("</div>")
+           "<p>Candidate images vs. today's images on BuildBuddy RBE; ruleset cells count projects that "
+           "pass on today's image and also on the candidate.</p>",
+           "<table><tr><th>Image</th><th>eMudhra protected</th>%s</tr>" % "".join(
+               "<th>%s</th>" % esc(g) for g in GROUPS)]
+    for c in cols:
+        if c.get("role") != "candidate":
+            continue
+        digest = c["ref"].rsplit("@sha256:", 1)[-1][:12]
+        others = probe_others(runs, c)
+        note = ("<br><span class=\"no\" title=\"%s\">probe: %d other checks fail</span>" % (
+            esc("; ".join(others)), len(others))) if others else ""
+        out.append('<tr><td>%s &middot; %s<br><code title="%s">%s</code>%s</td>' % (
+            esc(c.get("release")), esc(arch_of(c)), esc(c["ref"]), esc(digest), note))
+        state, why, pr = protected(runs, c)
+        out.append(cell(state, "", first_link(pr), "; ".join(why)))
+        pair = compare_subset(cfg, runs, images, c)
+        href = first_link(pair[2])
+        for g, projects in GROUPS.items():
+            st, ok, ref, failing = group_cell(cfg, pair, projects)
+            title = ("fails: " + ", ".join(failing)) if st == "no" else "; ".join(failing) or ", ".join(
+                t for t in ("//%s:test" % p for p in projects) if t in pair[1])
+            out.append(cell(st, "%d/%d" % (ok, ref) if ref else "", href if st in ("yes", "no") else "", title))
+        out.append("</tr>")
+    out.append("</table>")
     det = []
     if current:
-        det.append("<p>Running: %s %s %s, %s elapsed. <a href=\"/logs/%s?tail=200\">log tail</a></p>" % (
+        det.append('<p>Running: %s %s %s, %s. <a href="/logs/%s?tail=200">log</a></p>' % (
             esc(current["image"]["name"]), esc(arch_of(current["image"])), esc(current["step"]),
             elapsed(current["start"]), esc(current["log"])))
-    else:
-        det.append("<p>Idle between steps.</p>")
-    base_rows = []
+    det.append("<p>Baselines:</p><ul>")
     for b in cols:
-        if b.get("role") != "baseline":
-            continue
-        pr = latest_complete(runs, b, "probe")
-        sr = latest_complete(runs, b, "subset", subset_of(cfg, b)) if subset_of(cfg, b) else None
-        base_rows.append("<tr><td>%s %s</td><td>probe %s %s</td><td>%s</td></tr>" % (
-            esc(b["name"]), esc(arch_of(b)), esc(pr["status"]) if pr else "none", links(pr),
-            ("rulesets %d/%d passed %s" % (sum(1 for s in sr["targets"].values() if is_pass(s)), len(sr["targets"]),
-                                          links(sr))) if sr else "rulesets: none"))
-    det.append("<b>Baselines</b> (the reference)<table>%s</table>" % "".join(base_rows))
-    det.append("<p><b>Rulesets checked</b>: %s</p>" % "; ".join(
-        "%s: %s" % (esc(k), esc(", ".join(v) or "none")) for k, v in sorted(cfg["subset"].items())))
-    if SUBSET_NOTES:
-        det.append("<p><b>Not included</b>%s</p>" % lis(SUBSET_NOTES))
-    hist = []
-    for r in list(reversed(runs))[:30]:
-        hist.append("<tr><td>%s</td><td>%s %s</td><td>%s</td><td>%s</td><td>%s%s</td><td>%s</td></tr>" % (
-            esc(r["cycle"]), esc(r["image"]["name"]), esc(arch_of(r["image"])), esc(r["step"]), esc(r["start"]),
-            esc(r["status"]), (" (%s)" % esc(r["error"])) if r.get("error") else "", links(r)))
-    det.append("<b>Recent runs</b><table>%s</table>" % "".join(hist))
+        if b.get("role") == "baseline":
+            pr = latest_complete(runs, b, "probe")
+            sr = latest_complete(runs, b, "subset", subset_of(cfg, b)) if subset_of(cfg, b) else None
+            det.append('<li>%s %s <code>%s</code>: probe %s%s, projects %s%s</li>' % (
+                esc(b["name"]), esc(arch_of(b)), esc(b["ref"].rsplit("@sha256:", 1)[-1][:12]),
+                esc(pr["status"]) if pr else "none", (' <a href="%s">link</a>' % esc(first_link(pr))) if pr else "",
+                ("%d/%d passed" % (sum(1 for x in sr["targets"].values() if is_pass(x)), len(sr["targets"])))
+                if sr else "none", (' <a href="%s">link</a>' % esc(first_link(sr))) if sr else ""))
+    det.append("</ul><p>Projects per release/arch: %s</p>" % esc("; ".join(
+        "%s: %s" % (k, ", ".join(v) or "none") for k, v in sorted(cfg["subset"].items())) or "none"))
+    det.append("<p>Recent runs:</p><table>")
+    for r in list(reversed(runs))[:40]:
+        det.append('<tr><td>%s</td><td>%s %s</td><td>%s</td><td>%s</td><td>%s%s</td><td><a href="/logs/%s">log</a>'
+                   '%s</td></tr>' % (
+                       esc(r["cycle"]), esc(r["image"]["name"]), esc(arch_of(r["image"])), esc(r["step"]),
+                       esc(r["start"]), esc(r["status"]), (" (%s)" % esc(r["error"])) if r.get("error") else "",
+                       esc(r["log"]), "".join(' <a href="%s">invocation</a>' % esc(u) for u in r.get("invocations") or [])))
+    det.append("</table>")
     out.append("<details><summary>details</summary>%s</details></body></html>" % "".join(det))
     return "".join(out)
 
