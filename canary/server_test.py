@@ -264,6 +264,45 @@ class VerdictTest(unittest.TestCase):
         self.assertEqual(got[:3], ("yes", 1, 1))
         self.assertIn("infra (not counted): //a:test", got[3])
 
+    def test_retry_outcome(self):
+        targets = {"//a:test": "FAILED", "//b:test": "FAILED", "//c:test": "FAILED", "//d:test": "FAILED"}
+        again = {"//a:test": "PASSED", "//b:test": "FAILED", "//c:test": "FAILED"}
+        xml = {"//b:test": '<testcase name="//x:y"><failure/></testcase>', "//c:test": '<testcase name="infra_killed"/>'}
+        left = server.retry_outcome(targets, ["//a:test", "//b:test", "//c:test", "//d:test"], again, 3, False,
+                                    lambda t: xml.get(t, ""))
+        # Passed only on the retry: flaky. A fresh real failure: failed. Killed
+        # again, or no fresh result: infra.
+        self.assertEqual(targets["//a:test"], "FLAKY")
+        self.assertEqual(targets["//b:test"], "FAILED")
+        self.assertEqual(left, ["//c:test", "//d:test"])
+        # A retry that failed before running tests (exit 2, 37, ...) proves nothing.
+        targets = {"//b:test": "FAILED"}
+        self.assertEqual(server.retry_outcome(targets, ["//b:test"], {"//b:test": "FAILED"}, 37, False,
+                                              lambda t: xml.get(t, "")), ["//b:test"])
+        self.assertEqual(server.retry_outcome(targets, ["//a:test"], {"//a:test": "PASSED"}, 0, True,
+                                              lambda t: ""), ["//a:test"])
+
+    def test_baseline_infra_is_unknown(self):
+        b, c = COLS
+        runs = [run(b, "subset", "failed", {"//a:test": "INFRA", "//b:test": "PASSED"}),
+                run(c, "subset", "failed", {"//a:test": "FAILED", "//b:test": "PASSED"})]
+        got = server.group_cell(CFG, server.compare_subset(CFG, runs, IMAGES, c), ["a", "b"])
+        self.assertEqual(got[:3], ("pending", 1, 2))
+        self.assertIn("unknown (baseline infra): //a:test", got[3])
+        got = server.group_cell(CFG, server.compare_subset(CFG, runs, IMAGES, c), ["a"])
+        self.assertEqual(got[:3], ("pending", 0, 1))
+
+    def test_live_bazel(self):
+        d = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, d)
+        for pid, argv in (("1", ["bazel", "--output_base=/o/amd64-inner", "test"]),
+                          ("2", ["bazel(work)", "--output_base=/o/arm64"]),
+                          ("3", ["bazel", "--output_base=/elsewhere", "test"]), ("x", ["junk"])):
+            os.makedirs(os.path.join(d, pid))
+            with open(os.path.join(d, pid, "cmdline"), "wb") as f:
+                f.write("\0".join(argv).encode())
+        self.assertEqual(server.live_bazel("/o", proc=d), ["/o/amd64-inner"])
+
     def test_bep(self):
         lines = [json.dumps({"id": {"testResult": {"label": "//a:test", "run": 1}}, "testResult": {"status": "FAILED"}}),
                  json.dumps({"id": {"testSummary": {"label": "//a:test"}}, "testSummary": {"overallStatus": "FLAKY"}}),

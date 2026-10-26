@@ -280,8 +280,9 @@ def no_tests(output_base, targets):
 INFRA = "INFRA"
 
 
-def test_xml(output_base, target):
-    """The text of a //p:test target's test.xml, "" if missing."""
+def test_xml(output_base, target, since=0):
+    """The text of a //p:test target's test.xml, "" if missing or older than
+    `since` (a time)."""
     pkg, _, name = target[2:].partition(":")
     out_dir = os.path.join(output_base, "execroot", "_main", "bazel-out")
     try:
@@ -289,12 +290,39 @@ def test_xml(output_base, target):
     except OSError:
         return ""
     for c in configs:
+        path = os.path.join(out_dir, c, "testlogs", pkg, name, "test.xml")
         try:
-            with open(os.path.join(out_dir, c, "testlogs", pkg, name, "test.xml"), errors="replace") as f:
+            if os.path.getmtime(path) < since:
+                continue
+            with open(path, errors="replace") as f:
                 return f.read()
         except OSError:
             pass
     return ""
+
+
+def retry_outcome(targets, infra, again, code, aborted, xml):
+    """Updates targets with an infra retry's results; returns the targets
+    still to count as INFRA.
+
+    again: the retry's own summary results; code: its exit code; xml(t): the
+    target's test.xml written by the retry ("" if not). A pass only on the
+    retry is FLAKY; a fresh, non-infra failure is a failure; anything else
+    (no fresh result, the retry failing before running tests, interrupted)
+    stays INFRA, never a pass.
+    """
+    left = []
+    for t in infra:
+        st = again.get(t)
+        fresh = xml(t)
+        if st is not None and is_pass(st) and not aborted:
+            targets[t] = "FLAKY"
+        elif (st is not None and fresh and not aborted and code in (1, 3)
+              and not re.search(r'name="(infra_killed|wrapper_error)"', fresh)):
+            targets[t] = st
+        else:
+            left.append(t)
+    return left
 
 
 def infra_killed(output_base, targets):
@@ -450,15 +478,21 @@ def group_cell(cfg, pair, group):
         return ("running" if live else "pending"), len(ok), len(mine), [NO_BASELINE], done
     # Infra-killed projects count neither way: not as a candidate failure,
     # nor (on the baseline) as a failure that excuses the candidate.
-    infra = [t for t in mine if is_pass(table[t][0]) and table[t][1] == INFRA]
-    reference = [t for t in mine if is_pass(table[t][0]) and t not in infra]
+    infra = [t for t in mine if (is_pass(table[t][0]) or table[t][0] == INFRA) and table[t][1] == INFRA]
+    reference = [t for t in mine if (is_pass(table[t][0]) or table[t][0] == INFRA) and t not in infra]
     ok = [t for t in reference if is_pass(table[t][1])]
     running = [t for t in reference if table[t][1] is None]
-    failing = [t for t in reference if t not in ok and t not in running]
+    # Failing on the candidate, infra-killed on the baseline: unknown.
+    unknown = [t for t in reference if table[t][0] == INFRA and t not in ok and t not in running]
+    failing = [t for t in reference if t not in ok and t not in running and t not in unknown]
     done = len(reference) - len(running)
     notes = ["infra (not counted): " + ", ".join(infra)] if infra else []
+    if unknown:
+        notes.append("unknown (baseline infra): " + ", ".join(unknown))
     if not reference:
         return ("pending", 0, 0, notes, 0) if infra else ("n/a", 0, 0, ["none passed on the baseline"], 0)
+    if unknown and not failing and not running and not live:
+        return "pending", len(ok), len(reference), notes, done
     if running or live:
         # Not green until the run's final summary is in.
         return ("no" if failing else "running"), len(ok), len(reference), failing + (
@@ -559,6 +593,27 @@ def resolve_bazel(cfg, work):
     raise RuntimeError("no Bazel %s under %s; run bazelisk once in %s" % (want, root, work))
 
 
+def live_bazel(output_root, proc="/proc"):
+    """This server's output bases with a Bazel client still running (a
+    command in progress: an old server's step, or its shutdown)."""
+    bases = {os.path.join(output_root, a + sfx) for a in ARCHS for sfx in ("", "-inner")}
+    busy = set()
+    for pid in os.listdir(proc):
+        if not pid.isdigit():
+            continue
+        try:
+            with open(os.path.join(proc, pid, "cmdline"), "rb") as f:
+                argv = f.read().decode("utf-8", "replace").split("\0")
+        except OSError:
+            continue
+        if argv and argv[0].startswith("bazel("):
+            continue  # a Bazel server (idle ones stay up), not a client
+        for a in argv:
+            if a.startswith("--output_base=") and a.split("=", 1)[1] in bases:
+                busy.add(a.split("=", 1)[1])
+    return sorted(busy)
+
+
 def pid_alive(pid):
     try:
         os.kill(pid, 0)
@@ -635,6 +690,13 @@ class Runner(threading.Thread):
                 self.stopping.wait(10)
                 return
             self.store.compact()  # under the lock: no other server is appending
+            busy = live_bazel(cfg["output_root"])
+            if busy:
+                # An old server's Bazel is still shutting down: don't reset
+                # the workspace under it.
+                print("waiting for Bazel servers on %s" % ", ".join(busy), file=sys.stderr)
+                self.stopping.wait(10)
+                return
             with self.lock:
                 rev = self.prepare(cfg["repo_branch"])
                 cfg["bazel"] = resolve_bazel(cfg, self.work)
@@ -829,16 +891,19 @@ class Runner(threading.Thread):
                     with open(log_path, "a") as log:
                         log.write("\n=== canary: retrying infra-killed %s\n" % " ".join(infra))
                         log.flush()
-                        start = log.tell()
+                        start, began = log.tell(), time.time()
                         code2, timed_out = self.invoke(rec, retry, env, key, log, log_path, deadline)
                     with open(log_path, errors="replace") as f:
                         f.seek(start)
-                        targets.update(target_results(f.read(), set(infra)))
-                    infra = infra_killed(output_base, [t for t in infra if not is_pass(targets.get(t))])
-                    if all(is_pass(targets.get(t)) or t in infra for t in wanted):
-                        code = 0  # only infra kills, if anything, are left
+                        again = target_results(f.read(), set(infra))
+                    infra = retry_outcome(targets, infra, again, code2, timed_out or self.stopping.is_set(),
+                                          lambda t: test_xml(output_base, t, since=began))
+                    # The step's exit: failed if any real failure is left.
+                    real = [t for t in wanted if not is_pass(targets.get(t)) and targets.get(t) != INFRA]
+                    code = 0 if not real else (code if code in (1, 3) else 3)
                 for t in infra:
                     targets[t] = INFRA
+                targets = {t: st for t, st in targets.items() if st is not None}
             if timed_out or self.stopping.is_set():
                 # The Bazel server may still run the build; stop it.
                 subprocess.run([cfg["bazel"], "--output_base=" + output_base, "shutdown"],
@@ -1114,10 +1179,21 @@ def main(argv=None):
     signal.signal(signal.SIGTERM, shutdown)
     signal.signal(signal.SIGINT, shutdown)
     runner.start()
+    pidfile = os.path.join(args.data_dir, "server.pid")
+    with open(pidfile, "w") as f:
+        f.write("%d\n" % os.getpid())  # for canary/restart.sh
     print("serving on http://%s:%d" % (args.host, args.port), file=sys.stderr)
     server.serve_forever()
     server.server_close()
-    runner.join(120)  # lets the running step record its end
+    try:
+        with open(pidfile) as f:
+            if f.read().strip() == str(os.getpid()):
+                os.remove(pidfile)
+    except OSError:
+        pass
+    # Hold the work dir's lock (this process) until the running step and its
+    # Bazel shutdown are done: a 30 s kill grace plus a 300 s shutdown.
+    runner.join(900)
 
 
 if __name__ == "__main__":
