@@ -153,81 +153,68 @@ GOOD = {"emudhra/fixture": ["PASS", "rejected"], "host/x": ["PASS", "ok"],
 BASE_SUB = {"//a:test": "PASSED", "//b:test": "FAILED"}
 
 
-def builds(cfg, runs, images, col, group=("a", "b"), live=None):
-    return server.group_cell(cfg, server.compare_subset(cfg, runs, images, col, live), list(group))[:4]
+def table(runs, col, targets=("//a:test", "//b:test"), lives=(), cfg=None):
+    return server.project_table(cfg or CFG, runs, col, list(targets), lives)
 
 
 class VerdictTest(unittest.TestCase):
     def test_yes(self):
         b, c = COLS
         runs = [run(b, "probe", "passed", checks=GOOD, expect="trusted"), run(c, "probe", "passed", checks=GOOD),
-                run(b, "subset", "failed", BASE_SUB), run(c, "subset", "failed", BASE_SUB)]
+                run(b, "batch", "failed", BASE_SUB), run(c, "batch", "failed", BASE_SUB)]
         self.assertEqual(server.protected(runs, c)[:2], ("yes", []))
-        # //b:test fails on the baseline too: not counted.
-        self.assertEqual(builds(CFG, runs, IMAGES, c), ("yes", 1, 1, []))
+        t = table(runs, c)
+        # //b:test fails on the baseline too: a failure, not a regression.
+        self.assertEqual([server.kind(*t[x][:2]) for x in sorted(t)], ["pass", "fail"])
+        self.assertEqual(server.tally(t, sorted(t))["regression"], 0)
         self.assertEqual(server.probe_others(runs, c), [])
+        self.assertEqual(server.ref_label(t), "vs baseline")
 
     def test_no(self):
         b, c = COLS
         bad = dict(GOOD, **{"emudhra/fixture": ["FAIL", "still verifies"], "host/x": ["FAIL", "curl 60"]})
-        runs = [run(c, "probe", "passed", checks=bad), run(b, "subset", "passed", {"//a:test": "PASSED", "//b:test": "PASSED"}),
-                run(c, "subset", "failed", {"//a:test": "FAILED", "//b:test": "PASSED"})]
+        runs = [run(c, "probe", "passed", checks=bad), run(b, "batch", "passed", {"//a:test": "PASSED", "//b:test": "PASSED"}),
+                run(c, "batch", "failed", {"//a:test": "FAILED", "//b:test": "PASSED"})]
         self.assertEqual(server.protected(runs, c)[:2], ("no", ["emudhra/fixture: still verifies"]))
-        self.assertEqual(builds(CFG, runs, IMAGES, c), ("no", 1, 2, ["//a:test"]))
-        self.assertEqual(builds(CFG, runs, IMAGES, c, group=["b"]), ("yes", 1, 1, []))
-        self.assertEqual(builds(CFG, runs, IMAGES, c, group=["zzz"])[0], "n/a")
+        n = server.tally(table(runs, c), ["//a:test", "//b:test", "//zzz:test"])
+        self.assertEqual((n["regression"], n["ok"], n["total"]), (1, 1, 2))
         self.assertEqual(server.probe_others(runs, c), ["FAIL host/x: curl 60"])
 
-    def test_pending(self):
+    def test_reference(self):
         b, c = COLS
-        # Nothing yet.
-        self.assertEqual(server.protected([], c)[0], "pending")
-        self.assertEqual(builds(CFG, [], IMAGES, c)[0], "pending")
-        self.assertIsNone(server.probe_others([], c))
-        # An interrupted probe, or one without a complete summary, proves nothing.
-        runs = [run(c, "probe", "interrupted", checks=GOOD), run(c, "probe", "error", checks=None)]
-        self.assertEqual(server.protected(runs, c)[0], "pending")
-        # A NETERR eMudhra check is pending, not yes.
-        runs = [run(c, "probe", "failed", checks=dict(GOOD, **{"emudhra/x": ["NETERR", "timeout"]}))]
-        self.assertEqual(server.protected(runs, c)[0], "pending")
-        # A missing target result, a baseline at another revision, an older
-        # subset config, or another digest: pending.
-        probes = [run(c, "probe", "passed", checks=GOOD)]
-        for runs in (
-            [run(b, "subset", "passed", BASE_SUB), run(c, "subset", "failed", {"//a:test": "PASSED"})],
-            [run(b, "subset", "passed", BASE_SUB), run(c, "subset", "failed", BASE_SUB, subset=("a",))],
-            [run(c, "subset", "interrupted", BASE_SUB)],
-        ):
-            self.assertEqual(builds(CFG, probes + runs, IMAGES, c)[0], "pending", runs)
-        # Without a complete baseline run at the same revision and digest:
-        # the candidate's counts, but no verdict.
-        for runs in (
-            [run(b, "subset", "passed", BASE_SUB, rev="r0"), run(c, "subset", "failed", BASE_SUB)],
-            [run(dict(b, ref="old"), "subset", "passed", BASE_SUB), run(c, "subset", "failed", BASE_SUB)],
-            [run(b, "subset", "interrupted", BASE_SUB), run(c, "subset", "failed", BASE_SUB)],
-        ):
-            self.assertEqual(builds(CFG, probes + runs, IMAGES, c), ("pending", 1, 2, [server.NO_BASELINE]), runs)
-        # A NO STATUS baseline target doesn't excuse a candidate failure and
-        # isn't counted: only baseline passes are the reference.
-        runs = probes + [run(b, "subset", "failed", {"//a:test": "NO STATUS", "//b:test": "PASSED"}),
-                         run(c, "subset", "failed", {"//a:test": "FAILED", "//b:test": "PASSED"})]
-        self.assertEqual(builds(CFG, runs, IMAGES, c), ("yes", 1, 1, []))
+        cand = [run(c, "batch", "failed", {"//a:test": "FAILED", "//b:test": "PASSED"})]
+        # 22.04 amd64 without a baseline run: the matrix record says it passes.
+        t = table(cand, c)
+        self.assertEqual(t["//a:test"][:2], (server.MATRIX, "FAILED"))
+        self.assertEqual(server.kind(*t["//a:test"][:2]), "regression")
+        self.assertEqual(server.ref_label(t), "vs matrix record")
+        # Elsewhere: baseline pending, a failure but no regression.
+        imgs = [dict(im, release="24.04") for im in IMAGES]
+        b4, c4 = server.columns(imgs)
+        t = table([run(c4, "batch", "failed", {"//a:test": "FAILED"})], c4, cfg=dict(CFG, images=imgs))
+        self.assertEqual(server.kind(*t["//a:test"][:2]), "fail")
+        self.assertEqual(server.kind(*t["//b:test"][:2]), "pending")
+        self.assertEqual(server.ref_label(t), "baseline pending")
+        # A baseline at another revision or digest, or interrupted, isn't the reference.
+        for base in (run(b, "batch", "failed", {"//a:test": "FAILED"}, rev="r0"),
+                     run(dict(b, ref="old"), "batch", "failed", {"//a:test": "FAILED"}),
+                     run(b, "batch", "interrupted", {"//a:test": "FAILED"})):
+            self.assertEqual(table([base] + cand, c)["//a:test"][0], server.MATRIX, base)
+        # Older candidate results at another revision than the newest run: pending.
+        t = table(cand + [run(b, "probe", "passed", checks=GOOD, rev="r2")], c)
+        self.assertEqual(t["//a:test"][1], None)
 
     def test_live(self):
         b, c = COLS
-        base = [run(b, "subset", "passed", {"//a:test": "PASSED", "//b:test": "PASSED"})]
-        cur = run(c, "subset", "running", {"//a:test": "PASSED"})
-        got = server.group_cell(CFG, server.compare_subset(CFG, base, IMAGES, c, cur), ["a", "b"])
-        self.assertEqual(got, ("running", 1, 2, ["running: //b:test"], 1))
-        # No baseline yet: running, with the counts so far.
-        self.assertEqual(server.group_cell(CFG, server.compare_subset(CFG, [], IMAGES, c, cur), ["a", "b"]),
-                         ("running", 1, 2, [server.NO_BASELINE], 1))
-        # Every target done, but no final summary yet: still not green.
-        cur["targets"]["//b:test"] = "PASSED"
-        self.assertEqual(server.group_cell(CFG, server.compare_subset(CFG, base, IMAGES, c, cur), ["a", "b"])[0],
-                         "running")
-        cur["targets"]["//b:test"] = "FAILED"
-        self.assertEqual(server.group_cell(CFG, server.compare_subset(CFG, base, IMAGES, c, cur), ["a", "b"])[0], "no")
+        base = [run(b, "batch", "passed", {"//a:test": "PASSED", "//b:test": "PASSED"})]
+        old = run(c, "batch", "failed", {"//a:test": "FAILED", "//b:test": "FAILED"})
+        cur = run(c, "batch", "running", {"//a:test": "PASSED"})
+        t = table(base + [old], c, lives=[cur])
+        self.assertEqual([server.kind(*t[x][:2]) for x in sorted(t)], ["pass", "running"])
+        # The newest finished batch with a result decides, per project.
+        newer = run(c, "batch", "passed", {"//a:test": "PASSED"}, subset=("a",))
+        t = table(base + [old, newer], c)
+        self.assertEqual([server.kind(*t[x][:2]) for x in sorted(t)], ["pass", "regression"])
 
     def test_no_tests(self):
         d = tempfile.mkdtemp()
@@ -252,17 +239,12 @@ class VerdictTest(unittest.TestCase):
                 f.write(xml)
         self.assertEqual(server.infra_killed(d, ["//a:test", "//b:test", "//c:test", "//d:test"]),
                          ["//a:test", "//b:test"])
-        # An infra kill on the candidate isn't a failure; on the baseline it
-        # doesn't excuse the candidate.
-        runs = [run(b, "subset", "failed", {"//a:test": "PASSED", "//b:test": "INFRA"}),
-                run(c, "subset", "failed", {"//a:test": "INFRA", "//b:test": "FAILED"})]
-        got = server.group_cell(CFG, server.compare_subset(CFG, runs, IMAGES, c), ["a", "b"])
-        self.assertEqual(got[0], "pending")
-        runs = [run(b, "subset", "passed", {"//a:test": "PASSED", "//b:test": "PASSED"}),
-                run(c, "subset", "failed", {"//a:test": "INFRA", "//b:test": "PASSED"})]
-        got = server.group_cell(CFG, server.compare_subset(CFG, runs, IMAGES, c), ["a", "b"])
-        self.assertEqual(got[:3], ("yes", 1, 1))
-        self.assertIn("infra (not counted): //a:test", got[3])
+        # An infra kill on the candidate is neither a pass nor a failure; one
+        # on the baseline doesn't make a candidate failure a regression.
+        runs = [run(b, "batch", "failed", {"//a:test": "PASSED", "//b:test": "INFRA"}),
+                run(c, "batch", "failed", {"//a:test": "INFRA", "//b:test": "FAILED"})]
+        t = table(runs, c)
+        self.assertEqual([server.kind(*t[x][:2]) for x in sorted(t)], ["infra", "fail"])
 
     def test_retry_outcome(self):
         targets = {"//a:test": "FAILED", "//b:test": "FAILED", "//c:test": "FAILED", "//d:test": "FAILED"}
@@ -281,16 +263,6 @@ class VerdictTest(unittest.TestCase):
                                               lambda t: xml.get(t, "")), ["//b:test"])
         self.assertEqual(server.retry_outcome(targets, ["//a:test"], {"//a:test": "PASSED"}, 0, True,
                                               lambda t: ""), ["//a:test"])
-
-    def test_baseline_infra_is_unknown(self):
-        b, c = COLS
-        runs = [run(b, "subset", "failed", {"//a:test": "INFRA", "//b:test": "PASSED"}),
-                run(c, "subset", "failed", {"//a:test": "FAILED", "//b:test": "PASSED"})]
-        got = server.group_cell(CFG, server.compare_subset(CFG, runs, IMAGES, c), ["a", "b"])
-        self.assertEqual(got[:3], ("pending", 1, 2))
-        self.assertIn("unknown (baseline infra): //a:test", got[3])
-        got = server.group_cell(CFG, server.compare_subset(CFG, runs, IMAGES, c), ["a"])
-        self.assertEqual(got[:3], ("pending", 0, 1))
 
     def test_live_bazel(self):
         d = tempfile.mkdtemp()
@@ -317,32 +289,90 @@ class VerdictTest(unittest.TestCase):
         state, why, _ = server.protected(runs, c)
         self.assertEqual(state, "pending")
         self.assertTrue(why[0].startswith("last: error (incomplete), "), why)
-        runs = [run(b, "subset", "passed", BASE_SUB), run(c, "subset", "passed", BASE_SUB),
-                run(c, "subset", "timeout", {})]
-        self.assertEqual(builds(CFG, runs, IMAGES, c)[0], "pending")
         # Results from an older repo revision than the current cycle's: pending.
         runs = [run(c, "probe", "passed", checks=GOOD, rev="r0"), run(b, "probe", "passed", checks=GOOD, rev="r1")]
         self.assertEqual(server.protected(runs, c)[0], "pending")
 
-    def test_not_covered(self):
-        c = COLS[1]
-        runs = [run(c, "probe", "passed", checks=GOOD)]
-        self.assertEqual(builds({"subset": {}}, runs, IMAGES, c)[0], "n/a")
+
+PROJECTS_TXT = """# comment
+zlib
+  -//x/...  reason
+grpc@1.2
+  known-failing test  reason
+abseil-cpp
+rules_go
+  bazel 8.4.2  pinned
+gazelle_ext
+fp16
+rules_weird
+"""
+DEPS = {"zlib": ["rules_cc"], "abseil-cpp": ["googletest"], "googletest": ["rules_cc"], "rules_go": ["rules_cc"],
+        "gazelle_ext": ["rules_go"], "fp16": [], "rules_weird": ["toolchains_llvm", "rules_cc"], "grpc": ["rules_cc"]}
+
+
+class TierTest(unittest.TestCase):
+    def test_parse_projects(self):
+        got = server.parse_projects(PROJECTS_TXT)
+        self.assertEqual([p["name"] for p in got],
+                         ["zlib", "grpc", "abseil-cpp", "rules_go", "gazelle_ext", "fp16", "rules_weird"])
+        self.assertTrue(got[1]["known_failing"])
+        self.assertEqual(got[3]["bazel"], "8.4.2")
+        self.assertEqual(server.module_deps('bazel_dep(name = "a", version = "1")\nbazel_dep(\n  name="b", '
+                                            'dev_dependency=True)\nbazel_dep(name = "a", version = "2")'), ["a", "b"])
+
+    def test_tiers(self):
+        names = ["zlib", "abseil-cpp", "googletest", "rules_go", "gazelle_ext", "fp16", "rules_weird", "lib_on_llvm"]
+        got = server.tiers(names, dict(DEPS, lib_on_llvm=["rules_cc", "toolchains_llvm"]))
+        self.assertEqual({n: t for n, (t, _) in got.items()}, {
+            # rules_cc, or a C/C++ library (googletest) that uses it.
+            "zlib": 1, "abseil-cpp": 1, "googletest": 1,
+            # A popular ruleset (not tier 1, though it uses rules_cc), and its dependents.
+            "rules_go": 2, "gazelle_ext": 2,
+            # No deps (native cc rules can't be seen); a hermetic C++ toolchain
+            # (on a popular ruleset: tier 2).
+            "fp16": 3, "rules_weird": 2, "lib_on_llvm": 2})
+        self.assertIn("rules_cc", got["zlib"][1])
+        self.assertIn("googletest", got["abseil-cpp"][1])
+        self.assertEqual(server.tiers(["x"], {"x": ["toolchains_llvm"]})["x"][0], 3)
+
+    def test_batches(self):
+        projects = server.parse_projects(PROJECTS_TXT)
+        tier_of = server.tiers([p["name"] for p in projects], DEPS)
+        got = server.batches(projects, tier_of, "amd64", 2)
+        # Not known-failing (grpc); by tier, then name, in chunks.
+        self.assertEqual(got, [(1, 0, ["abseil-cpp", "zlib"]), (2, 0, ["gazelle_ext", "rules_go"]),
+                               (2, 1, ["rules_weird"]), (3, 0, ["fp16"])])
+        # arm64 skips the project pinned to a Bazel without an arm64 binary.
+        self.assertEqual(server.batches(projects, tier_of, "arm64", 2)[1], (2, 0, ["gazelle_ext", "rules_weird"]))
 
 
 class ScheduleTest(unittest.TestCase):
     def test_order_and_commands(self):
         images = [
-            {"name": "b22", "ref": "r", "role": "baseline", "release": "22.04"},
-            {"name": "c22", "ref": "r", "role": "candidate", "release": "22.04", "archs": ["amd64"]},
+            {"name": "b22", "ref": "r", "role": "baseline", "release": "22.04", "archs": ["amd64"]},
+            {"name": "c22", "ref": "r", "role": "candidate", "release": "22.04"},
+            {"name": "c24", "ref": "r4", "role": "candidate", "release": "24.04", "archs": ["amd64"]},
         ]
-        cfg = {"images": images, "subset": {"22.04": ["zlib"], "22.04/arm64": ["rules_go"]},
-               "salt_inner": True, "bazel": "bazel", "output_root": "/out"}
-        got = [(c["name"], c["arch"], step) for c, step in server.schedule(cfg)]
+        cfg = {"images": images, "salt_inner": True, "bazel": "bazel", "output_root": "/out", "batch_size": 1,
+               "jobs": 150}
+        projects = server.parse_projects("a\nb\nc\n  bazel 8.4.2  x\n")
+        tier_of = {"a": (1, ""), "b": (1, ""), "c": (2, "")}
+        got = [[(c["name"], c["arch"], st, b and b[:2]) for c, st, b in g]
+               for g in server.schedule(cfg, projects, tier_of)]
         self.assertEqual(got, [
-            ("c22", "amd64", "probe"), ("c22", "amd64", "subset"), ("b22", "amd64", "probe"),
-            ("b22", "arm64", "probe"), ("b22", "amd64", "subset"), ("b22", "arm64", "subset"),
+            # Candidate probes, an image's archs at once.
+            [("c22", "amd64", "probe", None), ("c22", "arm64", "probe", None)], [("c24", "amd64", "probe", None)],
+            # Tier 1, batch by batch across the images; then tier 2 (c isn't on arm64).
+            [("c22", "amd64", "batch", (1, 0)), ("c22", "arm64", "batch", (1, 0))],
+            [("c24", "amd64", "batch", (1, 0))],
+            [("c22", "amd64", "batch", (1, 1)), ("c22", "arm64", "batch", (1, 1))],
+            [("c24", "amd64", "batch", (1, 1))],
+            [("c22", "amd64", "batch", (2, 0))], [("c24", "amd64", "batch", (2, 0))],
+            # Then the baselines.
+            [("b22", "amd64", "probe", None)], [("b22", "amd64", "batch", (1, 0))],
+            [("b22", "amd64", "batch", (1, 1))], [("b22", "amd64", "batch", (2, 0))],
         ])
+        self.assertEqual(len(server.schedule(dict(cfg, parallel_archs=False), projects, tier_of)), 15)
         runner = server.Runner("/nonexistent", "/w", None)
         rbe = ["--config=remote-minimal", "--credential_helper=*.buildbuddy.io=/w/tools/buildbuddy_credential_helper.py",
                "--nocache_test_results"]
@@ -352,17 +382,43 @@ class ScheduleTest(unittest.TestCase):
             "--remote_default_exec_properties=Arch=arm64", "--test_output=all", "--test_env=CANARY_EXPECT=trusted"])
         self.assertIn("--test_env=CANARY_EXPECT=distrusted",
                       runner.command(cfg, 7, dict(images[1], arch="amd64"), "probe"))
-        inner = ["--credential_helper=*.buildbuddy.io=/w/tools/remote_exec_credential_helper.py",
-                 "--nocache_test_results", "--flaky_test_attempts=2", "--remote_download_regex=.*/testlogs/.*/test\\.xml$"]
-        self.assertEqual(runner.command(cfg, 7, dict(images[0], arch="amd64"), "subset"), [
-            "bazel", "--output_base=/out/amd64-inner", "test", "//zlib:test", "--config=remote-minimal",
+        inner = ["--jobs=150", "--credential_helper=*.buildbuddy.io=/w/tools/remote_exec_credential_helper.py",
+                 "--nocache_test_results", "--flaky_test_attempts=2",
+                 "--remote_download_regex=.*/testlogs/.*/test\\.xml$"]
+        self.assertEqual(runner.command(cfg, 7, dict(images[0], arch="amd64"), "batch", ["zlib", "re2"]), [
+            "bazel", "--output_base=/out/amd64-inner", "test", "//zlib:test", "//re2:test", "--config=remote-minimal",
             "--config=inner-remote"] + inner + [
             "--build_event_json_file=/out/bep-amd64.json", "--//:inner_flags=--remote_instance_name=canary-7"])
-        self.assertEqual(runner.command(cfg, 7, arm, "subset"), [
+        self.assertEqual(runner.command(cfg, 7, arm, "batch", ["rules_go"]), [
             "bazel", "--output_base=/out/arm64-inner", "test", "//rules_go:test", "--config=remote-minimal",
             "--config=inner-remote-arm64"] + inner + [
             "--build_event_json_file=/out/bep-arm64.json", "--//:inner_flags=--remote_instance_name=canary-7"])
-        self.assertIsNone(runner.command(dict(cfg, subset={}), 7, arm, "subset"))
+        self.assertIsNone(runner.command(cfg, 7, arm, "batch", []))
+
+    def test_resume(self):
+        b, c = COLS
+        group = [(c, "probe", None)]
+        batch = [(c, "batch", (1, 0, ["a", "b", "x"]))]
+        runs = [run(c, "probe", "passed", checks=GOOD), run(c, "batch", "failed", {"//a:test": "FAILED"}),
+                run(c, "batch", "interrupted", {"//b:test": "PASSED"}),
+                run(b, "batch", "passed", {"//x:test": "PASSED"})]
+        # A finished probe and a project with a finished result this cycle at
+        # this rev are skipped; an interrupted run's results aren't.
+        self.assertEqual(server.remaining(runs, group + batch, "r1", 1), [(c, "batch", (1, 0, ["b", "x"]))])
+        # Another cycle or revision: everything again.
+        self.assertEqual(server.remaining(runs, group + batch, "r1", 2), group + batch)
+        self.assertEqual(server.remaining(runs, batch, "r0", 1), batch)
+
+    def test_cycles(self):
+        d = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, d)
+        store = server.Store(d)
+        self.assertEqual(store.resume_cycle(), 1)
+        store.append(run(COLS[0], "probe", "passed", checks=GOOD))
+        # Cycle 1 hasn't finished: a restart resumes it.
+        self.assertEqual(store.resume_cycle(), 1)
+        store.mark_cycle_done(1)
+        self.assertEqual(store.resume_cycle(), 2)
 
     def test_kill_group(self):
         import subprocess
@@ -487,16 +543,9 @@ class StoreAndUiTest(unittest.TestCase):
             with urllib.request.urlopen(base + path) as resp:
                 return resp.read().decode()
 
-        orig = server.GROUPS
-        server.GROUPS = {"ab": ["a", "b"], "none": []}
-        try:
-            page = get("/")
-        finally:
-            server.GROUPS = orig
-        self.assertIn("<th>eMudhra protected</th><th>ab</th><th>none</th>", page)
-        self.assertIn('<span class="yes">&#10003;</span> 1/1', page)
-        self.assertIn('<span class="na">n/a</span>', page)
-        self.assertIn('http-equiv="refresh" content="30"', page)
+        page = get("/")
+        self.assertIn("<th>eMudhra protected</th>", page)
+        self.assertIn('http-equiv="refresh" content="60"', page)
         self.assertEqual(len(json.loads(get("/api/runs"))), 4)
         self.assertEqual(get("/logs/x.log?tail=1"), "line3\n")
         for bad in ("/logs/../secret", "/logs/%2e%2e/secret", "/logs/..%2fsecret", "/logs/.x"):
@@ -505,15 +554,31 @@ class StoreAndUiTest(unittest.TestCase):
             self.assertEqual(e.exception.code, 404)
             e.exception.close()
 
-        # A project that passed only on the retry is shown as flaky.
-        self.store.append(run(c, "subset", "passed", {"//a:test": "FLAKY", "//b:test": "FAILED"}))
-        server.GROUPS = {"ab": ["a", "b"]}
+    def test_render(self):
+        b, c = COLS
+        info = (server.parse_projects("a\nb\nd\n"), {"a": (1, "C/C++ via rules_cc"), "b": (1, ""), "d": (2, "")})
+        runs = [run(c, "probe", "passed", checks=GOOD),
+                run(b, "batch", "failed", {"//a:test": "PASSED", "//b:test": "FAILED", "//d:test": "PASSED"}),
+                run(c, "batch", "failed", {"//a:test": "FAILED", "//b:test": "FLAKY"})]
+        orig = server.GROUPS
+        server.GROUPS = {"ab": ["a", "b"], "none": ["zz"]}
         try:
-            page = get("/")
+            page = server.render(CFG, runs, [], info)
         finally:
             server.GROUPS = orig
-        self.assertIn("1/1, 1 flaky (candidate only)", page)
-        self.assertIn("//a:test (only on the candidate)", page)
+        # Summary: tier 1 has a regression (//a) and a flaky pass; tier 2 is pending.
+        self.assertIn('1/2 ok, <span class="regression">1 regression</span>, <span class="flaky">1 flaky</span>', page)
+        self.assertIn('0/1 ok, <span class="pending">1 pending</span>', page)
+        self.assertIn("<td>vs baseline</td>", page)
+        self.assertIn('<span class="na">n/a</span>', page)
+        # Projects: the regression first, then the rest by tier.
+        rows = re.findall(r"<tr><td>([a-z])</td><td", page)
+        self.assertEqual(rows, ["a", "b", "d"])
+        self.assertIn(server.esc(server.TIER_HEURISTIC), page)
+        # A running batch shows its projects as running.
+        cur = run(c, "batch", "running", {}, subset=("d",))
+        page = server.render(CFG, runs, [cur], info)
+        self.assertIn('<span class="running">1 running</span>', page)
 
 
 if __name__ == "__main__":

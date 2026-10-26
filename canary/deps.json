@@ -1,0 +1,11341 @@
+{
+"abc": [
+"bazel_skylib",
+"platforms",
+"readline",
+"rules_cc",
+"rules_license",
+"zlib"
+],
+"abseil-cpp": [
+"bazel_skylib",
+"gloop",
+"google_benchmark",
+"googletest",
+"platforms",
+"rules_cc"
+],
+"abseil-py": [
+"rules_cc",
+"rules_python"
+],
+"ada-url": [
+"rules_cc"
+],
+"aexml": [
+"apple_support",
+"rules_swift"
+],
+"ahab": [
+"bazel_skylib",
+"buildifier_prebuilt",
+"llvm",
+"platforms",
+"protobuf",
+"rules_proto",
+"rules_rs"
+],
+"alsa_lib": [
+"bazel_skylib",
+"platforms",
+"rules_cc"
+],
+"amqp-cpp": [
+"bazel_skylib",
+"openssl",
+"platforms",
+"rules_cc",
+"rules_license"
+],
+"antlr4-cpp-runtime": [
+"abseil-cpp",
+"rules_cc"
+],
+"aom": [
+"bazel_skylib",
+"googletest",
+"highway",
+"libwebm",
+"libyuv",
+"platforms",
+"rules_cc",
+"rules_license",
+"rules_nasm",
+"rules_perl"
+],
+"apache_arrow": [
+"aws_sdk",
+"azure-core-cpp",
+"azure-identity-cpp",
+"azure-storage-blobs-cpp",
+"azure-storage-files-datalake-cpp",
+"bazel_skylib",
+"bzip2",
+"lz4",
+"platforms",
+"rapidjson",
+"rules_cc",
+"snappy",
+"thrift",
+"xsimd",
+"zlib",
+"zstd"
+],
+"ape": [
+"bazel_skylib",
+"download_utils",
+"hermetic_cc_toolchain",
+"platforms",
+"pre-commit",
+"pre-commit-hooks",
+"rules_license",
+"rules_python",
+"toolchain_utils"
+],
+"apilark": [
+"bazel_skylib",
+"rules_testing"
+],
+"apple_mig": [
+"llvm",
+"platforms",
+"rules_cc",
+"rules_shell"
+],
+"apple_rules_lint": [
+"bazel_skylib",
+"stardoc"
+],
+"apple_support": [
+"bazel_features",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"gazelle",
+"platforms",
+"protobuf",
+"rules_cc",
+"rules_go",
+"rules_shell",
+"stardoc"
+],
+"apriltag": [
+"rules_cc",
+"rules_license"
+],
+"ar_hosek_sky_model": [
+"rules_cc"
+],
+"aravis": [
+"bazel_skylib",
+"glib",
+"libxml2",
+"rules_libusb",
+"rules_license",
+"zlib"
+],
+"argparse": [
+"rules_cc"
+],
+"array_record": [
+"abseil-cpp",
+"abseil-py",
+"boringssl",
+"eigen",
+"googletest",
+"platforms",
+"protobuf",
+"pybind11_bazel",
+"riegeli",
+"rules_cc",
+"rules_proto",
+"rules_python"
+],
+"asc_swift": [
+"apple_support",
+"bazel_lib",
+"jq.bzl",
+"platforms",
+"rules_apple",
+"rules_cc",
+"rules_multirun",
+"rules_shell",
+"rules_swift"
+],
+"asio": [
+"openssl",
+"platforms",
+"rules_cc"
+],
+"asio-grpc": [
+"asio",
+"bazel_skylib",
+"boost.asio",
+"boost.coroutine",
+"boost.filesystem",
+"boost.interprocess",
+"boost.thread",
+"doctest",
+"googletest",
+"grpc",
+"protobuf",
+"rules_cc",
+"rules_license"
+],
+"aspect_bazel_lib": [
+"bazel_features",
+"bazel_lib",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"buildifier_prebuilt",
+"external_test_repo",
+"gazelle",
+"jq.bzl",
+"platforms",
+"rules_go",
+"rules_shell",
+"stardoc",
+"tar.bzl",
+"yq.bzl"
+],
+"aspect_gazelle_js": [
+"aspect_gazelle",
+"aspect_rules_js",
+"aspect_tools_telemetry",
+"bazel_lib",
+"gazelle",
+"llvm",
+"rules_go",
+"rules_rs",
+"with_cfg.bzl"
+],
+"aspect_gazelle_prebuilt": [
+"aspect_go_treesitter_grammars",
+"aspect_tools_telemetry",
+"bazel_skylib",
+"gazelle",
+"platforms"
+],
+"aspect_rules_aws": [
+"aspect_bazel_lib",
+"aspect_rules_py",
+"aspect_tools_telemetry",
+"bazel_skylib",
+"buildifier_prebuilt",
+"container_structure_test",
+"package_metadata",
+"platforms",
+"rules_oci",
+"rules_python"
+],
+"aspect_rules_cypress": [
+"aspect_rules_js",
+"aspect_rules_lint",
+"aspect_tools_telemetry",
+"bazel_lib",
+"bazel_skylib",
+"bazelrc-preset.bzl",
+"buildifier_prebuilt",
+"gazelle",
+"platforms",
+"rules_go",
+"rules_nodejs",
+"rules_shell"
+],
+"aspect_rules_esbuild": [
+"aspect_rules_js",
+"aspect_tools_telemetry",
+"bazel_lib",
+"bazel_skylib",
+"buildifier_prebuilt",
+"platforms",
+"rules_nodejs",
+"rules_shell",
+"stardoc"
+],
+"aspect_rules_jasmine": [
+"aspect_bazel_lib",
+"aspect_rules_js",
+"aspect_rules_lint",
+"aspect_tools_telemetry",
+"bazel_skylib",
+"buildifier_prebuilt",
+"platforms",
+"rules_nodejs"
+],
+"aspect_rules_jest": [
+"aspect_rules_js",
+"aspect_rules_lint",
+"aspect_tools_telemetry",
+"bazel_lib",
+"bazel_skylib",
+"bazelrc-preset.bzl",
+"buildifier_prebuilt",
+"platforms",
+"rules_go",
+"rules_nodejs",
+"rules_shell"
+],
+"aspect_rules_js": [
+"aspect_bazel_lib",
+"aspect_rules_lint",
+"aspect_tools_telemetry",
+"bazel_features",
+"bazel_lib",
+"bazel_skylib",
+"bazelrc-preset.bzl",
+"buildifier_prebuilt",
+"hermetic_launcher",
+"jq.bzl",
+"platforms",
+"protobuf",
+"rules_go",
+"rules_nodejs",
+"rules_shell",
+"tar.bzl",
+"yq.bzl"
+],
+"aspect_rules_js_rust_wasm_bindgen": [
+"aspect_rules_js",
+"bazel_skylib",
+"platforms",
+"rules_rust",
+"rules_rust_mdbook",
+"rules_rust_wasm_bindgen",
+"rules_shell",
+"stardoc"
+],
+"aspect_rules_lint": [
+"aspect_bazel_lib",
+"aspect_rules_js",
+"aspect_tools_telemetry",
+"bazel_features",
+"bazel_lib",
+"bazel_skylib",
+"bazelrc-preset.bzl",
+"diff.bzl",
+"gazelle",
+"jq.bzl",
+"platforms",
+"protobuf",
+"rules_buf",
+"rules_cc",
+"rules_go",
+"rules_java",
+"rules_multirun",
+"rules_multitool",
+"rules_nodejs",
+"rules_proto",
+"rules_python",
+"rules_shell"
+],
+"aspect_rules_lint_rust": [
+"aspect_rules_js",
+"aspect_rules_lint",
+"bazel_lib",
+"llvm",
+"platforms",
+"rules_go",
+"rules_rs"
+],
+"aspect_rules_lint_scala": [
+"aspect_rules_lint",
+"rules_java",
+"rules_scala"
+],
+"aspect_rules_oxc": [
+"aspect_rules_js",
+"aspect_tools_telemetry",
+"bazel_lib",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"buildifier_prebuilt",
+"gazelle",
+"platforms"
+],
+"aspect_rules_py": [
+"aspect_gazelle_prebuilt",
+"aspect_tools_telemetry",
+"bazel_env.bzl",
+"bazel_features",
+"bazel_lib",
+"bazel_skylib",
+"bazelrc-preset.bzl",
+"buildifier_prebuilt",
+"bzip2",
+"gazelle",
+"llvm",
+"platforms",
+"rules_cc",
+"rules_go",
+"rules_multitool",
+"rules_pkg",
+"rules_python",
+"rules_python_gazelle_plugin",
+"rules_rs",
+"rules_shell",
+"tar.bzl",
+"with_cfg.bzl",
+"xz",
+"zstd"
+],
+"aspect_rules_rollup": [
+"aspect_bazel_lib",
+"aspect_rules_js",
+"bazel_skylib",
+"buildifier_prebuilt",
+"platforms",
+"rules_nodejs",
+"stardoc"
+],
+"aspect_rules_swc": [
+"aspect_bazel_lib",
+"aspect_rules_js",
+"aspect_tools_telemetry",
+"bazel_skylib",
+"bazelrc-preset.bzl",
+"buildifier_prebuilt",
+"platforms",
+"rules_nodejs",
+"rules_shell"
+],
+"aspect_rules_terser": [
+"aspect_bazel_lib",
+"aspect_gazelle_prebuilt",
+"aspect_rules_js",
+"aspect_rules_lint",
+"aspect_tools_telemetry",
+"bazelrc-preset.bzl",
+"buildifier_prebuilt",
+"platforms",
+"rules_go",
+"rules_nodejs"
+],
+"aspect_rules_ts": [
+"aspect_bazel_lib",
+"aspect_rules_js",
+"aspect_rules_lint",
+"aspect_tools_telemetry",
+"bazel_skylib",
+"bazelrc-preset.bzl",
+"buildifier_prebuilt",
+"platforms",
+"protobuf",
+"rules_go",
+"rules_nodejs",
+"rules_proto",
+"rules_shell"
+],
+"aspect_rules_webpack": [
+"aspect_bazel_lib",
+"aspect_gazelle_prebuilt",
+"aspect_rules_js",
+"aspect_tools_telemetry",
+"bazel_lib",
+"bazel_skylib",
+"bazelrc-preset.bzl",
+"buildifier_prebuilt",
+"platforms",
+"rules_shell"
+],
+"aspect_tools_telemetry": [
+"bazel_lib",
+"bazel_skylib"
+],
+"assimp": [
+"bazel_skylib",
+"pugixml",
+"rapidjson",
+"rules_cc",
+"zlib"
+],
+"at-spi2-core": [
+"bazel_skylib",
+"glib",
+"platforms",
+"rules_autoconf",
+"rules_cc"
+],
+"au": [
+"bazel_skylib",
+"eigen",
+"fmt",
+"gazelle",
+"gcc_toolchain",
+"googletest",
+"platforms",
+"rules_cc",
+"rules_cuda",
+"rules_go",
+"rules_proto",
+"rules_python",
+"rules_shell",
+"toolchains_llvm"
+],
+"autosharding": [
+"googleapis",
+"protobuf"
+],
+"avro-cpp": [
+"boost.algorithm",
+"boost.crc",
+"boost.filesystem",
+"boost.iostreams",
+"boost.lexical_cast",
+"boost.math",
+"boost.program_options",
+"boost.random",
+"boost.regex",
+"boost.system",
+"boost.test",
+"bzip2",
+"fmt",
+"rules_cc"
+],
+"aw-backtrace": [
+"abseil-cpp",
+"bazel_skylib",
+"googletest",
+"lua",
+"platforms",
+"rules_cc"
+],
+"awk.bzl": [
+"aspect_bazel_lib",
+"bazel_skylib",
+"buildifier_prebuilt",
+"gawk",
+"package_metadata",
+"platforms",
+"rules_testing"
+],
+"aws-in-a-box": [
+"gazelle",
+"rules_go"
+],
+"aws-lc": [
+"bazel_skylib",
+"googletest",
+"platforms",
+"rules_autoconf",
+"rules_cc"
+],
+"aws_sdk": [
+"bazel_lib",
+"boringssl",
+"curl",
+"google_benchmark",
+"openssl",
+"opentelemetry-cpp",
+"platforms",
+"rules_cc",
+"rules_go",
+"rules_license",
+"tar.bzl"
+],
+"azure-core-cpp": [
+"bazel_skylib",
+"curl",
+"googletest",
+"openssl",
+"platforms",
+"rules_cc"
+],
+"azure-core-test-cpp": [
+"azure-core-cpp",
+"azure-identity-cpp",
+"googletest",
+"rules_cc"
+],
+"azure-identity-cpp": [
+"azure-core-cpp",
+"azure-core-test-cpp",
+"googletest",
+"openssl",
+"platforms",
+"rules_cc"
+],
+"azure-storage-blobs-cpp": [
+"azure-storage-common-cpp",
+"googletest",
+"platforms",
+"rules_cc"
+],
+"azure-storage-common-cpp": [
+"azure-core-cpp",
+"libxml2",
+"openssl",
+"platforms",
+"rules_cc"
+],
+"azure-storage-files-datalake-cpp": [
+"azure-storage-blobs-cpp",
+"googletest",
+"platforms",
+"rules_cc"
+],
+"babylon": [],
+"backward-cpp": [
+"rules_cc"
+],
+"bant": [
+"abseil-cpp",
+"bazel_skylib",
+"googletest",
+"re2",
+"rules_cc",
+"rules_license"
+],
+"basis_universal": [
+"bazel_skylib",
+"opencl-sdk",
+"platforms",
+"rules_cc",
+"zstd"
+],
+"bazel-diff": [
+"aspect_rules_lint",
+"buildifier_prebuilt",
+"llvm",
+"platforms",
+"protobuf",
+"rules_go",
+"rules_license",
+"rules_python",
+"rules_rs"
+],
+"bazel_bats": [
+"bazel_skylib",
+"rules_shell"
+],
+"bazel_cc_meta": [
+"bazel_skylib",
+"buildozer",
+"rules_cc",
+"rules_python",
+"rules_shell"
+],
+"bazel_ci_rules": [
+"apple_support",
+"bazel_features",
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_java"
+],
+"bazel_difftools": [
+"build_stack_rules_proto",
+"gazelle",
+"rules_go",
+"rules_proto"
+],
+"bazel_env.bzl": [
+"bazel_features",
+"bazel_skylib",
+"protobuf",
+"rules_cc",
+"rules_coreutils",
+"rules_shell",
+"stardoc"
+],
+"bazel_features": [
+"bazel_skylib",
+"protobuf"
+],
+"bazel_gomock": [
+"bazel_skylib",
+"gazelle",
+"rules_go"
+],
+"bazel_iwyu": [
+"aspect_rules_lint",
+"bazel_skylib",
+"buildifier_prebuilt",
+"platforms",
+"rules_bazel_integration_test",
+"rules_cc",
+"rules_go",
+"rules_shell"
+],
+"bazel_jar_jar": [
+"platforms",
+"rules_java",
+"rules_jvm_external",
+"rules_shell"
+],
+"bazel_lib": [
+"bazel_features",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"buildifier_prebuilt",
+"external_test_repo",
+"gazelle",
+"platforms",
+"rules_go",
+"rules_shell"
+],
+"bazel_linux_packages": [
+"bazel_lib",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"buildifier_prebuilt",
+"gazelle",
+"jq.bzl",
+"platforms",
+"rules_shell"
+],
+"bazel_paq": [
+"bazel_skylib",
+"rules_shell"
+],
+"bazel_skylib": [
+"platforms",
+"rules_license"
+],
+"bazel_skylib_gazelle_plugin": [
+"bazel_skylib",
+"gazelle",
+"rules_go",
+"rules_license"
+],
+"bazel_sonarqube": [
+"bazel_skylib",
+"rules_java",
+"stardoc"
+],
+"bazel_worker_api": [
+"protobuf"
+],
+"bazel_worker_java": [
+"bazel_worker_api",
+"protobuf",
+"rules_java",
+"rules_jvm_external"
+],
+"bazeldnf": [
+"bazel_features",
+"bazel_lib",
+"bazel_skylib",
+"platforms"
+],
+"bazelpods": [
+"apple_support",
+"rules_apple",
+"rules_cc",
+"rules_ios",
+"rules_swift",
+"rules_xcodeproj"
+],
+"bazelrc-preset.bzl": [
+"bazel_features",
+"bazel_lib",
+"bazel_skylib"
+],
+"behaviortree_cpp": [
+"bazel_skylib",
+"cpp-sqlite",
+"cppzmq",
+"flatbuffers",
+"googletest",
+"lexy",
+"libzmq",
+"magic_enum",
+"minicoro",
+"minitrace",
+"ncurses",
+"nlohmann_json",
+"platforms",
+"rules_cc",
+"rules_license",
+"tinyxml2"
+],
+"behaviortree_ros2": [
+"behaviortree_cpp",
+"boost.signals2",
+"com_github_mvukov_rules_ros2",
+"rules_cc",
+"rules_license",
+"websocketpp"
+],
+"binutils": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf",
+"sed",
+"zlib",
+"zstd"
+],
+"bison": [
+"bazel_skylib",
+"m4",
+"package_metadata",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf"
+],
+"blake3": [
+"bazel_skylib",
+"onetbb",
+"platforms",
+"rules_cc"
+],
+"blaze-math": [],
+"bliss": [
+"rules_cc"
+],
+"boost": [
+"boost.accumulators",
+"boost.algorithm",
+"boost.align",
+"boost.any",
+"boost.array",
+"boost.asio",
+"boost.assert",
+"boost.assign",
+"boost.atomic",
+"boost.beast",
+"boost.bimap",
+"boost.bind",
+"boost.bloom",
+"boost.callable_traits",
+"boost.charconv",
+"boost.chrono",
+"boost.circular_buffer",
+"boost.cobalt",
+"boost.compat",
+"boost.compute",
+"boost.concept_check",
+"boost.config",
+"boost.container",
+"boost.container_hash",
+"boost.context",
+"boost.contract",
+"boost.conversion",
+"boost.convert",
+"boost.core",
+"boost.coroutine",
+"boost.coroutine2",
+"boost.crc",
+"boost.date_time",
+"boost.describe",
+"boost.detail",
+"boost.dll",
+"boost.dynamic_bitset",
+"boost.endian",
+"boost.exception",
+"boost.fiber",
+"boost.filesystem",
+"boost.flyweight",
+"boost.foreach",
+"boost.format",
+"boost.function",
+"boost.function_types",
+"boost.functional",
+"boost.fusion",
+"boost.geometry",
+"boost.gil",
+"boost.graph",
+"boost.graph_parallel",
+"boost.hana",
+"boost.hash2",
+"boost.headers",
+"boost.heap",
+"boost.histogram",
+"boost.hof",
+"boost.icl",
+"boost.integer",
+"boost.interprocess",
+"boost.intrusive",
+"boost.io",
+"boost.iostreams",
+"boost.iterator",
+"boost.json",
+"boost.lambda",
+"boost.lambda2",
+"boost.leaf",
+"boost.lexical_cast",
+"boost.local_function",
+"boost.locale",
+"boost.lockfree",
+"boost.log",
+"boost.logic",
+"boost.math",
+"boost.metaparse",
+"boost.move",
+"boost.mp11",
+"boost.mpi",
+"boost.mpl",
+"boost.mqtt5",
+"boost.msm",
+"boost.multi_array",
+"boost.multi_index",
+"boost.multiprecision",
+"boost.mysql",
+"boost.nowide",
+"boost.numeric_conversion",
+"boost.numeric_interval",
+"boost.numeric_odeint",
+"boost.numeric_ublas",
+"boost.openmethod",
+"boost.optional",
+"boost.outcome",
+"boost.parameter",
+"boost.parameter_python",
+"boost.parser",
+"boost.pfr",
+"boost.phoenix",
+"boost.poly_collection",
+"boost.polygon",
+"boost.pool",
+"boost.predef",
+"boost.preprocessor",
+"boost.process",
+"boost.program_options",
+"boost.property_map",
+"boost.property_map_parallel",
+"boost.property_tree",
+"boost.proto",
+"boost.ptr_container",
+"boost.python",
+"boost.qvm",
+"boost.random",
+"boost.range",
+"boost.ratio",
+"boost.rational",
+"boost.redis",
+"boost.regex",
+"boost.safe_numerics",
+"boost.scope",
+"boost.scope_exit",
+"boost.serialization",
+"boost.signals2",
+"boost.smart_ptr",
+"boost.sort",
+"boost.spirit",
+"boost.stacktrace",
+"boost.statechart",
+"boost.static_assert",
+"boost.static_string",
+"boost.stl_interfaces",
+"boost.system",
+"boost.test",
+"boost.thread",
+"boost.throw_exception",
+"boost.timer",
+"boost.tokenizer",
+"boost.tti",
+"boost.tuple",
+"boost.type_erasure",
+"boost.type_index",
+"boost.type_traits",
+"boost.typeof",
+"boost.units",
+"boost.unordered",
+"boost.url",
+"boost.utility",
+"boost.uuid",
+"boost.variant",
+"boost.variant2",
+"boost.vmd",
+"boost.wave",
+"boost.winapi",
+"boost.xpressive",
+"boost.yap",
+"rules_license"
+],
+"boost.accumulators": [
+"boost",
+"boost.array",
+"boost.assert",
+"boost.circular_buffer",
+"boost.concept_check",
+"boost.config",
+"boost.core",
+"boost.fusion",
+"boost.iterator",
+"boost.mpl",
+"boost.numeric_conversion",
+"boost.numeric_ublas",
+"boost.parameter",
+"boost.preprocessor",
+"boost.range",
+"boost.serialization",
+"boost.static_assert",
+"boost.throw_exception",
+"boost.tuple",
+"boost.type_traits",
+"boost.typeof",
+"rules_cc"
+],
+"boost.algorithm": [
+"boost",
+"boost.array",
+"boost.assert",
+"boost.bind",
+"boost.concept_check",
+"boost.config",
+"boost.core",
+"boost.exception",
+"boost.function",
+"boost.iterator",
+"boost.mpl",
+"boost.range",
+"boost.regex",
+"boost.static_assert",
+"boost.throw_exception",
+"boost.tuple",
+"boost.type_traits",
+"boost.unordered",
+"rules_cc"
+],
+"boost.align": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.core",
+"boost.static_assert",
+"rules_cc"
+],
+"boost.any": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.throw_exception",
+"boost.type_index",
+"rules_cc"
+],
+"boost.array": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.static_assert",
+"boost.throw_exception",
+"rules_cc"
+],
+"boost.asio": [
+"bazel_skylib",
+"boost",
+"boost.align",
+"boost.assert",
+"boost.config",
+"boost.context",
+"boost.date_time",
+"boost.system",
+"boost.throw_exception",
+"boringssl",
+"openssl",
+"platforms",
+"rules_cc"
+],
+"boost.assert": [
+"boost",
+"boost.config",
+"rules_cc"
+],
+"boost.assign": [
+"boost",
+"boost.array",
+"boost.config",
+"boost.core",
+"boost.move",
+"boost.preprocessor",
+"boost.ptr_container",
+"boost.range",
+"boost.static_assert",
+"boost.throw_exception",
+"boost.tuple",
+"boost.type_traits",
+"rules_cc"
+],
+"boost.atomic": [
+"boost",
+"boost.align",
+"boost.assert",
+"boost.config",
+"boost.predef",
+"boost.preprocessor",
+"boost.type_traits",
+"boost.winapi",
+"rules_cc"
+],
+"boost.beast": [
+"bazel_skylib",
+"boost",
+"boost.asio",
+"boost.assert",
+"boost.bind",
+"boost.config",
+"boost.container",
+"boost.container_hash",
+"boost.core",
+"boost.endian",
+"boost.intrusive",
+"boost.logic",
+"boost.mp11",
+"boost.optional",
+"boost.smart_ptr",
+"boost.static_string",
+"boost.system",
+"boost.throw_exception",
+"boost.type_index",
+"boost.type_traits",
+"boost.winapi",
+"rules_cc"
+],
+"boost.bimap": [
+"boost",
+"boost.concept_check",
+"boost.config",
+"boost.container_hash",
+"boost.core",
+"boost.iterator",
+"boost.lambda",
+"boost.mpl",
+"boost.multi_index",
+"boost.preprocessor",
+"boost.static_assert",
+"boost.throw_exception",
+"boost.type_traits",
+"boost.utility",
+"rules_cc"
+],
+"boost.bind": [
+"boost",
+"boost.config",
+"boost.core",
+"rules_cc"
+],
+"boost.bloom": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.container_hash",
+"boost.core",
+"boost.throw_exception",
+"boost.type_traits",
+"rules_cc"
+],
+"boost.callable_traits": [
+"boost",
+"rules_cc"
+],
+"boost.charconv": [
+"bazel_skylib",
+"boost",
+"boost.assert",
+"boost.config",
+"boost.core",
+"platforms",
+"rules_cc"
+],
+"boost.chrono": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.core",
+"boost.integer",
+"boost.move",
+"boost.mpl",
+"boost.predef",
+"boost.ratio",
+"boost.static_assert",
+"boost.system",
+"boost.throw_exception",
+"boost.type_traits",
+"boost.typeof",
+"boost.utility",
+"boost.winapi",
+"platforms",
+"rules_cc"
+],
+"boost.circular_buffer": [
+"boost",
+"boost.assert",
+"boost.concept_check",
+"boost.config",
+"boost.core",
+"boost.move",
+"boost.static_assert",
+"boost.throw_exception",
+"boost.type_traits",
+"rules_cc"
+],
+"boost.cobalt": [
+"bazel_skylib",
+"boost",
+"boost.asio",
+"boost.callable_traits",
+"boost.circular_buffer",
+"boost.config",
+"boost.container",
+"boost.context",
+"boost.core",
+"boost.endian",
+"boost.intrusive",
+"boost.mp11",
+"boost.preprocessor",
+"boost.smart_ptr",
+"boost.static_string",
+"boost.system",
+"boost.throw_exception",
+"boost.variant2",
+"boringssl",
+"openssl",
+"platforms",
+"rules_cc"
+],
+"boost.compat": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.throw_exception",
+"rules_cc"
+],
+"boost.compatibility": [
+"boost",
+"rules_cc"
+],
+"boost.compute": [
+"boost",
+"boost.algorithm",
+"boost.array",
+"boost.assert",
+"boost.atomic",
+"boost.chrono",
+"boost.config",
+"boost.core",
+"boost.filesystem",
+"boost.function",
+"boost.function_types",
+"boost.fusion",
+"boost.iterator",
+"boost.lexical_cast",
+"boost.mpl",
+"boost.optional",
+"boost.preprocessor",
+"boost.property_tree",
+"boost.proto",
+"boost.range",
+"boost.smart_ptr",
+"boost.static_assert",
+"boost.thread",
+"boost.throw_exception",
+"boost.tuple",
+"boost.type_traits",
+"boost.typeof",
+"boost.utility",
+"boost.uuid",
+"rules_cc"
+],
+"boost.concept_check": [
+"boost",
+"boost.config",
+"boost.preprocessor",
+"boost.static_assert",
+"boost.type_traits",
+"rules_cc"
+],
+"boost.config": [
+"boost",
+"rules_cc"
+],
+"boost.container": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.intrusive",
+"boost.move",
+"rules_cc"
+],
+"boost.container_hash": [
+"boost",
+"boost.config",
+"boost.describe",
+"boost.mp11",
+"rules_cc"
+],
+"boost.context": [
+"bazel_skylib",
+"boost",
+"boost.assert",
+"boost.config",
+"boost.core",
+"boost.mp11",
+"boost.pool",
+"boost.predef",
+"boost.smart_ptr",
+"platforms",
+"rules_cc"
+],
+"boost.contract": [
+"boost",
+"boost.any",
+"boost.assert",
+"boost.config",
+"boost.core",
+"boost.exception",
+"boost.function",
+"boost.function_types",
+"boost.mpl",
+"boost.optional",
+"boost.preprocessor",
+"boost.smart_ptr",
+"boost.static_assert",
+"boost.thread",
+"boost.type_traits",
+"boost.typeof",
+"boost.utility",
+"rules_cc"
+],
+"boost.conversion": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.smart_ptr",
+"boost.throw_exception",
+"rules_cc"
+],
+"boost.convert": [
+"boost",
+"boost.config",
+"boost.core",
+"boost.function_types",
+"boost.lexical_cast",
+"boost.math",
+"boost.mpl",
+"boost.optional",
+"boost.parameter",
+"boost.range",
+"boost.spirit",
+"boost.type_traits",
+"rules_cc"
+],
+"boost.core": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.throw_exception",
+"rules_cc"
+],
+"boost.coroutine": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.context",
+"boost.core",
+"boost.exception",
+"boost.move",
+"boost.system",
+"boost.throw_exception",
+"boost.type_traits",
+"boost.utility",
+"platforms",
+"rules_cc"
+],
+"boost.coroutine2": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.context",
+"rules_cc"
+],
+"boost.crc": [
+"boost",
+"rules_cc"
+],
+"boost.date_time": [
+"boost",
+"boost.algorithm",
+"boost.assert",
+"boost.config",
+"boost.core",
+"boost.io",
+"boost.lexical_cast",
+"boost.numeric_conversion",
+"boost.range",
+"boost.smart_ptr",
+"boost.static_assert",
+"boost.throw_exception",
+"boost.tokenizer",
+"boost.type_traits",
+"boost.utility",
+"boost.winapi",
+"rules_cc"
+],
+"boost.describe": [
+"boost",
+"boost.mp11",
+"rules_cc"
+],
+"boost.detail": [
+"boost",
+"boost.config",
+"boost.core",
+"boost.preprocessor",
+"boost.static_assert",
+"boost.type_traits",
+"rules_cc"
+],
+"boost.dll": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.core",
+"boost.filesystem",
+"boost.predef",
+"boost.smart_ptr",
+"boost.system",
+"boost.throw_exception",
+"boost.type_index",
+"boost.winapi",
+"platforms",
+"rules_cc"
+],
+"boost.dynamic_bitset": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.container_hash",
+"boost.core",
+"boost.throw_exception",
+"rules_cc"
+],
+"boost.endian": [
+"boost",
+"boost.config",
+"rules_cc"
+],
+"boost.exception": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.core",
+"boost.smart_ptr",
+"boost.throw_exception",
+"boost.tuple",
+"boost.type_traits",
+"rules_cc"
+],
+"boost.fiber": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.context",
+"boost.core",
+"boost.intrusive",
+"boost.predef",
+"boost.smart_ptr",
+"platforms",
+"rules_cc"
+],
+"boost.filesystem": [
+"boost",
+"boost.assert",
+"boost.atomic",
+"boost.config",
+"boost.container_hash",
+"boost.core",
+"boost.detail",
+"boost.io",
+"boost.iterator",
+"boost.predef",
+"boost.scope",
+"boost.smart_ptr",
+"boost.system",
+"boost.type_traits",
+"boost.winapi",
+"rules_cc"
+],
+"boost.flyweight": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.container_hash",
+"boost.core",
+"boost.detail",
+"boost.interprocess",
+"boost.mpl",
+"boost.multi_index",
+"boost.parameter",
+"boost.preprocessor",
+"boost.smart_ptr",
+"boost.throw_exception",
+"boost.type_traits",
+"boost.unordered",
+"rules_cc"
+],
+"boost.foreach": [
+"boost",
+"boost.config",
+"boost.core",
+"boost.iterator",
+"boost.mpl",
+"boost.range",
+"boost.type_traits",
+"rules_cc"
+],
+"boost.format": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.core",
+"boost.optional",
+"boost.smart_ptr",
+"boost.throw_exception",
+"boost.utility",
+"rules_cc"
+],
+"boost.function": [
+"boost",
+"boost.assert",
+"boost.bind",
+"boost.config",
+"boost.core",
+"boost.throw_exception",
+"rules_cc"
+],
+"boost.function_types": [
+"boost",
+"boost.config",
+"boost.core",
+"boost.detail",
+"boost.mpl",
+"boost.preprocessor",
+"boost.type_traits",
+"rules_cc"
+],
+"boost.functional": [
+"boost",
+"boost.config",
+"boost.core",
+"boost.function",
+"boost.function_types",
+"boost.mpl",
+"boost.preprocessor",
+"boost.type_traits",
+"boost.typeof",
+"boost.utility",
+"rules_cc"
+],
+"boost.fusion": [
+"boost",
+"boost.config",
+"boost.container_hash",
+"boost.core",
+"boost.function_types",
+"boost.functional",
+"boost.mpl",
+"boost.preprocessor",
+"boost.static_assert",
+"boost.tuple",
+"boost.type_traits",
+"boost.typeof",
+"boost.utility",
+"rules_cc"
+],
+"boost.geometry": [
+"boost",
+"boost.algorithm",
+"boost.any",
+"boost.array",
+"boost.assert",
+"boost.concept_check",
+"boost.config",
+"boost.container",
+"boost.core",
+"boost.function_types",
+"boost.fusion",
+"boost.graph",
+"boost.integer",
+"boost.iterator",
+"boost.lexical_cast",
+"boost.math",
+"boost.mpl",
+"boost.multiprecision",
+"boost.numeric_conversion",
+"boost.polygon",
+"boost.qvm",
+"boost.range",
+"boost.rational",
+"boost.serialization",
+"boost.static_assert",
+"boost.thread",
+"boost.throw_exception",
+"boost.tokenizer",
+"boost.tuple",
+"boost.type_traits",
+"boost.variant",
+"boost.variant2",
+"rules_cc"
+],
+"boost.gil": [
+"boost",
+"boost.assert",
+"boost.concept_check",
+"boost.config",
+"boost.container_hash",
+"boost.core",
+"boost.filesystem",
+"boost.integer",
+"boost.iterator",
+"boost.mp11",
+"boost.preprocessor",
+"boost.type_traits",
+"boost.variant2",
+"rules_cc"
+],
+"boost.graph": [
+"boost",
+"boost.algorithm",
+"boost.any",
+"boost.array",
+"boost.assert",
+"boost.bimap",
+"boost.bind",
+"boost.concept_check",
+"boost.config",
+"boost.container_hash",
+"boost.conversion",
+"boost.core",
+"boost.detail",
+"boost.foreach",
+"boost.function",
+"boost.integer",
+"boost.iterator",
+"boost.lexical_cast",
+"boost.math",
+"boost.move",
+"boost.mpl",
+"boost.multi_index",
+"boost.numeric_conversion",
+"boost.optional",
+"boost.parameter",
+"boost.preprocessor",
+"boost.property_map",
+"boost.property_tree",
+"boost.random",
+"boost.range",
+"boost.regex",
+"boost.serialization",
+"boost.smart_ptr",
+"boost.spirit",
+"boost.static_assert",
+"boost.throw_exception",
+"boost.tti",
+"boost.tuple",
+"boost.type_traits",
+"boost.typeof",
+"boost.unordered",
+"boost.utility",
+"boost.xpressive",
+"rules_cc"
+],
+"boost.hana": [
+"boost",
+"boost.config",
+"boost.core",
+"boost.fusion",
+"boost.mpl",
+"boost.tuple",
+"rules_cc"
+],
+"boost.hash2": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.container_hash",
+"boost.describe",
+"boost.mp11",
+"rules_cc"
+],
+"boost.headers": [
+"boost",
+"rules_cc"
+],
+"boost.heap": [
+"boost",
+"boost.assert",
+"boost.concept_check",
+"boost.config",
+"boost.core",
+"boost.intrusive",
+"boost.iterator",
+"boost.parameter",
+"boost.static_assert",
+"boost.throw_exception",
+"boost.type_traits",
+"rules_cc"
+],
+"boost.histogram": [
+"boost",
+"boost.config",
+"boost.core",
+"boost.math",
+"boost.mp11",
+"boost.serialization",
+"boost.throw_exception",
+"boost.variant2",
+"rules_cc"
+],
+"boost.hof": [
+"boost",
+"rules_cc"
+],
+"boost.icl": [
+"boost",
+"boost.assert",
+"boost.concept_check",
+"boost.config",
+"boost.container",
+"boost.core",
+"boost.date_time",
+"boost.detail",
+"boost.iterator",
+"boost.move",
+"boost.mpl",
+"boost.range",
+"boost.rational",
+"boost.static_assert",
+"boost.type_traits",
+"boost.utility",
+"rules_cc"
+],
+"boost.integer": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.core",
+"boost.static_assert",
+"boost.throw_exception",
+"boost.type_traits",
+"rules_cc"
+],
+"boost.interprocess": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.container",
+"boost.intrusive",
+"boost.move",
+"boost.winapi",
+"rules_cc"
+],
+"boost.intrusive": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.move",
+"rules_cc"
+],
+"boost.io": [
+"boost",
+"boost.config",
+"rules_cc"
+],
+"boost.iostreams": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.core",
+"boost.detail",
+"boost.function",
+"boost.integer",
+"boost.iterator",
+"boost.mpl",
+"boost.numeric_conversion",
+"boost.preprocessor",
+"boost.random",
+"boost.range",
+"boost.regex",
+"boost.smart_ptr",
+"boost.static_assert",
+"boost.throw_exception",
+"boost.type_traits",
+"boost.utility",
+"bzip2",
+"rules_cc",
+"xz",
+"zlib",
+"zstd"
+],
+"boost.iterator": [
+"boost",
+"boost.concept_check",
+"boost.config",
+"boost.core",
+"boost.detail",
+"boost.fusion",
+"boost.mp11",
+"boost.mpl",
+"boost.optional",
+"boost.type_traits",
+"boost.utility",
+"rules_cc"
+],
+"boost.json": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.container",
+"boost.container_hash",
+"boost.core",
+"boost.describe",
+"boost.endian",
+"boost.mp11",
+"boost.system",
+"boost.throw_exception",
+"rules_cc"
+],
+"boost.lambda": [
+"boost",
+"boost.bind",
+"boost.config",
+"boost.core",
+"boost.detail",
+"boost.iterator",
+"boost.mpl",
+"boost.preprocessor",
+"boost.tuple",
+"boost.type_traits",
+"boost.utility",
+"rules_cc"
+],
+"boost.lambda2": [
+"boost",
+"rules_cc"
+],
+"boost.leaf": [
+"boost",
+"rules_cc"
+],
+"boost.lexical_cast": [
+"boost",
+"boost.config",
+"boost.container",
+"boost.core",
+"boost.throw_exception",
+"rules_cc"
+],
+"boost.local_function": [
+"boost",
+"boost.config",
+"boost.mpl",
+"boost.preprocessor",
+"boost.scope_exit",
+"boost.type_traits",
+"boost.typeof",
+"boost.utility",
+"rules_cc"
+],
+"boost.locale": [
+"boost",
+"boost.assert",
+"boost.charconv",
+"boost.config",
+"boost.core",
+"boost.iterator",
+"boost.predef",
+"boost.thread",
+"platforms",
+"rules_cc"
+],
+"boost.lockfree": [
+"boost",
+"boost.align",
+"boost.assert",
+"boost.atomic",
+"boost.config",
+"boost.core",
+"boost.parameter",
+"boost.predef",
+"boost.static_assert",
+"boost.throw_exception",
+"boost.type_traits",
+"rules_cc"
+],
+"boost.log": [
+"bazel_skylib",
+"boost",
+"boost.align",
+"boost.asio",
+"boost.assert",
+"boost.atomic",
+"boost.config",
+"boost.core",
+"boost.date_time",
+"boost.exception",
+"boost.filesystem",
+"boost.function_types",
+"boost.fusion",
+"boost.interprocess",
+"boost.intrusive",
+"boost.io",
+"boost.iterator",
+"boost.move",
+"boost.mpl",
+"boost.optional",
+"boost.parameter",
+"boost.phoenix",
+"boost.predef",
+"boost.preprocessor",
+"boost.property_tree",
+"boost.proto",
+"boost.range",
+"boost.regex",
+"boost.smart_ptr",
+"boost.spirit",
+"boost.system",
+"boost.thread",
+"boost.throw_exception",
+"boost.type_index",
+"boost.type_traits",
+"boost.utility",
+"boost.winapi",
+"boost.xpressive",
+"platforms",
+"rules_cc"
+],
+"boost.logic": [
+"boost",
+"boost.config",
+"boost.core",
+"rules_cc"
+],
+"boost.math": [
+"boost",
+"boost.assert",
+"boost.concept_check",
+"boost.config",
+"boost.core",
+"boost.integer",
+"boost.lexical_cast",
+"boost.predef",
+"boost.random",
+"boost.static_assert",
+"boost.throw_exception",
+"rules_cc"
+],
+"boost.metaparse": [
+"boost",
+"boost.config",
+"boost.mpl",
+"boost.predef",
+"boost.preprocessor",
+"boost.static_assert",
+"boost.type_traits",
+"rules_cc"
+],
+"boost.move": [
+"boost",
+"boost.config",
+"rules_cc"
+],
+"boost.mp11": [
+"boost",
+"rules_cc"
+],
+"boost.mpl": [
+"boost",
+"boost.config",
+"boost.core",
+"boost.predef",
+"boost.preprocessor",
+"boost.static_assert",
+"boost.type_traits",
+"boost.utility",
+"rules_cc"
+],
+"boost.mqtt5": [
+"bazel_skylib",
+"boost",
+"boost.asio",
+"boost.assert",
+"boost.beast",
+"boost.container",
+"boost.core",
+"boost.endian",
+"boost.random",
+"boost.range",
+"boost.smart_ptr",
+"boost.system",
+"boost.type_traits",
+"openssl",
+"rules_cc"
+],
+"boost.msm": [
+"boost",
+"boost.any",
+"boost.assert",
+"boost.bind",
+"boost.circular_buffer",
+"boost.config",
+"boost.core",
+"boost.function",
+"boost.fusion",
+"boost.mp11",
+"boost.mpl",
+"boost.parameter",
+"boost.phoenix",
+"boost.preprocessor",
+"boost.proto",
+"boost.serialization",
+"boost.type_index",
+"boost.type_traits",
+"boost.typeof",
+"boost.utility",
+"rules_cc"
+],
+"boost.multi_array": [
+"boost",
+"boost.array",
+"boost.assert",
+"boost.concept_check",
+"boost.config",
+"boost.core",
+"boost.functional",
+"boost.iterator",
+"boost.mpl",
+"boost.static_assert",
+"boost.type_traits",
+"rules_cc"
+],
+"boost.multi_index": [
+"boost",
+"boost.assert",
+"boost.bind",
+"boost.config",
+"boost.container_hash",
+"boost.core",
+"boost.integer",
+"boost.iterator",
+"boost.move",
+"boost.mpl",
+"boost.preprocessor",
+"boost.smart_ptr",
+"boost.static_assert",
+"boost.throw_exception",
+"boost.tuple",
+"boost.type_traits",
+"boost.utility",
+"rules_cc"
+],
+"boost.multiprecision": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.core",
+"boost.integer",
+"boost.lexical_cast",
+"boost.math",
+"boost.predef",
+"boost.random",
+"boost.throw_exception",
+"rules_cc"
+],
+"boost.mysql": [
+"bazel_skylib",
+"boost",
+"boost.asio",
+"boost.assert",
+"boost.charconv",
+"boost.compat",
+"boost.config",
+"boost.container",
+"boost.core",
+"boost.describe",
+"boost.endian",
+"boost.intrusive",
+"boost.mp11",
+"boost.optional",
+"boost.pfr",
+"boost.system",
+"boost.throw_exception",
+"boost.variant2",
+"boringssl",
+"openssl",
+"platforms",
+"rules_cc"
+],
+"boost.nowide": [
+"boost",
+"boost.config",
+"platforms",
+"rules_cc"
+],
+"boost.numeric_conversion": [
+"boost",
+"boost.config",
+"boost.conversion",
+"boost.core",
+"boost.mpl",
+"boost.preprocessor",
+"boost.throw_exception",
+"boost.type_traits",
+"rules_cc"
+],
+"boost.numeric_interval": [
+"boost",
+"boost.config",
+"boost.detail",
+"boost.logic",
+"rules_cc"
+],
+"boost.numeric_odeint": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.core",
+"boost.fusion",
+"boost.iterator",
+"boost.math",
+"boost.mpl",
+"boost.multi_array",
+"boost.numeric_ublas",
+"boost.preprocessor",
+"boost.range",
+"boost.static_assert",
+"boost.throw_exception",
+"boost.type_traits",
+"boost.units",
+"boost.utility",
+"rules_cc"
+],
+"boost.numeric_ublas": [
+"boost",
+"boost.compute",
+"boost.concept_check",
+"boost.config",
+"boost.core",
+"boost.iterator",
+"boost.mpl",
+"boost.numeric_interval",
+"boost.range",
+"boost.serialization",
+"boost.smart_ptr",
+"boost.static_assert",
+"boost.type_traits",
+"boost.typeof",
+"rules_cc"
+],
+"boost.openmethod": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.core",
+"boost.dynamic_bitset",
+"boost.mp11",
+"boost.preprocessor",
+"platforms",
+"rules_cc"
+],
+"boost.optional": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.core",
+"boost.throw_exception",
+"boost.type_traits",
+"rules_cc"
+],
+"boost.outcome": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.exception",
+"boost.system",
+"boost.throw_exception",
+"platforms",
+"rules_cc"
+],
+"boost.parameter": [
+"boost",
+"boost.config",
+"boost.core",
+"boost.function",
+"boost.fusion",
+"boost.mp11",
+"boost.mpl",
+"boost.optional",
+"boost.preprocessor",
+"boost.type_traits",
+"boost.utility",
+"rules_cc"
+],
+"boost.parameter_python": [
+"boost",
+"boost.mpl",
+"boost.parameter",
+"boost.preprocessor",
+"boost.python",
+"rules_cc"
+],
+"boost.parser": [
+"boost",
+"boost.assert",
+"boost.charconv",
+"boost.hana",
+"boost.type_index",
+"platforms",
+"rules_cc"
+],
+"boost.pfr": [
+"boost",
+"rules_cc"
+],
+"boost.phoenix": [
+"boost",
+"boost.assert",
+"boost.bind",
+"boost.config",
+"boost.core",
+"boost.function",
+"boost.fusion",
+"boost.mpl",
+"boost.predef",
+"boost.preprocessor",
+"boost.proto",
+"boost.range",
+"boost.smart_ptr",
+"boost.type_traits",
+"boost.utility",
+"rules_cc"
+],
+"boost.pin_version": [],
+"boost.poly_collection": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.core",
+"boost.detail",
+"boost.iterator",
+"boost.mp11",
+"boost.mpl",
+"boost.type_erasure",
+"boost.type_traits",
+"rules_cc"
+],
+"boost.polygon": [
+"boost",
+"boost.config",
+"rules_cc"
+],
+"boost.pool": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.integer",
+"boost.throw_exception",
+"boost.type_traits",
+"boost.winapi",
+"rules_cc"
+],
+"boost.predef": [
+"boost",
+"rules_cc"
+],
+"boost.preprocessor": [
+"boost",
+"rules_cc"
+],
+"boost.process": [
+"bazel_skylib",
+"boost",
+"boost.algorithm",
+"boost.asio",
+"boost.assert",
+"boost.config",
+"boost.core",
+"boost.filesystem",
+"boost.fusion",
+"boost.io",
+"boost.iterator",
+"boost.move",
+"boost.optional",
+"boost.system",
+"boost.throw_exception",
+"boost.tokenizer",
+"boost.type_index",
+"boost.type_traits",
+"boost.utility",
+"boost.winapi",
+"platforms",
+"rules_cc"
+],
+"boost.program_options": [
+"boost",
+"boost.any",
+"boost.bind",
+"boost.config",
+"boost.core",
+"boost.detail",
+"boost.function",
+"boost.iterator",
+"boost.lexical_cast",
+"boost.smart_ptr",
+"boost.static_assert",
+"boost.throw_exception",
+"boost.tokenizer",
+"boost.type_traits",
+"rules_cc"
+],
+"boost.property_map": [
+"boost",
+"boost.any",
+"boost.assert",
+"boost.concept_check",
+"boost.config",
+"boost.core",
+"boost.function",
+"boost.iterator",
+"boost.lexical_cast",
+"boost.mpl",
+"boost.smart_ptr",
+"boost.static_assert",
+"boost.throw_exception",
+"boost.type_index",
+"boost.type_traits",
+"boost.utility",
+"rules_cc"
+],
+"boost.property_tree": [
+"boost",
+"boost.any",
+"boost.assert",
+"boost.bind",
+"boost.config",
+"boost.core",
+"boost.iterator",
+"boost.mpl",
+"boost.multi_index",
+"boost.optional",
+"boost.range",
+"boost.serialization",
+"boost.static_assert",
+"boost.throw_exception",
+"boost.type_traits",
+"rules_cc"
+],
+"boost.proto": [
+"boost",
+"boost.config",
+"boost.core",
+"boost.fusion",
+"boost.mpl",
+"boost.preprocessor",
+"boost.range",
+"boost.static_assert",
+"boost.type_traits",
+"boost.typeof",
+"boost.utility",
+"rules_cc"
+],
+"boost.ptr_container": [
+"boost",
+"boost.array",
+"boost.assert",
+"boost.circular_buffer",
+"boost.config",
+"boost.core",
+"boost.iterator",
+"boost.mpl",
+"boost.range",
+"boost.smart_ptr",
+"boost.static_assert",
+"boost.type_traits",
+"boost.unordered",
+"boost.utility",
+"rules_cc"
+],
+"boost.python": [
+"boost",
+"boost.align",
+"boost.bind",
+"boost.config",
+"boost.conversion",
+"boost.core",
+"boost.detail",
+"boost.foreach",
+"boost.function",
+"boost.graph",
+"boost.integer",
+"boost.iterator",
+"boost.lexical_cast",
+"boost.mpl",
+"boost.numeric_conversion",
+"boost.preprocessor",
+"boost.property_map",
+"boost.smart_ptr",
+"boost.static_assert",
+"boost.tuple",
+"boost.type_traits",
+"boost.utility",
+"rules_cc",
+"rules_python"
+],
+"boost.qvm": [
+"boost",
+"rules_cc"
+],
+"boost.random": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.core",
+"boost.dynamic_bitset",
+"boost.integer",
+"boost.io",
+"boost.static_assert",
+"boost.system",
+"boost.throw_exception",
+"boost.type_traits",
+"boost.utility",
+"rules_cc"
+],
+"boost.range": [
+"boost",
+"boost.array",
+"boost.assert",
+"boost.concept_check",
+"boost.config",
+"boost.container_hash",
+"boost.conversion",
+"boost.core",
+"boost.detail",
+"boost.iterator",
+"boost.mpl",
+"boost.optional",
+"boost.preprocessor",
+"boost.regex",
+"boost.static_assert",
+"boost.tuple",
+"boost.type_traits",
+"boost.utility",
+"rules_cc"
+],
+"boost.ratio": [
+"boost",
+"rules_cc"
+],
+"boost.rational": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.core",
+"boost.integer",
+"boost.static_assert",
+"boost.throw_exception",
+"boost.type_traits",
+"boost.utility",
+"rules_cc"
+],
+"boost.redis": [
+"bazel_skylib",
+"boost",
+"boost.asio",
+"boost.assert",
+"boost.core",
+"boost.mp11",
+"boost.system",
+"boost.throw_exception",
+"boringssl",
+"openssl",
+"platforms",
+"rules_cc"
+],
+"boost.regex": [
+"boost",
+"boost.assert",
+"boost.concept_check",
+"boost.config",
+"boost.core",
+"boost.predef",
+"boost.static_assert",
+"boost.throw_exception",
+"boost.type_traits",
+"rules_cc"
+],
+"boost.safe_numerics": [
+"boost",
+"boost.concept_check",
+"boost.config",
+"boost.core",
+"boost.integer",
+"boost.logic",
+"boost.mp11",
+"rules_cc"
+],
+"boost.scope": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.core",
+"boost.type_traits",
+"rules_cc"
+],
+"boost.scope_exit": [
+"boost",
+"boost.config",
+"boost.function",
+"boost.preprocessor",
+"boost.type_traits",
+"boost.typeof",
+"rules_cc"
+],
+"boost.serialization": [
+"boost",
+"boost.array",
+"boost.assert",
+"boost.config",
+"boost.core",
+"boost.detail",
+"boost.function",
+"boost.integer",
+"boost.io",
+"boost.iterator",
+"boost.move",
+"boost.mp11",
+"boost.mpl",
+"boost.optional",
+"boost.predef",
+"boost.preprocessor",
+"boost.smart_ptr",
+"boost.spirit",
+"boost.static_assert",
+"boost.throw_exception",
+"boost.type_traits",
+"boost.utility",
+"boost.variant",
+"boost.variant2",
+"rules_cc"
+],
+"boost.signals2": [
+"boost",
+"boost.assert",
+"boost.bind",
+"boost.config",
+"boost.core",
+"boost.function",
+"boost.iterator",
+"boost.move",
+"boost.mpl",
+"boost.optional",
+"boost.parameter",
+"boost.preprocessor",
+"boost.smart_ptr",
+"boost.throw_exception",
+"boost.tuple",
+"boost.type_traits",
+"boost.variant",
+"rules_cc"
+],
+"boost.smart_ptr": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.core",
+"boost.throw_exception",
+"rules_cc"
+],
+"boost.sort": [
+"boost",
+"boost.config",
+"boost.core",
+"boost.range",
+"boost.static_assert",
+"boost.type_traits",
+"rules_cc"
+],
+"boost.spirit": [
+"boost",
+"boost.array",
+"boost.assert",
+"boost.config",
+"boost.core",
+"boost.endian",
+"boost.function",
+"boost.function_types",
+"boost.fusion",
+"boost.integer",
+"boost.io",
+"boost.iterator",
+"boost.move",
+"boost.mpl",
+"boost.optional",
+"boost.phoenix",
+"boost.pool",
+"boost.preprocessor",
+"boost.proto",
+"boost.range",
+"boost.regex",
+"boost.smart_ptr",
+"boost.static_assert",
+"boost.thread",
+"boost.throw_exception",
+"boost.type_traits",
+"boost.typeof",
+"boost.unordered",
+"boost.utility",
+"boost.variant",
+"platforms",
+"rules_cc"
+],
+"boost.stacktrace": [
+"bazel_skylib",
+"boost",
+"boost.assert",
+"boost.config",
+"boost.container_hash",
+"boost.core",
+"boost.predef",
+"boost.winapi",
+"libbacktrace",
+"platforms",
+"rules_cc"
+],
+"boost.statechart": [
+"boost",
+"boost.assert",
+"boost.bind",
+"boost.config",
+"boost.conversion",
+"boost.core",
+"boost.detail",
+"boost.function",
+"boost.mpl",
+"boost.smart_ptr",
+"boost.static_assert",
+"boost.thread",
+"boost.type_traits",
+"rules_cc"
+],
+"boost.static_assert": [
+"boost",
+"boost.config",
+"rules_cc"
+],
+"boost.static_string": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.container_hash",
+"boost.core",
+"boost.throw_exception",
+"boost.utility",
+"rules_cc"
+],
+"boost.stl_interfaces": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.core",
+"boost.type_traits",
+"rules_cc"
+],
+"boost.system": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.throw_exception",
+"boost.variant2",
+"boost.winapi",
+"rules_cc"
+],
+"boost.test": [
+"boost",
+"boost.algorithm",
+"boost.assert",
+"boost.bind",
+"boost.config",
+"boost.core",
+"boost.detail",
+"boost.exception",
+"boost.function",
+"boost.io",
+"boost.iterator",
+"boost.mpl",
+"boost.numeric_conversion",
+"boost.optional",
+"boost.preprocessor",
+"boost.smart_ptr",
+"boost.static_assert",
+"boost.type_traits",
+"boost.utility",
+"rules_cc"
+],
+"boost.thread": [
+"boost",
+"boost.assert",
+"boost.atomic",
+"boost.bind",
+"boost.chrono",
+"boost.concept_check",
+"boost.config",
+"boost.container",
+"boost.container_hash",
+"boost.core",
+"boost.date_time",
+"boost.exception",
+"boost.function",
+"boost.io",
+"boost.move",
+"boost.optional",
+"boost.predef",
+"boost.preprocessor",
+"boost.smart_ptr",
+"boost.static_assert",
+"boost.system",
+"boost.throw_exception",
+"boost.tuple",
+"boost.type_traits",
+"boost.utility",
+"boost.winapi",
+"platforms",
+"rules_cc"
+],
+"boost.throw_exception": [
+"boost",
+"boost.assert",
+"boost.config",
+"rules_cc"
+],
+"boost.timer": [
+"boost",
+"boost.config",
+"boost.io",
+"boost.predef",
+"rules_cc"
+],
+"boost.tokenizer": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.iterator",
+"boost.throw_exception",
+"boost.type_traits",
+"rules_cc"
+],
+"boost.tti": [
+"boost",
+"boost.config",
+"boost.function_types",
+"boost.mpl",
+"boost.preprocessor",
+"boost.type_traits",
+"rules_cc"
+],
+"boost.tuple": [
+"boost",
+"boost.config",
+"boost.core",
+"boost.static_assert",
+"boost.type_traits",
+"rules_cc"
+],
+"boost.type_erasure": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.core",
+"boost.detail",
+"boost.fusion",
+"boost.iterator",
+"boost.mp11",
+"boost.mpl",
+"boost.preprocessor",
+"boost.smart_ptr",
+"boost.thread",
+"boost.throw_exception",
+"boost.type_traits",
+"boost.typeof",
+"boost.utility",
+"boost.vmd",
+"rules_cc"
+],
+"boost.type_index": [
+"boost",
+"boost.config",
+"boost.container_hash",
+"boost.throw_exception",
+"rules_cc"
+],
+"boost.type_traits": [
+"boost",
+"boost.config",
+"boost.static_assert",
+"rules_cc"
+],
+"boost.typeof": [
+"boost",
+"boost.config",
+"rules_cc"
+],
+"boost.units": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.core",
+"boost.integer",
+"boost.io",
+"boost.lambda",
+"boost.math",
+"boost.mpl",
+"boost.preprocessor",
+"boost.static_assert",
+"boost.type_traits",
+"boost.typeof",
+"rules_cc"
+],
+"boost.unordered": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.container_hash",
+"boost.core",
+"boost.mp11",
+"boost.predef",
+"boost.throw_exception",
+"rules_cc"
+],
+"boost.url": [
+"boost",
+"boost.align",
+"boost.assert",
+"boost.config",
+"boost.container",
+"boost.core",
+"boost.filesystem",
+"boost.mp11",
+"boost.optional",
+"boost.system",
+"boost.throw_exception",
+"boost.type_traits",
+"boost.variant2",
+"platforms",
+"rules_cc"
+],
+"boost.utility": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.core",
+"boost.io",
+"boost.preprocessor",
+"boost.throw_exception",
+"boost.type_traits",
+"rules_cc"
+],
+"boost.uuid": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.throw_exception",
+"boost.type_traits",
+"rules_cc"
+],
+"boost.variant": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.container_hash",
+"boost.core",
+"boost.detail",
+"boost.integer",
+"boost.mpl",
+"boost.preprocessor",
+"boost.static_assert",
+"boost.throw_exception",
+"boost.type_index",
+"boost.type_traits",
+"boost.utility",
+"rules_cc"
+],
+"boost.variant2": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.mp11",
+"rules_cc"
+],
+"boost.vmd": [
+"boost",
+"boost.preprocessor",
+"rules_cc"
+],
+"boost.wave": [
+"boost",
+"boost.assert",
+"boost.concept_check",
+"boost.config",
+"boost.core",
+"boost.filesystem",
+"boost.format",
+"boost.iterator",
+"boost.lexical_cast",
+"boost.mpl",
+"boost.multi_index",
+"boost.optional",
+"boost.pool",
+"boost.preprocessor",
+"boost.serialization",
+"boost.smart_ptr",
+"boost.spirit",
+"boost.static_assert",
+"boost.throw_exception",
+"boost.type_traits",
+"rules_cc"
+],
+"boost.winapi": [
+"boost",
+"boost.config",
+"boost.predef",
+"platforms",
+"rules_cc"
+],
+"boost.xpressive": [
+"boost",
+"boost.assert",
+"boost.config",
+"boost.conversion",
+"boost.core",
+"boost.exception",
+"boost.fusion",
+"boost.integer",
+"boost.iterator",
+"boost.lexical_cast",
+"boost.mpl",
+"boost.numeric_conversion",
+"boost.optional",
+"boost.preprocessor",
+"boost.proto",
+"boost.range",
+"boost.smart_ptr",
+"boost.static_assert",
+"boost.throw_exception",
+"boost.type_traits",
+"boost.typeof",
+"boost.utility",
+"rules_cc"
+],
+"boost.yap": [
+"boost",
+"boost.hana",
+"boost.preprocessor",
+"boost.type_index",
+"rules_cc"
+],
+"boringssl": [
+"google_benchmark",
+"googletest",
+"platforms",
+"rules_cc",
+"rules_license"
+],
+"briansmith_ring": [
+"bazel_skylib",
+"nasm",
+"platforms",
+"rules_cc",
+"rules_nasm",
+"rules_perl"
+],
+"brotli": [
+"rules_cc"
+],
+"brotli_go": [
+"brotli",
+"gazelle",
+"rules_go"
+],
+"bubblewrap": [
+"bazel_skylib",
+"libcap",
+"platforms",
+"rules_cc"
+],
+"build_stack_rules_proto": [
+"abseil-cpp",
+"aspect_bazel_lib",
+"aspect_rules_js",
+"aspect_rules_ts",
+"bazel_features",
+"bazel_skylib",
+"buildifier_prebuilt",
+"gazelle",
+"grpc",
+"grpc-java",
+"package_metadata",
+"protobuf",
+"rules_cc",
+"rules_foreign_cc",
+"rules_go",
+"rules_java",
+"rules_jvm_external",
+"rules_license",
+"rules_pkg",
+"rules_proto",
+"rules_python",
+"rules_scala",
+"rules_shell",
+"zlib"
+],
+"build_stack_scala_gazelle": [
+"build_stack_rules_proto",
+"gazelle",
+"protobuf",
+"rules_go",
+"rules_java",
+"rules_jvm_external",
+"rules_proto",
+"rules_scala"
+],
+"buildifier_prebuilt": [
+"bazel_features",
+"bazel_skylib",
+"platforms",
+"rules_bazel_integration_test",
+"rules_shell"
+],
+"buildozer": [
+"platforms",
+"rules_shell"
+],
+"bullet": [
+"platforms",
+"rules_cc",
+"rules_license"
+],
+"byte_track_eigen": [
+"eigen",
+"rules_cc"
+],
+"bzip2": [
+"bazel_skylib",
+"platforms",
+"rules_cc"
+],
+"bzlparty_rules_quickjs": [
+"aspect_bazel_lib",
+"aspect_rules_js",
+"bazel_skylib"
+],
+"bzlparty_tools": [
+"aspect_bazel_lib",
+"bazel_skylib",
+"buildifier_prebuilt",
+"platforms",
+"rules_license"
+],
+"bzlws": [
+"bazel_skylib",
+"hedron_compile_commands",
+"rules_cc",
+"stardoc",
+"toolchains_llvm",
+"yaml-cpp"
+],
+"c-ares": [
+"bazel_skylib",
+"platforms",
+"rules_cc"
+],
+"c-blosc2": [
+"lz4",
+"platforms",
+"rules_cc",
+"zlib-ng",
+"zstd"
+],
+"c4core": [
+"fast_float",
+"rules_cc"
+],
+"cachelib": [
+"boost.context",
+"boost.intrusive",
+"fbthrift",
+"fmt",
+"folly",
+"gflags",
+"glog",
+"googletest",
+"libaio",
+"magic_enum",
+"numactl",
+"platforms",
+"rules_cc",
+"sparse_map",
+"xxhash"
+],
+"cadical": [
+"rules_cc"
+],
+"cairo": [
+"bazel_skylib",
+"fontconfig",
+"freetype",
+"glib",
+"libpng",
+"libx11",
+"libxext",
+"libxrender",
+"pixman",
+"platforms",
+"rules_autoconf",
+"rules_cc",
+"rules_python",
+"zlib"
+],
+"capnp-cpp": [
+"bazel_skylib",
+"boringssl",
+"brotli",
+"platforms",
+"rules_cc",
+"zlib"
+],
+"cargo_env.bzl": [
+"aspect_gazelle_prebuilt",
+"bazel_lib",
+"bazel_skylib",
+"bazelrc-preset.bzl",
+"package_metadata",
+"platforms",
+"rules_shell"
+],
+"caseyduquettesc_rules_python_pytest": [
+"aspect_bazel_lib",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"buildifier_prebuilt",
+"gazelle",
+"platforms",
+"rules_python"
+],
+"catch2": [
+"bazel_skylib",
+"rules_cc",
+"rules_license"
+],
+"ccd": [
+"bazel_skylib",
+"rules_cc",
+"rules_license"
+],
+"ccronexpr": [
+"bazel_skylib",
+"platforms",
+"rules_cc"
+],
+"cctz": [
+"google_benchmark",
+"googletest",
+"platforms"
+],
+"cdt": [
+"rules_cc"
+],
+"cel-c": [
+"abseil-cpp",
+"cel-cpp",
+"cel-spec",
+"fuzztest",
+"google_benchmark",
+"googleapis",
+"googleapis-upb",
+"googletest",
+"platforms",
+"protobuf",
+"re2",
+"rules_cc",
+"rules_license"
+],
+"cel-cpp": [
+"abseil-cpp",
+"antlr4-cpp-runtime",
+"bazel_skylib",
+"cel-spec",
+"flatbuffers",
+"google_benchmark",
+"googleapis",
+"googleapis-cc",
+"googletest",
+"platforms",
+"protobuf",
+"re2",
+"rules_cc",
+"rules_java",
+"rules_license",
+"rules_proto",
+"rules_python",
+"yaml-cpp"
+],
+"cel-spec": [
+"bazel_skylib",
+"gazelle",
+"protobuf",
+"rules_cc",
+"rules_go",
+"rules_java",
+"rules_proto",
+"rules_python"
+],
+"cereal": [
+"bazel_skylib",
+"rules_cc"
+],
+"ceres-solver": [
+"eigen",
+"gflags",
+"glog",
+"google_benchmark"
+],
+"cgrapht": [
+"catch2",
+"rules_cc"
+],
+"cgrindel_bazel_starlib": [
+"aspect_bazel_lib",
+"aspect_rules_lint",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"buildifier_prebuilt",
+"gazelle",
+"platforms",
+"rules_bazel_integration_test",
+"rules_go",
+"rules_multitool",
+"rules_python",
+"rules_shell",
+"stardoc"
+],
+"check": [
+"platforms",
+"rules_foreign_cc"
+],
+"chicory": [
+"javaparser"
+],
+"circe": [
+"apple_support",
+"rules_apple",
+"rules_swift",
+"rules_xcodeproj"
+],
+"circl": [
+"gazelle",
+"rules_cc",
+"rules_go"
+],
+"cityhash": [
+"rules_cc"
+],
+"civetweb": [
+"boringssl",
+"platforms",
+"rules_cc"
+],
+"cjson": [
+"bazel_skylib",
+"platforms",
+"rules_cc"
+],
+"clarabel": [
+"eigen",
+"openblas",
+"platforms",
+"rules_cc",
+"rules_rs"
+],
+"claro-lang": [
+"aspect_bazel_lib",
+"bazel_skylib",
+"rules_jvm_external",
+"rules_proto"
+],
+"cli11": [
+"catch2",
+"rules_cc"
+],
+"clickhouse-cpp": [
+"abseil-cpp",
+"bazel_skylib",
+"boringssl",
+"googletest",
+"lz4",
+"openssl",
+"platforms",
+"rules_cc",
+"zstd"
+],
+"clipper2": [
+"platforms"
+],
+"closure-templates": [
+"protobuf",
+"rules_java",
+"rules_jvm_external",
+"rules_proto"
+],
+"cmake_configure_file": [
+"platforms",
+"rules_license",
+"rules_python"
+],
+"cnats": [
+"openssl",
+"platforms",
+"rules_cc"
+],
+"coacd": [
+"cdt",
+"onetbb",
+"openvdb",
+"platforms",
+"rules_cc"
+],
+"coal": [
+"assimp",
+"boost.filesystem",
+"boost.math",
+"boost.serialization",
+"eigen",
+"octomap",
+"qhull",
+"rules_cc",
+"rules_license"
+],
+"codec2": [
+"platforms",
+"rules_cc"
+],
+"codescythe": [
+"platforms"
+],
+"codesign.bzl": [
+"bazel_lib",
+"bazel_skylib",
+"bzip2",
+"llvm",
+"platforms",
+"rules_cc",
+"rules_rs",
+"windows_support",
+"xz"
+],
+"codspeed_core": [
+"bazel_skylib",
+"platforms",
+"rules_cc"
+],
+"codspeed_google_benchmark_compat": [
+"bazel_skylib",
+"codspeed_core",
+"googletest",
+"libpfm",
+"nanobind_bazel",
+"platforms",
+"rules_cc",
+"rules_python"
+],
+"coin-or-lemon": [
+"glpk",
+"rules_cc"
+],
+"com_clementguillot_rules_quarkus": [
+"aspect_rules_lint",
+"bazel_lib",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"buildifier_prebuilt",
+"gazelle",
+"package_metadata",
+"platforms",
+"rules_android",
+"rules_cc",
+"rules_go",
+"rules_graalvm",
+"rules_java",
+"rules_jvm_external"
+],
+"com_github_benchsci_rules_nodejs_gazelle": [
+"gazelle",
+"rules_go",
+"rules_shell"
+],
+"com_github_mvukov_rules_ros2": [
+"asio",
+"bazel_skylib",
+"boringssl",
+"curl",
+"eigen",
+"fmt",
+"googletest",
+"libyaml",
+"lz4",
+"nlohmann_json",
+"platforms",
+"pybind11_bazel",
+"readerwriterqueue",
+"rules_cc",
+"rules_foreign_cc",
+"rules_python",
+"rules_rust",
+"rules_rust_bindgen",
+"rules_shell",
+"spdlog",
+"sqlite3",
+"tinyxml",
+"tinyxml2",
+"websocketpp",
+"yaml-cpp",
+"zlib",
+"zstd"
+],
+"com_github_rabbitmq_looking_glass": [
+"lz4-erlang",
+"platforms",
+"rules_erlang"
+],
+"concurrentqueue": [
+"rules_cc"
+],
+"console_bridge": [
+"generate_export_header",
+"rules_cc"
+],
+"container_structure_test": [
+"aspect_bazel_lib",
+"bazel_skylib",
+"platforms",
+"stardoc"
+],
+"contrib_rules_jvm": [
+"apple_rules_lint",
+"bazel_lib",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"gazelle",
+"platforms",
+"protobuf",
+"rules_cc",
+"rules_go",
+"rules_java",
+"rules_jvm_external",
+"rules_python",
+"rules_shell",
+"stardoc"
+],
+"copybara": [
+"bazel_skylib",
+"blake3",
+"buildifier_prebuilt",
+"grpc",
+"grpc-java",
+"platforms",
+"protobuf",
+"rules_cc",
+"rules_java",
+"rules_jvm_external",
+"rules_license",
+"rules_pkg",
+"rules_python",
+"rules_shell",
+"zstd-jni"
+],
+"coroutines": [
+"abseil-cpp",
+"bazel_skylib",
+"googletest",
+"platforms",
+"rules_cc"
+],
+"cpio": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf",
+"rules_shell"
+],
+"cpp-httplib": [
+"boringssl",
+"rules_cc",
+"zlib"
+],
+"cpp-peglib": [
+"rules_cc"
+],
+"cpp-sqlite": [
+"rules_cc",
+"rules_license",
+"sqlite3"
+],
+"cpp_fpm": [
+"rules_cc"
+],
+"cpp_toolbelt": [
+"abseil-cpp",
+"bazel_skylib",
+"coroutines",
+"googletest",
+"platforms",
+"rules_cc"
+],
+"cppcheck": [
+"platforms",
+"rules_cc",
+"tinyxml2"
+],
+"cppitertools": [],
+"cpplint": [
+"rules_python"
+],
+"cppoptlib": [
+"eigen",
+"googletest",
+"rules_cc"
+],
+"cppregpattern": [
+"rules_license"
+],
+"cpptoml": [
+"rules_cc"
+],
+"cpptrace": [
+"bazel_skylib",
+"libdwarf",
+"libunwind",
+"platforms",
+"rules_cc"
+],
+"cppunit": [
+"platforms",
+"rules_cc"
+],
+"cppzmq": [
+"libzmq",
+"rules_cc",
+"rules_license"
+],
+"cpr": [
+"bazel_skylib",
+"curl",
+"rules_cc",
+"rules_license"
+],
+"cpu_features": [
+"bazel_skylib",
+"googletest",
+"platforms",
+"rules_cc"
+],
+"cpuinfo": [
+"platforms",
+"rules_cc",
+"rules_license"
+],
+"crc32c": [],
+"crispy-doom": [
+"platforms",
+"rules_cc",
+"rules_cc_autoconf",
+"rules_license",
+"sdl2",
+"sdl2_mixer",
+"zlib"
+],
+"crowcpp": [
+"asio",
+"bazel_skylib",
+"catch2",
+"rules_cc",
+"zlib"
+],
+"csv-parser": [],
+"cucumber-cpp": [
+"asio",
+"googletest",
+"nlohmann_json",
+"platforms",
+"rules_cc",
+"tclap"
+],
+"cucumberswift_expressions": [
+"apple_support",
+"rules_swift"
+],
+"cuda_toolchain_types": [
+"bazel_skylib"
+],
+"cuda_toolkit": [
+"bazel_lib",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"cuda_toolchain_types",
+"gazelle",
+"platforms",
+"rules_cc",
+"stardoc",
+"zlib"
+],
+"cudd": [
+"rules_cc",
+"rules_license"
+],
+"cudnn_frontend": [
+"rules_cc"
+],
+"cunit": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_shell"
+],
+"curl": [
+"bazel_skylib",
+"boringssl",
+"mbedtls",
+"openssl",
+"platforms",
+"rules_cc"
+],
+"cutlass": [
+"rules_cc"
+],
+"cxx.rs": [
+"apple_support",
+"bazel_features",
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_rust"
+],
+"cxxopts": [
+"rules_cc"
+],
+"cxxtest": [
+"rules_cc",
+"rules_python"
+],
+"cxxurl": [
+"rules_cc"
+],
+"cyclonedds": [
+"cmake_configure_file",
+"package_metadata",
+"platforms",
+"rules_cc"
+],
+"cython": [
+"rules_cc",
+"rules_python"
+],
+"daqp": [
+"bazel_skylib",
+"eigen",
+"platforms",
+"rules_cc"
+],
+"darts-clone": [
+"rules_cc"
+],
+"dartsim": [
+"assimp",
+"bullet",
+"cmake_configure_file",
+"eigen",
+"fcl",
+"fmt",
+"ode",
+"platforms",
+"rules_cc",
+"rules_license",
+"tinyxml2"
+],
+"dav1d": [
+"platforms",
+"rules_cc"
+],
+"debian_dependency_bazelizer": [
+"ofiuco",
+"rules_python"
+],
+"delaunator-cpp": [
+"rules_cc"
+],
+"depend_on_what_you_use": [
+"bazel_lib",
+"bazel_skylib",
+"boost.assert",
+"boost.concept_check",
+"boost.config",
+"boost.core",
+"boost.filesystem",
+"boost.format",
+"boost.iterator",
+"boost.lexical_cast",
+"boost.mpl",
+"boost.multi_index",
+"boost.optional",
+"boost.pool",
+"boost.preprocessor",
+"boost.regex",
+"boost.serialization",
+"boost.smart_ptr",
+"boost.spirit",
+"boost.static_assert",
+"boost.throw_exception",
+"boost.type_traits",
+"buildozer",
+"googletest",
+"nlohmann_json",
+"protobuf",
+"rules_cc",
+"rules_python",
+"stardoc",
+"toolchains_llvm"
+],
+"diff.bzl": [
+"bazel_lib",
+"bazel_skylib",
+"bazelrc-preset.bzl",
+"buildifier_prebuilt",
+"package_metadata",
+"platforms",
+"protobuf",
+"stardoc"
+],
+"diffutils": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"sed"
+],
+"directxmath": [
+"bazel_skylib",
+"platforms",
+"rules_cc"
+],
+"distributed_point_functions": [
+"abseil-cpp",
+"boringssl",
+"cppitertools",
+"gflags",
+"glog",
+"google_benchmark",
+"googletest",
+"highway",
+"protobuf",
+"rapidjson",
+"riegeli",
+"rules_cc",
+"rules_go",
+"rules_license",
+"rules_proto",
+"tink_cc"
+],
+"divsufsort": [
+"bazel_skylib",
+"rules_cc"
+],
+"dlpack": [
+"rules_cc"
+],
+"dnsmasq": [
+"bazel_skylib",
+"platforms",
+"rules_cc"
+],
+"docoptexpr": [
+"hedron_compile_commands",
+"platforms",
+"rules_cc"
+],
+"doctest": [
+"rules_cc"
+],
+"double-conversion": [
+"platforms",
+"rules_cc"
+],
+"download_archives": [
+"aspect_bazel_lib",
+"bazel_skylib",
+"version_utils"
+],
+"download_utils": [
+"bazel_skylib",
+"ci-component-bazelisk",
+"llvm",
+"pre-commit",
+"pre-commit-hooks",
+"rules_license",
+"rules_python",
+"rules_testing",
+"toolchain_utils"
+],
+"doxygen": [
+"bison",
+"flex",
+"platforms",
+"rules_cc",
+"rules_python"
+],
+"dtc": [
+"bazel_skylib",
+"bison",
+"flex",
+"hermetic_cc_toolchain",
+"libyaml",
+"rules_cc"
+],
+"dumb-init": [
+"rules_cc",
+"rules_license",
+"xxd"
+],
+"dylib": [
+"platforms",
+"rules_cc"
+],
+"earcut": [],
+"effcee": [
+"googletest",
+"re2",
+"rules_cc",
+"rules_python"
+],
+"egl-registry": [
+"rules_cc"
+],
+"eigen": [
+"bazel_skylib",
+"rules_cc",
+"rules_license"
+],
+"elemental2": [
+"bazel_skylib",
+"google_bazel_common",
+"j2cl",
+"jsinterop_base",
+"jsinterop_generator",
+"rules_java",
+"rules_jvm_external",
+"rules_license"
+],
+"elfutils": [
+"bazel_skylib",
+"rules_cc",
+"rules_m4",
+"zlib"
+],
+"emboss": [
+"abseil-cpp",
+"googletest",
+"rules_cc",
+"rules_python",
+"rules_shell"
+],
+"embree": [
+"bazel_skylib",
+"onetbb",
+"platforms",
+"rules_cc"
+],
+"emdawnwebgpu": [
+"package_metadata",
+"platforms",
+"rules_cc"
+],
+"emsdk": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_nodejs",
+"rules_python"
+],
+"engflowapis": [
+"googleapis",
+"protobuf",
+"rules_proto"
+],
+"engflowapis-go": [
+"engflowapis",
+"gazelle",
+"googleapis",
+"rules_go"
+],
+"engflowapis-java": [
+"engflowapis",
+"grpc-java",
+"protobuf",
+"rules_java"
+],
+"envoy_api": [
+"abseil-cpp",
+"aspect_bazel_lib",
+"bazel_skylib",
+"gazelle",
+"googleapis",
+"googleapis-cc",
+"googleapis-go",
+"googleapis-java",
+"googletest",
+"grpc",
+"opentelemetry-proto",
+"protobuf",
+"protoc-gen-validate",
+"re2",
+"rules_cc",
+"rules_go",
+"rules_java",
+"rules_jvm_external",
+"rules_proto",
+"rules_python",
+"xds",
+"zipkin-api"
+],
+"envoy_toolshed": [
+"aspect_bazel_lib",
+"bazel_skylib",
+"platforms",
+"rules_foreign_cc",
+"rules_pkg",
+"rules_python",
+"rules_shell",
+"toolchains_llvm"
+],
+"esaxx": [
+"rules_cc"
+],
+"etherlab-ethercat": [
+"googletest",
+"rtipc",
+"rules_cc",
+"rules_license"
+],
+"evidence_store_bazel": [
+"gazelle",
+"rules_go"
+],
+"exempi": [
+"boost.format",
+"boost.test",
+"libexpat",
+"platforms",
+"rules_cc",
+"zlib"
+],
+"exprtk": [
+"rules_cc"
+],
+"extra_rules_java": [
+"rules_java",
+"rules_jvm_external"
+],
+"faiss": [
+"openmp",
+"package_metadata",
+"platforms",
+"rules_cc",
+"rules_cuda"
+],
+"fast_double_parser": [],
+"fast_float": [
+"doctest",
+"rules_cc"
+],
+"fastcdr": [
+"cmake_configure_file",
+"package_metadata",
+"platforms",
+"rules_cc"
+],
+"fastdds": [
+"asio",
+"cmake_configure_file",
+"fastcdr",
+"foonathan_memory",
+"nlohmann_json",
+"openssl",
+"platforms",
+"rules_cc",
+"sqlite3",
+"tinyxml2"
+],
+"fastjson": [
+"boost.property_tree",
+"platforms",
+"rules_cc",
+"saru"
+],
+"fasttext": [
+"platforms",
+"pybind11_bazel",
+"rules_cc",
+"rules_python"
+],
+"fbthrift": [
+"boost.algorithm",
+"boost.container",
+"boost.core",
+"fmt",
+"folly",
+"gflags",
+"glog",
+"openssl",
+"rules_cc"
+],
+"fcl": [
+"bazel_skylib",
+"ccd",
+"cmake_configure_file",
+"eigen",
+"octomap",
+"platforms",
+"rules_cc",
+"rules_license"
+],
+"federated_language": [
+"protobuf",
+"rules_license",
+"rules_python",
+"rules_shell"
+],
+"ffmpeg": [
+"alsa_lib",
+"aom",
+"apple_support",
+"bazel_skylib",
+"boringssl",
+"bzip2",
+"codec2",
+"dav1d",
+"ffnvcodec",
+"freetype",
+"gmp",
+"gsm",
+"harfbuzz",
+"lame",
+"libjxl",
+"libsvtav1",
+"libvpx",
+"libwebp",
+"libxcb",
+"libxml2",
+"libzmq",
+"mbedtls",
+"opencv",
+"openjpeg",
+"openssl",
+"opus",
+"platforms",
+"rav1e",
+"rules_cc",
+"rules_cc_autoconf",
+"rules_nasm",
+"shine",
+"snappy",
+"speex",
+"twolame",
+"vorbis",
+"x264",
+"x265",
+"xvidcore",
+"xz",
+"zlib"
+],
+"ffnvcodec": [
+"rules_cc"
+],
+"fftw": [
+"platforms",
+"rules_autoconf",
+"rules_cc"
+],
+"fildesh": [
+"google_benchmark",
+"platforms",
+"rules_cc",
+"rules_license"
+],
+"fire": [
+"aspect_rules_lint",
+"bazel_skylib",
+"rules_cc",
+"rules_go",
+"rules_java",
+"rules_python",
+"rules_rust"
+],
+"fizz": [
+"bazel_skylib",
+"boost.variant",
+"brotli",
+"fmt",
+"folly",
+"glog",
+"libsodium",
+"openssl",
+"platforms",
+"rules_cc",
+"rules_license",
+"zlib",
+"zstd"
+],
+"fkyaml": [],
+"flac": [
+"ogg",
+"platforms",
+"rules_cc"
+],
+"flann": [
+"lz4",
+"rules_cc"
+],
+"flatbuffers": [
+"aspect_bazel_lib",
+"aspect_rules_esbuild",
+"aspect_rules_js",
+"aspect_rules_ts",
+"bazel_skylib",
+"grpc",
+"platforms",
+"rules_cc",
+"rules_go",
+"rules_nodejs",
+"rules_shell",
+"rules_swift"
+],
+"flex": [
+"bazel_skylib",
+"bison",
+"m4",
+"package_metadata",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf"
+],
+"flip": [],
+"fmt": [
+"package_metadata",
+"rules_cc",
+"rules_license"
+],
+"folly": [
+"bazel_skylib",
+"boost.algorithm",
+"boost.container",
+"boost.container_hash",
+"boost.context",
+"boost.conversion",
+"boost.core",
+"boost.crc",
+"boost.filesystem",
+"boost.function_types",
+"boost.functional",
+"boost.interprocess",
+"boost.intrusive",
+"boost.iterator",
+"boost.mpl",
+"boost.multi_index",
+"boost.preprocessor",
+"boost.program_options",
+"boost.random",
+"boost.range",
+"boost.regex",
+"boost.smart_ptr",
+"boost.sort",
+"boost.thread",
+"boost.utility",
+"boost.variant",
+"bzip2",
+"cmake_configure_file",
+"fast_float",
+"fmt",
+"gflags",
+"glog",
+"googletest",
+"libaio",
+"libdwarf",
+"libevent",
+"libsodium",
+"libunwind",
+"liburing",
+"lz4",
+"openssl",
+"platforms",
+"range-v3",
+"rules_cc",
+"snappy",
+"xz",
+"zlib",
+"zstd"
+],
+"fontconfig": [
+"freetype",
+"libexpat",
+"platforms",
+"rules_cc"
+],
+"foonathan_memory": [
+"cmake_configure_file",
+"rules_cc"
+],
+"foxglove_schemas_protobuf": [
+"protobuf"
+],
+"foxglove_websocket": [
+"boringssl",
+"nlohmann_json",
+"rules_cc",
+"websocketpp"
+],
+"foxglove_ws_protocol": [
+"boringssl",
+"nlohmann_json",
+"rules_cc",
+"websocketpp"
+],
+"fp16": [],
+"freeimage": [
+"libjpeg_turbo",
+"libpng",
+"libwebp",
+"openexr",
+"platforms",
+"rules_cc",
+"rules_license",
+"zlib"
+],
+"freertos": [
+"pico-sdk",
+"platforms",
+"rules_cc"
+],
+"freetype": [
+"libpng",
+"rules_cc"
+],
+"fremtind_rules_vitest": [
+"aspect_bazel_lib",
+"aspect_rules_js",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"buildifier_prebuilt",
+"gazelle",
+"rules_nodejs",
+"stardoc"
+],
+"fribidi": [
+"rules_cc"
+],
+"fshlib": [
+"protobuf",
+"rules_android",
+"rules_go",
+"rules_shell"
+],
+"ftxui": [
+"googletest",
+"platforms",
+"rules_cc"
+],
+"fuzztest": [
+"abseil-cpp",
+"antlr4-cpp-runtime",
+"bazel_skylib",
+"flatbuffers",
+"googletest",
+"nlohmann_json",
+"platforms",
+"protobuf",
+"re2",
+"riegeli",
+"rules_cc",
+"rules_shell"
+],
+"fxdiv": [
+"google_benchmark",
+"googletest",
+"rules_cc"
+],
+"fzf": [
+"gazelle",
+"platforms",
+"rules_cc",
+"rules_go"
+],
+"gason": [
+"platforms",
+"rapidjson",
+"rules_cc"
+],
+"gateweavers_rules_vhdl": [
+"aspect_rules_py",
+"bazel_skylib",
+"gazelle",
+"platforms",
+"rules_go",
+"rules_python"
+],
+"gavel_tools": [
+"aspect_bazel_lib",
+"aspect_rules_esbuild",
+"aspect_rules_js",
+"aspect_rules_ts",
+"gazelle",
+"rules_go",
+"rules_java",
+"rules_nodejs",
+"rules_python",
+"rules_rust"
+],
+"gawk": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf",
+"rules_shell"
+],
+"gazelle": [
+"bazel_features",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"package_metadata",
+"platforms",
+"protobuf",
+"rules_cc",
+"rules_go",
+"rules_license",
+"rules_shell",
+"rules_testing",
+"stardoc"
+],
+"gazelle_cc": [
+"bazel_skylib",
+"gazelle",
+"grpc",
+"package_metadata",
+"platforms",
+"protobuf",
+"rules_cc",
+"rules_go",
+"rules_proto",
+"rules_python"
+],
+"gazelle_css": [
+"gazelle",
+"rules_go"
+],
+"gazelle_d": [
+"bazelrc-preset.bzl",
+"gazelle",
+"rules_d",
+"rules_go"
+],
+"gazelle_fold": [
+"gazelle",
+"rules_go"
+],
+"gazelle_orbit": [
+"bazel_skylib",
+"curl",
+"gazelle",
+"openssl",
+"rules_cc",
+"rules_go",
+"rules_rust",
+"rules_verilog",
+"rules_vhdl",
+"zstd"
+],
+"gazelle_py": [
+"gazelle",
+"llvm",
+"platforms",
+"protobuf",
+"rules_go",
+"rules_proto",
+"rules_rs",
+"with_cfg.bzl"
+],
+"gazelle_rs": [
+"gazelle",
+"llvm",
+"platforms",
+"protobuf",
+"rules_go",
+"rules_proto",
+"rules_rs",
+"with_cfg.bzl"
+],
+"gazelle_rust": [
+"gazelle",
+"rules_go",
+"rules_proto",
+"rules_rust",
+"rules_rust_prost",
+"rules_shell"
+],
+"gazelle_ts": [
+"gazelle",
+"llvm",
+"platforms",
+"protobuf",
+"rules_go",
+"rules_proto",
+"rules_rs",
+"with_cfg.bzl"
+],
+"gcc_toolchain": [
+"bazel_lib",
+"bazel_skylib",
+"platforms",
+"protobuf",
+"rules_cc",
+"rules_foreign_cc",
+"rules_shell",
+"stardoc"
+],
+"gcem": [
+"rules_cc"
+],
+"gdk-pixbuf": [
+"bazel_skylib",
+"glib",
+"libjpeg_turbo",
+"libpng",
+"platforms",
+"rules_autoconf",
+"rules_cc"
+],
+"generate_export_header": [],
+"geographiclib": [
+"cmake_configure_file",
+"platforms",
+"rules_cc"
+],
+"geometry-central": [
+"eigen",
+"googletest",
+"happly",
+"nanoflann",
+"platforms"
+],
+"gflags": [
+"platforms",
+"rules_cc"
+],
+"ghdl": [
+"bazel_skylib",
+"llvm-project",
+"platforms",
+"rules_ada",
+"rules_cc",
+"zlib"
+],
+"giflib": [
+"platforms",
+"rules_cc"
+],
+"gifsicle": [
+"platforms",
+"rules_foreign_cc",
+"rules_license"
+],
+"git": [
+"bazel_skylib",
+"curl",
+"libexpat",
+"openssl",
+"platforms",
+"rules_cc",
+"rules_perl",
+"rules_python",
+"rules_rust",
+"rules_shell",
+"zlib"
+],
+"glew": [
+"glu",
+"libx11",
+"platforms",
+"rules_cc"
+],
+"glfw": [
+"apple_support",
+"egl-registry",
+"libffi",
+"libx11",
+"libxcursor",
+"libxi",
+"libxinerama",
+"libxrandr",
+"opengl-registry",
+"package_metadata",
+"platforms",
+"rules_cc",
+"wayland",
+"xkbcommon"
+],
+"glib": [
+"apple_support",
+"bazel_skylib",
+"libffi",
+"pcre2",
+"platforms",
+"rules_cc",
+"rules_license",
+"rules_python",
+"zlib"
+],
+"glm": [
+"package_metadata",
+"rules_cc"
+],
+"glog": [
+"gflags",
+"rules_cc"
+],
+"gloop": [
+"abseil-cpp",
+"aspect_bazel_lib",
+"aspect_rules_esbuild",
+"bazel_skylib",
+"boringssl",
+"brotli",
+"docker_toolchain",
+"fuzztest",
+"gloop_examples",
+"google_benchmark",
+"googleapis",
+"googletest",
+"grpc",
+"highwayhash",
+"numactl",
+"platforms",
+"protobuf",
+"re2",
+"rules_cc",
+"rules_license",
+"rules_shell",
+"rules_swift",
+"snappy",
+"tcmalloc",
+"zlib"
+],
+"glpk": [
+"rules_cc",
+"zlib"
+],
+"glu": [
+"platforms",
+"rules_cc"
+],
+"glucose": [
+"rules_cc",
+"zlib"
+],
+"gmp": [
+"bazel_skylib",
+"m4",
+"package_metadata",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf"
+],
+"gonzojive_protobuf_javascript": [
+"abseil-cpp",
+"hedron_compile_commands",
+"protobuf",
+"rules_pkg"
+],
+"google_bazel_common": [
+"bazel_skylib",
+"rules_java",
+"rules_jvm_external"
+],
+"google_benchmark": [
+"bazel_skylib",
+"googletest",
+"libpfm",
+"nanobind_bazel",
+"platforms",
+"rules_cc",
+"rules_python"
+],
+"google_cloud_cpp": [
+"abseil-cpp",
+"bazel_skylib",
+"boringssl",
+"curl",
+"google_benchmark",
+"googleapis",
+"googleapis-cc",
+"googleapis-grpc-cc",
+"googletest",
+"grpc",
+"nlohmann_json",
+"opentelemetry-cpp",
+"platforms",
+"protobuf",
+"protoc-gen-validate",
+"pugixml",
+"rules_apple",
+"rules_cc",
+"rules_proto",
+"rules_python",
+"yaml-cpp"
+],
+"googleapis": [
+"googleapis-rules-registry",
+"protobuf",
+"rules_proto"
+],
+"googleapis-rules-registry": [],
+"googletest": [
+"abseil-cpp",
+"platforms",
+"re2",
+"rules_cc",
+"rules_python"
+],
+"gotopt2": [
+"bazel_bats",
+"bazel_lib",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"buildifier_prebuilt",
+"gazelle",
+"protobuf",
+"rules_go",
+"rules_multitool",
+"rules_pkg",
+"rules_shell",
+"stardoc"
+],
+"gperf": [
+"rules_cc"
+],
+"gperftools": [
+"aw-backtrace",
+"bazel_skylib",
+"googletest",
+"platforms",
+"rules_cc"
+],
+"graaf": [],
+"graphene": [
+"bazel_skylib",
+"glib",
+"platforms",
+"rules_cc"
+],
+"graphite2": [
+"bazel_skylib",
+"rules_cc"
+],
+"graphviz": [
+"rules_cc",
+"rules_shell",
+"zlib"
+],
+"greatest": [
+"rules_cc"
+],
+"grep": [
+"bazel_skylib",
+"pcre2",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf"
+],
+"grpc": [
+"abseil-cpp",
+"apple_support",
+"bazel_skylib",
+"boringssl",
+"c-ares",
+"cython",
+"envoy_api",
+"fuzztest",
+"google_benchmark",
+"google_cloud_cpp",
+"googleapis",
+"googleapis-cc",
+"googleapis-grpc-cc",
+"googleapis-python",
+"googletest",
+"grpc-proto",
+"libpfm",
+"opencensus-cpp",
+"openssl",
+"opentelemetry-cpp",
+"platforms",
+"protobuf",
+"protoc-gen-validate",
+"re2",
+"riegeli",
+"rules_apple",
+"rules_cc",
+"rules_go",
+"rules_proto",
+"rules_python",
+"rules_shell",
+"rules_swift",
+"xds",
+"yaml-cpp",
+"zlib"
+],
+"grpc-httpjson-transcoding": [
+"abseil-cpp",
+"google_benchmark",
+"googletest",
+"nlohmann_json",
+"proto-converter",
+"protobuf",
+"rules_cc",
+"rules_fuzzing",
+"rules_proto",
+"zlib"
+],
+"grpc-java": [
+"abseil-cpp",
+"bazel_jar_jar",
+"bazel_skylib",
+"googleapis",
+"grpc-proto",
+"protobuf",
+"rules_android",
+"rules_cc",
+"rules_java",
+"rules_jvm_external",
+"rules_proto"
+],
+"grpc-proto": [
+"googleapis",
+"protobuf",
+"rules_proto"
+],
+"grpc_ecosystem_grpc_gateway": [
+"bazel_features",
+"bazel_skylib",
+"gazelle",
+"googleapis",
+"protobuf",
+"rules_android",
+"rules_go",
+"rules_license",
+"rules_proto",
+"rules_python",
+"rules_rust",
+"rules_shell"
+],
+"grpc_kotlin": [
+"format",
+"grpc-java",
+"protobuf",
+"rules_java",
+"rules_jvm_external",
+"rules_kotlin"
+],
+"gsl": [
+"googletest",
+"rules_cc",
+"rules_license"
+],
+"gsl-lite": [
+"rules_cc",
+"rules_license"
+],
+"gsm": [
+"rules_cc"
+],
+"gtk": [
+"bazel_skylib",
+"cairo",
+"fontconfig",
+"fribidi",
+"gdk-pixbuf",
+"glib",
+"graphene",
+"harfbuzz",
+"libepoxy",
+"libjpeg_turbo",
+"libpng",
+"libtiff",
+"libx11",
+"libxcursor",
+"libxdamage",
+"libxext",
+"libxfixes",
+"libxi",
+"libxinerama",
+"libxml2",
+"libxrandr",
+"libxrender",
+"pango",
+"platforms",
+"rules_cc",
+"rules_python"
+],
+"gtsam": [
+"bazel_skylib",
+"boost.assign",
+"boost.bimap",
+"boost.chrono",
+"boost.date_time",
+"boost.filesystem",
+"boost.format",
+"boost.graph",
+"boost.lexical_cast",
+"boost.math",
+"boost.regex",
+"boost.serialization",
+"boost.system",
+"boost.thread",
+"boost.timer",
+"cmake_configure_file",
+"eigen",
+"geographiclib",
+"rules_cc"
+],
+"gutil": [
+"abseil-cpp",
+"buildifier_prebuilt",
+"google_benchmark",
+"googletest",
+"protobuf",
+"re2",
+"rules_cc",
+"rules_license"
+],
+"gz-common": [
+"assimp",
+"bazel_skylib",
+"buildifier_prebuilt",
+"cdt",
+"googletest",
+"gz-math",
+"gz-utils",
+"libuuid",
+"remotery",
+"rules_cc",
+"rules_gazebo",
+"rules_license",
+"spdlog",
+"tinyxml2"
+],
+"gz-fuel-tools": [
+"buildifier_prebuilt",
+"curl",
+"googletest",
+"gz-common",
+"gz-math",
+"gz-msgs",
+"gz-utils",
+"jsoncpp",
+"libyaml",
+"libzip",
+"protobuf",
+"rules_cc",
+"rules_gazebo",
+"rules_license",
+"tinyxml2"
+],
+"gz-math": [
+"buildifier_prebuilt",
+"eigen",
+"googletest",
+"gz-utils",
+"platforms",
+"pybind11_bazel",
+"rules_cc",
+"rules_gazebo",
+"rules_license",
+"rules_python"
+],
+"gz-msgs": [
+"buildifier_prebuilt",
+"googletest",
+"gz-math",
+"gz-utils",
+"protobuf",
+"rules_cc",
+"rules_gazebo",
+"rules_license",
+"rules_proto",
+"rules_python",
+"tinyxml2"
+],
+"gz-physics": [
+"bazel_skylib",
+"buildifier_prebuilt",
+"bullet",
+"dartsim",
+"eigen",
+"googletest",
+"gz-common",
+"gz-math",
+"gz-plugin",
+"gz-utils",
+"rules_cc",
+"rules_gazebo",
+"rules_license",
+"sdformat"
+],
+"gz-plugin": [
+"buildifier_prebuilt",
+"googletest",
+"gz-utils",
+"rules_cc",
+"rules_gazebo",
+"rules_license"
+],
+"gz-rendering": [
+"bazel_skylib",
+"buildifier_prebuilt",
+"egl-registry",
+"googletest",
+"gz-common",
+"gz-math",
+"gz-plugin",
+"gz-utils",
+"ogre-next",
+"platforms",
+"rules_cc",
+"rules_gazebo",
+"rules_license"
+],
+"gz-sensors": [
+"bazel_skylib",
+"buildifier_prebuilt",
+"eigen",
+"googletest",
+"gz-common",
+"gz-math",
+"gz-msgs",
+"gz-rendering",
+"gz-transport",
+"gz-utils",
+"rules_cc",
+"rules_gazebo",
+"rules_license",
+"sdformat"
+],
+"gz-sim": [
+"bazel_skylib",
+"buildifier_prebuilt",
+"eigen",
+"googletest",
+"gz-common",
+"gz-fuel-tools",
+"gz-math",
+"gz-msgs",
+"gz-physics",
+"gz-plugin",
+"gz-rendering",
+"gz-sensors",
+"gz-transport",
+"gz-utils",
+"protobuf",
+"rules_cc",
+"rules_gazebo",
+"rules_license",
+"rules_proto",
+"sdformat",
+"tinyxml2"
+],
+"gz-transport": [
+"buildifier_prebuilt",
+"cppzmq",
+"googletest",
+"gz-common",
+"gz-math",
+"gz-msgs",
+"gz-utils",
+"libuuid",
+"libzmq",
+"protobuf",
+"rules_cc",
+"rules_gazebo",
+"rules_license",
+"rules_proto",
+"sqlite3"
+],
+"gz-utils": [
+"buildifier_prebuilt",
+"googletest",
+"rules_cc",
+"rules_gazebo",
+"rules_license",
+"spdlog"
+],
+"gzgz_rules_sass": [
+"bazel_lib",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"bazelrc-preset.bzl",
+"gazelle",
+"package_metadata",
+"platforms"
+],
+"gzip": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf",
+"rules_shell"
+],
+"happly": [],
+"harfbuzz": [
+"bazel_skylib",
+"freetype",
+"glib",
+"icu",
+"platforms",
+"rules_cc"
+],
+"hashes.bzl": [
+"aspect_rules_py",
+"bazel_skylib",
+"buildifier_prebuilt",
+"rules_python"
+],
+"hdrhistogram_c": [
+"zlib"
+],
+"helly25_bashtest": [
+"bazel_skylib",
+"platforms",
+"rules_shell"
+],
+"helly25_bzl": [
+"bazel_skylib"
+],
+"helly25_mbo": [
+"abseil-cpp",
+"bazel_skylib",
+"google_benchmark",
+"googletest",
+"helly25_bashtest",
+"platforms",
+"re2",
+"rules_cc",
+"rules_shell"
+],
+"helly25_proto": [
+"abseil-cpp",
+"bazel_skylib",
+"googletest",
+"platforms",
+"protobuf",
+"re2",
+"rules_android",
+"rules_cc",
+"rules_go",
+"rules_shell"
+],
+"hermetic_android_toolchains": [
+"bazel_skylib",
+"llvm",
+"platforms",
+"protobuf",
+"rules_android",
+"rules_android_ndk",
+"rules_cc",
+"rules_java",
+"rules_jvm_external",
+"rules_python",
+"rules_shell"
+],
+"hermetic_cc_toolchain": [
+"bazel_features",
+"gazelle",
+"platforms",
+"rules_cc",
+"rules_go"
+],
+"hermetic_clang_toolchain": [
+"platforms",
+"rules_cc"
+],
+"hermetic_launcher": [
+"bazel_lib",
+"bazel_skylib",
+"bzip2",
+"llvm",
+"platforms",
+"rules_cc",
+"rules_go",
+"rules_platform",
+"rules_python",
+"rules_rs",
+"rules_shell",
+"rules_testing",
+"xz"
+],
+"hfsm2": [
+"rules_cc",
+"rules_license"
+],
+"highs": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_cuda",
+"zlib"
+],
+"highway": [
+"bazel_skylib",
+"googletest",
+"platforms",
+"rules_cc",
+"rules_license"
+],
+"highwayhash": [
+"platforms",
+"rules_cc"
+],
+"hiredis": [
+"boringssl",
+"glib",
+"libevent",
+"libuv",
+"platforms",
+"rules_cc"
+],
+"howardhinnant_date": [
+"rules_cc"
+],
+"hugooole_muda": [
+"bazel_skylib",
+"eigen",
+"rules_cc",
+"rules_license"
+],
+"hypothesis": [
+"rules_cc"
+],
+"iceoryx": [
+"bazel_skylib",
+"buildifier_prebuilt",
+"cpptoml",
+"googletest",
+"ncurses",
+"platforms",
+"rules_cc"
+],
+"iceoryx2": [
+"bazel_features",
+"bazel_skylib",
+"googletest",
+"platforms",
+"rules_cc",
+"rules_rust",
+"rules_rust_bindgen",
+"toolchains_llvm"
+],
+"icestorm": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_python"
+],
+"icu": [
+"platforms",
+"rules_cc"
+],
+"imath": [
+"bazel_skylib",
+"rules_cc",
+"rules_java"
+],
+"imgui": [
+"glfw",
+"platforms",
+"rules_cc"
+],
+"implot": [
+"imgui",
+"platforms",
+"rules_cc"
+],
+"implot3d": [
+"glfw",
+"imgui",
+"implot"
+],
+"inno-lidar-sdk": [
+"platforms",
+"rules_cc"
+],
+"intrinsic-clips": [
+"rules_cc",
+"rules_license"
+],
+"iperf": [
+"bazel_skylib",
+"openssl",
+"rules_cc",
+"rules_license"
+],
+"isl": [
+"rules_cc",
+"rules_license"
+],
+"iverilog": [
+"bazel_skylib",
+"bison",
+"bzip2",
+"flex",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf",
+"zlib"
+],
+"j2cl": [
+"bazel_skylib",
+"bazel_worker_java",
+"fp16",
+"google_bazel_common",
+"protobuf",
+"rules_cc",
+"rules_closure",
+"rules_java",
+"rules_jvm_external",
+"rules_kotlin",
+"rules_license",
+"rules_python",
+"rules_shell",
+"rules_webtesting"
+],
+"javacc": [
+"rules_java"
+],
+"javaparser": [
+"bazel_skylib",
+"javacc",
+"rules_java"
+],
+"jeffmanzione_intern": [
+"googletest",
+"rules_cc"
+],
+"jeffmanzione_rzalloc": [
+"google_benchmark",
+"googletest",
+"rules_cc"
+],
+"jemalloc": [
+"bazel_lib",
+"bazel_skylib",
+"libunwind",
+"platforms",
+"rules_cc",
+"rules_license",
+"rules_shell"
+],
+"jq.bzl": [
+"bazel_lib",
+"bazelrc-preset.bzl",
+"buildifier_prebuilt",
+"package_metadata",
+"platforms"
+],
+"jsinterop_base": [
+"bazel_skylib",
+"google_bazel_common",
+"j2cl",
+"rules_java",
+"rules_jvm_external",
+"rules_license"
+],
+"jsinterop_generator": [
+"bazel_skylib",
+"google_bazel_common",
+"j2cl",
+"jsinterop_base",
+"rules_closure",
+"rules_java",
+"rules_jvm_external",
+"rules_license",
+"rules_shell"
+],
+"jsmn": [
+"platforms",
+"rules_cc"
+],
+"json11": [
+"platforms",
+"rules_cc"
+],
+"json_spirit": [
+"boost.bind",
+"boost.config",
+"boost.function",
+"boost.smart_ptr",
+"boost.spirit",
+"boost.static_assert",
+"boost.variant",
+"rules_cc"
+],
+"jsoncons": [
+"rules_cc"
+],
+"jsoncpp": [
+"rules_cc"
+],
+"jsonnet": [
+"googletest",
+"rules_cc",
+"rules_python",
+"rules_shell"
+],
+"jsonnet_go": [
+"gazelle",
+"rules_cc",
+"rules_go"
+],
+"julia_depot": [
+"platforms"
+],
+"jvm_image": [
+"buildifier_prebuilt",
+"gazelle",
+"rules_go",
+"rules_java"
+],
+"jwt-cpp": [
+"boringssl",
+"nlohmann_json",
+"rules_license"
+],
+"jwt_verify_lib": [
+"abseil-cpp",
+"boringssl",
+"googletest",
+"libprotobuf-mutator",
+"protobuf",
+"rules_fuzzing",
+"rules_proto"
+],
+"kdtreepp": [
+"eigen",
+"rules_cc"
+],
+"keynub_licdongle": [
+"platforms",
+"rules_cc"
+],
+"kissat": [
+"rules_cc"
+],
+"kleidiai": [
+"bazel_skylib",
+"google_benchmark",
+"googletest",
+"platforms",
+"rules_cc"
+],
+"lame": [
+"platforms",
+"rules_cc"
+],
+"lanelet2": [
+"boost.config",
+"boost.core",
+"boost.filesystem",
+"boost.format",
+"boost.geometry",
+"boost.graph",
+"boost.iterator",
+"boost.lexical_cast",
+"boost.optional",
+"boost.polygon",
+"boost.program_options",
+"boost.property_map",
+"boost.serialization",
+"boost.type_traits",
+"boost.units",
+"boost.variant",
+"eigen",
+"geographiclib",
+"googletest",
+"platforms",
+"pugixml",
+"rules_cc",
+"rules_license"
+],
+"lcm": [
+"apple_support",
+"bazel_skylib",
+"glib",
+"googletest",
+"pcre2",
+"platforms",
+"rules_cc",
+"rules_java",
+"rules_jvm_external",
+"rules_license",
+"rules_python"
+],
+"lcms2": [
+"platforms",
+"rules_cc"
+],
+"lcov": [
+"bazel_skylib",
+"platforms",
+"rules_perl"
+],
+"lexbor": [
+"platforms",
+"rules_cc"
+],
+"lexy": [
+"doctest",
+"rules_cc",
+"rules_license"
+],
+"libarchive": [
+"bazel_skylib",
+"bzip2",
+"lz4",
+"mbedtls",
+"platforms",
+"rules_cc",
+"xz",
+"zlib",
+"zstd"
+],
+"libass": [
+"fontconfig",
+"freetype",
+"fribidi",
+"harfbuzz",
+"libunibreak",
+"nasm",
+"platforms",
+"rules_cc"
+],
+"libavif": [
+"aom",
+"bazel_skylib",
+"libyuv",
+"platforms",
+"rules_cc"
+],
+"libbacktrace": [
+"platforms",
+"rules_cc",
+"rules_license"
+],
+"libbpf": [
+"elfutils",
+"rules_cc",
+"zlib"
+],
+"libc_replacer": [
+"buildifier_prebuilt",
+"clang_tools",
+"rules_cc",
+"testing",
+"toolchains_musl"
+],
+"libcap": [
+"package_metadata",
+"rules_cc",
+"sed"
+],
+"libcircllhist": [
+"platforms",
+"rules_cc"
+],
+"libconfig": [
+"platforms"
+],
+"libcpuid": [
+"platforms"
+],
+"libcreate": [
+"boost.asio",
+"boost.filesystem",
+"boost.numeric_ublas",
+"boost.system",
+"googletest",
+"rules_cc"
+],
+"libdatrie": [
+"platforms",
+"rules_cc"
+],
+"libde265": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf"
+],
+"libdeflate": [
+"rules_cc",
+"rules_license"
+],
+"libdwarf": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"zlib",
+"zstd"
+],
+"libedlib": [
+"rules_cc"
+],
+"libepoxy": [
+"bazel_skylib",
+"egl-registry",
+"libx11",
+"platforms",
+"rules_cc",
+"rules_python"
+],
+"libestr": [
+"rules_cc"
+],
+"libev": [
+"rules_cc",
+"rules_license"
+],
+"libevdev": [
+"platforms",
+"rules_cc",
+"rules_python"
+],
+"libevent": [
+"openssl",
+"platforms",
+"rules_cc",
+"rules_license",
+"zlib"
+],
+"libexpat": [
+"bazel_skylib",
+"platforms",
+"rules_cc"
+],
+"libfastjson": [
+"rules_cc"
+],
+"libffi": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_license"
+],
+"libfn": [
+"rules_cc"
+],
+"libfuse": [
+"liburing",
+"numactl",
+"rules_cc"
+],
+"libgd": [
+"bazel_skylib",
+"freetype",
+"libavif",
+"libheif",
+"libjpeg_turbo",
+"libpng",
+"libtiff",
+"libwebp",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf",
+"zlib"
+],
+"libgit2": [
+"bazel_skylib",
+"libssh2",
+"mbedtls",
+"openssl",
+"platforms",
+"rules_cc",
+"zlib"
+],
+"libgpiod": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf"
+],
+"libgps": [
+"rules_cc",
+"rules_python"
+],
+"libheif": [
+"bazel_skylib",
+"brotli",
+"libde265",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf",
+"zlib"
+],
+"libhubbub": [
+"gperf",
+"libparserutils",
+"rules_perl"
+],
+"libiberty": [
+"rules_cc"
+],
+"libigl": [
+"eigen",
+"rules_cc"
+],
+"libjpeg_turbo": [
+"bazel_skylib",
+"nasm",
+"platforms",
+"rules_cc",
+"rules_license"
+],
+"libjxl": [
+"bazel_skylib",
+"brotli",
+"giflib",
+"googletest",
+"highway",
+"libjpeg_turbo",
+"libpng",
+"libwebp",
+"openexr",
+"rules_cc",
+"skcms"
+],
+"libmagic": [
+"bazel_lib",
+"platforms",
+"rules_cc"
+],
+"libmaxminddb": [
+"cmake_configure_file",
+"rules_cc"
+],
+"libmdnsd": [
+"rules_autoconf",
+"rules_cc",
+"rules_license"
+],
+"libmicrohttpd": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf"
+],
+"libmodbus": [
+"bazel_skylib",
+"rules_cc"
+],
+"libpaper": [
+"platforms",
+"rules_cc",
+"rules_cc_autoconf"
+],
+"libparserutils": [],
+"libpcap": [
+"bazel_skylib",
+"bison",
+"flex",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf"
+],
+"libpfm": [
+"platforms",
+"rules_cc"
+],
+"libpng": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_license",
+"zlib"
+],
+"libprotobuf-mutator": [
+"protobuf",
+"rules_cc"
+],
+"librdkafka": [
+"bazel_skylib",
+"curl",
+"lz4",
+"openssl",
+"platforms",
+"rules_cc",
+"zlib",
+"zstd"
+],
+"librealsense": [
+"aspect_bazel_lib",
+"nlohmann_json",
+"platforms",
+"rules_cc",
+"rules_libusb",
+"rules_license",
+"systemd"
+],
+"librsvg": [
+"bazel_skylib",
+"cairo",
+"fontconfig",
+"freetype",
+"gdk-pixbuf",
+"glib",
+"harfbuzz",
+"libxml2",
+"pango",
+"platforms",
+"rules_cc",
+"rules_rs"
+],
+"libsais": [
+"bazel_skylib",
+"rules_cc"
+],
+"libsl3": [
+"doctest",
+"platforms",
+"rules_cc",
+"sqlite3"
+],
+"libsocketcan": [
+"package_metadata",
+"rules_cc"
+],
+"libsodium": [
+"platforms",
+"rules_cc",
+"rules_license"
+],
+"libssh2": [
+"bazel_skylib",
+"mbedtls",
+"openssl",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf",
+"zlib"
+],
+"libstemmer": [
+"rules_cc"
+],
+"libsvtav1": [
+"cpuinfo",
+"nasm",
+"platforms",
+"rules_cc",
+"rules_license",
+"rules_nasm"
+],
+"libthai": [
+"bazel_skylib",
+"libdatrie",
+"platforms",
+"rules_cc"
+],
+"libtiff": [
+"bazel_skylib",
+"cmake_configure_file",
+"libdeflate",
+"platforms",
+"rules_cc",
+"zlib"
+],
+"libudev-zero": [
+"bazel_skylib",
+"package_metadata",
+"platforms",
+"rules_cc"
+],
+"libunibreak": [
+"rules_cc"
+],
+"libunwind": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"xz",
+"zlib"
+],
+"liburing": [
+"rules_cc"
+],
+"libusb": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf"
+],
+"libuuid": [
+"package_metadata",
+"platforms",
+"rules_cc"
+],
+"libuv": [
+"platforms",
+"rules_cc"
+],
+"libvpx": [
+"bazel_skylib",
+"nasm",
+"platforms",
+"rules_cc",
+"rules_license",
+"rules_nasm",
+"rules_perl"
+],
+"libwebm": [
+"rules_cc",
+"rules_license"
+],
+"libwebp": [
+"platforms",
+"rules_cc"
+],
+"libwebsockets": [
+"bazel_skylib",
+"openssl",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf"
+],
+"libx11": [
+"bazel_skylib",
+"libxau",
+"libxcb",
+"libxtrans",
+"platforms",
+"rules_cc",
+"xorgproto"
+],
+"libxau": [
+"rules_cc",
+"xorgproto"
+],
+"libxcb": [
+"bazel_skylib",
+"libxau",
+"platforms",
+"rules_cc",
+"rules_python",
+"xcb-proto"
+],
+"libxcb-keysyms": [
+"libxcb",
+"rules_cc",
+"xorgproto"
+],
+"libxcrypt": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_coreutils",
+"rules_python",
+"toolchain_utils"
+],
+"libxcursor": [
+"bazel_skylib",
+"libx11",
+"libxfixes",
+"libxrender",
+"rules_cc"
+],
+"libxdamage": [
+"bazel_skylib",
+"libx11",
+"libxfixes",
+"platforms",
+"rules_cc",
+"xorgproto"
+],
+"libxev": [
+"rules_zig"
+],
+"libxext": [
+"bazel_skylib",
+"libx11",
+"rules_cc"
+],
+"libxfixes": [
+"bazel_skylib",
+"libx11",
+"rules_cc"
+],
+"libxi": [
+"bazel_skylib",
+"libx11",
+"libxext",
+"libxfixes",
+"rules_cc"
+],
+"libxinerama": [
+"bazel_skylib",
+"libx11",
+"libxext",
+"rules_cc"
+],
+"libxml2": [
+"platforms",
+"rules_cc"
+],
+"libxml2-go": [
+"gazelle",
+"libxml2",
+"rules_go"
+],
+"libxrandr": [
+"bazel_skylib",
+"libx11",
+"libxext",
+"libxrender",
+"rules_cc"
+],
+"libxrender": [
+"bazel_skylib",
+"libx11",
+"rules_cc"
+],
+"libxslt": [
+"aspect_bazel_lib",
+"libxml2",
+"platforms",
+"rules_autoconf",
+"rules_cc"
+],
+"libxtrans": [
+"rules_cc",
+"xorgproto"
+],
+"libyaml": [
+"rules_cc"
+],
+"libyang": [
+"pcre2",
+"platforms",
+"rules_cc"
+],
+"libyuv": [
+"bazel_skylib",
+"libjpeg_turbo",
+"platforms",
+"rules_cc"
+],
+"libzip": [
+"bazel_skylib",
+"boringssl",
+"bzip2",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf",
+"rules_license",
+"xz",
+"zlib",
+"zstd"
+],
+"libzmq": [
+"platforms",
+"rules_cc",
+"rules_license"
+],
+"linenoise": [
+"rules_cc",
+"rules_license"
+],
+"linux.bzl": [
+"bazel_lib",
+"bazel_skylib",
+"buildifier_prebuilt",
+"elfutils",
+"gazelle",
+"libbpf",
+"llvm",
+"lz4",
+"pahole",
+"platforms",
+"rules_bison",
+"rules_cc",
+"rules_flex",
+"rules_go",
+"rules_perl",
+"rules_rs",
+"tar.bzl",
+"zstd"
+],
+"linuxptp": [
+"bazel_skylib",
+"openssl",
+"rules_cc",
+"rules_cc_autoconf",
+"rules_shell"
+],
+"lit2md": [
+"aspect_bazel_lib",
+"bazel_lib",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"buildifier_prebuilt",
+"gazelle",
+"protobuf",
+"rules_go",
+"rules_multitool",
+"rules_pkg",
+"stardoc"
+],
+"livox_sdk2": [
+"rules_cc"
+],
+"llvm": [
+"bazel_features",
+"bazel_lib",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"buildifier_prebuilt",
+"gazelle",
+"glibc-stubs-generator",
+"libarchive",
+"libstdcxx-stubs-generator",
+"libxml2",
+"mimalloc",
+"platforms",
+"rules_cc",
+"rules_go",
+"rules_platform",
+"rules_python",
+"rules_shell",
+"rules_swift",
+"rules_zig",
+"tar.bzl",
+"windows_support",
+"with_cfg.bzl",
+"xpkgutil",
+"zlib-ng",
+"zstd"
+],
+"llvm-project": [
+"apple_support",
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_python",
+"rules_shell"
+],
+"lmdb": [
+"platforms"
+],
+"lobster": [
+"gazelle",
+"googletest",
+"rules_python",
+"rules_python_gazelle_plugin",
+"trlc"
+],
+"lodepng": [
+"package_metadata",
+"rules_cc"
+],
+"logfmt_cpp": [
+"platforms",
+"rules_cc"
+],
+"lttng-ust": [
+"rules_cc",
+"userspace_rcu"
+],
+"lua": [
+"platforms",
+"rules_cc"
+],
+"luajit": [
+"bazel_skylib",
+"platforms",
+"rules_cc"
+],
+"lunasvg": [
+"rules_cc"
+],
+"lvm2": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf",
+"rules_shell"
+],
+"lz4": [
+"bazel_skylib",
+"platforms",
+"rules_cc"
+],
+"lz4-erlang": [
+"platforms",
+"rules_erlang"
+],
+"lzip": [
+"bazel_skylib",
+"rules_cc",
+"rules_shell"
+],
+"lzo": [
+"rules_cc"
+],
+"m4": [
+"bazel_skylib",
+"package_metadata",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf"
+],
+"magic_enum": [
+"rules_cc"
+],
+"make": [
+"bazel_skylib",
+"package_metadata",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf"
+],
+"maliput": [
+"eigen",
+"platforms",
+"rules_cc",
+"yaml-cpp"
+],
+"maliput_geopackage": [
+"googletest",
+"maliput",
+"maliput_sparse",
+"rules_cc",
+"sqlite3"
+],
+"maliput_malidrive": [
+"eigen",
+"gflags",
+"googletest",
+"maliput",
+"rules_cc",
+"tinyxml2",
+"yaml-cpp"
+],
+"maliput_sparse": [
+"gflags",
+"googletest",
+"maliput",
+"rules_cc"
+],
+"malloc_guard": [
+"googletest",
+"plthook",
+"rules_cc"
+],
+"marchingcubecpp": [
+"package_metadata",
+"rules_cc"
+],
+"marisa-trie": [
+"platforms",
+"rules_cc"
+],
+"masorange_rules_helm": [
+"aspect_bazel_lib",
+"bazel_skylib",
+"platforms",
+"rules_oci",
+"rules_pkg",
+"rules_shell",
+"stardoc",
+"zlib"
+],
+"mbedtls": [
+"platforms",
+"rules_cc"
+],
+"mboworks_bashtest": [
+"bazel_skylib",
+"platforms",
+"rules_shell"
+],
+"mboworks_bzl": [
+"bazel_skylib",
+"platforms"
+],
+"mboworks_mbo": [
+"abseil-cpp",
+"bazel_skylib",
+"google_benchmark",
+"googletest",
+"mboworks_bashtest",
+"platforms",
+"re2",
+"rules_cc",
+"rules_fuzzing",
+"rules_shell"
+],
+"mboworks_proto": [
+"abseil-cpp",
+"bazel_skylib",
+"googletest",
+"platforms",
+"protobuf",
+"re2",
+"rules_android",
+"rules_cc",
+"rules_go",
+"rules_shell"
+],
+"mcap": [
+"lz4",
+"rules_cc",
+"zstd"
+],
+"mediainfo": [
+"rules_cc",
+"zenlib",
+"zlib"
+],
+"mercurial.bzl": [],
+"meshoptimizer": [
+"rules_cc"
+],
+"meson": [
+"platforms",
+"rules_python"
+],
+"mimalloc": [
+"platforms",
+"rules_cc"
+],
+"mimick": [
+"cmake_configure_file",
+"platforms",
+"rules_cc"
+],
+"minicoro": [
+"rules_cc",
+"rules_license"
+],
+"miniply": [
+"rules_cc"
+],
+"minitrace": [
+"bazel_skylib",
+"rules_cc",
+"rules_license"
+],
+"miniz": [
+"rules_cc"
+],
+"modern-cpp-kafka": [
+"boost.algorithm",
+"googletest",
+"librdkafka",
+"rapidjson"
+],
+"mold": [
+"bazel_skylib",
+"blake3",
+"onetbb",
+"platforms",
+"rules_cc",
+"zlib",
+"zstd"
+],
+"mosquitto": [
+"bazel_skylib",
+"c-ares",
+"cjson",
+"cunit",
+"googletest",
+"libmicrohttpd",
+"openssl",
+"platforms",
+"readline",
+"rules_cc",
+"rules_cc_autoconf",
+"rules_shell",
+"sqlite3"
+],
+"mp-units": [
+"bazel_skylib",
+"catch2",
+"gsl",
+"rules_cc",
+"rules_license"
+],
+"mpc": [
+"bazel_skylib",
+"gmp",
+"mpfr",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf"
+],
+"mpfr": [
+"bazel_skylib",
+"gmp",
+"package_metadata",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf"
+],
+"mpich": [
+"platforms",
+"rules_foreign_cc"
+],
+"msgpack-c": [
+"rules_cc"
+],
+"msix_packaging": [
+"openssl",
+"platforms",
+"rules_cc",
+"zlib"
+],
+"mujoco": [
+"abseil-cpp",
+"apple_support",
+"bazel_skylib",
+"ccd",
+"glfw",
+"googletest",
+"lodepng",
+"marchingcubecpp",
+"miniz",
+"platforms",
+"qhull",
+"rules_cc",
+"rules_shell",
+"tinyobjloader",
+"tinyxml2"
+],
+"mvfst": [
+"bazel_skylib",
+"boost.iterator",
+"fizz",
+"fmt",
+"folly",
+"glog",
+"libsodium",
+"mbedtls",
+"rules_cc",
+"rules_license"
+],
+"naja": [
+"bazel_skylib",
+"bison",
+"boost.asio",
+"boost.dynamic_bitset",
+"boost.intrusive",
+"boost.multiprecision",
+"capnp-cpp",
+"fmt",
+"naja-if",
+"naja-verilog",
+"onetbb",
+"platforms",
+"rules_cc",
+"rules_python",
+"rules_shell",
+"spdlog",
+"sv-lang",
+"zlib"
+],
+"naja-if": [
+"capnp-cpp"
+],
+"naja-verilog": [
+"bison",
+"flex",
+"rules_cc"
+],
+"nanobind": [
+"bazel_skylib",
+"eigen",
+"platforms",
+"robin-map",
+"rules_cc",
+"rules_python"
+],
+"nanobind_bazel": [
+"bazel_skylib",
+"platforms",
+"robin-map",
+"rules_cc",
+"rules_python"
+],
+"nanoflann": [
+"rules_cc"
+],
+"nanomsg": [
+"platforms",
+"rules_cc"
+],
+"nanopb": [
+"bazel_skylib",
+"protobuf",
+"rules_cc",
+"rules_proto",
+"rules_proto_grpc",
+"rules_python"
+],
+"nasm": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf",
+"zlib"
+],
+"ncurses": [
+"bazel_skylib",
+"gawk",
+"package_metadata",
+"platforms",
+"rules_cc"
+],
+"nextpnr": [
+"bazel_skylib",
+"boost.filesystem",
+"boost.iostreams",
+"boost.program_options",
+"boost.system",
+"boost.thread",
+"eigen",
+"platforms",
+"prjtrellis",
+"pybind11_bazel",
+"rules_cc",
+"rules_python",
+"rules_rust"
+],
+"ng-log": [
+"gflags",
+"googletest",
+"platforms",
+"rules_cc"
+],
+"nghttp2": [
+"bazel_skylib",
+"rules_cc"
+],
+"ninja": [
+"platforms",
+"rules_cc"
+],
+"ninjatracing": [
+"rules_python"
+],
+"nlohmann_json": [
+"rules_cc"
+],
+"nlopt": [
+"bazel_skylib",
+"cmake_configure_file",
+"platforms",
+"rules_cc",
+"rules_python",
+"swig"
+],
+"nmea": [
+"rules_cc"
+],
+"node_addon_api": [
+"rules_cc",
+"rules_nodejs"
+],
+"nogo_analyzer_bzlmod": [
+"bazel_skylib",
+"gazelle",
+"rules_go"
+],
+"nonstd-span": [
+"rules_cc"
+],
+"nsync": [
+"platforms"
+],
+"numactl": [
+"bazel_skylib",
+"platforms",
+"rules_cc"
+],
+"nvc": [
+"bazel_skylib",
+"elfutils",
+"flex",
+"libffi",
+"llvm-project",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf",
+"rules_vhdl",
+"zlib",
+"zstd"
+],
+"occt": [
+"bazel_skylib",
+"platforms",
+"rules_cc"
+],
+"octomap": [
+"rules_cc",
+"rules_license"
+],
+"ode": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_license"
+],
+"ofiuco": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_multitool",
+"rules_python",
+"rules_rust",
+"rules_shell"
+],
+"ogg": [
+"bazel_lib",
+"platforms",
+"rules_cc"
+],
+"ogre-next": [
+"bazel_skylib",
+"egl-registry",
+"freeimage",
+"freetype",
+"libx11",
+"libxcb",
+"opengl-registry",
+"platforms",
+"rapidjson",
+"rules_cc",
+"rules_license"
+],
+"onednn": [
+"bazel_skylib",
+"platforms",
+"rules_cc"
+],
+"onetbb": [
+"platforms",
+"rules_cc",
+"rules_license"
+],
+"onnx": [
+"platforms",
+"protobuf",
+"rules_cc",
+"rules_python"
+],
+"onnxruntime_prebuilt": [
+"platforms",
+"rules_pkg",
+"rules_python"
+],
+"open-inference-protocol": [
+"grpc",
+"protobuf",
+"rules_cc",
+"rules_go"
+],
+"open62541": [
+"libmdnsd",
+"openssl",
+"platforms",
+"rules_cc",
+"rules_python"
+],
+"open62541pp": [
+"bazel_skylib",
+"catch2",
+"open62541",
+"openssl",
+"rules_cc",
+"rules_license"
+],
+"openapi_tools_generator_bazel": [
+"rules_java",
+"rules_pkg"
+],
+"openblas": [
+"platforms",
+"rules_cc"
+],
+"opencc": [
+"aspect_bazel_lib",
+"aspect_rules_js",
+"darts-clone",
+"googletest",
+"marisa-trie",
+"node_addon_api",
+"platforms",
+"pybind11_bazel",
+"rapidjson",
+"rules_cc",
+"rules_node_addon",
+"rules_nodejs",
+"rules_python",
+"rules_shell",
+"rules_zig",
+"tclap",
+"toolchains_buildbuddy"
+],
+"opencensus-cpp": [
+"abseil-cpp",
+"bazel_skylib",
+"boringssl",
+"civetweb",
+"curl",
+"google_benchmark",
+"googleapis",
+"googleapis-cc",
+"googleapis-grpc-cc",
+"googletest",
+"grpc",
+"opencensus-proto",
+"prometheus-cpp",
+"protobuf",
+"rapidjson",
+"rules_cc",
+"rules_foreign_cc",
+"rules_go",
+"zlib"
+],
+"opencensus-proto": [
+"grpc",
+"protobuf",
+"rules_go",
+"rules_proto"
+],
+"opencl-sdk": [
+"bazel_skylib",
+"platforms",
+"rules_cc"
+],
+"openconfig_attestz": [
+"aspect_bazel_lib",
+"gazelle",
+"grpc",
+"platforms",
+"protobuf",
+"rules_go",
+"rules_oci",
+"rules_proto",
+"tar.bzl"
+],
+"openconfig_bootz": [
+"gazelle",
+"grpc",
+"openconfig_attestz",
+"openconfig_gnmi",
+"openconfig_gnsi",
+"protobuf",
+"rules_go"
+],
+"openconfig_gnmi": [
+"gazelle",
+"grpc",
+"protobuf",
+"rules_go",
+"rules_proto"
+],
+"openconfig_gnoi": [
+"gazelle",
+"googleapis",
+"grpc",
+"openconfig_bootz",
+"openconfig_gnsi",
+"protobuf",
+"rules_go",
+"rules_proto"
+],
+"openconfig_gnpsi": [
+"abseil-cpp",
+"glog",
+"googletest",
+"grpc",
+"protobuf",
+"rules_cc",
+"rules_proto"
+],
+"openconfig_gnsi": [
+"gazelle",
+"grpc",
+"openconfig_gnmi",
+"protobuf",
+"rules_go",
+"rules_proto"
+],
+"openconfig_goyang": [
+"gazelle",
+"rules_go"
+],
+"opencv": [
+"apple_support",
+"bazel_skylib",
+"cpu_features",
+"eigen",
+"libjpeg_turbo",
+"libpng",
+"libtiff",
+"libwebp",
+"platforms",
+"protobuf",
+"rules_cc",
+"rules_license",
+"rules_python",
+"rules_qt",
+"zlib"
+],
+"openexr": [
+"bazel_skylib",
+"imath",
+"libdeflate",
+"openjph",
+"platforms",
+"rules_cc",
+"zstd"
+],
+"openfhe": [
+"bazel_skylib",
+"cereal",
+"rapidjson",
+"rules_cc"
+],
+"openfpgaloader": [
+"bazel_skylib",
+"libgpiod",
+"libusb",
+"platforms",
+"rules_cc",
+"zlib"
+],
+"openfst": [
+"abseil-cpp",
+"rules_cc"
+],
+"opengl-registry": [
+"rules_cc"
+],
+"opengrm": [
+"abseil-cpp",
+"abseil-py",
+"bazel_skylib",
+"cython",
+"googletest",
+"openfst",
+"platforms",
+"protobuf",
+"rules_bison",
+"rules_cc",
+"rules_license",
+"rules_m4",
+"rules_python",
+"rules_shell"
+],
+"openjpeg": [
+"platforms",
+"rules_cc"
+],
+"openjph": [
+"rules_cc",
+"rules_license"
+],
+"openmesh": [
+"platforms",
+"rules_cc",
+"rules_license"
+],
+"openmp": [
+"bazel_skylib",
+"rules_cc",
+"rules_python"
+],
+"openssh": [
+"boringssl",
+"libxcrypt",
+"platforms",
+"rules_cc",
+"rules_coreutils",
+"zlib"
+],
+"openssl": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_perl"
+],
+"opentelemetry-cpp": [
+"abseil-cpp",
+"bazel_skylib",
+"curl",
+"google_benchmark",
+"googletest",
+"grpc",
+"nlohmann_json",
+"opentelemetry-proto",
+"opentracing-cpp",
+"platforms",
+"prometheus-cpp",
+"protobuf",
+"rapidyaml",
+"rules_cc",
+"rules_foreign_cc",
+"rules_proto",
+"zlib"
+],
+"opentelemetry-proto": [
+"grpc",
+"protobuf",
+"rules_go",
+"rules_proto",
+"rules_python"
+],
+"opentracing-cpp": [
+"bazel_skylib",
+"rules_cc"
+],
+"openusd": [
+"bazel_lib",
+"bazel_skylib",
+"cmake_configure_file",
+"onetbb",
+"platforms",
+"rules_cc",
+"rules_license"
+],
+"openvdb": [
+"bazel_skylib",
+"boost.numeric_conversion",
+"onetbb",
+"platforms",
+"rules_cc"
+],
+"opus": [
+"platforms",
+"rules_autoconf",
+"rules_cc"
+],
+"or-tools": [
+"abseil-cpp",
+"bazel_skylib",
+"bzip2",
+"contrib_rules_jvm",
+"eigen",
+"gazelle",
+"glpk",
+"google_benchmark",
+"googletest",
+"highs",
+"platforms",
+"protobuf",
+"protobuf-matchers",
+"pybind11_abseil",
+"pybind11_bazel",
+"pybind11_protobuf",
+"re2",
+"rules_cc",
+"rules_go",
+"rules_java",
+"rules_jvm_external",
+"rules_license",
+"rules_proto",
+"rules_python",
+"rules_shell",
+"scip",
+"swig",
+"zlib"
+],
+"orocos-kdl": [
+"cmake_configure_file",
+"eigen",
+"rules_cc"
+],
+"osqp": [
+"bazel_skylib",
+"cmake_configure_file",
+"platforms",
+"qdldl",
+"rules_cc",
+"rules_cuda",
+"suitesparse"
+],
+"osqp-cpp": [
+"abseil-cpp",
+"eigen",
+"osqp",
+"rules_license"
+],
+"osqp-eigen": [
+"catch2",
+"eigen",
+"osqp",
+"rules_cc"
+],
+"p4_constraints": [
+"abseil-cpp",
+"bazel_skylib",
+"boost.multiprecision",
+"buildifier_prebuilt",
+"googletest",
+"gutil",
+"p4c",
+"p4runtime",
+"protobuf",
+"re2",
+"rules_cc",
+"rules_license",
+"rules_proto",
+"z3"
+],
+"p4_infra": [
+"abseil-cpp",
+"bazel_skylib",
+"boost.bimap",
+"boost.graph",
+"buildifier_prebuilt",
+"google_benchmark",
+"googleapis",
+"googleapis-cc",
+"googletest",
+"grpc",
+"gutil",
+"p4c",
+"p4runtime",
+"protobuf",
+"rules_cc",
+"rules_license"
+],
+"p4c": [
+"abseil-cpp",
+"bazel_skylib",
+"boost.algorithm",
+"boost.functional",
+"boost.graph",
+"boost.iostreams",
+"boost.multi_index",
+"boost.multiprecision",
+"boost.serialization",
+"buildifier_prebuilt",
+"googleapis",
+"googletest",
+"nlohmann_json",
+"p4runtime",
+"protobuf",
+"rules_bison",
+"rules_cc",
+"rules_flex",
+"rules_license",
+"rules_m4",
+"rules_proto",
+"z3"
+],
+"p4runtime": [
+"bazel_skylib",
+"buildifier_prebuilt",
+"googleapis",
+"googleapis-cc",
+"googleapis-go",
+"googleapis-grpc-cc",
+"googleapis-python",
+"grpc",
+"protobuf",
+"re2",
+"rules_cc",
+"rules_go",
+"rules_license"
+],
+"package_metadata": [],
+"paho.mqtt.c": [
+"boringssl",
+"cmake_configure_file",
+"libuuid",
+"platforms",
+"rules_cc"
+],
+"paho.mqtt.cpp": [
+"paho.mqtt.c",
+"rules_cc"
+],
+"pahole": [
+"elfutils",
+"libbpf",
+"rules_cc",
+"zlib"
+],
+"pango": [
+"bazel_skylib",
+"cairo",
+"fontconfig",
+"freetype",
+"fribidi",
+"glib",
+"harfbuzz",
+"libdatrie",
+"libpng",
+"libthai",
+"platforms",
+"rules_cc",
+"zlib"
+],
+"papilo": [
+"boost.graph",
+"boost.heap",
+"boost.iostreams",
+"boost.multiprecision",
+"boost.program_options",
+"boost.serialization",
+"fmt",
+"onetbb",
+"platforms",
+"rules_cc",
+"zlib",
+"zstr"
+],
+"patch": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf"
+],
+"patchelf": [
+"rules_cc"
+],
+"pathkit": [
+"rules_swift"
+],
+"pbrt_proto": [
+"abseil-cpp",
+"googletest",
+"protobuf",
+"rules_cc"
+],
+"pcg": [
+"rules_cc"
+],
+"pcl": [
+"bazel_skylib",
+"boost.algorithm",
+"boost.array",
+"boost.asio",
+"boost.assert",
+"boost.bimap",
+"boost.circular_buffer",
+"boost.concept_check",
+"boost.config",
+"boost.core",
+"boost.dynamic_bitset",
+"boost.filesystem",
+"boost.foreach",
+"boost.format",
+"boost.fusion",
+"boost.graph",
+"boost.interprocess",
+"boost.iostreams",
+"boost.lexical_cast",
+"boost.math",
+"boost.mpl",
+"boost.multi_array",
+"boost.multiprecision",
+"boost.numeric_conversion",
+"boost.optional",
+"boost.predef",
+"boost.preprocessor",
+"boost.property_map",
+"boost.property_tree",
+"boost.ptr_container",
+"boost.random",
+"boost.signals2",
+"boost.smart_ptr",
+"boost.sort",
+"boost.thread",
+"boost.tokenizer",
+"boost.utility",
+"boost.uuid",
+"cmake_configure_file",
+"eigen",
+"flann",
+"libpng",
+"nanoflann",
+"platforms",
+"qhull",
+"rules_cc",
+"rules_cuda"
+],
+"pcre2": [
+"bazel_skylib",
+"platforms",
+"rules_cc"
+],
+"pegtl": [],
+"peregrine": [
+"abseil-cpp",
+"abseil-py",
+"bazel_features",
+"envoy_api",
+"flatbuffers",
+"fuzztest",
+"google_benchmark",
+"googletest",
+"grpc",
+"nanobind",
+"nanobind_bazel",
+"ncurses",
+"platforms",
+"protobuf",
+"rules_cc",
+"rules_proto",
+"rules_python",
+"rules_shell",
+"xxhash"
+],
+"periphery": [
+"aexml",
+"apple_support",
+"bazel_skylib",
+"buildifier_prebuilt",
+"pathkit",
+"platforms",
+"rules_apple",
+"rules_swift",
+"swift-filename-matcher",
+"swift-index-store",
+"swift-syntax",
+"swift-system",
+"swift_argument_parser",
+"xcodeproj",
+"yams"
+],
+"phaser_zc_protobuf": [
+"abseil-cpp",
+"bazel_skylib",
+"coroutines",
+"cpp_toolbelt",
+"googletest",
+"platforms",
+"protobuf",
+"rules_android",
+"rules_cc",
+"rules_go",
+"rules_pkg",
+"zlib"
+],
+"phtree-cpp": [
+"buildifier_prebuilt",
+"google_benchmark",
+"googletest",
+"platforms",
+"rules_cc",
+"rules_shell",
+"spdlog"
+],
+"pico-sdk": [
+"bazel_skylib",
+"buildifier_prebuilt",
+"picotool",
+"platforms",
+"rules_cc",
+"rules_python"
+],
+"picotool": [
+"bazel_skylib",
+"pico-sdk",
+"platforms",
+"rules_cc",
+"rules_libusb",
+"rules_python"
+],
+"pict": [
+"rules_cc"
+],
+"pigz": [
+"platforms",
+"rules_cc",
+"zlib",
+"zopfli"
+],
+"pinocchio": [
+"bazel_skylib",
+"boost.algorithm",
+"boost.asio",
+"boost.bind",
+"boost.filesystem",
+"boost.foreach",
+"boost.format",
+"boost.fusion",
+"boost.integer",
+"boost.iostreams",
+"boost.math",
+"boost.property_tree",
+"boost.serialization",
+"boost.test",
+"boost.type_traits",
+"boost.variant",
+"cmake_configure_file",
+"eigen",
+"rules_cc",
+"sdformat"
+],
+"pixelmatch-cpp17": [
+"googletest",
+"pixelmatch-cpp17",
+"platforms",
+"rules_cc",
+"rules_fuzzing"
+],
+"pixman": [
+"bazel_skylib",
+"platforms",
+"rules_autoconf",
+"rules_cc"
+],
+"pkg-config": [
+"bazel_skylib",
+"glib",
+"platforms",
+"rules_cc"
+],
+"pkgconf": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf"
+],
+"platforms": [
+"package_metadata",
+"rules_license",
+"rules_shell"
+],
+"platforms_contrib": [
+"package_metadata"
+],
+"plthook": [
+"platforms",
+"rules_cc"
+],
+"plyodine": [
+"googletest",
+"rules_cc"
+],
+"pocketfft": [
+"rules_cc",
+"rules_license"
+],
+"poco": [
+"pcre2",
+"rules_cc",
+"rules_license"
+],
+"polyscope": [
+"apple_support",
+"glfw",
+"glm",
+"googletest",
+"happly",
+"imgui",
+"nlohmann_json"
+],
+"poppler": [
+"freetype",
+"rules_autoconf",
+"rules_cc",
+"zlib"
+],
+"popt": [
+"platforms",
+"rules_cc"
+],
+"portable_cc_toolchain": [
+"abseil-cpp",
+"aspect_bazel_lib",
+"bazel_skylib",
+"platforms",
+"re2",
+"rules_cc",
+"stardoc"
+],
+"portaudio": [
+"alsa_lib",
+"bazel_skylib",
+"platforms",
+"rules_cc"
+],
+"postgres": [
+"bazel_skylib",
+"boringssl",
+"curl",
+"lz4",
+"openssl",
+"platforms",
+"readline",
+"rules_cc",
+"rules_cc_autoconf",
+"zlib",
+"zstd"
+],
+"pplib": [
+"platforms",
+"rules_cc",
+"zlib"
+],
+"ppp": [
+"bazel_skylib",
+"libpcap",
+"openssl",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf"
+],
+"pre-commit": [
+"ape",
+"bazel_skylib",
+"buildifier_prebuilt",
+"ci-component-bazelisk",
+"download_utils",
+"hermetic_cc_toolchain",
+"platforms",
+"rules_diff",
+"rules_license",
+"rules_python",
+"toolchain_utils"
+],
+"pre-commit-hooks": [
+"buildifier_prebuilt",
+"download_utils",
+"hermetic_cc_toolchain",
+"pre-commit",
+"rules_license",
+"rules_python",
+"rules_shellcheck",
+"rules_uv",
+"toolchain_utils"
+],
+"prismo": [
+"aspect_rules_js",
+"aspect_rules_lint",
+"bazel_skylib",
+"buildifier_prebuilt",
+"llvm",
+"platforms",
+"rules_cc",
+"rules_nodejs",
+"rules_python",
+"rules_rs",
+"rules_rust"
+],
+"prjoxide": [
+"bazel_skylib",
+"capnp-cpp",
+"platforms",
+"prjoxide-db",
+"rules_python",
+"rules_rust",
+"rules_rust_pyo3"
+],
+"prjoxide-db": [
+"prjoxide"
+],
+"prjtrellis": [
+"bazel_skylib",
+"boost.config",
+"boost.container_hash",
+"boost.dll",
+"boost.filesystem",
+"boost.interprocess",
+"boost.optional",
+"boost.program_options",
+"boost.property_tree",
+"boost.range",
+"boost.system",
+"boost.thread",
+"platforms",
+"prjtrellis-db",
+"rules_cc"
+],
+"prjtrellis-db": [
+"prjtrellis"
+],
+"procps-ng": [
+"ncurses",
+"rules_cc"
+],
+"prodrive_technologies_bazel_latex": [
+"platforms",
+"rules_foreign_cc",
+"rules_python"
+],
+"proj": [
+"bazel_skylib",
+"cmake_configure_file",
+"curl",
+"libtiff",
+"platforms",
+"rules_cc",
+"sqlite3"
+],
+"prometheus-cpp": [
+"boringssl",
+"civetweb",
+"curl",
+"google_benchmark",
+"googletest",
+"platforms",
+"rules_cc",
+"zlib"
+],
+"proto-converter": [
+"abseil-cpp",
+"bazel_skylib",
+"googletest",
+"platforms",
+"protobuf",
+"rules_cc",
+"rules_pkg",
+"rules_proto"
+],
+"protobuf": [
+"abseil-cpp",
+"abseil-py",
+"apple_support",
+"bazel_features",
+"bazel_skylib",
+"com_google_protobuf_previous_release",
+"com_google_protobuf_v25",
+"google_benchmark",
+"googleapis",
+"googletest",
+"jq.bzl",
+"jsoncpp",
+"lua",
+"platforms",
+"re2",
+"rules_buf",
+"rules_cc",
+"rules_fuzzing",
+"rules_java",
+"rules_jvm_external",
+"rules_kotlin",
+"rules_license",
+"rules_pkg",
+"rules_proto",
+"rules_python",
+"rules_ruby",
+"rules_rust",
+"rules_shell",
+"rules_testing",
+"zlib"
+],
+"protobuf-matchers": [
+"googletest",
+"protobuf",
+"rules_cc"
+],
+"protoc-gen-validate": [
+"bazel_skylib",
+"gazelle",
+"protobuf",
+"re2",
+"rules_cc",
+"rules_go",
+"rules_java",
+"rules_proto",
+"rules_python"
+],
+"protoc_gen_clojure": [
+"aspect_bazel_lib",
+"aspect_rules_lint",
+"bazel_skylib",
+"buildifier_prebuilt",
+"platforms",
+"protobuf",
+"rules_buf",
+"rules_clj",
+"rules_img",
+"rules_java",
+"rules_jvm_external",
+"rules_pkg",
+"rules_shell",
+"stardoc"
+],
+"protothreads": [],
+"protovalidate": [
+"gazelle",
+"googleapis",
+"protobuf",
+"rules_buf",
+"rules_go",
+"rules_proto"
+],
+"protovalidate-cc": [
+"abseil-cpp",
+"cel-cpp",
+"googletest",
+"protobuf",
+"protovalidate",
+"re2",
+"rules_buf",
+"rules_cc",
+"rules_proto"
+],
+"proxy-wasm-cpp-sdk": [
+"emsdk",
+"platforms",
+"protobuf",
+"re2",
+"rules_cc",
+"rules_python"
+],
+"proxy-wasm-rust-sdk": [
+"bazel_features",
+"bazel_skylib",
+"rules_cc",
+"rules_rust"
+],
+"proxygen": [
+"boost.algorithm",
+"boost.bind",
+"boost.container",
+"boost.conversion",
+"boost.filesystem",
+"boost.iostreams",
+"boost.lexical_cast",
+"boost.optional",
+"boost.thread",
+"boost.variant",
+"c-ares",
+"fizz",
+"fmt",
+"folly",
+"gflags",
+"glog",
+"gperf",
+"mvfst",
+"openssl",
+"rules_cc",
+"rules_license",
+"rules_python",
+"wangle",
+"zlib",
+"zstd"
+],
+"psimd": [
+"rules_cc"
+],
+"psimpl": [
+"package_metadata",
+"rules_cc"
+],
+"psmisc": [
+"ncurses",
+"rules_cc"
+],
+"pthreadpool": [
+"cpuinfo",
+"fxdiv",
+"google_benchmark",
+"googletest",
+"platforms",
+"rules_cc",
+"rules_license"
+],
+"pugixml": [
+"package_metadata",
+"rules_cc"
+],
+"pybind11_abseil": [
+"abseil-cpp",
+"bazel_skylib",
+"platforms",
+"pybind11_bazel",
+"rules_cc",
+"rules_python"
+],
+"pybind11_bazel": [
+"bazel_features",
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_python"
+],
+"pybind11_protobuf": [
+"abseil-cpp",
+"abseil-py",
+"bazel_skylib",
+"grpc",
+"platforms",
+"protobuf",
+"pybind11_abseil",
+"pybind11_bazel",
+"rules_cc",
+"rules_python"
+],
+"pypackaging.bzl": [
+"bazel_lib",
+"bazel_skylib",
+"bazelrc-preset.bzl",
+"package_metadata",
+"rules_testing"
+],
+"pystring": [
+"rules_cc"
+],
+"qdldl": [
+"bazel_skylib",
+"cmake_configure_file",
+"platforms",
+"rules_cc"
+],
+"qhull": [
+"package_metadata",
+"platforms",
+"rules_cc"
+],
+"qoi": [
+"rules_cc"
+],
+"qpdf": [
+"bazel_skylib",
+"libjpeg_turbo",
+"openssl",
+"platforms",
+"rules_cc",
+"zlib"
+],
+"qr-code-generator": [
+"rules_cc"
+],
+"quickjs-ng": [
+"bazel_skylib",
+"platforms",
+"rules_cc"
+],
+"quill": [
+"bazel_features",
+"bazel_skylib",
+"platforms",
+"rules_cc"
+],
+"rabbitmq_osiris": [
+"rabbitmq_seshat",
+"rules_erlang"
+],
+"rabbitmq_ra": [
+"rabbitmq_seshat",
+"rules_erlang"
+],
+"rabbitmq_seshat": [
+"gazelle",
+"rules_erlang"
+],
+"ragel": [
+"rules_cc"
+],
+"range-v3": [
+"rules_cc"
+],
+"rapidcheck": [
+"rules_cc"
+],
+"rapidjson": [
+"googletest",
+"rules_cc"
+],
+"rapidyaml": [
+"c4core",
+"rules_cc"
+],
+"rav1e": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_rs"
+],
+"rawrtc": [
+"rawrtc_common",
+"rawrtc_data_channel",
+"rules_cc"
+],
+"rawrtc_common": [
+"rawrtc_rew",
+"rules_cc"
+],
+"rawrtc_data_channel": [
+"rawrtc_common",
+"rawrtc_usrsctp",
+"rules_cc"
+],
+"rawrtc_re": [
+"boringssl",
+"rules_cc"
+],
+"rawrtc_rew": [
+"rawrtc_re",
+"rules_cc"
+],
+"rawrtc_usrsctp": [
+"platforms",
+"rules_cc"
+],
+"re.bzl": [
+"bazel_lib",
+"bazel_skylib",
+"bazelrc-preset.bzl",
+"buildifier_prebuilt",
+"package_metadata",
+"rules_testing"
+],
+"re2": [
+"abseil-cpp",
+"abseil-py",
+"apple_support",
+"google_benchmark",
+"googletest",
+"platforms",
+"pybind11_bazel",
+"rules_cc",
+"rules_python"
+],
+"readerwriterqueue": [
+"rules_cc",
+"rules_license"
+],
+"readline": [
+"ncurses",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf",
+"rules_license"
+],
+"redis": [
+"platforms",
+"rules_cc",
+"rules_shell"
+],
+"reflect-cpp": [
+"capnp-cpp",
+"rules_cc",
+"yaml-cpp",
+"yyjson"
+],
+"reflexxes-rmltype2": [
+"rules_cc"
+],
+"remotery": [
+"rules_cc",
+"rules_license"
+],
+"reproc": [
+"platforms",
+"rules_cc"
+],
+"riegeli": [
+"abseil-cpp",
+"abseil-py",
+"bazel_skylib",
+"boringssl",
+"brotli",
+"bzip2",
+"google_cloud_cpp",
+"highwayhash",
+"lz4",
+"platforms",
+"protobuf",
+"rules_cc",
+"rules_python",
+"snappy",
+"xz",
+"zlib",
+"zstd"
+],
+"roaring": [
+"rules_cc"
+],
+"robin-map": [
+"platforms",
+"rules_cc"
+],
+"roboticslibrary.rl": [
+"abseil-cpp",
+"boost.algorithm",
+"boost.dynamic_bitset",
+"boost.graph",
+"boost.iostreams",
+"boost.lexical_cast",
+"boost.optional",
+"eigen",
+"rules_cc",
+"rules_license"
+],
+"rocksdb": [
+"bazel_skylib",
+"bzip2",
+"googletest",
+"jemalloc",
+"liburing",
+"lz4",
+"platforms",
+"rules_cc",
+"snappy",
+"with_cfg.bzl",
+"zlib",
+"zstd"
+],
+"rply": [
+"rules_cc"
+],
+"rpmpack": [
+"gazelle",
+"rules_go"
+],
+"rsync": [
+"lz4",
+"openssl",
+"platforms",
+"rules_cc",
+"xxhash",
+"zstd"
+],
+"rsyslog": [
+"curl",
+"libestr",
+"libfastjson",
+"libuuid",
+"rules_bison",
+"rules_cc",
+"rules_flex",
+"rules_shell",
+"zlib"
+],
+"rtipc": [
+"libyaml",
+"rules_cc",
+"zlib"
+],
+"ruff_prebuilt": [
+"buildifier_prebuilt",
+"platforms",
+"rules_pkg",
+"rules_python"
+],
+"rules_abs": [
+"bazel_skylib",
+"rules_bazel_integration_test",
+"rules_java",
+"rules_proto",
+"rules_testing",
+"stardoc",
+"toolchains_protoc",
+"tweag-credential-helper"
+],
+"rules_ada": [
+"apple_support",
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_rust",
+"rules_rust_mdbook",
+"rules_shell",
+"rules_venv",
+"stardoc"
+],
+"rules_android": [
+"abseil-py",
+"bazel_features",
+"bazel_skylib",
+"bazel_worker_api",
+"bazel_worker_java",
+"cgrindel_bazel_starlib",
+"gazelle",
+"libxml2",
+"platforms",
+"protobuf",
+"rules_bazel_integration_test",
+"rules_cc",
+"rules_go",
+"rules_java",
+"rules_jvm_external",
+"rules_license",
+"rules_proto",
+"rules_python",
+"rules_robolectric",
+"rules_shell",
+"stardoc"
+],
+"rules_android_ndk": [
+"platforms",
+"rules_cc"
+],
+"rules_angular": [
+"aspect_bazel_lib",
+"aspect_rules_js"
+],
+"rules_apko": [
+"aspect_bazel_lib",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"buildifier_prebuilt",
+"gazelle",
+"platforms",
+"rules_oci",
+"rules_pkg",
+"stardoc"
+],
+"rules_appimage": [
+"aspect_bazel_lib",
+"bazel_skylib",
+"container_structure_test",
+"platforms",
+"rules_cc",
+"rules_oci",
+"rules_pkg",
+"rules_pycross",
+"rules_python",
+"rules_shell",
+"rules_testing",
+"squashfs-tools",
+"stardoc",
+"with_cfg.bzl"
+],
+"rules_apple": [
+"apple_support",
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_python",
+"rules_shell",
+"rules_swift",
+"stardoc",
+"xctestrunner"
+],
+"rules_apple_linker": [
+"apple_support",
+"bazel_features",
+"bazel_skylib",
+"rules_apple",
+"rules_cc",
+"rules_swift"
+],
+"rules_apple_remote_xcframework": [
+"bazel_skylib",
+"rules_apple",
+"rules_swift"
+],
+"rules_auto_dotnet": [
+"bazel_lib",
+"bazel_skylib",
+"bazelrc-preset.bzl",
+"buildifier_prebuilt",
+"package_metadata",
+"platforms",
+"rules_dotnet",
+"rules_python",
+"xml.bzl"
+],
+"rules_autoconf": [
+"bazel_lib",
+"bazel_skylib",
+"platforms",
+"rules_cc"
+],
+"rules_batch": [
+"bazel_skylib",
+"platforms",
+"rules_rust_mdbook",
+"rules_shell",
+"stardoc"
+],
+"rules_bazel_integration_test": [
+"bazel_skylib",
+"buildifier_prebuilt",
+"cgrindel_bazel_starlib",
+"platforms",
+"rules_python",
+"rules_shell"
+],
+"rules_bison": [
+"bazel_skylib",
+"googletest",
+"rules_cc",
+"rules_java",
+"rules_m4",
+"rules_shell",
+"stardoc"
+],
+"rules_bittorrent": [
+"bazel_lib",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"gazelle",
+"rules_multitool",
+"rules_pkg",
+"stardoc"
+],
+"rules_bound": [
+"bazel_skylib",
+"platforms"
+],
+"rules_browsers": [
+"aspect_rules_js",
+"aspect_rules_ts",
+"bazel_skylib",
+"platforms",
+"rules_nodejs"
+],
+"rules_bsx": [],
+"rules_buf": [
+"bazel_skylib",
+"gazelle",
+"platforms",
+"protobuf",
+"rules_go",
+"rules_proto",
+"rules_shell",
+"stardoc"
+],
+"rules_build_error": [
+"bazel_skylib",
+"buildifier_prebuilt",
+"hermetic_cc_toolchain",
+"platforms",
+"rules_cc"
+],
+"rules_bzip2": [
+"ape",
+"bzip2",
+"hermetic_cc_toolchain",
+"rules_coreutils",
+"rules_license",
+"toolchain_utils"
+],
+"rules_c_proto": [
+"googletest",
+"protobuf"
+],
+"rules_cc": [
+"apple_support",
+"bazel_features",
+"bazel_skylib",
+"googletest",
+"platforms",
+"protobuf",
+"rules_python",
+"rules_shell",
+"rules_testing",
+"stardoc",
+"test_repo"
+],
+"rules_cc_autoconf": [
+"bazel_features",
+"bazel_skylib",
+"buildifier_prebuilt",
+"m4",
+"nlohmann_json",
+"platforms",
+"rules_cc",
+"rules_multirun",
+"rules_perl",
+"rules_python",
+"rules_req_compile",
+"rules_rust_mdbook",
+"rules_shell",
+"rules_venv",
+"stardoc"
+],
+"rules_cc_hdrs_map": [
+"bazel_lib",
+"gcc_toolchain",
+"platforms",
+"protobuf",
+"rules_cc",
+"stardoc"
+],
+"rules_cc_resources": [
+"rules_cc"
+],
+"rules_chisel": [
+"bazel_skylib",
+"rules_java",
+"rules_jvm_external",
+"rules_license",
+"rules_python",
+"rules_scala",
+"rules_shell",
+"rules_verilog",
+"verilator"
+],
+"rules_ciq": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_rust",
+"stardoc"
+],
+"rules_clj": [
+"aspect_rules_lint",
+"bazel_skylib",
+"buildifier_prebuilt",
+"rules_go",
+"rules_java",
+"rules_shell"
+],
+"rules_closure": [
+"bazel_skylib",
+"google_bazel_common",
+"platforms",
+"protobuf",
+"rules_java",
+"rules_jvm_external",
+"rules_proto",
+"rules_python",
+"rules_web_testing_java",
+"rules_webtesting"
+],
+"rules_cocotb": [
+"bazel_skylib",
+"ghdl",
+"iverilog",
+"nvc",
+"platforms",
+"rules_cc",
+"rules_python",
+"rules_req_compile",
+"rules_rust",
+"rules_rust_mdbook",
+"rules_shell",
+"rules_venv",
+"rules_verible",
+"rules_verilator",
+"rules_verilog",
+"rules_vhdl",
+"stardoc",
+"verilator"
+],
+"rules_codeowners": [
+"bazel_skylib",
+"stardoc"
+],
+"rules_conda": [
+"aspect_rules_lint",
+"bazel_lib",
+"bazel_skylib",
+"buildifier_prebuilt",
+"platforms",
+"rules_cc",
+"rules_python"
+],
+"rules_contest": [
+"rules_cc",
+"rules_python"
+],
+"rules_coreutils": [
+"ape",
+"download_utils",
+"hermetic_cc_toolchain",
+"pre-commit",
+"pre-commit-hooks",
+"rules_license",
+"rules_python",
+"toolchain_utils"
+],
+"rules_cpan": [
+"rules_perl",
+"rules_python"
+],
+"rules_csharp": [
+"apple_support",
+"bazel_skylib",
+"platforms",
+"protobuf",
+"stardoc"
+],
+"rules_cuda": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_cuda_examples"
+],
+"rules_cue": [
+"bazel_skylib",
+"gazelle",
+"platforms",
+"rules_go",
+"rules_shell"
+],
+"rules_curl": [
+"ape",
+"bazel_skylib",
+"rules_go",
+"toolchain_utils"
+],
+"rules_cyclone": [
+"platforms"
+],
+"rules_d": [
+"bazel_features",
+"bazel_lib",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"bazelrc-preset.bzl",
+"boringssl",
+"curl",
+"gazelle",
+"package_metadata",
+"platforms",
+"protobuf",
+"rules_cc",
+"rules_go"
+],
+"rules_dart": [
+"apple_support",
+"bazel_lib",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"bazelrc-preset.bzl",
+"buildifier_prebuilt",
+"gazelle",
+"package_metadata",
+"platforms",
+"rules_cc",
+"rules_go",
+"rules_multitool",
+"rules_shell",
+"sqlite3",
+"yaml.bzl"
+],
+"rules_dart_proto": [
+"bazel_lib",
+"bazel_skylib",
+"bazelrc-preset.bzl",
+"buildifier_prebuilt",
+"package_metadata",
+"protobuf",
+"rules_dart",
+"rules_multitool",
+"rules_proto"
+],
+"rules_detekt": [
+"bazel_skylib",
+"bazel_worker_api",
+"bazel_worker_java",
+"hermetic_android_toolchains",
+"protobuf",
+"rules_android",
+"rules_java",
+"rules_jvm_external",
+"rules_kotlin",
+"rules_pmd",
+"rules_proto",
+"stardoc"
+],
+"rules_devicetree": [
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"buildifier_prebuilt",
+"dtc",
+"gazelle",
+"package_metadata",
+"platforms",
+"rules_cc",
+"rules_python"
+],
+"rules_diff": [
+"ape",
+"rules_license",
+"toolchain_utils"
+],
+"rules_distroless": [
+"aspect_bazel_lib",
+"bazel_features",
+"bazel_lib",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"buildifier_prebuilt",
+"gawk",
+"gazelle",
+"platforms",
+"rules_cc",
+"rules_java",
+"rules_shell",
+"tar.bzl",
+"yq.bzl"
+],
+"rules_docker_compose": [
+"bazel_skylib",
+"gazelle",
+"platforms",
+"rules_go",
+"rules_img",
+"rules_oci",
+"rules_rust_mdbook",
+"rules_shell",
+"stardoc"
+],
+"rules_docker_compose_test": [
+"rules_go",
+"rules_oci",
+"rules_pkg"
+],
+"rules_docs": [
+"bazel_env.bzl",
+"bazel_lib",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"bazelrc-preset.bzl",
+"buildifier_prebuilt",
+"gazelle",
+"jq.bzl",
+"package_metadata",
+"platforms",
+"rules_docs_%s",
+"rules_multitool",
+"rules_python",
+"stardoc"
+],
+"rules_doom": [
+"apple_support",
+"bazel_skylib",
+"crispy-doom",
+"hermetic_launcher",
+"llvm",
+"platforms",
+"rules_cc",
+"rules_java",
+"rules_license",
+"zlib"
+],
+"rules_dotnet": [
+"bazel_ci_rules",
+"bazel_lib",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"dotnet_test_resources_other_repo",
+"gazelle",
+"platforms",
+"rules_cc",
+"rules_pkg",
+"rules_shell",
+"rules_testing"
+],
+"rules_doxygen": [
+"bazel_skylib",
+"platforms",
+"stardoc"
+],
+"rules_elide": [
+"bazel_features",
+"bazel_skylib",
+"platforms",
+"protobuf",
+"rules_java",
+"rules_jvm_external",
+"rules_kotlin",
+"rules_proto",
+"stardoc"
+],
+"rules_elisp": [
+"abseil-cpp",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"buildifier_prebuilt",
+"gazelle",
+"gazelle_cc",
+"googletest",
+"platforms",
+"protobuf",
+"re2",
+"rules_cc",
+"rules_elisp_example",
+"rules_go",
+"rules_license",
+"rules_pkg",
+"rules_shell",
+"stardoc",
+"wolfd_bazel_compile_commands"
+],
+"rules_elixir": [
+"bazel_skylib",
+"rules_erlang"
+],
+"rules_elm": [
+"aspect_rules_js",
+"bazel_lib",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"cgrindel_bazel_starlib",
+"gazelle",
+"platforms",
+"protobuf",
+"rules_bazel_integration_test",
+"rules_nodejs",
+"rules_python",
+"rules_shell"
+],
+"rules_erlang": [
+"bazel_skylib",
+"gazelle",
+"rules_go"
+],
+"rules_flex": [
+"bazel_skylib",
+"googletest",
+"rules_cc",
+"rules_m4",
+"rules_shell",
+"stardoc"
+],
+"rules_flutter": [
+"apple_support",
+"bazel_lib",
+"bazel_skylib",
+"bazelrc-preset.bzl",
+"buildifier_prebuilt",
+"package_metadata",
+"platforms",
+"rules_android",
+"rules_apple",
+"rules_cc",
+"rules_dart",
+"rules_java",
+"rules_jvm_external",
+"rules_kotlin",
+"rules_multitool",
+"rules_python",
+"rules_swift",
+"yaml.bzl"
+],
+"rules_foreign_cc": [
+"aspect_rules_lint",
+"bazel_features",
+"bazel_lib",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"gazelle",
+"m4",
+"make",
+"ninja",
+"pkgconf",
+"platforms",
+"rules_bazel_integration_test",
+"rules_cc",
+"rules_python",
+"rules_shell"
+],
+"rules_formatjs": [
+"bazel_lib",
+"bazelrc-preset.bzl",
+"buildifier_prebuilt",
+"gazelle",
+"jq.bzl",
+"package_metadata",
+"platforms",
+"rules_go",
+"rules_shell"
+],
+"rules_freecad": [
+"platforms",
+"rules_python"
+],
+"rules_fuzzing": [
+"abseil-cpp",
+"bazel_features",
+"bazel_skylib",
+"googletest",
+"platforms",
+"re2",
+"rules_cc",
+"rules_java",
+"rules_python",
+"rules_shell",
+"stardoc"
+],
+"rules_gazebo": [
+"bazel_skylib",
+"buildifier_prebuilt",
+"rules_cc",
+"rules_license",
+"rules_python"
+],
+"rules_gcs": [
+"bazel_skylib",
+"rules_bazel_integration_test",
+"rules_java",
+"rules_proto",
+"rules_testing",
+"stardoc",
+"toolchains_protoc"
+],
+"rules_ghdl": [
+"bazel_lib",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"buildifier_prebuilt",
+"gazelle",
+"ghdl",
+"platforms",
+"protobuf",
+"rules_vhdl",
+"stardoc"
+],
+"rules_gherkin": [
+"bazel_skylib",
+"cucumber-cpp",
+"rules_cc"
+],
+"rules_gitops": [
+"bazel_lib",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"bazelrc-preset.bzl",
+"buildifier_prebuilt",
+"gazelle",
+"package_metadata",
+"platforms",
+"protobuf",
+"rules_go",
+"rules_img",
+"rules_shell"
+],
+"rules_gleam": [
+"bazel_features",
+"bazel_skylib",
+"gazelle",
+"platforms",
+"rules_erlang",
+"rules_go"
+],
+"rules_go": [
+"apple_support",
+"bazel_ci_rules",
+"bazel_features",
+"bazel_skylib",
+"buildifier_prebuilt",
+"gazelle",
+"googleapis",
+"hermetic_cc_toolchain",
+"package_metadata",
+"platforms",
+"protobuf",
+"rules_cc",
+"rules_proto",
+"rules_shell",
+"runfiles_remote_test",
+"stardoc",
+"toolchains_llvm",
+"with_cfg.bzl"
+],
+"rules_go_write_protos": [
+"bazel_skylib",
+"gazelle",
+"protobuf",
+"rules_go",
+"rules_proto",
+"stardoc"
+],
+"rules_google_secret_manager": [
+"bazel_skylib"
+],
+"rules_graalvm": [
+"apple_rules_lint",
+"apple_support",
+"aspect_bazel_lib",
+"aspect_rules_js",
+"bazel_features",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"buildifier_prebuilt",
+"contrib_rules_jvm",
+"gazelle",
+"platforms",
+"protobuf",
+"rules_cc",
+"rules_go",
+"rules_java",
+"rules_jvm_external",
+"rules_license",
+"rules_nodejs",
+"rules_python",
+"rules_testing",
+"stardoc"
+],
+"rules_graphql": [
+"aspect_bazel_lib",
+"aspect_rules_js",
+"aspect_rules_lint",
+"bazel_env.bzl",
+"bazel_skylib",
+"bazelrc-preset.bzl",
+"buildifier_prebuilt",
+"rules_nodejs"
+],
+"rules_gzip": [
+"ape",
+"rules_coreutils",
+"rules_license",
+"toolchain_utils"
+],
+"rules_halide": [
+"aspect_rules_lint",
+"buildifier_prebuilt",
+"platforms",
+"rules_bazel_integration_test",
+"rules_cc",
+"rules_shell"
+],
+"rules_haskell": [
+"aspect_rules_js",
+"bazel_skylib",
+"gazelle",
+"platforms",
+"protobuf",
+"rules_cc",
+"rules_go",
+"rules_java",
+"rules_license",
+"rules_nixpkgs_cc",
+"rules_nixpkgs_core",
+"rules_nixpkgs_go",
+"rules_nixpkgs_nodejs",
+"rules_nixpkgs_posix",
+"rules_nixpkgs_python",
+"rules_nodejs",
+"rules_proto",
+"rules_python",
+"rules_sh",
+"stardoc"
+],
+"rules_heir": [
+"bazel_skylib",
+"platforms",
+"pybind11_bazel",
+"rules_cc",
+"rules_go"
+],
+"rules_helm": [
+"bazel_lib",
+"bazel_skylib",
+"buildifier_prebuilt",
+"gazelle",
+"platforms",
+"rules_cc",
+"rules_go",
+"rules_img",
+"rules_oci",
+"rules_rust_mdbook",
+"rules_shell",
+"stardoc"
+],
+"rules_idb": [
+"apple_support",
+"bazel_skylib",
+"platforms",
+"rules_apple",
+"rules_python",
+"rules_shell",
+"rules_swift"
+],
+"rules_img": [
+"bazel_features",
+"bazel_skylib",
+"hermetic_launcher",
+"package_metadata",
+"platforms",
+"rules_runfiles_group",
+"sha256.bzl"
+],
+"rules_img_pull_tool": [
+"bazel_skylib",
+"gazelle",
+"rules_go",
+"rules_img"
+],
+"rules_img_signer_cosign": [
+"bazel_skylib",
+"platforms"
+],
+"rules_img_signer_notation": [
+"bazel_skylib",
+"gazelle",
+"platforms",
+"rules_go"
+],
+"rules_img_tool": [
+"bazel_lib",
+"bazel_skylib",
+"gazelle",
+"googleapis",
+"platforms",
+"protobuf",
+"rules_go",
+"rules_img"
+],
+"rules_ios": [
+"apple_support",
+"bazel_skylib",
+"buildifier_prebuilt",
+"rules_apple",
+"rules_cc",
+"rules_pkg",
+"rules_swift",
+"stardoc"
+],
+"rules_ispc": [
+"platforms",
+"rules_cc"
+],
+"rules_itest": [
+"bazel_lib",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"gazelle",
+"llvm",
+"package_metadata",
+"platforms",
+"rules_cc",
+"rules_go",
+"stardoc"
+],
+"rules_java": [
+"abseil-cpp",
+"bazel_features",
+"bazel_skylib",
+"platforms",
+"protobuf",
+"re2",
+"rules_cc",
+"rules_license",
+"rules_pkg",
+"rules_shell",
+"rules_testing",
+"stardoc",
+"zlib"
+],
+"rules_jni": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_java",
+"rules_jvm_external",
+"rules_license",
+"rules_shell",
+"stardoc"
+],
+"rules_js_rust_wasm_bindgen": [
+"aspect_rules_js",
+"bazel_skylib",
+"platforms",
+"rules_rust",
+"rules_rust_mdbook",
+"rules_rust_wasm_bindgen",
+"rules_shell",
+"stardoc"
+],
+"rules_jsonnet": [
+"bazel_skylib",
+"jsonnet",
+"jsonnet_go",
+"rules_python",
+"rules_rust"
+],
+"rules_julia": [
+"bazel_skylib",
+"platforms",
+"rules_batch",
+"rules_cc",
+"rules_rust_mdbook",
+"rules_shell",
+"stardoc",
+"toml.bzl"
+],
+"rules_jupyter": [
+"bazel_skylib",
+"platforms",
+"rules_multirun",
+"rules_req_compile",
+"rules_rust_mdbook",
+"rules_shell",
+"rules_venv",
+"stardoc",
+"texlive",
+"texlive-texmf"
+],
+"rules_jvm_external": [
+"aspect_bazel_lib",
+"bazel_features",
+"bazel_skylib",
+"bzlmod_lock_files",
+"coursier_higher_layer",
+"package_metadata",
+"platforms",
+"protobuf",
+"root_wins_layer",
+"rules_android",
+"rules_java",
+"rules_kotlin",
+"rules_license",
+"rules_shell",
+"stardoc",
+"toml.bzl",
+"transitive_module_can_override"
+],
+"rules_kconfig": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf",
+"rules_python",
+"rules_req_compile",
+"rules_rust_mdbook",
+"rules_shell",
+"rules_venv",
+"stardoc"
+],
+"rules_kotlin": [
+"bazel_features",
+"bazel_lib",
+"bazel_skylib",
+"platforms",
+"rules_android",
+"rules_java",
+"rules_license"
+],
+"rules_kustomize": [
+"bazel_skylib",
+"platforms",
+"rules_shell"
+],
+"rules_latex": [
+"bazel_skylib",
+"platforms",
+"rules_python",
+"rules_shell",
+"stardoc"
+],
+"rules_latex_host": [
+"bazel_skylib",
+"platforms",
+"rules_latex_host",
+"rules_shell"
+],
+"rules_layer_optimizer": [
+"aspect_bazel_lib",
+"aspect_rules_py",
+"bazel_skylib",
+"gawk",
+"rules_distroless",
+"rules_python",
+"toml.bzl"
+],
+"rules_libusb": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_license"
+],
+"rules_license": [
+"bazel_skylib",
+"rules_pkg",
+"rules_python",
+"stardoc"
+],
+"rules_m4": [
+"bazel_skylib",
+"googletest",
+"platforms",
+"rules_cc",
+"rules_shell",
+"stardoc"
+],
+"rules_mayhem": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_shell"
+],
+"rules_minijinja": [
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"buildifier_prebuilt",
+"gazelle",
+"package_metadata",
+"platforms"
+],
+"rules_mise": [
+"bazel_features",
+"bazel_lib",
+"bazel_skylib_gazelle_plugin",
+"bazelrc-preset.bzl",
+"gazelle",
+"package_metadata",
+"platforms",
+"toml.bzl"
+],
+"rules_ml_toolchain": [
+"abseil-cpp",
+"bazel_skylib",
+"googletest",
+"platforms",
+"protobuf",
+"pybind11_bazel",
+"rules_cc",
+"rules_proto"
+],
+"rules_mojo": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_python"
+],
+"rules_multirun": [
+"bazel_skylib",
+"rules_python",
+"rules_shell",
+"stardoc"
+],
+"rules_multitool": [
+"bazel_features",
+"bazel_lib",
+"bazel_skylib",
+"buildifier_prebuilt",
+"platforms"
+],
+"rules_mypy": [
+"bazel_features",
+"bazel_skylib",
+"buildifier_prebuilt",
+"platforms",
+"rules_python",
+"rules_uv"
+],
+"rules_nasm": [
+"bazel_features",
+"bazel_skylib",
+"nasm",
+"platforms",
+"rules_cc",
+"rules_rust_mdbook",
+"rules_shell",
+"stardoc"
+],
+"rules_nccl": [
+"bazel_skylib",
+"platforms",
+"rules_cuda"
+],
+"rules_nixpkgs_core": [
+"bazel_features",
+"bazel_skylib",
+"platforms",
+"rules_license"
+],
+"rules_nixpkgs_nodejs": [
+"bazel_skylib",
+"platforms",
+"rules_nixpkgs_core",
+"rules_nodejs"
+],
+"rules_node_addon": [
+"aspect_rules_js",
+"bazel_skylib",
+"node_addon_api",
+"platforms",
+"rules_cc",
+"rules_nodejs"
+],
+"rules_nodejs": [
+"bazel_features",
+"bazel_lib",
+"bazel_skylib",
+"buildifier_prebuilt",
+"platforms",
+"rules_cc",
+"zlib"
+],
+"rules_nu": [
+"bazel_lib",
+"bazel_skylib",
+"bazelrc-preset.bzl",
+"hermetic_launcher",
+"platforms",
+"stardoc",
+"toolchains_buildbuddy"
+],
+"rules_oci": [
+"aspect_bazel_lib",
+"bazel_env.bzl",
+"bazel_features",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"gazelle",
+"package_metadata",
+"platforms",
+"rules_go",
+"rules_multirun",
+"rules_multitool",
+"stardoc",
+"tar.bzl"
+],
+"rules_ocx": [
+"bazel_skylib",
+"buildifier_prebuilt",
+"platforms",
+"rules_shell",
+"stardoc"
+],
+"rules_odin": [
+"bazel_skylib",
+"platforms"
+],
+"rules_omniverse": [
+"platforms",
+"rules_shell"
+],
+"rules_openscad": [],
+"rules_pact": [
+"bazel_skylib",
+"platforms",
+"stardoc"
+],
+"rules_patchelf": [
+"bazel_skylib",
+"hermetic_cc_toolchain",
+"patchelf",
+"platforms",
+"pre-commit",
+"pre-commit-hooks",
+"rules_license",
+"rules_python",
+"toolchain_utils"
+],
+"rules_periphery": [
+"bazel_skylib",
+"buildifier_prebuilt",
+"platforms",
+"rules_apple",
+"rules_shell",
+"rules_swift"
+],
+"rules_perl": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_shell"
+],
+"rules_pex": [
+"bazel_skylib",
+"platforms",
+"rules_python",
+"rules_rust_mdbook",
+"rules_shell",
+"stardoc"
+],
+"rules_pkg": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_license",
+"rules_python",
+"rules_shell",
+"stardoc"
+],
+"rules_pkg_providers": [
+"rules_license"
+],
+"rules_pkl": [
+"aspect_bazel_lib",
+"bazel_skylib",
+"buildifier_prebuilt",
+"gazelle",
+"platforms",
+"rules_bazel_integration_test",
+"rules_java",
+"rules_jvm_external",
+"rules_python",
+"rules_shell",
+"stardoc"
+],
+"rules_platform": [
+"bazel_skylib",
+"rules_pkg"
+],
+"rules_playwright": [
+"aspect_bazel_lib",
+"bazel_skylib",
+"buildifier_prebuilt",
+"platforms",
+"rules_rust",
+"toolchains_llvm",
+"toolchains_musl"
+],
+"rules_pmd": [
+"bazel_skylib",
+"buildifier_prebuilt",
+"rules_java",
+"stardoc"
+],
+"rules_poetry": [
+"bazel_skylib",
+"platforms",
+"rules_python"
+],
+"rules_powershell": [
+"bazel_skylib",
+"platforms",
+"rules_batch",
+"rules_rust_mdbook",
+"rules_shell",
+"stardoc"
+],
+"rules_prefect": [
+"aspect_rules_py",
+"bazel_skylib",
+"rules_python"
+],
+"rules_probe_rs": [
+"aspect_bazel_lib",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"buildifier_prebuilt",
+"gazelle",
+"platforms"
+],
+"rules_proto": [
+"bazel_skylib",
+"googletest",
+"platforms",
+"protobuf",
+"rules_cc",
+"rules_license"
+],
+"rules_proto_grpc": [
+"aspect_bazel_lib",
+"bazel_skylib",
+"platforms",
+"protobuf",
+"rules_rust",
+"toolchains_protoc"
+],
+"rules_proto_grpc_buf": [
+"bazel_skylib",
+"protobuf",
+"rules_proto_grpc",
+"rules_shell"
+],
+"rules_proto_grpc_c": [
+"protobuf",
+"rules_cc",
+"rules_proto_grpc"
+],
+"rules_proto_grpc_cpp": [
+"grpc",
+"protobuf",
+"rules_cc",
+"rules_proto_grpc"
+],
+"rules_proto_grpc_csharp": [
+"grpc",
+"rules_dotnet",
+"rules_proto_grpc"
+],
+"rules_proto_grpc_doc": [
+"rules_proto_grpc"
+],
+"rules_proto_grpc_go": [
+"gazelle",
+"rules_go",
+"rules_proto_grpc"
+],
+"rules_proto_grpc_grpc_gateway": [
+"gazelle",
+"grpc_ecosystem_grpc_gateway",
+"rules_go",
+"rules_proto_grpc",
+"rules_proto_grpc_go"
+],
+"rules_proto_grpc_java": [
+"rules_java",
+"rules_jvm_external",
+"rules_proto_grpc"
+],
+"rules_proto_grpc_js": [
+"aspect_rules_js",
+"rules_proto_grpc"
+],
+"rules_proto_grpc_objc": [
+"apple_support",
+"grpc",
+"protobuf",
+"rules_cc",
+"rules_proto_grpc"
+],
+"rules_proto_grpc_python": [
+"grpc",
+"protobuf",
+"rules_proto_grpc",
+"rules_python"
+],
+"rules_proto_grpc_scala": [
+"rules_java",
+"rules_jvm_external",
+"rules_proto_grpc",
+"rules_proto_grpc_java",
+"rules_scala"
+],
+"rules_proto_grpc_swift": [
+"apple_support",
+"rules_proto_grpc",
+"rules_swift",
+"rules_swift_package_manager"
+],
+"rules_pycross": [
+"bazel_features",
+"bazel_lib",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"buildifier_prebuilt",
+"gazelle",
+"platforms",
+"pypackaging.bzl",
+"rules_cc",
+"rules_python",
+"rules_shell",
+"rules_testing",
+"toml.bzl"
+],
+"rules_pycross_backend_maturin": [
+"bazel_features",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"gazelle",
+"rules_cc",
+"rules_pycross",
+"rules_python",
+"rules_rust",
+"rules_testing",
+"toml.bzl"
+],
+"rules_pydeps": [
+"bazel_skylib",
+"buildifier_prebuilt",
+"platforms",
+"rules_python",
+"rules_uv"
+],
+"rules_pylyglot": [
+"bazel_lib",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"bazelrc-preset.bzl",
+"gazelle",
+"package_metadata",
+"platforms",
+"rules_python"
+],
+"rules_pyrefly": [
+"bazel_skylib",
+"buildifier_prebuilt",
+"platforms",
+"rules_python"
+],
+"rules_python": [
+"another_module",
+"bazel_ci_rules",
+"bazel_features",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"gazelle",
+"other",
+"package_metadata",
+"platforms",
+"protobuf",
+"rules_bazel_integration_test",
+"rules_cc",
+"rules_go",
+"rules_multirun",
+"rules_pkg",
+"rules_pyrefly",
+"rules_rust",
+"rules_shell",
+"rules_testing",
+"sphinxdocs",
+"toml.bzl"
+],
+"rules_python_gazelle_plugin": [
+"bazel_skylib",
+"gazelle",
+"rules_cc",
+"rules_go",
+"rules_python"
+],
+"rules_qemu": [
+"bazel_features",
+"bazel_lib",
+"buildifier_prebuilt",
+"hermetic_launcher",
+"llvm",
+"package_metadata",
+"platforms",
+"rules_cc",
+"rules_python",
+"rules_shell"
+],
+"rules_qt": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_shell"
+],
+"rules_req_compile": [
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"buildifier_prebuilt",
+"buildozer",
+"gazelle",
+"platforms",
+"rules_cc",
+"rules_go",
+"rules_python",
+"rules_venv",
+"stardoc"
+],
+"rules_riviera": [
+"bazel_skylib",
+"platforms",
+"rules_rust",
+"rules_rust_mdbook",
+"rules_shell",
+"rules_verilog",
+"rules_vhdl",
+"stardoc"
+],
+"rules_robolectric": [
+"bazel_skylib",
+"buildifier_prebuilt",
+"rules_java",
+"rules_python"
+],
+"rules_rs": [
+"apple_support",
+"bazel_features",
+"bazel_lib",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"buildifier_prebuilt",
+"gazelle",
+"hermetic_launcher",
+"llvm",
+"package_metadata",
+"platforms",
+"rules_cc",
+"rules_go",
+"rules_proto",
+"rules_python",
+"rules_shell"
+],
+"rules_rs_mutants": [
+"bazel_skylib",
+"buildifier_prebuilt",
+"hermetic_launcher",
+"llvm",
+"platforms",
+"rules_rs"
+],
+"rules_ruby": [
+"aspect_bazel_lib",
+"bazel_features",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"buildifier_prebuilt",
+"cgrindel_bazel_starlib",
+"gazelle",
+"platforms",
+"protobuf",
+"rules_cc",
+"rules_go",
+"rules_java",
+"rules_shell",
+"stardoc"
+],
+"rules_runfile_codegen_core": [
+"bazel_skylib"
+],
+"rules_runfile_codegen_go": [
+"bazel_skylib",
+"protobuf",
+"rules_go",
+"rules_runfile_codegen_core",
+"stardoc"
+],
+"rules_runfile_codegen_kotlin": [
+"bazel_features",
+"bazel_skylib",
+"protobuf",
+"rules_java",
+"rules_jvm_external",
+"rules_kotlin",
+"rules_runfile_codegen_core",
+"stardoc"
+],
+"rules_runfiles_group": [
+"bazel_skylib"
+],
+"rules_rust": [
+"apple_support",
+"bazel_ci_rules",
+"bazel_features",
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_license",
+"rules_python",
+"rules_shell",
+"rules_testing"
+],
+"rules_rust_bindgen": [
+"bazel_ci_rules",
+"bazel_features",
+"bazel_skylib",
+"llvm-project",
+"platforms",
+"rules_cc",
+"rules_rust",
+"rules_testing"
+],
+"rules_rust_mdbook": [
+"bazel_ci_rules",
+"bazel_features",
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_rust"
+],
+"rules_rust_mutants": [
+"bazel_features",
+"bazel_skylib",
+"platforms",
+"rules_rust",
+"rules_rust_mdbook",
+"rules_shell",
+"stardoc"
+],
+"rules_rust_prost": [
+"bazel_ci_rules",
+"bazel_features",
+"bazel_skylib",
+"googleapis",
+"platforms",
+"protobuf",
+"rules_cc",
+"rules_proto",
+"rules_rust"
+],
+"rules_rust_protobuf": [
+"bazel_ci_rules",
+"bazel_features",
+"bazel_skylib",
+"platforms",
+"protobuf",
+"rules_cc",
+"rules_proto",
+"rules_rust"
+],
+"rules_rust_pyo3": [
+"bazel_ci_rules",
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_python",
+"rules_req_compile",
+"rules_rust",
+"rules_venv"
+],
+"rules_rust_wasm_bindgen": [
+"apple_support",
+"bazel_ci_rules",
+"bazel_features",
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_rust"
+],
+"rules_s3": [
+"bazel_skylib",
+"rules_bazel_integration_test",
+"rules_java",
+"rules_proto",
+"rules_testing",
+"stardoc",
+"toolchains_protoc",
+"tweag-credential-helper"
+],
+"rules_s5": [
+"bazel_skylib"
+],
+"rules_sbom": [
+"bazel_skylib",
+"platforms",
+"rules_python"
+],
+"rules_scala": [
+"bazel_ci_rules",
+"bazel_skylib",
+"bazel_worker_api",
+"buildifier_prebuilt",
+"platforms",
+"protobuf",
+"rules_java",
+"rules_jvm_external",
+"rules_proto",
+"rules_python",
+"rules_shell"
+],
+"rules_scala_native": [
+"bazel_skylib",
+"llvm",
+"platforms",
+"protobuf",
+"rules_bazel_integration_test",
+"rules_cc",
+"rules_java",
+"rules_scala"
+],
+"rules_sh": [
+"bazel_skylib",
+"platforms",
+"stardoc"
+],
+"rules_shar": [
+"protobuf",
+"rules_android",
+"rules_cc",
+"rules_pkg",
+"rules_shell"
+],
+"rules_shell": [
+"bazel_features",
+"bazel_skylib",
+"platforms",
+"rules_shellcheck"
+],
+"rules_shellcheck": [
+"bazel_skylib",
+"platforms",
+"rules_batch",
+"rules_bazel_integration_test",
+"rules_pkg",
+"rules_shell"
+],
+"rules_shellspec": [
+"aspect_rules_lint",
+"bazel_lib",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"bazelrc-preset.bzl",
+"buildifier_prebuilt",
+"gazelle",
+"package_metadata",
+"platforms",
+"rules_multitool",
+"rules_shell",
+"rules_testing"
+],
+"rules_shtk": [
+"bazel_skylib"
+],
+"rules_signing": [
+"bazel_lib",
+"bazel_skylib",
+"codesign.bzl",
+"hermetic_cc_toolchain",
+"package_metadata",
+"platforms",
+"rules_cc",
+"rules_dotnet",
+"rules_java",
+"rules_kotlin",
+"rules_oci",
+"rules_python",
+"rules_scala",
+"rules_shell"
+],
+"rules_spring": [
+"rules_jvm_external",
+"rules_license",
+"rules_python"
+],
+"rules_spring_aot": [
+"aspect_bazel_lib",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"buildifier_prebuilt",
+"gazelle",
+"package_metadata",
+"platforms",
+"rules_graalvm",
+"rules_java",
+"rules_jvm_external"
+],
+"rules_squashfs": [
+"hermetic_cc_toolchain",
+"rules_bzip2",
+"rules_coreutils",
+"rules_gzip",
+"rules_xz",
+"rules_zstd",
+"squashfs-tools",
+"toolchain_utils"
+],
+"rules_swift": [
+"abseil-cpp",
+"apple_support",
+"bazel_features",
+"bazel_linux_packages",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"gazelle",
+"hermetic_android_toolchains",
+"nlohmann_json",
+"platforms",
+"platforms_contrib",
+"protobuf",
+"rules_android",
+"rules_android_ndk",
+"rules_cc",
+"rules_go",
+"rules_java",
+"rules_jvm_external",
+"rules_kotlin",
+"rules_multirun",
+"rules_python",
+"rules_shell",
+"rules_swift_layering_check_external_test",
+"stardoc",
+"swift-syntax",
+"swift_argument_parser"
+],
+"rules_swift_package_manager": [
+"apple_support",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"cgrindel_bazel_starlib",
+"gazelle",
+"platforms",
+"rules_apple",
+"rules_bazel_integration_test",
+"rules_cc",
+"rules_go",
+"rules_license",
+"rules_shell",
+"rules_swift"
+],
+"rules_swift_previews": [
+"bazel_lib",
+"bazel_skylib",
+"buildifier_prebuilt",
+"rules_swift",
+"rules_swift_resources"
+],
+"rules_swift_resources": [
+"apple_support",
+"bazel_lib",
+"bazel_skylib",
+"buildifier_prebuilt",
+"platforms",
+"rules_cc",
+"rules_swift"
+],
+"rules_syft": [
+"aspect_bazel_lib",
+"bazel_skylib",
+"buildifier_prebuilt",
+"platforms",
+"stardoc"
+],
+"rules_synology": [
+"aspect_bazel_lib",
+"bazel_skylib",
+"buildifier_prebuilt",
+"gazelle",
+"platforms",
+"rules_bazel_integration_test",
+"rules_cc",
+"rules_go",
+"rules_pkg",
+"rules_shellcheck",
+"stardoc"
+],
+"rules_systemrdl": [
+"bazel_skylib",
+"platforms",
+"rules_req_compile",
+"rules_rust_mdbook",
+"rules_shell",
+"rules_venv",
+"rules_verilog",
+"rules_vhdl",
+"stardoc"
+],
+"rules_tar": [
+"ape",
+"gazelle",
+"hermetic_cc_toolchain",
+"platforms",
+"rules_bzip2",
+"rules_coreutils",
+"rules_go",
+"rules_gzip",
+"rules_license",
+"rules_xz",
+"rules_zstd",
+"toolchain_utils"
+],
+"rules_tcl": [
+"bazel_skylib",
+"platforms",
+"rules_batch",
+"rules_req_compile",
+"rules_rust_mdbook",
+"rules_shell",
+"rules_venv",
+"stardoc",
+"tcl_lang"
+],
+"rules_tensorrt_rtx": [
+"bazel_skylib",
+"buildifier_prebuilt",
+"platforms",
+"rules_cc",
+"rules_cuda"
+],
+"rules_terraform": [
+"bazel_lib",
+"bazel_skylib",
+"gazelle",
+"platforms",
+"rules_go",
+"rules_rust_mdbook",
+"rules_shell",
+"rules_venv",
+"stardoc"
+],
+"rules_testing": [
+"bazel_skylib",
+"platforms",
+"rules_license",
+"rules_python",
+"rules_shell",
+"stardoc"
+],
+"rules_tf": [
+"bazel_skylib",
+"platforms",
+"rules_license",
+"rules_pkg",
+"rules_python"
+],
+"rules_tofu": [
+"bazel_skylib",
+"buildifier_prebuilt",
+"gazelle",
+"platforms",
+"rules_bazel_integration_test",
+"rules_go",
+"rules_shell",
+"rules_tofu"
+],
+"rules_tsickle": [
+"aspect_bazel_lib",
+"aspect_rules_js",
+"aspect_rules_ts",
+"bazel_skylib",
+"rules_nodejs"
+],
+"rules_typst": [
+"bazel_skylib",
+"platforms",
+"rules_rust",
+"rules_venv"
+],
+"rules_uv": [
+"bazel_skylib",
+"buildifier_prebuilt",
+"platforms",
+"rules_multitool",
+"rules_python"
+],
+"rules_varlink": [
+"bazel_skylib",
+"llvm",
+"platforms",
+"rules_rs"
+],
+"rules_venv": [
+"bazel_skylib",
+"buildifier_prebuilt",
+"platforms",
+"rules_batch",
+"rules_cc",
+"rules_python",
+"rules_req_compile",
+"rules_rust_mdbook",
+"rules_shell",
+"stardoc"
+],
+"rules_verible": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_rust_mdbook",
+"rules_shell",
+"rules_verilog",
+"stardoc"
+],
+"rules_verilator": [
+"bazel_skylib",
+"googletest",
+"platforms",
+"rules_cc",
+"rules_license",
+"rules_python",
+"rules_verilog",
+"systemc",
+"verilator"
+],
+"rules_verilog": [
+"bazel_skylib",
+"platforms",
+"rules_rust_mdbook",
+"rules_shell",
+"rules_venv",
+"rules_vhdl",
+"stardoc"
+],
+"rules_vhdl": [
+"bazel_skylib",
+"rules_venv",
+"rules_verilog"
+],
+"rules_vivado": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_license",
+"rules_python",
+"rules_rust",
+"rules_rust_mdbook",
+"rules_shell",
+"rules_tcl",
+"rules_venv",
+"rules_verilog",
+"rules_vhdl",
+"stardoc"
+],
+"rules_vsg": [
+"bazel_skylib",
+"platforms",
+"rules_req_compile",
+"rules_rust_mdbook",
+"rules_shell",
+"rules_venv",
+"rules_vhdl",
+"stardoc"
+],
+"rules_vulkan": [
+"aspect_bazel_lib",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"buildifier_prebuilt",
+"gazelle",
+"platforms",
+"protobuf",
+"rules_cc",
+"rules_go",
+"rules_pkg",
+"stardoc"
+],
+"rules_vunit": [
+"bazel_skylib",
+"ghdl",
+"nvc",
+"platforms",
+"rules_cc",
+"rules_python",
+"rules_req_compile",
+"rules_rust_mdbook",
+"rules_shell",
+"rules_venv",
+"rules_verilog",
+"rules_vhdl",
+"stardoc"
+],
+"rules_wasm": [
+"bazel_skylib",
+"buildifier_prebuilt",
+"example",
+"gazelle",
+"jq.bzl",
+"package_metadata",
+"platforms",
+"rules_cc",
+"rules_go",
+"rules_license",
+"rules_rust",
+"rules_shell"
+],
+"rules_web_e2e": [
+"aspect_rules_js",
+"aspect_rules_ts",
+"bazel_lib",
+"bazel_skylib",
+"bubblewrap",
+"llvm",
+"platforms",
+"rules_cc",
+"rules_license",
+"rules_shell",
+"sed",
+"tar.bzl",
+"zip"
+],
+"rules_web_testing_go": [
+"bazel_skylib",
+"gazelle",
+"rules_go",
+"rules_webtesting"
+],
+"rules_web_testing_java": [
+"bazel_skylib",
+"rules_java",
+"rules_jvm_external",
+"rules_webtesting"
+],
+"rules_web_testing_python": [
+"bazel_skylib",
+"rules_python",
+"rules_webtesting"
+],
+"rules_web_testing_scala": [
+"bazel_skylib",
+"rules_jvm_external",
+"rules_scala",
+"rules_web_testing_java",
+"rules_webtesting"
+],
+"rules_webtesting": [
+"bazel_skylib",
+"gazelle",
+"platforms",
+"rules_go",
+"rules_shell"
+],
+"rules_xcodeproj": [
+"apple_support",
+"bazel_features",
+"bazel_skylib",
+"rsync",
+"rules_apple",
+"rules_cc",
+"rules_python",
+"rules_swift"
+],
+"rules_xz": [
+"ape",
+"hermetic_cc_toolchain",
+"rules_coreutils",
+"rules_license",
+"toolchain_utils",
+"xz"
+],
+"rules_ytt": [
+"aspect_bazel_lib",
+"bazel_features",
+"bazel_skylib",
+"platforms",
+"stardoc"
+],
+"rules_zig": [
+"apple_support",
+"aspect_bazel_lib",
+"bazel_features",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"buildifier_prebuilt",
+"cgrindel_bazel_starlib",
+"gazelle",
+"platforms",
+"rules_bazel_integration_test",
+"rules_cc",
+"rules_go",
+"rules_multirun",
+"rules_python",
+"stardoc",
+"toolchains_buildbuddy"
+],
+"rules_zstd": [
+"ape",
+"bazel_lib",
+"bazel_skylib",
+"ci-component-bazelisk",
+"download_utils",
+"pre-commit",
+"pre-commit-hooks",
+"rules_license",
+"rules_python",
+"toolchain_utils",
+"zstd"
+],
+"ruy": [
+"googletest"
+],
+"ryandraves_nlb": [
+"aspect_bazel_lib",
+"aspect_rules_js",
+"aspect_rules_lint",
+"aspect_rules_py",
+"aspect_rules_ts",
+"bazel_skylib",
+"buildifier_prebuilt",
+"cppzmq",
+"googletest",
+"hedron_compile_commands",
+"libzmq",
+"pico-sdk",
+"picotool",
+"platforms",
+"pybind11_bazel",
+"rules_cc",
+"rules_foreign_cc",
+"rules_nodejs",
+"rules_platform",
+"rules_python",
+"rules_rust"
+],
+"s2geometry": [
+"abseil-cpp",
+"bazel_skylib",
+"boringssl",
+"google_benchmark",
+"googletest",
+"rules_cc"
+],
+"safedi": [
+"apple_support",
+"rules_swift",
+"rules_swift_package_manager"
+],
+"safeint": [
+"rules_cc"
+],
+"sajson": [
+"platforms",
+"rules_cc",
+"unittest-cpp"
+],
+"saru": [
+"rules_cc"
+],
+"scip": [
+"bliss",
+"platforms",
+"rules_cc",
+"soplex",
+"zlib"
+],
+"sdformat": [
+"buildifier_prebuilt",
+"googletest",
+"gz-math",
+"gz-utils",
+"rules_cc",
+"rules_gazebo",
+"rules_license",
+"rules_python",
+"tinyxml2"
+],
+"sdl2": [
+"alsa_lib",
+"apple_support",
+"egl-registry",
+"libffi",
+"libx11",
+"libxcursor",
+"libxext",
+"libxfixes",
+"libxi",
+"libxrandr",
+"opengl-registry",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf",
+"rules_license",
+"wayland",
+"xkbcommon"
+],
+"sdl2_mixer": [
+"apple_support",
+"platforms",
+"rules_cc",
+"rules_license",
+"sdl2"
+],
+"sdl3": [
+"alsa_lib",
+"libffi",
+"libx11",
+"libxcursor",
+"libxext",
+"libxfixes",
+"libxi",
+"libxrandr",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf",
+"wayland",
+"xkbcommon"
+],
+"seastar": [
+"bazel_skylib",
+"boost.algorithm",
+"boost.asio",
+"boost.endian",
+"boost.filesystem",
+"boost.intrusive",
+"boost.lockfree",
+"boost.program_options",
+"boost.range",
+"boost.test",
+"c-ares",
+"fmt",
+"liburing",
+"lz4",
+"openssl",
+"protobuf",
+"ragel",
+"rules_cc",
+"rules_python",
+"yaml-cpp"
+],
+"sed": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf"
+],
+"sentencepiece": [
+"abseil-cpp",
+"darts-clone",
+"esaxx",
+"platforms",
+"protobuf",
+"rules_cc"
+],
+"sentry_native": [
+"apple_mig",
+"apple_support",
+"bazel_skylib",
+"curl",
+"llvm",
+"platforms",
+"rules_cc",
+"rules_python",
+"rules_shell",
+"zlib"
+],
+"sfml": [
+"apple_support",
+"flac",
+"freetype",
+"harfbuzz",
+"libssh2",
+"libx11",
+"libxcursor",
+"libxi",
+"libxrandr",
+"mbedtls",
+"platforms",
+"rules_cc",
+"sheenbidi",
+"vorbis"
+],
+"sha256.bzl": [
+"bazel_skylib",
+"gazelle",
+"rules_go",
+"rules_java",
+"rules_rust"
+],
+"sheenbidi": [
+"rules_cc"
+],
+"shine": [
+"platforms",
+"rules_cc"
+],
+"sign-here": [
+"apple_support",
+"rules_apple",
+"rules_swift",
+"swift_argument_parser"
+],
+"simde": [],
+"simdjson": [
+"platforms",
+"rules_cc"
+],
+"simdutf": [
+"rules_cc"
+],
+"simplehttp": [
+"platforms"
+],
+"skcms": [
+"platforms",
+"rules_cc"
+],
+"skywalking-data-collect-protocol": [
+"grpc",
+"protobuf"
+],
+"slinky": [
+"google_benchmark",
+"googletest",
+"rules_cc",
+"rules_license",
+"rules_shell"
+],
+"snappy": [
+"bazel_skylib",
+"google_benchmark",
+"googletest",
+"platforms",
+"rules_cc"
+],
+"sockpp": [
+"bazel_skylib",
+"catch2",
+"platforms",
+"rules_cc",
+"rules_license"
+],
+"sophus": [
+"eigen",
+"fmt",
+"rules_cc"
+],
+"soplex": [
+"boost.multiprecision",
+"boost.serialization",
+"fmt",
+"platforms",
+"rules_cc",
+"zlib",
+"zstr"
+],
+"sourcekit_bazel_bsp": [],
+"sourcekitten": [
+"apple_support",
+"platforms",
+"rules_cc",
+"rules_swift",
+"swift_argument_parser",
+"swxmlhash",
+"yams"
+],
+"sparrowhawk": [
+"abseil-cpp",
+"openfst",
+"protobuf",
+"re2",
+"rules_cc",
+"thrax"
+],
+"sparse_map": [
+"rules_cc"
+],
+"spdlog": [
+"bazel_skylib",
+"catch2",
+"fmt",
+"rules_cc",
+"rules_license"
+],
+"speex": [
+"platforms",
+"rules_cc"
+],
+"sphinxdocs": [
+"bazel_skylib",
+"platforms",
+"protobuf",
+"rules_bazel_integration_test",
+"rules_pyrefly",
+"rules_python",
+"stardoc"
+],
+"spirv_headers": [
+"rules_cc"
+],
+"spirv_tools": [
+"bazel_skylib",
+"effcee",
+"googletest",
+"platforms",
+"re2",
+"rules_cc",
+"rules_python",
+"spirv_headers"
+],
+"sqids_bazel": [
+"aspect_bazel_lib",
+"bazel_skylib"
+],
+"sqlite3": [
+"platforms",
+"rules_cc"
+],
+"sqlite_orm": [
+"platforms",
+"rules_cc",
+"sqlite3"
+],
+"squashfs-tools": [
+"lz4",
+"rules_cc",
+"rules_shell",
+"xz",
+"zlib",
+"zstd"
+],
+"squashfuse": [
+"libfuse",
+"rules_cc",
+"zlib",
+"zstd"
+],
+"sse2neon": [
+"rules_cc"
+],
+"stardoc": [
+"bazel_skylib",
+"protobuf",
+"rules_java",
+"rules_jvm_external",
+"rules_license"
+],
+"stb": [
+"rules_cc"
+],
+"stdexec": [
+"rules_cc"
+],
+"su-exec": [],
+"subspace": [
+"abseil-cpp",
+"bazel_skylib",
+"boost.asio",
+"boost.coroutine",
+"coroutines",
+"cpp_toolbelt",
+"googletest",
+"platforms",
+"protobuf",
+"pybind11_bazel",
+"rules_android_ndk",
+"rules_cc",
+"rules_java",
+"rules_pkg",
+"rules_proto",
+"rules_python",
+"rules_rust",
+"rules_shell",
+"zlib"
+],
+"suitesparse": [
+"platforms",
+"rules_cc"
+],
+"supply-chain-go": [
+"gazelle",
+"package_metadata",
+"rules_go"
+],
+"supply_chain_tools": [
+"bazel_skylib",
+"package_metadata",
+"platforms",
+"rules_cc",
+"rules_license",
+"rules_python",
+"supply-chain-go"
+],
+"sv-elab": [
+"bazel_skylib",
+"boost.regex",
+"fmt",
+"rules_cc",
+"rules_license",
+"rules_python",
+"yosys"
+],
+"sv-lang": [
+"aspect_bazel_lib",
+"aspect_rules_py",
+"bazel_skylib",
+"boost.regex",
+"boost.unordered",
+"fmt",
+"nanobind_bazel",
+"platforms",
+"rules_cc",
+"rules_foreign_cc",
+"rules_pycross",
+"rules_python",
+"tomlplusplus"
+],
+"swift-bylaws": [
+"bazel_lib",
+"platforms"
+],
+"swift-filename-matcher": [
+"apple_support",
+"rules_swift"
+],
+"swift-index-store": [
+"apple_support",
+"platforms",
+"rules_apple",
+"rules_cc",
+"rules_swift"
+],
+"swift-indexstore": [
+"apple_support",
+"rules_cc",
+"rules_swift",
+"swift_argument_parser"
+],
+"swift-syntax": [
+"apple_support",
+"platforms",
+"rules_apple",
+"rules_cc",
+"rules_swift"
+],
+"swift-system": [
+"platforms",
+"rules_cc",
+"rules_swift"
+],
+"swift-tomldecoder": [
+"apple_support",
+"rules_cc",
+"rules_swift"
+],
+"swift_argument_parser": [
+"apple_support",
+"rules_swift"
+],
+"swift_bep_parser": [
+"apple_support",
+"buildifier_prebuilt",
+"protobuf",
+"rules_apple",
+"rules_cc",
+"rules_java",
+"rules_license",
+"rules_pkg",
+"rules_proto",
+"rules_python",
+"rules_swift",
+"rules_xcodeproj",
+"swiftlint"
+],
+"swift_gazelle_plugin": [
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"cgrindel_bazel_starlib",
+"gazelle",
+"platforms",
+"rules_bazel_integration_test",
+"rules_go",
+"rules_shell"
+],
+"swiftlint": [
+"apple_support",
+"bazel_skylib",
+"platforms",
+"rules_apple",
+"rules_cc",
+"rules_shell",
+"rules_swift",
+"rules_xcodeproj",
+"sourcekitten",
+"swift-filename-matcher",
+"swift_argument_parser",
+"yams"
+],
+"swig": [
+"pcre2",
+"platforms",
+"rules_cc"
+],
+"swxmlhash": [
+"apple_support",
+"rules_swift"
+],
+"symengine": [
+"bazel_skylib",
+"gmp",
+"rules_cc"
+],
+"systemc": [
+"platforms",
+"rules_cc"
+],
+"systemd": [
+"bazel_skylib",
+"gawk",
+"gperf",
+"rules_cc",
+"rules_license",
+"rules_python"
+],
+"tar.bzl": [
+"bazel_features",
+"bazel_lib",
+"bazel_skylib",
+"bazelrc-preset.bzl",
+"buildifier_prebuilt",
+"gawk",
+"platforms",
+"rules_shell"
+],
+"tcl_lang": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf",
+"zlib"
+],
+"tclap": [
+"rules_cc"
+],
+"tclreadline": [
+"bazel_skylib",
+"platforms",
+"readline",
+"rules_cc",
+"rules_license",
+"tcl_lang"
+],
+"tcmalloc": [
+"abseil-cpp",
+"bazel_skylib",
+"docker_toolchain",
+"fuzztest",
+"gloop",
+"google_benchmark",
+"googletest",
+"platforms",
+"protobuf",
+"re2",
+"rules_cc",
+"rules_fuzzing"
+],
+"tcpdump": [
+"bazel_skylib",
+"libpcap",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf"
+],
+"teckit": [
+"libexpat",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf",
+"zlib"
+],
+"tensorrt_headers": [
+"rules_cc"
+],
+"texlive": [
+"bazel_skylib",
+"cairo",
+"freetype",
+"gawk",
+"gmp",
+"harfbuzz",
+"icu",
+"libgd",
+"libjpeg_turbo",
+"libpaper",
+"libpng",
+"libtiff",
+"lua",
+"mpfr",
+"platforms",
+"pplib",
+"rules_cc",
+"rules_cc_autoconf",
+"rules_shell",
+"teckit",
+"texlive-texmf",
+"xpdf",
+"zlib",
+"zziplib"
+],
+"texlive-texmf": [],
+"textforge": [
+"bazel_skylib",
+"rules_python"
+],
+"tftp-hpa": [
+"bazel_skylib",
+"platforms",
+"readline",
+"rules_cc",
+"rules_cc_autoconf"
+],
+"theora": [
+"bazel_skylib",
+"ogg",
+"platforms",
+"rules_cc"
+],
+"thinkit": [
+"abseil-cpp",
+"bazel_skylib",
+"boringssl",
+"buildifier_prebuilt",
+"google_benchmark",
+"googleapis",
+"googletest",
+"grpc",
+"gutil",
+"openconfig_gnmi",
+"openconfig_gnoi",
+"p4runtime",
+"protobuf",
+"rules_cc",
+"rules_go",
+"rules_proto"
+],
+"thorvg": [
+"bazel_skylib",
+"platforms",
+"rules_cc"
+],
+"thrax": [
+"abseil-cpp",
+"googletest",
+"openfst",
+"rules_cc"
+],
+"thrift": [
+"bazel_skylib",
+"boost.numeric_conversion",
+"boost.predef",
+"boost.uuid",
+"platforms",
+"rules_cc"
+],
+"tink_cc": [
+"abseil-cpp",
+"bazel_skylib",
+"boringssl",
+"google_benchmark",
+"googletest",
+"platforms",
+"protobuf",
+"rules_cc",
+"rules_license",
+"rules_proto",
+"rules_shell"
+],
+"tinyexr": [
+"miniz",
+"rules_cc"
+],
+"tinyformat": [],
+"tinygltf": [
+"rules_cc",
+"rules_license"
+],
+"tinyobjloader": [
+"platforms",
+"rules_cc"
+],
+"tinyply": [
+"rules_cc"
+],
+"tinyxml": [
+"rules_cc"
+],
+"tinyxml2": [
+"rules_cc"
+],
+"tl-expected": [
+"rules_cc",
+"rules_license"
+],
+"tl-optional": [
+"rules_cc"
+],
+"toml.bzl": [
+"bazel_lib",
+"bazel_skylib",
+"bazelrc-preset.bzl",
+"buildifier_prebuilt",
+"package_metadata",
+"rules_testing"
+],
+"tomlplusplus": [
+"platforms",
+"rules_cc"
+],
+"toolchain_utils": [
+"bazel_features",
+"bazel_skylib",
+"ci-component-bazelisk",
+"llvm",
+"package_metadata",
+"platforms",
+"pre-commit",
+"pre-commit-hooks",
+"rules_python"
+],
+"toolchains_arm_gnu": [
+"aspect_bazel_lib",
+"bazel_skylib",
+"platforms",
+"rules_cc"
+],
+"toolchains_avr": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_rust",
+"rules_shell"
+],
+"toolchains_buildbuddy": [
+"buildifier_prebuilt",
+"platforms",
+"rules_bazel_integration_test",
+"rules_cc",
+"rules_java"
+],
+"toolchains_llvm": [
+"aspect_bazel_lib",
+"bazel_features",
+"bazel_skylib",
+"mboworks_bzl",
+"platforms",
+"rules_cc",
+"rules_python",
+"tar.bzl"
+],
+"toolchains_llvm_bootstrapped": [
+"bazel_features",
+"bazel_lib",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"bazelrc-preset.bzl",
+"buildifier_prebuilt",
+"gazelle",
+"glibc-stubs-generator",
+"libarchive",
+"libstdcxx-stubs-generator",
+"platforms",
+"rules_cc",
+"rules_shell",
+"rules_swift",
+"rules_zig",
+"tar.bzl",
+"with_cfg.bzl",
+"xpkgutil"
+],
+"toolchains_musl": [
+"bazel_features",
+"platforms",
+"rules_cc"
+],
+"toolchains_protoc": [
+"aspect_bazel_lib",
+"bazel_features",
+"bazel_skylib",
+"bazelrc-preset.bzl",
+"buildifier_prebuilt",
+"platforms",
+"rules_proto"
+],
+"toolchains_riscv_gnu": [
+"aspect_bazel_lib",
+"bazel_skylib",
+"platforms",
+"rules_cc"
+],
+"tools_android": [
+"rules_android",
+"rules_java",
+"rules_jvm_external"
+],
+"toybox": [
+"rules_cc",
+"rules_license"
+],
+"tre": [
+"bazel_skylib",
+"rules_cc",
+"rules_cc_autoconf"
+],
+"trec_eval": [
+"platforms",
+"rules_cc"
+],
+"tree-sitter-bazel": [
+"bazel_features",
+"bazel_skylib",
+"rules_cc",
+"rules_shell"
+],
+"tree-sitter-c-bazel": [
+"bazel_skylib",
+"tree-sitter-bazel"
+],
+"triton-inference-server-common": [
+"grpc",
+"protobuf"
+],
+"trlc": [
+"aspect_rules_lint",
+"buildifier_prebuilt",
+"rules_python",
+"rules_shell"
+],
+"trompeloeil": [
+"rules_cc"
+],
+"tweag-credential-helper": [
+"bazel_skylib",
+"buildifier_prebuilt",
+"gazelle",
+"platforms",
+"rules_bazel_integration_test",
+"rules_go",
+"rules_pkg"
+],
+"twolame": [
+"platforms",
+"rules_cc"
+],
+"ujson4c": [
+"platforms",
+"rules_cc"
+],
+"ultrajson": [
+"platforms",
+"rules_cc"
+],
+"uncrustify": [
+"cmake_configure_file",
+"platforms",
+"rules_autoconf",
+"rules_cc",
+"rules_python"
+],
+"unittest-cpp": [
+"platforms",
+"rules_cc"
+],
+"universal-robots-client-library": [
+"googletest",
+"rules_license"
+],
+"upb": [
+"abseil-cpp",
+"bazel_skylib",
+"platforms",
+"protobuf",
+"rules_cc",
+"rules_pkg",
+"rules_proto",
+"rules_python"
+],
+"urdfdom": [
+"console_bridge",
+"rules_cc",
+"tinyxml",
+"urdfdom_headers"
+],
+"urdfdom_headers": [
+"rules_cc"
+],
+"userspace_rcu": [
+"bazel_skylib",
+"platforms",
+"rules_cc"
+],
+"utf8proc": [
+"rules_cc"
+],
+"uthash": [
+"rules_cc"
+],
+"valkey": [
+"platforms",
+"rules_cc",
+"rules_shell"
+],
+"verible": [
+"abseil-cpp",
+"bant",
+"bazel_skylib",
+"googletest",
+"nlohmann_json",
+"platforms",
+"protobuf",
+"re2",
+"rules_bison",
+"rules_flex",
+"rules_license",
+"rules_m4",
+"zlib"
+],
+"verilator": [
+"bazel_skylib",
+"bison",
+"flex",
+"m4",
+"platforms",
+"rules_cc",
+"rules_shell",
+"rules_venv",
+"zlib"
+],
+"version_utils": [
+"bazel_skylib"
+],
+"versor": [
+"rules_cc",
+"rules_license"
+],
+"vhdl_ls_gen": [
+"bazel_lib",
+"bazel_skylib",
+"protobuf",
+"rules_shell"
+],
+"videoproto": [
+"rules_cc"
+],
+"vorbis": [
+"ogg",
+"platforms",
+"rules_cc"
+],
+"vulkan_headers": [
+"rules_cc"
+],
+"vulkan_utility_libraries": [
+"platforms",
+"rules_cc",
+"vulkan_headers"
+],
+"wabt": [
+"bazel_skylib",
+"platforms",
+"rules_cc"
+],
+"wangle": [
+"bazel_skylib",
+"boost.thread",
+"fizz",
+"fmt",
+"folly",
+"glog",
+"openssl",
+"rules_cc",
+"rules_license"
+],
+"watchman": [
+"bazel_skylib",
+"boost.filesystem",
+"boost.regex",
+"boost.utility",
+"fmt",
+"folly",
+"gflags",
+"glog",
+"googletest",
+"openssl",
+"platforms",
+"rules_cc",
+"with_cfg.bzl"
+],
+"wayland": [
+"bazel_skylib",
+"libexpat",
+"libffi",
+"rules_autoconf",
+"rules_cc"
+],
+"webgpu_headers": [
+"rules_cc"
+],
+"websocketpp": [
+"asio",
+"bazel_skylib",
+"boost.asio",
+"platforms",
+"rules_cc",
+"zlib"
+],
+"wget": [
+"bazel_skylib",
+"c-ares",
+"libuuid",
+"openssl",
+"pcre2",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf",
+"zlib"
+],
+"wget2": [
+"bazel_skylib",
+"brotli",
+"bzip2",
+"nghttp2",
+"openssl",
+"pcre2",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf",
+"rules_shell",
+"xz",
+"zlib",
+"zstd"
+],
+"wheelos_common_msgs": [
+"bazel_skylib",
+"protobuf",
+"rules_cc",
+"rules_pkg",
+"rules_proto"
+],
+"windows_support": [
+"bazel_lib",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"buildifier_prebuilt",
+"gazelle",
+"package_metadata",
+"platforms"
+],
+"with_cfg.bzl": [
+"aspect_bazel_lib",
+"bazel_features",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"buildifier_prebuilt",
+"gazelle",
+"platforms",
+"protobuf",
+"rules_android",
+"rules_cc",
+"rules_go",
+"rules_java",
+"rules_python",
+"rules_shell",
+"rules_testing",
+"stardoc"
+],
+"wolfd_bazel_compile_commands": [
+"protobuf",
+"rules_python"
+],
+"wpilib_toolchains": [
+"bazel_skylib",
+"platforms",
+"rules_cc"
+],
+"wsg32": [],
+"x264": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf",
+"rules_nasm"
+],
+"x265": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf",
+"rules_nasm"
+],
+"xacro": [
+"bazel_skylib",
+"rules_license",
+"rules_python"
+],
+"xcb-proto": [
+"rules_python"
+],
+"xcodeproj": [
+"aexml",
+"pathkit",
+"rules_swift"
+],
+"xctestrunner": [
+"rules_python"
+],
+"xds": [
+"bazel_skylib",
+"cel-spec",
+"gazelle",
+"googleapis",
+"grpc",
+"protobuf",
+"protoc-gen-validate",
+"re2",
+"rules_cc",
+"rules_go",
+"rules_python"
+],
+"xilinx_bootgen": [
+"openssl",
+"platforms",
+"rules_cc"
+],
+"xkbcommon": [
+"platforms",
+"rules_bison",
+"rules_cc",
+"rules_cc_autoconf",
+"rules_license",
+"rules_m4"
+],
+"xml.bzl": [
+"bazel_lib",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"bazelrc-preset.bzl",
+"buildifier_prebuilt",
+"gazelle",
+"package_metadata"
+],
+"xorgproto": [
+"bazel_skylib",
+"platforms",
+"rules_cc"
+],
+"xpdf": [
+"bazel_skylib",
+"freetype",
+"libpng",
+"platforms",
+"rules_cc",
+"rules_cc_autoconf"
+],
+"xplane_sdk": [
+"platforms",
+"rules_cc"
+],
+"xrootfs": [
+"buildifier_prebuilt",
+"gazelle",
+"rules_go",
+"rules_multitool",
+"rules_pkg",
+"rules_shell"
+],
+"xsimd": [
+"rules_cc"
+],
+"xtensor": [
+"rules_cc",
+"xtl"
+],
+"xtl": [
+"rules_cc"
+],
+"xvidcore": [
+"platforms",
+"rules_cc"
+],
+"xxd": [
+"platforms",
+"rules_cc",
+"rules_license"
+],
+"xxhash": [
+"platforms",
+"rules_cc"
+],
+"xz": [
+"bazel_lib",
+"bazel_skylib",
+"platforms",
+"rules_cc"
+],
+"yaml-cpp": [
+"googletest",
+"platforms",
+"rules_cc"
+],
+"yaml.bzl": [
+"bazel_lib",
+"bazel_skylib",
+"bazel_skylib_gazelle_plugin",
+"bazelrc-preset.bzl",
+"buildifier_prebuilt",
+"gazelle",
+"package_metadata"
+],
+"yams": [
+"apple_support",
+"platforms",
+"rules_apple",
+"rules_cc",
+"rules_swift"
+],
+"yoga": [
+"bazel_skylib",
+"googletest",
+"platforms",
+"rules_cc"
+],
+"yosys": [
+"abc",
+"bazel_skylib",
+"bison",
+"cxxopts",
+"flex",
+"gawk",
+"googletest",
+"libffi",
+"platforms",
+"readline",
+"rules_cc",
+"rules_python",
+"tcl_lang",
+"zlib"
+],
+"yosys-slang": [
+"bazel_skylib",
+"fmt",
+"rules_cc",
+"rules_license",
+"rules_python",
+"yosys"
+],
+"yq.bzl": [
+"bazel_lib",
+"bazel_skylib",
+"buildifier_prebuilt",
+"package_metadata",
+"platforms"
+],
+"yyjson": [
+"rules_cc"
+],
+"z3": [
+"buildifier_prebuilt",
+"platforms",
+"rules_foreign_cc",
+"rules_license"
+],
+"zchunk": [
+"bazel_skylib",
+"openssl",
+"platforms",
+"rules_cc",
+"zstd"
+],
+"zenlib": [
+"platforms",
+"rules_cc"
+],
+"zenoh-c": [
+"bazel_skylib",
+"llvm",
+"platforms",
+"rules_cc",
+"rules_rs"
+],
+"zenoh-cpp": [
+"bazel_skylib",
+"rules_cc",
+"rules_shell",
+"zenoh-c",
+"zenoh-pico"
+],
+"zenoh-pico": [
+"cmake_configure_file",
+"mbedtls",
+"platforms",
+"rules_cc"
+],
+"zip": [
+"rules_cc"
+],
+"zipkin-api": [
+"protobuf"
+],
+"zlib": [
+"bazel_skylib",
+"platforms",
+"rules_cc",
+"rules_license"
+],
+"zlib-ng": [
+"bazel_skylib",
+"platforms",
+"rules_cc"
+],
+"zopfli": [
+"rules_cc"
+],
+"zpaq": [
+"platforms",
+"rules_cc"
+],
+"zstd": [
+"platforms",
+"rules_cc"
+],
+"zstd-jni": [
+"bazel_skylib",
+"rules_cc",
+"rules_java"
+],
+"zstr": [
+"rules_cc"
+],
+"zsync3": [
+"bazel_skylib",
+"rules_cc",
+"rules_python",
+"rules_shell"
+],
+"zziplib": [
+"bazel_skylib",
+"platforms",
+"readline",
+"rules_cc",
+"rules_cc_autoconf",
+"zlib"
+]
+}

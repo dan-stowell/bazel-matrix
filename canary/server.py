@@ -77,14 +77,38 @@ GROUPS = {
 ALL_PROJECTS = [p for g in GROUPS.values() for p in g]
 SUBSETS = {k: list(ALL_PROJECTS) for k in ("22.04", "22.04/arm64", "24.04", "24.04/arm64")}
 
+# Priority tiers for the broad run (every projects.txt project that isn't
+# known-failing; see tiers()). Tier 1: C/C++ projects on the image's own,
+# autodetected cc toolchain; tier 2: popular rulesets and their dependents;
+# tier 3: the rest.
+HERMETIC_CC = {"toolchains_llvm", "hermetic_cc_toolchain", "toolchains_llvm_bootstrapped", "gcc_toolchain",
+               "toolchains_musl", "hermetic_clang_toolchain", "portable_cc_toolchain", "toolchains_buildbuddy"}
+CC_RULES = {"rules_cc", "rules_foreign_cc"}
+POPULAR = ["rules_go", "gazelle", "rules_python", "rules_java", "rules_jvm_external", "rules_kotlin", "rules_rust",
+           "aspect_rules_js", "rules_nodejs", "protobuf", "grpc", "rules_proto", "rules_oci", "rules_pkg",
+           "rules_shell", "rules_cc"]
+TIER_NAMES = {1: "tier 1: image toolchains (C/C++)", 2: "tier 2: popular rulesets", 3: "tier 3: the rest"}
+TIER_HEURISTIC = (
+    "Tiers come from each project's bazel_dep lines (its BCR MODULE.bazel at the projects.json version, "
+    "in canary/deps.json). Tier 1, the image's own toolchains: not a ruleset (no rules_/aspect_rules_/"
+    "toolchains_/gazelle prefix, no .bzl suffix), no hermetic C++ toolchain dep (%s), and a direct dep on "
+    "rules_cc or rules_foreign_cc, or on another tier-1 project (a C/C++ library), so its inner Bazel "
+    "autodetects the image's gcc. Tier 2: one of %s or a direct dep on one. Tier 3: the rest (including "
+    "C/C++ projects that use native cc rules without any such dep, which MODULE.bazel can't show). "
+    "System python3/perl/shell use isn't visible in MODULE.bazel, so it doesn't promote a project."
+) % (", ".join(sorted(HERMETIC_CC)), ", ".join(POPULAR))
+MATRIX = "MATRIX"  # reference: the matrix's own record (not known-failing in projects.txt) says it passes
+
 PROBE = "//canary:tls_probe_test"
 ARCHS = ["amd64", "arm64"]
 DEFAULT_TIMEOUT = 3 * 3600
 PASSING = {"PASSED", "FLAKY"}
-MAX_RUNS = 200
+MAX_RUNS = 600
 LOG_DAYS = 3
 WORK_ROOT = "/var/tmp/bazel-matrix/work"  # tools/inner_bazel.py's
-COMPLETE = ("passed", "failed")  # statuses of a run that ran to the end
+COMPLETE = ("passed", "failed")
+# The server's own files: changing them doesn't change any build result.
+SERVER_FILES = ("server.py", "server_test.py", "README.md", "restart.sh", "BUILD.bazel")  # statuses of a run that ran to the end
 
 
 def seed_config():
@@ -98,7 +122,12 @@ def seed_config():
         # --remote_header=x-buildbuddy-api-key=<key> to Bazel's argv.
         "bazel": "",
         "output_root": os.path.expanduser("~/canary-out"),
-        "min_free_gb": 15,
+        "min_free_gb": 20,
+        # The broad run: projects per batch invocation, its --jobs, and
+        # whether an image's amd64 and arm64 batches run at once.
+        "batch_size": 200,
+        "jobs": 100,
+        "parallel_archs": True,
         "images": [
             {"name": "ubuntu22-04", "ref": BASELINE_2204, "role": "baseline", "release": "22.04"},
             {"name": "ubuntu22-04-candidate", "ref": CANDIDATE_2204, "role": "candidate", "release": "22.04"},
@@ -151,16 +180,41 @@ def subset_of(cfg, image):
     return cfg["subset"].get(rel if arch == "amd64" else "%s/%s" % (rel, arch))
 
 
-def schedule(cfg):
-    """[(column, step)] for a cycle: candidates first, probes (fast) then
-    subsets, then baselines likewise. Until a baseline run pairs with it, a
-    candidate is compared with the subset, which is chosen from baseline
-    passers."""
+def schedule(cfg, projects, tier_of):
+    """[group] for a cycle, each group [(column, step, batch)] of one image
+    (its archs run at once, in their own output bases; cfg["parallel_archs"]
+    false runs them one by one). batch is None for a probe, else (tier,
+    index, [projects]). Order: candidate probes, then each tier's batches on
+    every candidate column (batch k of every image before batch k+1), then
+    the baselines likewise."""
     cols = columns(cfg["images"])
-    cands = [c for c in cols if c.get("role") == "candidate"]
-    bases = [c for c in cols if c.get("role") != "candidate"]
-    return ([(c, "probe") for c in cands] + [(c, "subset") for c in cands if subset_of(cfg, c)]
-            + [(c, "probe") for c in bases] + [(c, "subset") for c in bases if subset_of(cfg, c)])
+    size = int(cfg.get("batch_size", 150))
+    plans = {id(c): batches(projects, tier_of, arch_of(c), size) for c in cols}
+    groups = []
+
+    def add(items):
+        if not items:
+            return
+        if cfg.get("parallel_archs", True):
+            groups.append(items)
+        else:
+            groups.extend([i] for i in items)
+
+    for role in ("candidate", "baseline"):
+        mine = [c for c in cols if (c.get("role") == "candidate") == (role == "candidate")]
+        images = []
+        for c in mine:
+            if (c["name"], c["ref"]) not in images:
+                images.append((c["name"], c["ref"]))
+        by_image = [[c for c in mine if (c["name"], c["ref"]) == im] for im in images]
+        for cs in by_image:
+            add([(c, "probe", None) for c in cs])
+        for tier in (1, 2, 3):
+            n = max([sum(1 for b in plans[id(c)] if b[0] == tier) for c in mine] or [0])
+            for k in range(n):
+                for cs in by_image:
+                    add([(c, "batch", b) for c in cs for b in plans[id(c)] if b[0] == tier and b[1] == k])
+    return groups
 
 
 # --- tools/remote.bazelrc ---------------------------------------------------
@@ -176,6 +230,100 @@ def rewrite_image(text, ref):
     if n != 1:
         raise ValueError("expected one container-image line in remote.bazelrc, found %d" % n)
     return new
+
+
+# --- projects, tiers and batches --------------------------------------------
+
+def parse_projects(text):
+    """projects.txt -> [{"name", "known_failing": bool, "bazel": pinned version or None}] in file order."""
+    out = []
+    for line in text.splitlines():
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        if not line[0].isspace():
+            out.append({"name": line.split()[0].split("@")[0], "known_failing": False, "bazel": None})
+        elif out:
+            words = line.split()
+            if words[0] == "known-failing":
+                out[-1]["known_failing"] = True
+            elif words[0] == "bazel" and len(words) > 1:
+                out[-1]["bazel"] = words[1]
+    return out
+
+
+_BAZEL_DEP = re.compile(r'bazel_dep\(\s*name\s*=\s*"([^"]+)"')
+
+
+def module_deps(text):
+    """The sorted bazel_dep names of a MODULE.bazel (dev deps included: the project is the root)."""
+    return sorted(set(_BAZEL_DEP.findall(text)))
+
+
+def write_deps(bcr_dir, projects_json, out):
+    """Writes {module: [bazel_dep names]} for every projects.json project, from
+    a BCR checkout at projects.json's bcr_commit (tools/sync.py's cache)."""
+    with open(projects_json) as f:
+        projects = json.load(f)["projects"]
+    deps = {}
+    for p in projects:
+        with open(os.path.join(bcr_dir, "modules", p["name"], p["version"], "MODULE.bazel")) as f:
+            deps[p["name"]] = module_deps(f.read())
+    with open(out, "w") as f:
+        json.dump(deps, f, indent=0, sort_keys=True)
+        f.write("\n")
+
+
+def is_ruleset(name):
+    return name.startswith(("rules_", "aspect_rules_", "toolchains_", "gazelle")) or name.endswith(".bzl")
+
+
+def tiers(names, deps):
+    """{name: (tier, reason)} for names, by TIER_HEURISTIC; deps: {module: [bazel_dep names]}."""
+    cc = set()  # C/C++ projects, among every module deps has (known-failing ones too)
+    changed = True
+    while changed:
+        changed = False
+        for n in sorted(set(names) | set(deps)):
+            d = set(deps.get(n, []))
+            if n in cc or is_ruleset(n) or d & HERMETIC_CC:
+                continue
+            if d & CC_RULES or d & cc:
+                cc.add(n)
+                changed = True
+    out = {}
+    pop = set(POPULAR)
+    for n in names:
+        d = set(deps.get(n, []))
+        if n in cc:
+            why = sorted(d & CC_RULES) or sorted(d & cc)[:3]
+            out[n] = (1, "C/C++ via " + ", ".join(why))
+        elif n in pop or d & pop:
+            out[n] = (2, "is a popular ruleset" if n in pop else "uses " + ", ".join(sorted(d & pop)))
+        else:
+            out[n] = (3, "hermetic C++ toolchain: " + ", ".join(sorted(d & HERMETIC_CC)) if d & HERMETIC_CC else
+                      "no popular ruleset or C/C++ dep")
+    return out
+
+
+NO_ARM64_BAZELS = ("8.4.2",)  # tools/versions.bzl versions without an arm64_sha256
+
+
+def arm64_ok(project):
+    """False for a project whose pinned inner Bazel has no linux-arm64 binary."""
+    return project["bazel"] not in NO_ARM64_BAZELS
+
+
+def batches(projects, tier_of, arch, size):
+    """[(tier, index, [names])]: the column's projects (not known-failing; on
+    arm64, not pinned to a Bazel without an arm64 binary), by tier then name,
+    in chunks of `size`."""
+    out = []
+    for tier in (1, 2, 3):
+        names = sorted(p["name"] for p in projects if not p["known_failing"] and tier_of.get(p["name"], (3,))[0] == tier
+                       and (arch == "amd64" or arm64_ok(p)))
+        for i in range(0, len(names), size):
+            out.append((tier, i // size, names[i:i + size]))
+    return out
 
 
 # --- output parsing -----------------------------------------------------------
@@ -429,75 +577,133 @@ def probe_others(runs, col):
 
 
 NO_BASELINE = "no baseline result yet"
+RUNNING = "RUNNING"
+DONE = COMPLETE + ("timeout",)  # a batch that needn't run again this cycle
 
 
-def compare_subset(cfg, runs, images, col, live=None):
-    """(pending reason or None, {target: (baseline status, candidate status
-    or None while running)}, candidate run, baseline run).
-
-    The candidate side is `live` (the running subset step of this column,
-    with the results so far) or the newest complete subset run with a result
-    for every configured target. The baseline side is a complete baseline
-    run (same release and arch, same subset, same repo revision); without
-    one, NO_BASELINE (the candidate's results show, but no verdict).
-    """
-    subset = subset_of(cfg, col)
-    if not subset:
-        return "no ruleset projects for this release and arch", {}, None, None
-    targets = ["//%s:test" % p for p in subset]
-    sub = live or latest_complete(runs, col, "subset", subset, rev=current_rev(runs))
-    if sub is None:
-        return last_note(runs, col, "subset", subset) or "not run yet", {}, None, None
-    missing = [t for t in targets if t not in sub.get("targets", {})]
-    if missing and not live:
-        return "no result for %s" % ", ".join(missing), {}, sub, None
-    bases = [b for b in columns(images) if b.get("role") == "baseline" and b.get("release") == col.get("release")
-             and arch_of(b) == arch_of(col)]
-    base = next((x for x in (latest_complete(runs, b, "subset", subset, rev=sub.get("rev")) for b in bases) if x), None)
-    if base is not None and any(t not in base.get("targets", {}) for t in targets):
-        base = None
-    ref = (lambda t: base["targets"][t]) if base else (lambda t: NO_BASELINE)
-    return None, {t: (ref(t), sub.get("targets", {}).get(t)) for t in targets}, sub, base
+def same_column(im, col):
+    return (im["name"] == col["name"] and im["ref"] == col["ref"] and im.get("role") == col.get("role")
+            and arch_of(im) == arch_of(col))
 
 
-def group_cell(cfg, pair, group):
-    """("yes"|"no"|"running"|"pending"|"n/a", ok, reference, [notes], done)
-    for a ruleset group: its projects that passed on the baseline must pass
-    on the candidate."""
-    pending, table = pair[0], pair[1]
-    live = pair[2] is not None and pair[2].get("status") == "running"
-    projects = ["//%s:test" % p for p in group]
-    if pending is not None:
-        return ("n/a" if pending.startswith("no ruleset") else "pending"), 0, 0, [pending], 0
-    mine = [t for t in projects if t in table]
-    if not mine:
-        return "n/a", 0, 0, [], 0
-    if any(table[t][0] == NO_BASELINE for t in mine):
-        ok = [t for t in mine if is_pass(table[t][1])]
-        done = sum(1 for t in mine if table[t][1] is not None)
-        return ("running" if live else "pending"), len(ok), len(mine), [NO_BASELINE], done
-    # Infra-killed projects count neither way: not as a candidate failure,
-    # nor (on the baseline) as a failure that excuses the candidate.
-    infra = [t for t in mine if (is_pass(table[t][0]) or table[t][0] == INFRA) and table[t][1] == INFRA]
-    reference = [t for t in mine if (is_pass(table[t][0]) or table[t][0] == INFRA) and t not in infra]
-    ok = [t for t in reference if is_pass(table[t][1])]
-    running = [t for t in reference if table[t][1] is None]
-    # Failing on the candidate, infra-killed on the baseline: unknown.
-    unknown = [t for t in reference if table[t][0] == INFRA and t not in ok and t not in running]
-    failing = [t for t in reference if t not in ok and t not in running and t not in unknown]
-    done = len(reference) - len(running)
-    notes = ["infra (not counted): " + ", ".join(infra)] if infra else []
-    if unknown:
-        notes.append("unknown (baseline infra): " + ", ".join(unknown))
-    if not reference:
-        return ("pending", 0, 0, notes, 0) if infra else ("n/a", 0, 0, ["none passed on the baseline"], 0)
-    if unknown and not failing and not running and not live:
-        return "pending", len(ok), len(reference), notes, done
-    if running or live:
-        # Not green until the run's final summary is in.
-        return ("no" if failing else "running"), len(ok), len(reference), failing + (
-            ["running: " + ", ".join(running)] if running else ["finishing"]) + notes, done
-    return ("no" if failing else "yes"), len(ok), len(reference), failing + notes, done
+def batch_done(runs, col, rev, cycle, step, names):
+    """A run of this step (and batch) for the column finished this cycle at rev."""
+    return any(r["step"] == step and r.get("cycle") == cycle and r.get("rev") == rev and r["status"] in DONE
+               and same_column(r["image"], col) and (step != "batch" or r.get("subset") == names)
+               and (step != "probe" or bool(r.get("probe"))) for r in runs)
+
+
+def done_projects(runs, col, rev, cycle):
+    """The projects with a result from a finished batch of this cycle at rev."""
+    out = set()
+    for r in runs:
+        if (r["step"] == "batch" and r.get("cycle") == cycle and r.get("rev") == rev and r["status"] in DONE
+                and same_column(r["image"], col)):
+            out.update(t[2:-5] for t in r.get("targets") or {})
+    return out
+
+
+def remaining(runs, group, rev, cycle):
+    """The group's items still to run this cycle: a probe without a finished
+    run; a batch less its projects that already have a result (a restart, or
+    a new batch_size, resumes where it was)."""
+    todo = []
+    done = {}
+    for im, st, b in group:
+        if st == "probe":
+            if not batch_done(runs, im, rev, cycle, st, None):
+                todo.append((im, st, b))
+            continue
+        key = (im["name"], im["ref"], arch_of(im))
+        if key not in done:
+            done[key] = done_projects(runs, im, rev, cycle)
+        names = [n for n in b[2] if n not in done[key]]
+        if names:
+            todo.append((im, st, (b[0], b[1], names)))
+    return todo
+
+
+def project_results(runs, col, rev, lives=()):
+    """{target: (status, run)}: per project, a running batch's result (RUNNING
+    until it has one), else the newest finished batch at rev with a result."""
+    out = {}
+    for r in lives:
+        if r.get("step") == "batch" and same_column(r["image"], col):
+            for p in r.get("subset") or []:
+                t = "//%s:test" % p
+                out[t] = (r["targets"].get(t, RUNNING), r)
+    for r in reversed(runs):
+        if r["step"] != "batch" or r.get("rev") != rev or r["status"] not in DONE or not same_column(r["image"], col):
+            continue
+        for t, st in (r.get("targets") or {}).items():
+            out.setdefault(t, (st, r))
+    return out
+
+
+def baseline_of(images, col):
+    return [b for b in columns(images) if b.get("role") == "baseline" and b.get("release") == col.get("release")
+            and arch_of(b) == arch_of(col)]
+
+
+def project_table(cfg, runs, col, targets, lives=()):
+    """{target: (reference status, candidate status or None, candidate run)}.
+    The reference: the baseline's result at the same rev; else, for 22.04
+    amd64, MATRIX (the matrix's bb remote record on that same image: projects
+    not known-failing pass); else NO_BASELINE."""
+    rev = current_rev(runs)
+    cand = project_results(runs, col, rev, lives)
+    base = {}
+    for b in baseline_of(cfg["images"], col):
+        for t, v in project_results(runs, b, rev, lives).items():
+            base.setdefault(t, v)
+    matrix = col.get("release") == "22.04" and arch_of(col) == "amd64"
+    out = {}
+    for t in targets:
+        ref = base.get(t, (None,))[0]
+        if ref is None or ref == RUNNING:
+            ref = MATRIX if matrix else NO_BASELINE
+        c = cand.get(t)
+        out[t] = (ref, c[0] if c else None, c[1] if c else None)
+    return out
+
+
+def ref_passes(ref):
+    return is_pass(ref) or ref == MATRIX
+
+
+def kind(ref, st):
+    """pass | flaky | regression | fail | infra | running | pending, for a candidate result."""
+    if st is None:
+        return "pending"
+    if st == RUNNING:
+        return "running"
+    if st == INFRA:
+        return "infra"
+    if st == "FLAKY":
+        return "flaky"
+    if is_pass(st):
+        return "pass"
+    return "regression" if ref_passes(ref) else "fail"
+
+
+def tally(table, targets):
+    """Counts of kind() over the targets in table, plus "total" and "ok" (pass + flaky)."""
+    c = {k: 0 for k in ("pass", "flaky", "regression", "fail", "infra", "running", "pending")}
+    for t in targets:
+        if t in table:
+            c[kind(table[t][0], table[t][1])] += 1
+    c["total"] = sum(c.values())
+    c["ok"] = c["pass"] + c["flaky"]
+    return c
+
+
+def ref_label(table):
+    refs = {v[0] for v in table.values()}
+    if refs and refs <= {MATRIX}:
+        return "vs matrix record"
+    if NO_BASELINE in refs:
+        return "baseline pending" if not (refs - {NO_BASELINE}) else "baseline partly pending"
+    return "vs baseline" if MATRIX not in refs else "vs baseline / matrix record"
 
 
 # --- run store --------------------------------------------------------------
@@ -567,6 +773,23 @@ class Store:
 
     def next_cycle(self):
         return max([r["cycle"] for r in self.runs()] or [0]) + 1
+
+    def resume_cycle(self):
+        """The newest cycle if it hasn't finished (a restart resumes it, its
+        finished batches skipped), else a new one."""
+        last = max([r["cycle"] for r in self.runs()] or [0])
+        try:
+            with open(os.path.join(os.path.dirname(self.path), "cycle-done")) as f:
+                done = int(f.read().strip() or 0)
+        except (OSError, ValueError):
+            done = 0
+        return last if last > done else last + 1
+
+    def mark_cycle_done(self, cycle):
+        path = os.path.join(os.path.dirname(self.path), "cycle-done")
+        with open(path + ".tmp", "w") as f:
+            f.write("%d\n" % cycle)
+        os.replace(path + ".tmp", path)
 
 
 def now():
@@ -648,8 +871,9 @@ class Runner(threading.Thread):
     def __init__(self, data_dir, work_dir, store):
         super().__init__(daemon=True)
         self.data_dir, self.work, self.store = data_dir, work_dir, store
-        self.current = None  # the running step's record
-        self.proc = None
+        self.currents = {}  # id -> the running steps' records
+        self.procs = set()
+        self.info = None  # (projects, {name: (tier, reason)}) of the current cycle
         self.stopping = threading.Event()
         self.lock = threading.Lock()  # one step at a time in the work dir
 
@@ -665,7 +889,18 @@ class Runner(threading.Thread):
         self.git("fetch", "--quiet", "origin", branch)
         self.git("reset", "--quiet", "--hard", "FETCH_HEAD")
         self.git("clean", "-fdq")
-        return self.git("rev-parse", "HEAD")
+        # The newest commit that can change a project's result: one touching
+        # more than the server's own files. Pushing server changes then
+        # keeps this cycle's results (and the finished batches) current.
+        return self.git("log", "-1", "--format=%H", "--", ".", *(":(exclude)canary/" + f for f in SERVER_FILES))
+
+    def load_info(self):
+        with open(os.path.join(self.work, "projects.txt")) as f:
+            projects = parse_projects(f.read())
+        with open(os.path.join(self.work, "canary", "deps.json")) as f:
+            deps = json.load(f)
+        names = [p["name"] for p in projects if not p["known_failing"]]
+        return projects, tiers(names, deps)
 
     def run(self):
         while not self.stopping.is_set():
@@ -679,7 +914,7 @@ class Runner(threading.Thread):
 
     def cycle(self):
         cfg = load_config(self.data_dir)
-        cycle = self.store.next_cycle()
+        cycle = self.store.resume_cycle()
         # Two servers must not share a work dir: hold its lock for the cycle.
         with open(self.work.rstrip("/") + ".lock", "w") as lk:
             try:
@@ -700,11 +935,16 @@ class Runner(threading.Thread):
             with self.lock:
                 rev = self.prepare(cfg["repo_branch"])
                 cfg["bazel"] = resolve_bazel(cfg, self.work)
-            for image, step in schedule(cfg):
+                self.info = self.load_info()
+            for group in schedule(cfg, *self.info):
                 if self.stopping.is_set():
                     return
-                self.housekeeping(cfg)
-                self.step(cfg, cycle, rev, image, step)
+                todo = remaining(self.store.runs(), group, rev, cycle)
+                if todo:
+                    self.housekeeping(cfg)
+                    self.group(cfg, cycle, rev, todo)
+            if not self.stopping.is_set():
+                self.store.mark_cycle_done(cycle)
         # Not a hot loop when every step is skipped or fails at once.
         if not self.stopping.is_set():
             self.stopping.wait(cfg.get("cycle_pause_s", 60))
@@ -723,7 +963,7 @@ class Runner(threading.Thread):
             prune_work()
             root = cfg["output_root"]
             os.makedirs(root, exist_ok=True)
-            if shutil.disk_usage(root).free >= cfg.get("min_free_gb", 15) * 2**30:
+            if shutil.disk_usage(root).free >= cfg.get("min_free_gb", 20) * 2**30:
                 return
             for base in [os.path.join(root, a + sfx) for a in ARCHS for sfx in ("", "-inner")]:
                 if os.path.isdir(base):
@@ -752,13 +992,14 @@ class Runner(threading.Thread):
                 "end": None, "exit_code": None, "status": "running", "invocations": [],
                 "targets": {}, "log": rid + ".log", "command": []}
 
-    def command(self, cfg, cycle, image, step):
+    def command(self, cfg, cycle, image, step, names=None):
         """The Bazel command line for a step (no secrets), None if it has
         nothing to run.
 
         Bazel runs here, its actions on RBE in the image of the rewritten
-        tools/remote.bazelrc. The projects' :test actions are no-remote-exec,
-        so their inner Bazels run here too, with their actions on RBE.
+        tools/remote.bazelrc. A batch's //<p>:test actions run on RBE in the
+        image too (--config=inner-remote): each inner Bazel's host is the
+        image and arch under test.
         """
         arch = arch_of(image)
         arch_flags = [] if arch == "amd64" else ["--remote_default_exec_properties=Arch=" + arch]
@@ -769,17 +1010,16 @@ class Runner(threading.Thread):
         if step == "probe":
             expect = "trusted" if image.get("role") == "baseline" else "distrusted"
             return head + [PROBE] + tail + ["--test_output=all", "--test_env=CANARY_EXPECT=" + expect]
-        subset = subset_of(cfg, image)
-        if not subset:
+        if not names:
             return None
-        # Each project's :test runs on RBE in the image (its inner Bazel's host
-        # is the image and arch under test). Its own output base: the
-        # credential helper differs, and Bazel caches helper results.
+        # Its own output base: the credential helper differs, and Bazel
+        # caches helper results.
         remote_helper = os.path.join(self.work, "tools", "remote_exec_credential_helper.py")
         bep = os.path.join(cfg["output_root"], "bep-%s.json" % arch)
         args = [cfg["bazel"], "--output_base=" + self.output_base(cfg, image) + "-inner", "test"]
-        args += ["//%s:test" % p for p in subset]
+        args += ["//%s:test" % p for p in names]
         args += ["--config=remote-minimal", "--config=inner-remote" + ("" if arch == "amd64" else "-" + arch),
+                 "--jobs=%d" % int(cfg.get("jobs", 100)),
                  "--credential_helper=*.buildbuddy.io=" + remote_helper, "--nocache_test_results",
                  # Once more after a failure: a wrapper killed by infra
                  # passes the second time (FLAKY, which counts as a pass).
@@ -789,17 +1029,22 @@ class Runner(threading.Thread):
             args.append("--//:inner_flags=--remote_instance_name=canary-%d" % cycle)
         return args
 
-    def step(self, cfg, cycle, rev, image, step):
-        rec = self.new_record(cycle, image, step)
-        rec["rev"] = rev
-        if step == "subset":
-            rec["subset"] = subset_of(cfg, image)
+    def group(self, cfg, cycle, rev, items):
+        """Runs a group's steps (one image, its archs) at once."""
+        image = items[0][0]
+        recs = []
+        for im, step, batch in items:
+            rec = self.new_record(cycle, im, step if batch is None else "%s-t%d-%d" % (step, batch[0], batch[1]))
+            rec.update(rev=rev, step=step)
+            if batch is not None:
+                rec.update(tier=batch[0], batch=batch[1], subset=list(batch[2]))
+            recs.append((rec, self.command(cfg, cycle, im, step, batch[2] if batch else None)))
         key = os.environ.get("BUILDBUDDY_API_KEY", "")
         if not key:
-            rec.update(status="error", end=now(), error="BUILDBUDDY_API_KEY is not set")
-            self.store.append(rec)
+            for rec, _ in recs:
+                rec.update(status="error", end=now(), error="BUILDBUDDY_API_KEY is not set")
+                self.store.append(rec)
             return
-        args = self.command(cfg, cycle, image, step)
         with self.lock:
             rc = os.path.join(self.work, "tools", "remote.bazelrc")
             try:
@@ -810,38 +1055,57 @@ class Runner(threading.Thread):
                 with open(rc, "w") as f:
                     f.write(text)
             except Exception as e:
-                rec.update(status="error", end=now(), error="%s: %s" % (type(e).__name__, e))
-                self.store.append(rec)
+                for rec, _ in recs:
+                    rec.update(status="error", end=now(), error="%s: %s" % (type(e).__name__, e))
+                    self.store.append(rec)
                 return
-            # A BEP file of this run's own, so live results never come from another run.
-            bep = os.path.join(cfg["output_root"], "bep-%s.json" % rec["id"])
-            args = [("--build_event_json_file=" + bep) if a.startswith("--build_event_json_file=") else a for a in args]
-            if os.path.exists(bep):
-                os.remove(bep)
-            rec["command"] = args
-            self.current = rec
-            self.store.append(rec)
-            self.execute(rec, cfg, args, env, key)
-            self.current = None
-            self.store.append(rec)
+            threads = []
+            for rec, args in recs:
+                if args is None:
+                    rec.update(status="error", end=now(), error="nothing to run")
+                    self.store.append(rec)
+                    continue
+                # A BEP file of this run's own, so live results never come from another run.
+                bep = os.path.join(cfg["output_root"], "bep-%s.json" % rec["id"])
+                args = [("--build_event_json_file=" + bep) if a.startswith("--build_event_json_file=") else a
+                        for a in args]
+                if os.path.exists(bep):
+                    os.remove(bep)
+                rec["command"] = args
+                self.currents[rec["id"]] = rec
+                self.store.append(rec)
+                t = threading.Thread(target=self.execute, args=(rec, cfg, args, env, key), daemon=True)
+                t.start()
+                threads.append((t, rec))
+            for t, rec in threads:
+                t.join()
+                self.currents.pop(rec["id"], None)
+                self.store.append(rec)
 
-    def invoke(self, rec, args, env, key, log, log_path, deadline):
+    def step(self, cfg, cycle, rev, image, step, batch=None):
+        self.group(cfg, cycle, rev, [(image, step, batch)])
+
+    def invoke(self, rec, args, env, key, log, log_path, deadline, holder):
         """Runs one Bazel invocation, its output appended (redacted) to log
         and its test results streamed into rec["targets"] from its BEP file.
-        Returns (exit code, timed out)."""
+        Returns (exit code, timed out). holder[0] is set to its process."""
         timed_out = False
-        self.proc = subprocess.Popen(args, cwd=self.work, env=env, stdout=subprocess.PIPE,
-                                     stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, start_new_session=True)
+        proc = subprocess.Popen(args, cwd=self.work, env=env, stdout=subprocess.PIPE,
+                                stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, start_new_session=True)
+        holder[:] = [proc]
+        self.procs.add(proc)
+        if self.stopping.is_set():
+            kill_group(proc)
         # Redacted on the way in, in case anything echoes the key.
-        copier = threading.Thread(target=copy_redacted, args=(self.proc.stdout, log, key), daemon=True)
+        copier = threading.Thread(target=copy_redacted, args=(proc.stdout, log, key), daemon=True)
         copier.start()
         wanted = {x for x in args if x.startswith("//") and ":" in x}
         bep = next((x.split("=", 1)[1] for x in args if x.startswith("--build_event_json_file=")), None)
         bep_pos, bep_buf = 0, ""
-        while self.proc.poll() is None:
+        while proc.poll() is None:
             if self.stopping.is_set() or time.time() > deadline:
                 timed_out = not self.stopping.is_set()
-                kill_group(self.proc)
+                kill_group(proc)
                 break
             if bep:
                 # Results as each target finishes, for the page.
@@ -858,7 +1122,8 @@ class Runner(threading.Thread):
                 with open(log_path, errors="replace") as f:
                     rec["invocations"] = invocation_links(f.read(1 << 16))
             time.sleep(2)
-        code = self.proc.wait()
+        code = proc.wait()
+        self.procs.discard(proc)
         copier.join(60)
         if bep:
             try:
@@ -872,15 +1137,16 @@ class Runner(threading.Thread):
         deadline = time.time() + cfg.get("step_timeout_s", DEFAULT_TIMEOUT)
         output_base = args[1].split("=", 1)[1]
         timed_out = False
+        holder = []
         try:
             wanted = [x for x in args if x.startswith("//") and ":" in x]
             with open(log_path, "w") as log:
-                code, timed_out = self.invoke(rec, args, env, key, log, log_path, deadline)
+                code, timed_out = self.invoke(rec, args, env, key, log, log_path, deadline, holder)
             with open(log_path, errors="replace") as f:
                 text = f.read()
             targets = target_results(text, set(wanted))
             infra = []
-            if rec["step"] == "subset" and not self.stopping.is_set() and not timed_out:
+            if rec["step"] in ("subset", "batch") and not self.stopping.is_set() and not timed_out:
                 infra = infra_killed(output_base, [t for t in wanted if not is_pass(targets.get(t))])
                 if infra:
                     # Killed by infrastructure, not failed: once more, alone.
@@ -892,7 +1158,7 @@ class Runner(threading.Thread):
                         log.write("\n=== canary: retrying infra-killed %s\n" % " ".join(infra))
                         log.flush()
                         start, began = log.tell(), time.time()
-                        code2, timed_out = self.invoke(rec, retry, env, key, log, log_path, deadline)
+                        code2, timed_out = self.invoke(rec, retry, env, key, log, log_path, deadline, holder)
                     with open(log_path, errors="replace") as f:
                         f.seek(start)
                         again = target_results(f.read(), set(infra))
@@ -912,7 +1178,7 @@ class Runner(threading.Thread):
             with open(log_path, errors="replace") as f:
                 text = f.read()
             rec.update(exit_code=code, invocations=invocation_links(text), targets=targets, infra=infra)
-            if rec["step"] == "subset":
+            if rec["step"] in ("subset", "batch"):
                 rec["no_tests"] = no_tests(output_base, [t for t, st in targets.items() if is_pass(st)])
             if rec["step"] == "probe":
                 rec["probe"] = probe_result(text)
@@ -928,7 +1194,7 @@ class Runner(threading.Thread):
         except Exception as e:
             rec.update(status="error", error="%s: %s" % (type(e).__name__, e))
         finally:
-            p = self.proc
+            p = holder[0] if holder else None
             if p is not None and p.poll() is None:
                 # Failed after launching: don't leave the build running.
                 try:
@@ -939,14 +1205,13 @@ class Runner(threading.Thread):
                                    stderr=subprocess.DEVNULL, timeout=300)
                 except Exception as e2:
                     print("cleanup: %s: %s" % (type(e2).__name__, e2), file=sys.stderr)
-            self.proc = None
             rec["end"] = now()
 
     def stop(self):
         self.stopping.set()
-        p = self.proc
-        if p is not None and p.poll() is None:
-            kill_group(p)
+        for p in list(self.procs):
+            if p.poll() is None:
+                threading.Thread(target=kill_group, args=(p,), daemon=True).start()
 
 
 def copy_redacted(src, dst, key):
@@ -981,10 +1246,13 @@ def kill_group(proc, grace=30):
 
 # --- UI ---------------------------------------------------------------------
 
-CSS = "body{font-family:sans-serif;margin:16px} table{border-collapse:collapse} " \
-      "td,th{border:1px solid #ccc;padding:4px 8px;text-align:left;vertical-align:top} " \
-      ".yes{color:#1a7f37} .no{color:#cf222e;font-weight:bold} .pending,.na,.running{color:#777}"
+CSS = "body{font-family:sans-serif;margin:16px;background:#fff;color:#000} table{border-collapse:collapse;margin-bottom:16px} " \
+      "td,th{border:1px solid #ccc;padding:3px 6px;text-align:left;vertical-align:top} " \
+      ".yes,.pass{color:#1a7f37} .no,.regression{color:#cf222e;font-weight:bold} .fail{color:#9a3412} " \
+      ".pending,.na,.running,.infra,.flaky,.small{color:#777} .small{font-size:85%}"
 MARK = {"yes": "&#10003;", "no": "&#10007;", "pending": "pending", "n/a": "n/a", "running": "running"}
+PMARK = {"pass": "&#10003;", "flaky": "flaky", "regression": "&#10007;", "fail": "&#10007;", "infra": "infra",
+         "running": "running", "pending": "pending"}
 
 
 def esc(s):
@@ -1014,19 +1282,83 @@ def cell(state, text, href, title):
     return '<td title="%s">%s</td>' % (esc(title), body)
 
 
-def render(cfg, runs, current):
+def column_targets(projects, tier_of, col):
+    """{tier: [targets]} the column runs."""
+    out = {1: [], 2: [], 3: []}
+    for tier, _, names in batches(projects, tier_of, arch_of(col), 10 ** 6):
+        out[tier] += ["//%s:test" % n for n in names]
+    return out
+
+
+def tally_html(c, label=True):
+    """ "N/M ok" with the non-zero other counts; regressions red."""
+    if not c["total"]:
+        return '<span class="na">none</span>'
+    parts = ["%d/%d ok" % (c["ok"], c["total"])]
+    if c["regression"]:
+        parts.append('<span class="regression">%d regression%s</span>' % (c["regression"], "s" if c["regression"] > 1 else ""))
+    for k, name in (("fail", "failing"), ("flaky", "flaky"), ("infra", "infra"), ("running", "running"),
+                    ("pending", "pending")):
+        if c[k]:
+            parts.append('<span class="%s">%d %s</span>' % (k if k != "fail" else "fail", c[k], name))
+    return ", ".join(parts)
+
+
+def batch_minutes(runs, rev):
+    """Median minutes of this rev's finished batches, None without any."""
+    mins = []
+    for r in runs:
+        if r["step"] == "batch" and r.get("rev") == rev and r["status"] in DONE and r.get("end"):
+            try:
+                mins.append((datetime.datetime.fromisoformat(r["end"]) -
+                             datetime.datetime.fromisoformat(r["start"])).total_seconds() / 60)
+            except (TypeError, ValueError):
+                pass
+    return sorted(mins)[len(mins) // 2] if mins else None
+
+
+def etas(cfg, runs, info, lives):
+    """{(column name, ref, arch, tier): "~HH:MM UTC"}: when the tier's last
+    batch on the column should end, at the median batch time (45 min until
+    one has finished) per remaining group, groups one after another."""
+    rev = current_rev(runs)
+    cycle = max([r["cycle"] for r in runs] or [0])
+    per = batch_minutes(runs, rev) or 45.0
+    t = datetime.datetime.now(datetime.timezone.utc)
+    out = {}
+    running = {(r["image"]["name"], r["image"]["ref"], arch_of(r["image"]), tuple(r.get("subset") or [])) for r in lives}
+    for group in schedule(cfg, *info):
+        todo = [x for x in remaining(runs, group, rev, cycle) if x[1] == "batch"]
+        if not todo:
+            continue
+        live = any((c["name"], c["ref"], arch_of(c), tuple(b[2])) in running for c, _, b in todo)
+        t += datetime.timedelta(minutes=per / 2 if live else per)
+        for c, _, b in todo:
+            out[(c["name"], c["ref"], arch_of(c), b[0])] = t.strftime("~%H:%M UTC")
+    return out
+
+
+def render(cfg, runs, lives=(), info=None):
     images = cfg["images"]
     cols = columns(images)
-    out = ['<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="30">',
+    cands = [c for c in cols if c.get("role") == "candidate"]
+    lives = list(lives)
+    projects, tier_of = info or ([], {})
+    targets = {id(c): column_targets(projects, tier_of, c) for c in cands}
+    tables = {id(c): project_table(cfg, runs, c, [t for ts in targets[id(c)].values() for t in ts], lives)
+              for c in cands}
+    eta = etas(cfg, runs, info, lives) if info else {}
+    out = ['<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="60">',
            "<title>RBE image canary</title><style>%s</style></head><body>" % CSS,
            "<h1>RBE image canary</h1>",
-           "<p>Candidate images vs. today's images on BuildBuddy RBE; ruleset cells count projects that "
-           "pass on today's image and also on the candidate.</p>",
-           "<table><tr><th>Image</th><th>eMudhra protected</th>%s</tr>" % "".join(
-               "<th>%s</th>" % esc(g) for g in GROUPS)]
-    for c in cols:
-        if c.get("role") != "candidate":
-            continue
+           "<p>Candidate images vs. today's images on BuildBuddy RBE. Every project in projects.txt that "
+           "isn't known-failing runs as //&lt;p&gt;:test with its inner Bazel on an RBE executor in the image "
+           "under test (--config=inner-remote). A regression is a candidate failure of a project that passes "
+           "on the reference: the baseline image's run, or (22.04 amd64, until its baseline runs) the "
+           "matrix's own record. Tiers: see details.</p>",
+           "<h2>Summary</h2><table><tr><th>Image</th><th>eMudhra protected</th>%s<th>reference</th></tr>" % "".join(
+               "<th>%s</th>" % esc(TIER_NAMES[t]) for t in (1, 2, 3))]
+    for c in cands:
         digest = c["ref"].rsplit("@sha256:", 1)[-1][:12]
         others = probe_others(runs, c)
         note = ("<br><span class=\"no\" title=\"%s\">probe: %d other checks fail</span>" % (
@@ -1035,70 +1367,116 @@ def render(cfg, runs, current):
             esc(c.get("release")), esc(arch_of(c)), esc(c["ref"]), esc(digest), note))
         state, why, pr = protected(runs, c)
         out.append(cell(state, "", first_link(pr), "; ".join(why)))
-        live = current if (current and current["step"] == "subset" and current["image"].get("name") == c["name"]
-                           and current["image"].get("ref") == c["ref"] and arch_of(current["image"]) == arch_of(c)) else None
-        pair = compare_subset(cfg, runs, images, c, live)
-        href = first_link(pair[2])
-        for g, projects in GROUPS.items():
-            st, ok, ref, failing, done = group_cell(cfg, pair, projects)
-            if not set(projects) & set(subset_of(cfg, c) or []):
-                st, failing = "n/a", []
-            title = ("fails: " + ", ".join(failing)) if st == "no" else "; ".join(failing) or ", ".join(
-                t for t in ("//%s:test" % p for p in projects) if t in pair[1])
-            text = "%d/%d" % (ok, ref) if ref else ""
-            table = pair[1]
-            ok_targets = [t for t in ("//%s:test" % p for p in projects) if t in table and
-                          (is_pass(table[t][0]) or table[t][0] == NO_BASELINE) and is_pass(table[t][1])]
-            built_only = [t for t in ok_targets if t in ((pair[2] or {}).get("no_tests") or [])]
-            # Passed only on the retry: flaky on both is the project's own
-            # flakiness, flaky only on the candidate is worth a look.
-            flaky = [t for t in ok_targets if table[t][1] == "FLAKY"]
-            only_cand = [t for t in flaky if table[t][0] != "FLAKY"]
-            if built_only and st in ("yes", "no"):
-                text += ", %d tested" % (len(ok_targets) - len(built_only))
-                title += "; built, no tests: " + ", ".join(built_only)
-            infra_t = [t for t in ("//%s:test" % p for p in projects) if table.get(t, (None, None))[1] == INFRA]
-            if infra_t and st in ("yes", "no", "pending"):
-                text += ", %d infra" % len(infra_t)
-            if flaky and st in ("yes", "no"):
-                text += ", %d flaky%s" % (len(flaky), " (candidate only)" if only_cand else "")
-                title += "; flaky: %s" % ", ".join(
-                    "%s (%s)" % (t, "only on the candidate" if t in only_cand else "also on the baseline")
-                    for t in flaky)
-            if st == "running" or (st == "no" and live):
-                text = "%d/%d done, %d ok" % (done, ref, ok)
-            if pair[3] is None and table and ref:
-                text = ("%d/%d done, %d ok" % (done, ref, ok) if live else "%d/%d ok" % (ok, ref)) + ", baseline pending"
-            out.append(cell(st, text, href if (st in ("yes", "no", "running") or table) else "", title))
+        table = tables[id(c)]
+        for tier in (1, 2, 3):
+            ts = targets[id(c)][tier]
+            n = tally(table, ts)
+            regs = [t[2:-5] for t in ts if t in table and kind(table[t][0], table[t][1]) == "regression"]
+            e = eta.get((c["name"], c["ref"], arch_of(c), tier))
+            out.append('<td title="%s">%s%s</td>' % (
+                esc(("regressions: " + ", ".join(regs)) if regs else ""), tally_html(n),
+                ('<br><span class="small">ETA %s</span>' % esc(e)) if e and (n["pending"] or n["running"]) else ""))
+        out.append("<td>%s</td></tr>" % esc(ref_label(table) if table else ""))
+    out.append("</table>")
+    # Per ruleset.
+    out.append("<h2>Popular rulesets</h2><p class=\"small\">Each ruleset and a few small dependents "
+               "(GROUPS in server.py); same counts as above.</p><table><tr><th>Image</th>%s</tr>" % "".join(
+                   "<th>%s</th>" % esc(g) for g in GROUPS))
+    for c in cands:
+        table = tables[id(c)]
+        out.append("<tr><td>%s &middot; %s</td>" % (esc(c.get("release")), esc(arch_of(c))))
+        for g, members in GROUPS.items():
+            ts = ["//%s:test" % p for p in members if "//%s:test" % p in table]
+            if not ts:
+                out.append('<td><span class="na">n/a</span></td>')
+                continue
+            n = tally(table, ts)
+            st = "no" if n["regression"] else ("yes" if n["ok"] == n["total"] else "pending")
+            bad = [t[2:-5] for t in ts if kind(table[t][0], table[t][1]) not in ("pass", "flaky")]
+            out.append('<td title="%s"><span class="%s">%s</span> %s</td>' % (
+                esc(", ".join("%s: %s" % (t, kind(table["//%s:test" % t][0], table["//%s:test" % t][1])) for t in bad)),
+                st, MARK[st], tally_html(n)))
         out.append("</tr>")
     out.append("</table>")
-    det = []
-    if current:
-        det.append('<p>Running: %s %s %s, %s. <a href="/logs/%s?tail=200">log</a></p>' % (
-            esc(current["image"]["name"]), esc(arch_of(current["image"])), esc(current["step"]),
-            elapsed(current["start"]), esc(current["log"])))
+    # Per project.
+    if cands and projects:
+        rows = sorted({t for c in cands for t in tables[id(c)]})
+
+        def rank(t):
+            ks = [kind(tables[id(c)][t][0], tables[id(c)][t][1]) for c in cands if t in tables[id(c)]]
+            return (0 if "regression" in ks else 1 if "fail" in ks else 2 if "infra" in ks else 3,
+                    tier_of.get(t[2:-5], (3,))[0], t)
+
+        rows.sort(key=rank)
+        out.append("<h2>Projects</h2><p class=\"small\">Regressions first, then failures, then infra, then the rest "
+                   "(by tier). Each cell: the candidate's result (linked to its invocation), then the "
+                   "reference's.</p><table><tr><th>Project</th><th>tier</th>%s</tr>" % "".join(
+                       "<th>%s &middot; %s</th>" % (esc(c.get("release")), esc(arch_of(c))) for c in cands))
+        for t in rows:
+            name = t[2:-5]
+            tier, why = tier_of.get(name, (3, ""))
+            out.append('<tr><td>%s</td><td title="%s">%d</td>' % (esc(name), esc(why), tier))
+            for c in cands:
+                v = tables[id(c)].get(t)
+                if v is None:
+                    out.append('<td class="na">-</td>')
+                    continue
+                ref, st, r = v
+                k = kind(ref, st)
+                body = '<span class="%s">%s</span>' % (k, PMARK[k])
+                if r is not None and k not in ("pending",):
+                    body = '<a href="%s">%s</a>' % (esc(first_link(r)), body)
+                refs = ("matrix &#10003;" if ref == MATRIX else "base pending" if ref == NO_BASELINE
+                        else "base " + ("&#10003;" if ref == "PASSED" else esc(ref.lower())))
+                out.append('<td title="%s">%s <span class="small">%s</span></td>' % (esc(st or ""), body, refs))
+            out.append("</tr>")
+        out.append("</table>")
+    det = ["<p>%s</p>" % esc(TIER_HEURISTIC)]
+    if info:
+        sizes = {}
+        for n, (tier, _) in tier_of.items():
+            sizes[tier] = sizes.get(tier, 0) + 1
+        det.append("<p>Tier sizes: %s; batches of %d projects, --jobs=%d, amd64 and arm64 of an image at once.</p>" % (
+            esc(", ".join("tier %d: %d" % (t, sizes.get(t, 0)) for t in (1, 2, 3))), int(cfg.get("batch_size", 150)),
+            int(cfg.get("jobs", 100))))
+    for cur in lives:
+        det.append('<p>Running: %s %s %s%s, %s, %d/%d done. <a href="/logs/%s?tail=200">log</a></p>' % (
+            esc(cur["image"]["name"]), esc(arch_of(cur["image"])), esc(cur["step"]),
+            (" tier %s batch %s" % (cur.get("tier"), cur.get("batch"))) if cur.get("tier") else "",
+            elapsed(cur["start"]), len(cur.get("targets") or {}), len(cur.get("subset") or [1]), esc(cur["log"])))
     det.append("<p>Baselines:</p><ul>")
+    rev = current_rev(runs)
     for b in cols:
         if b.get("role") == "baseline":
             pr = latest_complete(runs, b, "probe")
-            sr = latest_complete(runs, b, "subset", subset_of(cfg, b)) if subset_of(cfg, b) else None
-            det.append('<li>%s %s <code>%s</code>: probe %s%s, projects %s%s</li>' % (
+            res = project_results(runs, b, rev, lives)
+            det.append('<li>%s %s <code>%s</code>: probe %s%s, projects %d/%d passed</li>' % (
                 esc(b["name"]), esc(arch_of(b)), esc(b["ref"].rsplit("@sha256:", 1)[-1][:12]),
                 esc(pr["status"]) if pr else "none", (' <a href="%s">link</a>' % esc(first_link(pr))) if pr else "",
-                ("%d/%d passed" % (sum(1 for x in sr["targets"].values() if is_pass(x)), len(sr["targets"])))
-                if sr else "none", (' <a href="%s">link</a>' % esc(first_link(sr))) if sr else ""))
-    det.append("</ul><p>Projects per release/arch: %s</p>" % esc("; ".join(
-        "%s: %s" % (k, ", ".join(v) or "none") for k, v in sorted(cfg["subset"].items())) or "none"))
-    det.append("<p>Recent runs:</p><table>")
-    for r in list(reversed(runs))[:40]:
-        det.append('<tr><td>%s</td><td>%s %s</td><td>%s</td><td>%s</td><td>%s%s</td><td><a href="/logs/%s">log</a>'
+                sum(1 for st, _ in res.values() if is_pass(st)), len(res)))
+    det.append("</ul><p>Recent runs:</p><table>")
+    for r in list(reversed(runs))[:60]:
+        det.append('<tr><td>%s</td><td>%s %s</td><td>%s%s</td><td>%s</td><td>%s%s</td><td><a href="/logs/%s">log</a>'
                    '%s</td></tr>' % (
                        esc(r["cycle"]), esc(r["image"]["name"]), esc(arch_of(r["image"])), esc(r["step"]),
+                       (" t%s/%s" % (r.get("tier"), r.get("batch"))) if r.get("tier") else "",
                        esc(r["start"]), esc(r["status"]), (" (%s)" % esc(r["error"])) if r.get("error") else "",
                        esc(r["log"]), "".join(' <a href="%s">invocation</a>' % esc(u) for u in r.get("invocations") or [])))
     det.append("</table>")
     out.append("<details><summary>details</summary>%s</details></body></html>" % "".join(det))
     return "".join(out)
+
+
+def repo_info(root):
+    """(projects, tiers) from a checkout (the page's fallback before the runner has read its clone)."""
+    try:
+        with open(os.path.join(root, "projects.txt")) as f:
+            projects = parse_projects(f.read())
+        with open(os.path.join(root, "canary", "deps.json")) as f:
+            deps = json.load(f)
+    except OSError:
+        return None
+    return projects, tiers([p["name"] for p in projects if not p["known_failing"]], deps)
 
 
 _LOG_NAME = re.compile(r"^[A-Za-z0-9_][A-Za-z0-9._-]*$")
@@ -1132,7 +1510,10 @@ def make_handler(data_dir, store, runner):
             try:
                 if path == "/":
                     cfg = load_config(data_dir)
-                    self.send(200, render(cfg, store.runs(), runner.current if runner else None), "text/html")
+                    lives = list(runner.currents.values()) if runner else []
+                    info = (runner.info if runner else None) or repo_info(
+                        os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+                    self.send(200, render(cfg, store.runs(), lives, info), "text/html")
                 elif path == "/api/runs":
                     self.send(200, redact(json.dumps(store.runs(), indent=1), key), "application/json")
                 elif path.startswith("/logs/"):
@@ -1163,7 +1544,13 @@ def main(argv=None):
     ap.add_argument("--host", default="0.0.0.0")
     ap.add_argument("--data-dir", default=os.path.expanduser("~/canary-data"))
     ap.add_argument("--work-dir", default=os.path.expanduser("~/canary-work"))
+    ap.add_argument("--write-deps", metavar="BCR_DIR",
+                    help="write canary/deps.json from a BCR checkout at projects.json's bcr_commit, then exit")
     args = ap.parse_args(argv)
+    if args.write_deps:
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        write_deps(args.write_deps, os.path.join(root, "projects.json"), os.path.join(root, "canary", "deps.json"))
+        return
     load_config(args.data_dir)
     store = Store(args.data_dir)
     store.mark_interrupted()

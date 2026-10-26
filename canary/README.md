@@ -99,56 +99,72 @@ through `tools/buildbuddy_credential_helper.py` and a 0600 file
 (`~/canary-out/.api-key`), and is never put on a command line, in the runs,
 in the logs or on the page.
 
-Each cycle runs, in order:
+### The broad run
 
-1. The probe for every candidate column, then every baseline column:
-   `bazel test //canary:tls_probe_test --config=remote-minimal
-   --nocache_test_results --test_output=all --test_env=CANARY_EXPECT=trusted`
-   (`distrusted` for a candidate).
-2. The subset for each column that has one, baselines first:
-   `bazel test //<p>:test ... --//:inner_flags=--remote_instance_name=canary-<cycle>`.
-   The salt makes each cycle's inner actions run cold (`salt_inner: false`
-   keeps them warm).
+Each cycle runs every project in `projects.txt` that isn't known-failing
+(on arm64, not one pinned to `bazel 8.4.2`, which has no arm64 binary) as
+`//<p>:test` with `--config=inner-remote[-arm64]`: each project's inner Bazel
+runs as an RBE action in the image under test. In order:
 
-A column is an image and an arch (`archs`, default `["amd64", "arm64"]`).
-arm64 adds `--remote_default_exec_properties=Arch=arm64`, outer and inner.
-A step that outlives `step_timeout_s` (3 h) gets SIGINT, then SIGKILL, to
-its process group, and `bazel shutdown`. Inner work dirs of dead processes
-are pruned, and this server's output bases are `clean --expunge`d below
-`min_free_gb` (15) free. `runs.jsonl` keeps the newest 200 runs, and logs
+1. The probe for each candidate image (`bazel test //canary:tls_probe_test
+   --config=remote-minimal --nocache_test_results --test_output=all
+   --test_env=CANARY_EXPECT=distrusted`).
+2. Tier 1 on every candidate column, then tier 2, then tier 3, in batches of
+   `batch_size` (200) projects per invocation (`--jobs`, `jobs`: 100), batch
+   k of every image before batch k+1. An image's amd64 and arm64 batches run
+   at once (`parallel_archs`), each in its own output base.
+3. The same for the baselines (probes with `CANARY_EXPECT=trusted`).
+
+`--//:inner_flags=--remote_instance_name=canary-<cycle>` makes each cycle's
+inner actions run cold (`salt_inner: false` keeps them warm). A restart
+resumes the unfinished cycle: a project with a result from a finished batch
+of this cycle at this revision isn't run again. The revision is the newest
+commit touching more than the server's own files (`SERVER_FILES`), so
+pushing server changes keeps the results.
+
+Tiers (`tiers()`, from `canary/deps.json`: each project's `bazel_dep`s in
+its BCR MODULE.bazel, written by `python3 canary/server.py --write-deps
+~/.cache/bazel-matrix/bcr` after `tools/sync.py`): tier 1 is C/C++ projects
+on the image's autodetected cc toolchain (not a ruleset, no hermetic C++
+toolchain dep, a dep on rules_cc/rules_foreign_cc or on another tier-1
+project); tier 2 the popular rulesets (`POPULAR`) and their direct
+dependents; tier 3 the rest. The page's details spell it out.
+
+The reference for a candidate column is its baseline's result at the same
+revision; until that exists, for 22.04 amd64 the matrix's own record (not
+known-failing in projects.txt, from `bb remote` mode on that same image),
+elsewhere "baseline pending". A candidate failure of a project that passes
+on the reference is a regression.
+
+A step that outlives `step_timeout_s` gets SIGINT, then SIGKILL, to its
+process group, and `bazel shutdown`. Inner work dirs of dead processes are
+pruned, and this server's output bases are `clean --expunge`d below
+`min_free_gb` (20) free. `runs.jsonl` keeps the newest 600 runs, and logs
 are kept 3 days.
 
-### The table
+### The page
 
-There is one row per candidate release and arch:
+Plain HTML, refreshed every minute, results live as each project finishes:
 
-- **eMudhra protected**: ✓ when every `emudhra*` probe check passes in
-  distrusted mode, ✗ when one fails, pending without a complete probe
-  result (summary printed, every counted check seen) for that exact digest
-  and arch.
-- **One column per ruleset** (`GROUPS` in `server.py`: the ruleset module
-  and a few small dependents, chosen from their BCR `bazel_dep`s): N/M,
-  where M is the group's projects that passed on the baseline of the same
-  release and arch (same subset, same repo revision) and N is how many of
-  those pass on the candidate. ✗ when N < M. pending without complete runs
-  of both, n/a when the column has none of the group's projects.
-- A note under the image when a non-eMudhra probe check fails (hosts builds
-  use; the CA store diff is informational).
+- **Summary**: one row per candidate release and arch: eMudhra protected
+  (✓ when every `emudhra*` probe check passes in distrusted mode, ✗ when one
+  fails, pending without a complete probe result for that digest and arch),
+  then per tier N/M ok with the regressions (red), other failures, flaky,
+  infra, running and pending counts, an ETA while it runs, and the
+  reference ("vs baseline", "vs matrix record", "baseline pending").
+- **Popular rulesets**: the same counts for each `GROUPS` ruleset and a few
+  small dependents.
+- **Projects**: one row per project, regressions first, then failures, then
+  infra, then the rest by tier; per candidate column the result (linked to
+  its invocation) and the reference's.
 
-`details` (collapsed) has the baselines, the subsets, the recent runs, and
-the logs. `/api/runs` gives the runs as JSON, and `/logs/<file>` a step's
-output (`?tail=N`).
+Infra: a wrapper killed by infrastructure (`infra_killed`/`wrapper_error`
+in its test.xml) is retried once in a follow-up invocation; still killed is
+"infra", neither pass nor failure. Passing only on a retry is "flaky" (a pass).
 
-### The subset
-
-The projects' `:test` actions are `no-remote-exec`, so their inner Bazels
-run on this machine (Ubuntu 24.04, gcc 13), not in the image. An inner
-Bazel that autodetects a C++ toolchain finds this machine's, so the subset
-of each release and arch keeps only the `GROUPS` projects that pass on its
-baseline in this mode (`SUBSETS` in `server.py`). `:test` runs the inner
-`bazel test //...`, which builds everything the inner build would, so
-`:build` isn't run separately. The config's `subset` key is `"22.04"` for
-amd64 and `"22.04/arm64"` for arm64.
+`details` (collapsed) has the tier heuristic and sizes, the running steps,
+the baselines, the recent runs and the logs. `/api/runs` gives the runs as
+JSON, and `/logs/<file>` a step's output (`?tail=N`).
 
 ### Data dir (`~/canary-data`)
 
