@@ -11,8 +11,21 @@ data=$HOME/canary-data
 port=8000
 if [ "${1:-}" = --between ]; then
   shift
-  id=$(tail -1 "$data/runs.jsonl" | python3 -c 'import json,sys; r=json.loads(sys.stdin.read()); print(r["id"] if r["status"]=="running" else "")')
-  while [ -n "$id" ] && grep -F "\"id\": \"$id\"" "$data/runs.jsonl" | tail -1 | grep -q '"status": "running"'; do sleep 2; done
+  # Until every step running now has ended (an image's amd64 and arm64
+  # batches run at once); a step started meanwhile is seconds old.
+  ids=$(python3 -c '
+import json, sys
+last = {}
+for line in open(sys.argv[1]):
+    try:
+        r = json.loads(line)
+    except ValueError:
+        continue
+    last[r["id"]] = r["status"]
+print(" ".join(i for i, s in last.items() if s == "running"))' "$data/runs.jsonl")
+  for id in $ids; do
+    while grep -F "\"id\": \"$id\"" "$data/runs.jsonl" | tail -1 | grep -q '"status": "running"'; do sleep 2; done
+  done
 fi
 old=$(cat "$data/server.pid" 2>/dev/null)
 if [ -n "$old" ] && kill -0 "$old" 2>/dev/null; then
