@@ -578,6 +578,9 @@ def probe_others(runs, col):
 
 NO_BASELINE = "no baseline result yet"
 RUNNING = "RUNNING"
+# Results of a project that ran (NO STATUS, INCOMPLETE, SKIPPED, REMOTE
+# FAILURE: it didn't, and a resume runs it again).
+RAN = {"PASSED", "FLAKY", "FAILED", "FAILED TO BUILD", "TIMEOUT", INFRA}
 DONE = COMPLETE + ("timeout",)  # a batch that needn't run again this cycle
 
 
@@ -599,7 +602,7 @@ def done_projects(runs, col, rev, cycle):
     for r in runs:
         if (r["step"] == "batch" and r.get("cycle") == cycle and r.get("rev") == rev and r["status"] in DONE
                 and same_column(r["image"], col)):
-            out.update(t[2:-5] for t in r.get("targets") or {})
+            out.update(t[2:-5] for t, st in (r.get("targets") or {}).items() if st in RAN)
     return out
 
 
@@ -624,19 +627,26 @@ def remaining(runs, group, rev, cycle):
 
 
 def project_results(runs, col, rev, lives=()):
-    """{target: (status, run)}: per project, a running batch's result (RUNNING
-    until it has one), else the newest finished batch at rev with a result."""
+    """{target: (status, run)}: per project, a running batch's result, else
+    the newest finished batch's at rev, else RUNNING while a batch runs it."""
     out = {}
+    running = {}
     for r in lives:
         if r.get("step") == "batch" and same_column(r["image"], col):
             for p in r.get("subset") or []:
                 t = "//%s:test" % p
-                out[t] = (r["targets"].get(t, RUNNING), r)
+                st = r["targets"].get(t)
+                if st is None:
+                    running[t] = (RUNNING, r)
+                else:
+                    out[t] = (st, r)
     for r in reversed(runs):
         if r["step"] != "batch" or r.get("rev") != rev or r["status"] not in DONE or not same_column(r["image"], col):
             continue
         for t, st in (r.get("targets") or {}).items():
             out.setdefault(t, (st, r))
+    for t, v in running.items():
+        out.setdefault(t, v)
     return out
 
 
@@ -1074,13 +1084,19 @@ class Runner(threading.Thread):
                 rec["command"] = args
                 self.currents[rec["id"]] = rec
                 self.store.append(rec)
-                t = threading.Thread(target=self.execute, args=(rec, cfg, args, env, key), daemon=True)
+                t = threading.Thread(target=self.execute_and_record, args=(rec, cfg, args, env, key), daemon=True)
                 t.start()
-                threads.append((t, rec))
-            for t, rec in threads:
+                threads.append(t)
+            for t in threads:
                 t.join()
-                self.currents.pop(rec["id"], None)
-                self.store.append(rec)
+
+    def execute_and_record(self, rec, cfg, args, env, key):
+        try:
+            self.execute(rec, cfg, args, env, key)
+        finally:
+            # Recorded as soon as it ends, not when the group's slowest does.
+            self.store.append(rec)
+            self.currents.pop(rec["id"], None)
 
     def step(self, cfg, cycle, rev, image, step, batch=None):
         self.group(cfg, cycle, rev, [(image, step, batch)])

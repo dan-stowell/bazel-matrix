@@ -210,7 +210,9 @@ class VerdictTest(unittest.TestCase):
         old = run(c, "batch", "failed", {"//a:test": "FAILED", "//b:test": "FAILED"})
         cur = run(c, "batch", "running", {"//a:test": "PASSED"})
         t = table(base + [old], c, lives=[cur])
-        self.assertEqual([server.kind(*t[x][:2]) for x in sorted(t)], ["pass", "running"])
+        # A running batch's results win; until it has one, an older result stands.
+        self.assertEqual([server.kind(*t[x][:2]) for x in sorted(t)], ["pass", "regression"])
+        self.assertEqual([server.kind(*v[:2]) for v in table(base, c, lives=[cur]).values()], ["pass", "running"])
         # The newest finished batch with a result decides, per project.
         newer = run(c, "batch", "passed", {"//a:test": "PASSED"}, subset=("a",))
         t = table(base + [old, newer], c)
@@ -399,7 +401,8 @@ class ScheduleTest(unittest.TestCase):
         b, c = COLS
         group = [(c, "probe", None)]
         batch = [(c, "batch", (1, 0, ["a", "b", "x"]))]
-        runs = [run(c, "probe", "passed", checks=GOOD), run(c, "batch", "failed", {"//a:test": "FAILED"}),
+        runs = [run(c, "probe", "passed", checks=GOOD),
+                run(c, "batch", "failed", {"//a:test": "FAILED", "//x:test": "NO STATUS"}),
                 run(c, "batch", "interrupted", {"//b:test": "PASSED"}),
                 run(b, "batch", "passed", {"//x:test": "PASSED"})]
         # A finished probe and a project with a finished result this cycle at
