@@ -91,6 +91,7 @@ class TestXmlTest(unittest.TestCase):
         text = inner_bazel.summary_text("p", "test", "9", inner_bazel.NO_TESTS, "L", {}, [], 1)
         self.assertIn("tests: NO_TESTS", text)
         self.assertIn("tests: none", inner_bazel.summary_text("p", "build", "9", 0, "L", {}, [], 1))
+        self.assertTrue(text.startswith("inner invocation for p: L\n"))
 
     def test_unexplained_failure(self):
         root = ET.fromstring(inner_bazel.test_xml("p", {("//:t", "c"): ("PASSED", 0)}, [], "L", ok=False))
@@ -111,17 +112,32 @@ class CommandTest(unittest.TestCase):
             "--startup_flag=--experimental_remote_repo_contents_cache",
             "--flag=--copt=-w", "--target=//...", "--target=-//x/...",
         ])
-        cmd = inner_bazel.inner_command(args, "/out", "/bep")
+        cmd = inner_bazel.inner_command(args, "/out", "/bep", "/install")
         mode = cmd.index("test")
         self.assertEqual(cmd[:mode], ["/b", "--batch", "--nosystem_rc", "--nohome_rc",
-                                      "--output_user_root=/out", "--host_jvm_args=-Xmx2g",
+                                      "--output_user_root=/out", "--install_base=/install",
+                                      "--host_jvm_args=-Xmx2g",
                                       "--bazelrc=/r1", "--bazelrc=/r2",
                                       "--experimental_remote_repo_contents_cache"])
         self.assertIn("--credential_helper=*.buildbuddy.io=/h", cmd)
         self.assertIn("--test_output=errors", cmd)
+        self.assertIn("--build_metadata=TAGS=bazel-matrix,p", cmd)
         self.assertFalse(any(c.startswith("--repository_cache") for c in cmd))
         self.assertEqual(cmd[-4:], ["--copt=-w", "--", "//...", "-//x/..."])
         self.assertFalse(any("api-key" in c for c in cmd))
+
+    def test_remove_stale_extractions(self):
+        with tempfile.TemporaryDirectory() as root:
+            for d in ("9.3.1", "8.4.2", "9.3.1.tmp.old", "9.3.1.tmp.new"):
+                os.makedirs(os.path.join(root, d, "sub"))
+            open(os.path.join(root, "9.3.1.lock"), "w").close()
+            old = time.time() - 2 * inner_bazel.STALE_EXTRACTION
+            os.utime(os.path.join(root, "9.3.1.tmp.old"), (old, old))
+            os.utime(os.path.join(root, "8.4.2"), (old, old))
+            inner_bazel.remove_stale_extractions(root)
+            self.assertEqual(sorted(os.listdir(root)),
+                             ["8.4.2", "9.3.1", "9.3.1.lock", "9.3.1.tmp.new"])
+        inner_bazel.remove_stale_extractions("/nonexistent/bazel-matrix")
 
     def test_env_is_explicit(self):
         env = inner_bazel.inner_env("/w", "/w/bin", "/k")

@@ -7,7 +7,8 @@ source.tar into a fresh work dir, runs the pinned inner Bazel there in
 environment, and deletes the work dir afterwards (also on SIGTERM, and stale
 ones left by killed runs), so a runner's disk doesn't grow per run. Fetches
 go through BuildBuddy's remote downloader and remote repo contents cache;
-nothing is cached on the runner between runs.
+nothing is cached on the runner between runs but one install base per pinned
+inner Bazel version (INSTALL_ROOT).
 
 build mode writes --summary (invocation link and counts) and --log (the
 inner output). test mode streams the inner output to the test log and writes
@@ -34,6 +35,17 @@ import xml.etree.ElementTree as ET
 # tmpfs there in locally sandboxed actions, which then can't run below an
 # output base in /tmp.
 WORK_ROOT = "/var/tmp/bazel-matrix/work"
+# Install bases (Bazel's extracted binaries and embedded JDK, 120-190 MB),
+# one per pinned inner Bazel version (tools/versions.bzl pins its binary),
+# shared by every run of it on this machine instead of extracted afresh into
+# each work dir. The client extracts into <install base>.tmp.XXXXXX and
+# renames that into place, so concurrent first runs are safe; one killed
+# mid-extraction leaves the temp dir, which remove_stale_extractions deletes.
+# Other versions' install bases stay: concurrent runs may be using them.
+INSTALL_ROOT = "/var/tmp/bazel-matrix/install"
+# Age after which an install base temp dir is a killed extraction's
+# leftover (extracting takes seconds).
+STALE_EXTRACTION = 3600
 # Where tools/credentials.bzl writes the API key, relative to the outer
 # output base.
 KEY_FILE = "bazel-matrix/api-key"
@@ -70,19 +82,42 @@ def parse_args(argv):
     return p.parse_args(argv)
 
 
-def inner_command(args, out_root, bep):
+def remove_stale_extractions(root):
+    """Removes <install base>.tmp.* dirs in root older than STALE_EXTRACTION:
+    left by an inner Bazel killed while extracting its install base."""
+    now = time.time()
+    try:
+        entries = os.listdir(root)
+    except FileNotFoundError:
+        return
+    for d in entries:
+        path = os.path.join(root, d)
+        if ".tmp." not in d or not os.path.isdir(path):
+            continue
+        try:
+            if now - os.path.getmtime(path) < STALE_EXTRACTION:
+                continue
+        except OSError:
+            continue
+        remove_tree(path)
+
+
+def inner_command(args, out_root, bep, install):
     """The inner Bazel command line."""
     startup = [
         "--batch",
         "--nosystem_rc",
         "--nohome_rc",
         "--output_user_root=" + out_root,
+        "--install_base=" + install,
         "--host_jvm_args=" + JVM_HEAP,
     ] + ["--bazelrc=" + rc for rc in args.rc] + args.startup_flag
     flags = [
         "--credential_helper=*.buildbuddy.io=" + args.credential_helper,
         "--build_event_json_file=" + bep,
         "--build_metadata=PROJECT=" + args.project,
+        # BuildBuddy's tag filter finds every inner run, or one project's.
+        "--build_metadata=TAGS=bazel-matrix," + args.project,
     ]
     if args.mode == "test":
         flags.append("--test_output=errors")
@@ -214,11 +249,11 @@ def summary_text(project, mode, version, code, link, tests, failed_builds, wall)
     for status, _ in tests.values():
         counts[status] = counts.get(status, 0) + 1
     lines = [
-        "project: " + project,
+        # One line naming both, which tools/run.py looks for.
+        "inner invocation for %s: %s" % (project, link),
         "command: " + mode,
         "inner bazel: " + version,
         "exit code: %d" % code,
-        "inner invocation: " + link,
         "tests: " + (", ".join("%s %d" % kv for kv in sorted(counts.items())) or
                      ("NO_TESTS (no test targets)" if mode == "test" and code == NO_TESTS else "none")),
         "failed to build: %d" % len(failed_builds),
@@ -343,6 +378,7 @@ def main(argv=None):
 
     os.makedirs(WORK_ROOT, exist_ok=True)
     remove_stale(WORK_ROOT)
+    remove_stale_extractions(INSTALL_ROOT)
     work = tempfile.mkdtemp(prefix=args.project + "-", dir=WORK_ROOT)
     with open(os.path.join(work, "pid"), "w") as f:
         f.write(str(os.getpid()))
@@ -374,7 +410,8 @@ def main(argv=None):
                 print("note: upstream .bazelversion is %s; using %s" % (upstream, args.bazel_version),
                       file=log, flush=True)
         bep = os.path.join(work, "bep.json")
-        cmd = inner_command(args, os.path.join(work, "out"), bep)
+        cmd = inner_command(args, os.path.join(work, "out"), bep,
+                            os.path.join(INSTALL_ROOT, args.bazel_version))
         print("+ " + " ".join(cmd), file=log, flush=True)
         state["proc"] = subprocess.Popen(cmd, cwd=src, env=env, stdout=log,
                                          stderr=subprocess.STDOUT, start_new_session=True)

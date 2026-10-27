@@ -1,4 +1,8 @@
+import os
+import tempfile
+import time
 import unittest
+from unittest import mock
 
 import run
 
@@ -55,7 +59,7 @@ class ParseLogTest(unittest.TestCase):
             OUTER,
             "\x1b[90m2026-10-24 (command exited with code 3)",
         ])
-        code, link, status = run.parse_log(log, "test", {"zlib": "test", "re2": "test", "fmt": "test"})
+        code, link, status, _ = run.parse_log(log, "test", {"zlib": "test", "re2": "test", "fmt": "test"})
         self.assertEqual(code, 3)
         self.assertEqual(link, "https://x.io/invocation/0000-aaaa")
         self.assertEqual(status, {"zlib": "PASSED", "re2": "FAILED", "fmt": "UNKNOWN"})
@@ -95,9 +99,9 @@ class ParseLogTest(unittest.TestCase):
             OUTER,
             "(command exited with code 1)",
         ])
-        _, _, status = run.parse_log(log, "build", {"zlib": "build", "re2": "build", "fmt": "build"})
+        _, _, status, _ = run.parse_log(log, "build", {"zlib": "build", "re2": "build", "fmt": "build"})
         self.assertEqual(status, {"zlib": "PASSED", "re2": "FAILED", "fmt": "UNKNOWN"})
-        _, _, status = run.parse_log("(command exited with code 0)", "build", {"zlib": "build"})
+        _, _, status, _ = run.parse_log("(command exited with code 0)", "build", {"zlib": "build"})
         self.assertEqual(status, {"zlib": "UNKNOWN"})
 
     def test_build_failure_summary(self):
@@ -179,6 +183,82 @@ class ClassifyTest(unittest.TestCase):
         self.assertFalse(run.shard_ok(shard(3, e="FAILED"), targets, kinds))
         self.assertFalse(run.shard_ok(shard(37, b="FAILED"), targets, kinds))
         self.assertFalse(run.shard_ok(shard(None, b="FAILED"), targets, kinds))
+
+
+class InnerLinksTest(unittest.TestCase):
+    LOG = "\n".join([
+        "==================== Test output for //projects/zlib:test:",
+        "inner output",
+        "inner invocation for zlib: https://x.io/invocation/1111",
+        "command: test",
+        "INFO: From Building re2 with inner Bazel 9.3.1:",
+        "\x1b[0minner invocation for re2: (none)",
+        "\x1b[0minner invocation for fmt: https://x.io/invocation/2222\x1b[0m",
+        "inner invocation for other: https://x.io/invocation/4444",
+        "inner invocation: https://x.io/invocation/3333",
+    ])
+
+    def test_links_from_summaries(self):
+        targets = {"zlib": "test", "re2": "build", "fmt": "build"}
+        self.assertEqual(run.parse_log(self.LOG, "test", targets)[3],
+                         {"zlib": "https://x.io/invocation/1111", "re2": "(none)",
+                          "fmt": "https://x.io/invocation/2222"})
+
+    def test_row(self):
+        self.assertEqual(run.row_line("zlib", "PASSED", 1, "https://l", 5, 7),
+                         "zlib   PASSED   shard 1  https://l")
+        self.assertTrue(run.row_line("a", "PASSED", 0, "(none)", 1, 1).endswith(
+            "(inner run has no invocation)"))
+        self.assertTrue(run.row_line("a", "PASSED", 0, None, 1, 1).endswith(
+            "(no inner link printed)"))
+
+
+class RunShardTest(unittest.TestCase):
+    def run_shard(self, command, targets, extra, log, build_txt=None):
+        calls = []
+
+        class FakePopen:
+            returncode = 0
+
+            def __init__(self, cmd, stdout, **_):
+                calls.append(cmd)
+                stdout.write(log)
+
+            def wait(self):
+                return 0
+
+        with tempfile.TemporaryDirectory() as d:
+            pattern = os.path.join(d, "%s", "build.txt")
+            for name, (text, age) in (build_txt or {}).items():
+                path = pattern % name
+                os.makedirs(os.path.dirname(path))
+                with open(path, "w") as f:
+                    f.write(text)
+                os.utime(path, (time.time() - age, time.time() - age))
+            with mock.patch.object(run.subprocess, "Popen", FakePopen), \
+                    mock.patch.object(run, "_BUILD_TXT", pattern):
+                result = run.run_shard(0, command, targets, extra, d)
+        return calls[0], result
+
+    def test_test_defaults_come_before_extra(self):
+        cmd, result = self.run_shard("test", {"zlib": "test"}, ["--test_output=errors"],
+                                     InnerLinksTest.LOG)
+        self.assertLess(cmd.index("--test_output=all"), cmd.index("--test_output=errors"))
+        self.assertLess(cmd.index("--experimental_ui_max_stdouterr_bytes=%d" % (64 << 20)),
+                        cmd.index("--test_output=errors"))
+        self.assertEqual(result["links"], {"zlib": "https://x.io/invocation/1111"})
+
+    def test_build_links_from_downloaded_summary(self):
+        cmd, result = self.run_shard(
+            "build", {"zlib": "build", "re2": "build", "fmt": "build"}, [],
+            "inner invocation for fmt: https://x.io/console\n",
+            # Ages: zlib's written during the run, re2's by an earlier one.
+            build_txt={"zlib": ("inner invocation for zlib: https://x.io/z\ncommand: build\n", -60),
+                       "re2": ("inner invocation for re2: https://x.io/old\n", 3600),
+                       # Fresh but another run's: the console's link wins.
+                       "fmt": ("inner invocation for fmt: https://x.io/other\n", -60)})
+        self.assertNotIn("--test_output=all", cmd)
+        self.assertEqual(result["links"], {"zlib": "https://x.io/z", "fmt": "https://x.io/console"})
 
 
 class ShardResultTest(unittest.TestCase):

@@ -36,7 +36,8 @@ tools/bb.sh test //projects/... --test_output=all  # print every project's summa
 
 For the whole matrix, `tools/run.py` splits the projects over concurrent
 `bb remote` runs (each gets its own runner) and prints each shard's
-invocation links and a pass/fail row per project:
+invocation links and a row per project: its result and its inner
+invocation link:
 
 ```sh
 tools/run.py test --shards 8     # every project, 8 runners
@@ -80,7 +81,11 @@ The plain-Bazel form skips known-failing projects entirely (they're
 
 Passing projects' logs (summary, inner invocation link) only print with
 `--test_output=all`; that flag isn't in the action key, so it replays cached
-results. Read inner logs with `bb view <inner invocation>`.
+results. Read inner logs with `bb view <inner invocation>`. `tools/run.py`
+prints each project's inner link in its row, from the test logs (it adds
+`--test_output=all`) or the downloaded `build.txt` summaries, where a cached
+result links the earlier run that produced it; inner runs are also tagged
+`bazel-matrix` and `<project>` for BuildBuddy's tag filter.
 
 Caveats: `bb remote` runs your local diff against the default branch on the
 runner (commits need not be pushed). Afterwards it downloads the top-level
@@ -104,9 +109,11 @@ cached):
    `--config=remote-minimal`), the project's flags and `--//:inner_flags`;
 3. deletes the work dir, also on SIGTERM (it kills the inner Bazel first)
    and when a killed run left one behind, so a runner's disk doesn't grow
-   per run. Nothing is cached on the runner between runs: fetches go
-   through BuildBuddy's remote downloader, and reproducible repos come from
-   the remote repo contents cache.
+   per run. Nothing is cached on the runner between runs but one install
+   base per pinned inner Bazel version (`/var/tmp/bazel-matrix/install/<version>`),
+   shared by concurrent runs. Fetches go through BuildBuddy's remote
+   downloader, and reproducible repos come from the remote repo contents
+   cache.
 
 Each inner run is tagged `resources:cpu:2`/`resources:memory:2500`, so a
 6-CPU, 7 GB runner runs two at a time and the 16-CPU, 32 GB one
@@ -160,7 +167,8 @@ environment variable, so the outer cache is shared across checkouts.
   flags) and `DEFAULT_INNER_BAZEL`; the one place they're defined.
 - `tools/remote.bazelrc`: `--config=remote-minimal` (BuildBuddy endpoints,
   `--remote_download_minimal`, `--jobs=100`, the executor image pinned by
-  digest, remote downloader, `--rewind_lost_inputs`, remote JDK), for the
+  digest, remote downloader, `--rewind_lost_inputs`, remote JDK, zstd
+  `--remote_cache_compression`), for the
   outer and every inner Bazel. The one place the image is defined.
 - `tools/inner.bazelrc`: flags for every inner Bazel.
 
