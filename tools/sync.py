@@ -19,6 +19,7 @@ projects.json. Generated packages of projects not written are deleted.
 """
 
 import argparse
+import ast
 import base64
 import collections
 import hashlib
@@ -171,65 +172,46 @@ def bazel_compatibility(module_text):
     return re.findall(r"[\"']([^\"']*)[\"']", c.group(1)) if c else []
 
 
-def _call_args(text, start):
-    """The text between the parenthesis at text[start] and its match,
-    skipping strings; None if it never closes."""
-    depth, i = 0, start
-    while i < len(text):
-        c = text[i]
-        if c in "\"'":
-            q = text[i:i + 3] if text[i:i + 3] in ('"""', "'''") else c
-            end = text.find(q, i + len(q))
-            while end != -1 and len(q) == 1 and text[end - 1] == "\\":
-                end = text.find(q, end + 1)
-            if end == -1:
-                return None
-            i = end + len(q)
-            continue
-        if c == "(":
-            depth += 1
-        elif c == ")":
-            depth -= 1
-            if depth == 0:
-                return text[start + 1:i]
-        i += 1
-    return None
-
-
-def _strip_comments(text):
-    """text with # comments blanked, leaving # inside string literals."""
-    return re.sub(r"""("(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*')|#[^\n]*""",
-                  lambda m: m.group(1) or "", text)
-
-
-def module_deps(module_text):
+def module_deps(module_text, path="MODULE.bazel"):
     """(deps, dev_deps): the sorted module names a MODULE.bazel bazel_dep()s,
     the second those only ever with dev_dependency = True. A project runs as
     the root module, so its dev dependencies are active too. Calls whose
-    name isn't a string literal are ignored; include()d files aren't seen."""
-    text = _strip_comments(module_text)
+    name isn't a plain string literal are ignored; include()d files aren't
+    seen. Parsed as Python, which every BCR MODULE.bazel is; raises
+    ValueError naming path when one isn't."""
+    try:
+        tree = ast.parse(module_text, path)
+    except SyntaxError as e:
+        raise ValueError("%s: can't parse as Python: %s" % (path, e))
     deps, dev = set(), set()
-    for m in re.finditer(r"(?<![\w.])bazel_dep\s*\(", text):
-        args = _call_args(text, m.end() - 1)
-        name = args and re.search(r"(?<!\w)name\s*=\s*([\"'])([^\"']+)\1", args)
-        if not name:
+    for node in ast.walk(tree):
+        if not (isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+                and node.func.id == "bazel_dep"):
             continue
-        is_dev = re.search(r"(?<!\w)dev_dependency\s*=\s*True\b", args)
-        (dev if is_dev else deps).add(name.group(2))
+        kw = {k.arg: k.value for k in node.keywords}
+        name = kw.get("name")
+        if not (isinstance(name, ast.Constant) and isinstance(name.value, str)):
+            continue
+        is_dev = kw.get("dev_dependency")
+        (dev if isinstance(is_dev, ast.Constant) and is_dev.value is True else deps).add(name.value)
     return sorted(deps), sorted(dev - deps)
+
+
+def usable_versions(metadata):
+    """A module's non-yanked versions, oldest first: the stable ones, or all
+    if none is (date versions like re2's 2025-11-05 parse as prereleases)."""
+    yanked = metadata.get("yanked_versions") or {}
+    versions = sorted((v for v in metadata.get("versions", []) if v not in yanked), key=version_key)
+    return [v for v in versions if is_stable(v)] or versions
 
 
 def pick(metadata, module_text_for, bazel):
     """(version, None) for a module's newest usable version, or (None, why)."""
     if metadata.get("deprecated"):
         return None, "deprecated"
-    yanked = metadata.get("yanked_versions") or {}
-    versions = sorted((v for v in metadata.get("versions", []) if v not in yanked), key=version_key)
-    if not versions:
+    stable = usable_versions(metadata)
+    if not stable:
         return None, "all versions yanked"
-    # Date versions like re2's 2025-11-05 parse as prereleases; a module
-    # with nothing else uses its latest.
-    stable = [v for v in versions if is_stable(v)] or versions
     for v in reversed(stable):
         text = module_text_for(v)
         if text is not None and bazel_compatible(bazel_compatibility(text), bazel):
@@ -448,20 +430,12 @@ def render_json(commit, entries, skipped, bcr):
 UNLISTED = ("deprecated", "git_repository source", "no compatible version", "unlisted")
 
 
-def latest_version(metadata):
-    """A module's newest non-yanked version, stable if it has one; None if none."""
-    yanked = metadata.get("yanked_versions") or {}
-    versions = sorted((v for v in metadata.get("versions", []) if v not in yanked), key=version_key)
-    stable = [v for v in versions if is_stable(v)] or versions
-    return stable[-1] if stable else None
-
-
-def unlisted_reason(metadata, picked, source_type):
-    """One of UNLISTED for a module projects.txt doesn't list: picked is the
-    version pick() chose (None if none), source_type that version's."""
-    if metadata.get("deprecated"):
+def unlisted_reason(why, source_type):
+    """One of UNLISTED for a module projects.txt doesn't list: why is pick()'s
+    reason (None if it picked a version), source_type that version's."""
+    if why == "deprecated":
         return "deprecated"
-    if not picked:
+    if why:
         return "no compatible version"
     if source_type not in (None, "archive"):
         return source_type + " source"
@@ -484,7 +458,7 @@ def bcr_summary(listed, modules, reasons):
 def render_coverage(projects, data, top=50):
     """docs/coverage.md, from projects.txt (parsed) and projects.json only,
     so tools/generated_test.py can check it without the BCR."""
-    bcr = data.get("bcr") or {"modules": 0, "unlisted": []}
+    bcr = data["bcr"]
     kf = {p["name"]: p["known_failing"][0] for p in projects if p.get("known_failing")}
     run = [e["name"] for e in data["projects"]]
     why = collections.Counter(u["reason"] for u in bcr["unlisted"])
@@ -502,22 +476,22 @@ def render_coverage(projects, data, top=50):
            "| | modules |\n|---|---:|\n"]
     out += ["| %s | %d |\n" % r for r in rows]
 
-    deps = collections.defaultdict(lambda: [0, 0, 0])
+    dependents, dev_only, failing = (collections.Counter() for _ in range(3))
     for e in data["projects"]:
-        for dev, names in ((0, e.get("deps", [])), (1, e.get("dev_deps", []))):
-            for d in names:
-                c = deps[d]
-                c[0] += 1
-                c[1] += dev
-                c[2] += e["name"] in kf
-    ranked = sorted(deps.items(), key=lambda kv: (-kv[1][0], kv[0]))
+        names = e["deps"] + e["dev_deps"]
+        dependents.update(names)
+        dev_only.update(e["dev_deps"])
+        if kf.get(e["name"]) == "build":
+            failing.update(names)
+    ranked = sorted(dependents, key=lambda m: (-dependents[m], m))
     out += ["\n## Most depended-on modules\n\n",
             "Modules by the number of matrix projects whose MODULE.bazel `bazel_dep`s them "
             "directly (dev dependencies too: a project runs as the root module). "
-            "`tools/run.py test --dep <module>` runs those projects. Top %d of %d.\n\n"
+            "`tools/run.py test --dep <module>` runs those projects, except the known-failing "
+            "build ones. Top %d of %d.\n\n"
             % (min(top, len(ranked)), len(ranked)),
-            "| module | dependents | dev-only | known-failing |\n|---|---:|---:|---:|\n"]
-    out += ["| %s | %d | %d | %d |\n" % ((m,) + tuple(c)) for m, c in ranked[:top]]
+            "| module | dependents | dev-only | known-failing build |\n|---|---:|---:|---:|\n"]
+    out += ["| %s | %d | %d | %d |\n" % (m, dependents[m], dev_only[m], failing[m]) for m in ranked[:top]]
 
     unlisted = sorted(bcr["unlisted"], key=lambda u: (-u["dependents"], u["name"]))
     out += ["\n## Unlisted BCR modules\n\n",
@@ -621,14 +595,15 @@ def survey_bcr(modules, projects, bazel):
         if not os.path.isfile(os.path.join(mdir, "metadata.json")):
             continue
         metadata = _read_json(os.path.join(mdir, "metadata.json"))
-        latest = latest_version(metadata)
-        deps[m] = module_deps(_module_text(mdir, latest) or "")[0] if latest else []
+        versions = usable_versions(metadata)
+        deps[m] = module_deps(_module_text(mdir, versions[-1]) or "", os.path.join(
+            mdir, versions[-1], "MODULE.bazel"))[0] if versions else []
         if m in listed:
             continue
-        picked, _ = pick(metadata, lambda v, mdir=mdir: _module_text(mdir, v), bazel)
+        picked, why = pick(metadata, lambda v, mdir=mdir: _module_text(mdir, v), bazel)
         source = os.path.join(mdir, picked or "", "source.json")
         kind = _read_json(source).get("type") if picked and os.path.isfile(source) else None
-        reasons[m] = unlisted_reason(metadata, picked, kind)
+        reasons[m] = unlisted_reason(why, kind)
     return bcr_summary(listed, deps, reasons)
 
 
@@ -683,7 +658,8 @@ def main():
                 entry["remove"] = {"MODULE.bazel": remove}
         if p["rc_drop"]:
             entry.setdefault("remove", {}).update(rc_remove(p["rc_drop"]))
-        deps, dev_deps = module_deps(module_file.decode("utf-8", "replace"))
+        deps, dev_deps = module_deps(module_file.decode("utf-8", "replace"),
+                                     os.path.join(mdir, version, "MODULE.bazel"))
         entries.append({"name": p["name"], "version": version, "deps": deps,
                         "dev_deps": dev_deps, "source": entry})
     if errors:
@@ -691,9 +667,9 @@ def main():
     for s in skipped:
         print("skip %s: %s" % (s["name"], s["reason"]), file=sys.stderr)
 
-    data = json.loads(render_json(commit, entries, skipped, survey_bcr(modules, projects, bazel)))
-    write("projects.json", render_json(commit, entries, skipped, data["bcr"]))
-    write(COVERAGE, render_coverage(projects, data))
+    text = render_json(commit, entries, skipped, survey_bcr(modules, projects, bazel))
+    write("projects.json", text)
+    write(COVERAGE, render_coverage(projects, json.loads(text)))
     names = {e["name"] for e in entries}
     for path, text in build_files(projects, entries).items():
         write(path, text)

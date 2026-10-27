@@ -25,7 +25,6 @@ project(
         "jq.bzl",
         "package_metadata",
         "platforms",
-        "rules_docs_%s",
         "rules_multitool",
         "rules_python",
         "stardoc",

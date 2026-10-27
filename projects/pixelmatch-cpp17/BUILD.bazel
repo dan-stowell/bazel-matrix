@@ -16,7 +16,6 @@ project(
     # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
     deps = [
         "googletest",
-        "pixelmatch-cpp17",
         "platforms",
         "rules_cc",
         "rules_fuzzing",

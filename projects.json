@@ -48724,7 +48724,6 @@
       "name": "pixelmatch-cpp17",
       "version": "2.0.0",
       "deps": [
-        "pixelmatch-cpp17",
         "platforms",
         "rules_cc"
       ],
@@ -50095,7 +50094,6 @@
         "bazel_skylib_gazelle_plugin",
         "buildifier_prebuilt",
         "gazelle",
-        "rules_docs_%s",
         "rules_multitool",
         "stardoc"
       ],
@@ -51950,8 +51948,7 @@
       "deps": [
         "gazelle",
         "platforms",
-        "rules_go",
-        "rules_tofu"
+        "rules_go"
       ],
       "dev_deps": [
         "bazel_skylib",

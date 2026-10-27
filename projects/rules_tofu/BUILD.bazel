@@ -16,6 +16,5 @@ project(
         "rules_bazel_integration_test",
         "rules_go",
         "rules_shell",
-        "rules_tofu",
     ],
 )

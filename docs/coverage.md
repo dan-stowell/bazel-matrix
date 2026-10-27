@@ -19,18 +19,18 @@ Of the BCR at 512468f22fc8.
 
 ## Most depended-on modules
 
-Modules by the number of matrix projects whose MODULE.bazel `bazel_dep`s them directly (dev dependencies too: a project runs as the root module). `tools/run.py test --dep <module>` runs those projects. Top 50 of 773.
+Modules by the number of matrix projects whose MODULE.bazel `bazel_dep`s them directly (dev dependencies too: a project runs as the root module). `tools/run.py test --dep <module>` runs those projects, except the known-failing build ones. Top 50 of 770.
 
-| module | dependents | dev-only | known-failing |
+| module | dependents | dev-only | known-failing build |
 |---|---:|---:|---:|
-| rules_cc | 982 | 13 | 86 |
-| platforms | 682 | 17 | 94 |
-| bazel_skylib | 616 | 22 | 105 |
-| rules_python | 195 | 35 | 42 |
-| rules_license | 186 | 1 | 27 |
-| rules_shell | 186 | 57 | 39 |
+| rules_cc | 982 | 13 | 84 |
+| platforms | 682 | 17 | 92 |
+| bazel_skylib | 616 | 22 | 103 |
+| rules_python | 195 | 35 | 41 |
+| rules_license | 186 | 1 | 26 |
+| rules_shell | 186 | 57 | 38 |
 | boost | 155 | 0 | 0 |
-| protobuf | 154 | 21 | 56 |
+| protobuf | 154 | 21 | 55 |
 | boost.config | 140 | 0 | 0 |
 | buildifier_prebuilt | 137 | 110 | 26 |
 | googletest | 136 | 55 | 29 |
@@ -39,7 +39,7 @@ Modules by the number of matrix projects whose MODULE.bazel `bazel_dep`s them di
 | boost.core | 104 | 0 | 1 |
 | stardoc | 104 | 95 | 28 |
 | boost.assert | 95 | 0 | 0 |
-| zlib | 93 | 1 | 11 |
+| zlib | 93 | 1 | 10 |
 | boost.type_traits | 85 | 0 | 0 |
 | bazel_lib | 84 | 15 | 14 |
 | rules_java | 77 | 9 | 27 |
@@ -49,7 +49,7 @@ Modules by the number of matrix projects whose MODULE.bazel `bazel_dep`s them di
 | package_metadata | 69 | 1 | 8 |
 | abseil-cpp | 66 | 2 | 25 |
 | aspect_bazel_lib | 61 | 17 | 21 |
-| apple_support | 58 | 4 | 30 |
+| apple_support | 58 | 4 | 29 |
 | bazel_skylib_gazelle_plugin | 54 | 53 | 16 |
 | boost.mpl | 53 | 0 | 0 |
 | boost.static_assert | 53 | 0 | 0 |
@@ -66,7 +66,7 @@ Modules by the number of matrix projects whose MODULE.bazel `bazel_dep`s them di
 | bazelrc-preset.bzl | 35 | 26 | 3 |
 | google_benchmark | 35 | 16 | 11 |
 | boringssl | 34 | 0 | 5 |
-| eigen | 34 | 2 | 3 |
+| eigen | 34 | 2 | 2 |
 | aspect_rules_js | 33 | 3 | 11 |
 | grpc | 31 | 1 | 15 |
 | zstd | 31 | 0 | 2 |

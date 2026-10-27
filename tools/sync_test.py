@@ -282,9 +282,12 @@ class GeneratedTest(unittest.TestCase):
 
 class ModuleDepsTest(unittest.TestCase):
     def test_forms(self):
-        text = '''module(name = "m", version = "1")
+        text = '''"""Use it like this:
+
+bazel_dep(name = "in_docstring", version = "1")
+"""
+module(name = "m", version = "1")
 bazel_dep(name = "rules_cc", version = "0.2")  # bazel_dep(name = "in_comment")
-# bazel_dep(name = "commented")
 bazel_dep(
     name = 'platforms',
     version = "1.0#not-a-comment",
@@ -295,6 +298,8 @@ bazel_dep(name="googletest",dev_dependency=True)
 bazel_dep(name = "googletest", version = "1")  # also a non-dev dep
 bazel_dep(name = "d", dev_dependency = False)
 bazel_dep(name = NAME)
+bazel_dep(name = "rules_docs_%s" % X)
+[bazel_dep(name = m, version = "1") for m in ["c1", "c2"]]
 x.bazel_dep(name = "attr")
 my_bazel_dep(name = "other")
 '''
@@ -302,21 +307,27 @@ my_bazel_dep(name = "other")
 
     def test_none(self):
         self.assertEqual(sync.module_deps('module(name = "m")\n'), ([], []))
-        self.assertEqual(sync.module_deps('bazel_dep(name = "a"'), ([], []))
+
+    def test_unparsable(self):
+        with self.assertRaisesRegex(ValueError, "^a/MODULE.bazel: "):
+            sync.module_deps('bazel_dep(name = "a"', "a/MODULE.bazel")
 
 
 class CoverageTest(unittest.TestCase):
-    def test_latest_version(self):
-        self.assertEqual(sync.latest_version({"versions": ["1.0", "2.0-rc1", "1.10", "1.9"]}), "1.10")
-        self.assertEqual(sync.latest_version({"versions": ["1.0", "1.1"],
-                                              "yanked_versions": {"1.1": "bad"}}), "1.0")
-        self.assertIsNone(sync.latest_version({"versions": []}))
+    def test_usable_versions(self):
+        self.assertEqual(sync.usable_versions({"versions": ["1.0", "2.0-rc1", "1.10", "1.9"]}),
+                         ["1.0", "1.9", "1.10"])
+        self.assertEqual(sync.usable_versions({"versions": ["1.0", "1.1"],
+                                               "yanked_versions": {"1.1": "bad"}}), ["1.0"])
+        self.assertEqual(sync.usable_versions({"versions": ["2025-11-05"]}), ["2025-11-05"])
+        self.assertEqual(sync.usable_versions({"versions": []}), [])
 
     def test_unlisted_reason(self):
-        self.assertEqual(sync.unlisted_reason({"deprecated": "x"}, "1", None), "deprecated")
-        self.assertEqual(sync.unlisted_reason({}, None, None), "no compatible version")
-        self.assertEqual(sync.unlisted_reason({}, "1", "git_repository"), "git_repository source")
-        self.assertEqual(sync.unlisted_reason({}, "1", "archive"), "unlisted")
+        self.assertEqual(sync.unlisted_reason("deprecated", None), "deprecated")
+        self.assertEqual(sync.unlisted_reason("no version admits Bazel 9", None), "no compatible version")
+        self.assertEqual(sync.unlisted_reason("all versions yanked", None), "no compatible version")
+        self.assertEqual(sync.unlisted_reason(None, "git_repository"), "git_repository source")
+        self.assertEqual(sync.unlisted_reason(None, "archive"), "unlisted")
 
     def test_bcr_summary(self):
         modules = {"a": ["b", "c"], "b": ["c", "c"], "c": [], "d": ["a"]}
@@ -325,7 +336,7 @@ class CoverageTest(unittest.TestCase):
                                        {"name": "d", "reason": "deprecated", "dependents": 0}]})
 
     def test_render(self):
-        projects = sync.parse_projects_txt("a\n  known-failing build  why\nb\nc\n")
+        projects = sync.parse_projects_txt("a\n  known-failing build  why\nb\n  known-failing test  why\nc\n")
         data = {"bcr_commit": "0123456789abcdef", "skipped": [{"name": "c", "reason": "r"}],
                 "projects": [{"name": "a", "deps": ["x"], "dev_deps": ["y"]},
                              {"name": "b", "deps": ["x", "y"], "dev_deps": []}],
@@ -340,6 +351,7 @@ class CoverageTest(unittest.TestCase):
                     "| &nbsp;&nbsp;skipped by sync (see projects.json) | 1 |",
                     "| not listed | 2 |", "| &nbsp;&nbsp;deprecated | 1 |",
                     "| &nbsp;&nbsp;unlisted | 1 |",
+                    "| &nbsp;&nbsp;&nbsp;&nbsp;known-failing test | 1 |",
                     "| x | 2 | 0 | 1 |\n| y | 2 | 1 | 1 |\n",
                     "| q | 3 | deprecated |\n| p | 0 | unlisted |\n"]:
             self.assertIn(row, text)
