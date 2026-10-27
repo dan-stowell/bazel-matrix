@@ -11,7 +11,9 @@
 Each shard is one `tools/bb.sh <command> <targets>` on its own runner
 (concurrent remote runs get separate runners). Projects are dealt to shards
 round-robin in name order. It prints each shard's invocation links as it
-finishes, then one row per project and the totals; the logs are in
+finishes, then one row per project (with its inner invocation link, read
+from the inner summaries in the log; a cached result's is the earlier run's)
+and the totals; the logs are in
 bb-out/run/<command>-<time>-<pid>/. Exit status 0 when every project passed
 or failed as expected (see below) and every shard's runner Bazel exited 0,
 or the exit its expected failures explain (3 tests, 1 builds).
@@ -71,6 +73,11 @@ _TEST = re.compile(r"^//projects/([^:\s/]+):test\s+(?:\(cached\)\s+)?"
 _BUILD = re.compile(r"^Target //projects/([^:\s/]+):build (up-to-date|failed to build)")
 # The line ending the outer summary, a few lines before the outer Bazel's
 # last "Streaming build results to" line.
+# The summary tools/inner_bazel.py writes to stderr: in a build action's
+# output, which Bazel prints (also replayed from the cache), and at the end
+# of a test log, which Bazel prints with --test_output=all (run_shard adds it).
+_PROJECT = re.compile(r"^project: (\S+)$")
+_INNER = re.compile(r"^inner invocation: (\S+)$")
 _END = {"build": re.compile(r"^INFO: Elapsed time: "),
         "test": re.compile(r"^Executed \d+ out of \d+ tests?\b")}
 # What the outer summary is made of, read backwards from its end.
@@ -201,6 +208,26 @@ def parse_log(text, command, targets):
     return code, links[0] if links else "", {n: status.get(n, "UNKNOWN") for n in targets}
 
 
+def inner_links(text):
+    """{project: inner invocation link} from the inner summaries in a log.
+
+    A cached result's link is that of the run that produced it.
+    """
+    lines = [l.strip() for l in _ANSI.sub("", text).splitlines()]
+    links = {}
+    for i, line in enumerate(lines):
+        m = _PROJECT.match(line)
+        if not m:
+            continue
+        for later in lines[i + 1:i + 6]:
+            n = _INNER.match(later)
+            if n:
+                if n.group(1).startswith("http"):
+                    links[m.group(1)] = n.group(1)
+                break
+    return links
+
+
 def run_shard(i, command, targets, extra, out_dir):
     labels = ["//projects/%s:%s" % kv for kv in sorted(targets.items())]
     if not labels:
@@ -214,6 +241,11 @@ def run_shard(i, command, targets, extra, out_dir):
     flags = ["--show_result=1000000"]
     if bazel_command == "test" and "build" in targets.values():
         flags.append("--nobuild_tests_only")  # .bazelrc sets it for test
+    if bazel_command == "test" and not any(e.startswith("--test_output") for e in extra):
+        # Passed tests' logs too, for their inner links (not in the action
+        # key: cached results still replay), also those over the default
+        # 1 MB limit (protobuf's is 1.3 MB).
+        flags += ["--test_output=all", "--experimental_ui_max_stdouterr_bytes=%d" % (64 << 20)]
     start = time.time()
     with open(log_path, "w") as log:
         with _lock:
@@ -228,7 +260,9 @@ def run_shard(i, command, targets, extra, out_dir):
         proc.wait()
     wall = time.time() - start
     with open(log_path, errors="replace") as f:
-        code, outer, status = parse_log(f.read(), bazel_command, targets)
+        text = f.read()
+    code, outer, status = parse_log(text, bazel_command, targets)
+    links = {n: l for n, l in inner_links(text).items() if n in targets}
     if bazel_command != command:
         status = {n: "BUILT" if s == "PASSED" else s for n, s in status.items()}
     remote = ""
@@ -236,7 +270,8 @@ def run_shard(i, command, targets, extra, out_dir):
         with open(id_path) as f:
             remote = RESULTS_URL + f.read().strip()
     return {"shard": i, "bb_exit": proc.returncode, "code": code, "remote": remote,
-            "outer": outer, "status": status, "wall": wall, "log": log_path, "error": ""}
+            "outer": outer, "status": status, "links": links, "wall": wall, "log": log_path,
+            "error": ""}
 
 
 _stopping = []
@@ -268,7 +303,7 @@ def shard_result(i, future, targets):
         return future.result()
     except Exception as e:  # a failed shard, not a failed run
         return {"shard": i, "bb_exit": None, "code": None, "remote": "", "outer": "",
-                "status": {n: "ERROR" for n in targets}, "wall": 0, "log": "",
+                "status": {n: "ERROR" for n in targets}, "links": {}, "wall": 0, "log": "",
                 "error": "%s: %s" % (type(e).__name__, e)}
 
 
@@ -339,13 +374,15 @@ def main(argv=None):
             if (r["bb_exit"] == 0) != (r["code"] == 0):
                 print("shard %d: WARNING: bb remote exited %s but the runner's Bazel exited %s; "
                       "see %s" % (i, r["bb_exit"], r["code"], os.path.relpath(r["log"])), flush=True)
+    links = {n: l for r in results for n, l in r["links"].items()}
     rows = sorted((n, s, r["shard"]) for r in results for n, s in r["status"].items())
     rows = [(n, s, i) + classify(s, targets[n], kf.get(n)) for n, s, i in rows]
     width = max(len(n) for n, *_ in rows)
     text_width = max(len(t) for *_, t, _ in rows)
     print()
     for n, _, i, text, _ in rows:
-        print("%-*s  %-*s  shard %d" % (width, n, text_width, text, i))
+        print("%-*s  %-*s  shard %d  %s" % (width, n, text_width, text, i,
+                                            links.get(n, "(no inner link)")))
     totals = collections.Counter(s for _, s, *_ in rows)
     kinds = {n: kind for n, _, _, _, kind in rows}
     wall = time.time() - start

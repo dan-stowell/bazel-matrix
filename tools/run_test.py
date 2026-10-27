@@ -181,6 +181,28 @@ class ClassifyTest(unittest.TestCase):
         self.assertFalse(run.shard_ok(shard(None, b="FAILED"), targets, kinds))
 
 
+class InnerLinksTest(unittest.TestCase):
+    def test_links_from_summaries(self):
+        log = "\n".join([
+            "==================== Test output for //projects/zlib:test:",
+            "inner output",
+            "project: zlib",
+            "command: test",
+            "inner bazel: 9.3.1",
+            "exit code: 0",
+            "inner invocation: https://x.io/invocation/1111",
+            "INFO: From Building re2 with inner Bazel 9.3.1:",
+            "\x1b[0mproject: re2",
+            "command: build",
+            "inner bazel: 9.3.1",
+            "exit code: 1",
+            "inner invocation: (none)",
+            "project: fmt",
+            "command: build",
+        ])
+        self.assertEqual(run.inner_links(log), {"zlib": "https://x.io/invocation/1111"})
+
+
 class ShardResultTest(unittest.TestCase):
     def test_exception_is_a_failed_shard(self):
         class Boom:
