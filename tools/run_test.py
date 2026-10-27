@@ -250,12 +250,15 @@ class RunShardTest(unittest.TestCase):
 
     def test_build_links_from_downloaded_summary(self):
         cmd, result = self.run_shard(
-            "build", {"zlib": "build", "re2": "build", "fmt": "build"}, [], "no summaries\n",
+            "build", {"zlib": "build", "re2": "build", "fmt": "build"}, [],
+            "inner invocation for fmt: https://x.io/console\n",
             # Ages: zlib's written during the run, re2's by an earlier one.
             build_txt={"zlib": ("inner invocation for zlib: https://x.io/z\ncommand: build\n", -60),
-                       "re2": ("inner invocation for re2: https://x.io/old\n", 3600)})
+                       "re2": ("inner invocation for re2: https://x.io/old\n", 3600),
+                       # Fresh but another run's: the console's link wins.
+                       "fmt": ("inner invocation for fmt: https://x.io/other\n", -60)})
         self.assertNotIn("--test_output=all", cmd)
-        self.assertEqual(result["links"], {"zlib": "https://x.io/z"})
+        self.assertEqual(result["links"], {"zlib": "https://x.io/z", "fmt": "https://x.io/console"})
 
 
 class ShardResultTest(unittest.TestCase):

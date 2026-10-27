@@ -282,7 +282,11 @@ def run_shard(i, command, targets, extra, out_dir):
     wall = time.time() - start
     with open(log_path, errors="replace") as f:
         code, outer, status, links = parse_log(f.read(), bazel_command, targets)
-    links.update(build_links(targets, start))
+    # The console's links win: bb-out is shared, so a fresh build.txt may be
+    # another concurrent run's. It's only a fallback for a :build the
+    # runner's local action cache skipped (no summary printed).
+    missing = {n: t for n, t in targets.items() if n not in links}
+    links.update(build_links(missing, start))
     if bazel_command != command:
         status = {n: "BUILT" if s == "PASSED" else s for n, s in status.items()}
     remote = ""
