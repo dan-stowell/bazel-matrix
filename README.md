@@ -83,15 +83,11 @@ Passing projects' logs (summary, inner invocation link) only print with
 `--test_output=all`; that flag isn't in the action key, so it replays cached
 results. Read inner logs with `bb view <inner invocation>`.
 
-Finding inner invocations: `tools/run.py` prints each project's inner link
-in its row, read from the inner summaries in the shard logs (for `test` it
-adds `--test_output=all` and a 64 MB limit for printed logs, unless you
-pass a `--test_output`; a build
-action's summary is in its output, which Bazel prints, also on a cache hit).
-Every inner run is also tagged `bazel-matrix` and `<project>`
-(`--build_metadata=TAGS`), so BuildBuddy's invocation history filtered by
-tag lists all of them, or one project's across runs. A cached outer result
-links the inner run that produced it, which may be from an earlier run.
+`tools/run.py` prints each project's inner invocation link in its row
+(for `test` it adds `--test_output=all`; a cached result links the earlier
+inner run that produced it). Every inner run is also tagged `bazel-matrix`
+and `<project>`, so BuildBuddy's invocation history filtered by tag finds
+them.
 
 Caveats: `bb remote` runs your local diff against the default branch on the
 runner (commits need not be pushed). Afterwards it downloads the top-level
@@ -116,20 +112,12 @@ cached):
 3. deletes the work dir, also on SIGTERM (it kills the inner Bazel first)
    and when a killed run left one behind, so a runner's disk doesn't grow
    per run. Nothing is cached on the runner between runs but one install
-   base per inner Bazel binary (`/var/tmp/bazel-matrix/install/<sha256
-   prefix>`, ~120-190 MB each, shared by concurrent runs, which Bazel's
-   install base lock makes safe): fetches go through BuildBuddy's remote
-   downloader, and reproducible repos come from the remote repo contents
-   cache.
-
-Disk per inner run (peak of the work dir, measured on the 16-CPU runner):
-zlib 42 MB, re2 249 MB, protobuf 2.1 GB (each 117 MB less than with a
-per-run install base). Most of the rest is external repos that repository
-rules run or read at fetch time, which the remote repo contents cache
-can't leave remote: for protobuf the Rust host toolchain (790 MB, used by
-crate_universe), a Python interpreter (150 MB) and pip wheels; and the
-local download cache of archives fetched (150 MB). Outer actions only
-write the summary, log and test.xml.
+   base per pinned inner Bazel version (`/var/tmp/bazel-matrix/install/<version>`,
+   120-190 MB each), shared by concurrent runs: Bazel extracts it into a temp
+   dir and renames that into place, so concurrent first runs are safe, and
+   temp dirs left by killed extractions are deleted after an hour. Fetches
+   go through BuildBuddy's remote downloader, and reproducible repos come
+   from the remote repo contents cache.
 
 Each inner run is tagged `resources:cpu:2`/`resources:memory:2500`, so a
 6-CPU, 7 GB runner runs two at a time and the 16-CPU, 32 GB one

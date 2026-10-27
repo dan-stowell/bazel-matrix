@@ -71,13 +71,13 @@ _TEST = re.compile(r"^//projects/([^:\s/]+):test\s+(?:\(cached\)\s+)?"
                    r"REMOTE FAILURE|SKIPPED)\b")
 # With --show_result (see run_shard), Bazel reports every top-level target.
 _BUILD = re.compile(r"^Target //projects/([^:\s/]+):build (up-to-date|failed to build)")
+# The first line of the summary tools/inner_bazel.py writes to stderr: in a
+# build action's output, which Bazel prints (also replayed from the cache),
+# and at the end of a test log, which Bazel prints with --test_output=all
+# (run_shard adds it).
+_INNER = re.compile(r"^inner invocation for (\S+): (https?://\S+)$")
 # The line ending the outer summary, a few lines before the outer Bazel's
 # last "Streaming build results to" line.
-# The summary tools/inner_bazel.py writes to stderr: in a build action's
-# output, which Bazel prints (also replayed from the cache), and at the end
-# of a test log, which Bazel prints with --test_output=all (run_shard adds it).
-_PROJECT = re.compile(r"^project: (\S+)$")
-_INNER = re.compile(r"^inner invocation: (\S+)$")
 _END = {"build": re.compile(r"^INFO: Elapsed time: "),
         "test": re.compile(r"^Executed \d+ out of \d+ tests?\b")}
 # What the outer summary is made of, read backwards from its end.
@@ -208,23 +208,15 @@ def parse_log(text, command, targets):
     return code, links[0] if links else "", {n: status.get(n, "UNKNOWN") for n in targets}
 
 
-def inner_links(text):
-    """{project: inner invocation link} from the inner summaries in a log.
-
-    A cached result's link is that of the run that produced it.
+def inner_links(lines):
+    """{project: inner invocation link} from the inner summaries in a log's
+    lines. A cached result's link is that of the run that produced it.
     """
-    lines = [l.strip() for l in _ANSI.sub("", text).splitlines()]
     links = {}
-    for i, line in enumerate(lines):
-        m = _PROJECT.match(line)
-        if not m:
-            continue
-        for later in lines[i + 1:i + 6]:
-            n = _INNER.match(later)
-            if n:
-                if n.group(1).startswith("http"):
-                    links[m.group(1)] = n.group(1)
-                break
+    for line in lines:
+        m = _INNER.match(_ANSI.sub("", line).strip())
+        if m:
+            links[m.group(1)] = m.group(2)
     return links
 
 
@@ -241,10 +233,11 @@ def run_shard(i, command, targets, extra, out_dir):
     flags = ["--show_result=1000000"]
     if bazel_command == "test" and "build" in targets.values():
         flags.append("--nobuild_tests_only")  # .bazelrc sets it for test
-    if bazel_command == "test" and not any(e.startswith("--test_output") for e in extra):
+    if bazel_command == "test":
         # Passed tests' logs too, for their inner links (not in the action
         # key: cached results still replay), also those over the default
-        # 1 MB limit (protobuf's is 1.3 MB).
+        # 1 MB limit (protobuf's is 1.3 MB). Defaults: extra comes later, so
+        # a --test_output or size of the user's (or a --config's) wins.
         flags += ["--test_output=all", "--experimental_ui_max_stdouterr_bytes=%d" % (64 << 20)]
     start = time.time()
     with open(log_path, "w") as log:
@@ -260,9 +253,9 @@ def run_shard(i, command, targets, extra, out_dir):
         proc.wait()
     wall = time.time() - start
     with open(log_path, errors="replace") as f:
-        text = f.read()
-    code, outer, status = parse_log(text, bazel_command, targets)
-    links = {n: l for n, l in inner_links(text).items() if n in targets}
+        code, outer, status = parse_log(f.read(), bazel_command, targets)
+    with open(log_path, errors="replace") as f:
+        links = {n: l for n, l in inner_links(f).items() if n in targets}
     if bazel_command != command:
         status = {n: "BUILT" if s == "PASSED" else s for n, s in status.items()}
     remote = ""

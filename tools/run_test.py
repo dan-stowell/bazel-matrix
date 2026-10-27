@@ -183,24 +183,18 @@ class ClassifyTest(unittest.TestCase):
 
 class InnerLinksTest(unittest.TestCase):
     def test_links_from_summaries(self):
-        log = "\n".join([
-            "==================== Test output for //projects/zlib:test:",
-            "inner output",
-            "project: zlib",
-            "command: test",
-            "inner bazel: 9.3.1",
-            "exit code: 0",
-            "inner invocation: https://x.io/invocation/1111",
-            "INFO: From Building re2 with inner Bazel 9.3.1:",
-            "\x1b[0mproject: re2",
-            "command: build",
-            "inner bazel: 9.3.1",
-            "exit code: 1",
-            "inner invocation: (none)",
-            "project: fmt",
-            "command: build",
-        ])
-        self.assertEqual(run.inner_links(log), {"zlib": "https://x.io/invocation/1111"})
+        log = [
+            "==================== Test output for //projects/zlib:test:\n",
+            "inner output\n",
+            "inner invocation for zlib: https://x.io/invocation/1111\n",
+            "command: test\n",
+            "INFO: From Building re2 with inner Bazel 9.3.1:\n",
+            "\x1b[0minner invocation for re2: (none)\n",
+            "\x1b[0minner invocation for fmt: https://x.io/invocation/2222\x1b[0m\n",
+            "inner invocation: https://x.io/invocation/3333\n",
+        ]
+        self.assertEqual(run.inner_links(log), {"zlib": "https://x.io/invocation/1111",
+                                                "fmt": "https://x.io/invocation/2222"})
 
 
 class ShardResultTest(unittest.TestCase):
