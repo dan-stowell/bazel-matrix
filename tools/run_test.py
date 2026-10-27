@@ -21,6 +21,20 @@ class SelectTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             run.select_projects(self.PROJECTS, "test", ["z"], False)
 
+    def test_depending_on(self):
+        entries = [{"name": "a", "deps": ["x"], "dev_deps": ["y"]},
+                   {"name": "b", "deps": ["y"], "dev_deps": []},
+                   {"name": "c", "deps": [], "dev_deps": []}]
+        self.assertEqual(run.depending_on(entries, ["x"]), {"a"})
+        self.assertEqual(run.depending_on(entries, ["y"]), {"a", "b"})
+        self.assertEqual(run.depending_on(entries, ["x", "y"]), {"a", "b"})
+        with self.assertRaises(ValueError):
+            run.depending_on(entries, ["z"])
+        # Then the default known-failing handling, as for all projects.
+        projects = [{"name": "a", "known_failing": ("build", "r")}, {"name": "b", "known_failing": None}]
+        self.assertEqual(run.select_projects([p for p in projects if p["name"] in {"a", "b"}],
+                                             "test", [], False), {"b": "test"})
+
     def test_shard(self):
         self.assertEqual(run.shard(["c", "a", "b", "d", "e"], 2), [["a", "c", "e"], ["b", "d"]])
         self.assertEqual(run.shard(["a"], 4), [["a"]])
