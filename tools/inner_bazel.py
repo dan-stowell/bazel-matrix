@@ -7,7 +7,8 @@ source.tar into a fresh work dir, runs the pinned inner Bazel there in
 environment, and deletes the work dir afterwards (also on SIGTERM, and stale
 ones left by killed runs), so a runner's disk doesn't grow per run. Fetches
 go through BuildBuddy's remote downloader and remote repo contents cache;
-nothing is cached on the runner between runs.
+nothing is cached on the runner between runs but one install base per inner
+Bazel binary (INSTALL_ROOT).
 
 build mode writes --summary (invocation link and counts) and --log (the
 inner output). test mode streams the inner output to the test log and writes
@@ -20,6 +21,7 @@ no tests), else 1.
 """
 
 import argparse
+import hashlib
 import json
 import os
 import shutil
@@ -34,6 +36,12 @@ import xml.etree.ElementTree as ET
 # tmpfs there in locally sandboxed actions, which then can't run below an
 # output base in /tmp.
 WORK_ROOT = "/var/tmp/bazel-matrix/work"
+# Install bases (Bazel's extracted binaries and embedded JDK, ~120 MB), one
+# per inner Bazel binary, shared by every run of it on this machine instead
+# of extracted afresh into each work dir. The client extracts into a temp
+# dir and renames it into place, so concurrent first runs are safe. Bounded:
+# one per pinned binary, never written to after extraction.
+INSTALL_ROOT = "/var/tmp/bazel-matrix/install"
 # Where tools/credentials.bzl writes the API key, relative to the outer
 # output base.
 KEY_FILE = "bazel-matrix/api-key"
@@ -70,19 +78,32 @@ def parse_args(argv):
     return p.parse_args(argv)
 
 
-def inner_command(args, out_root, bep):
+def install_base(bazel):
+    """The shared install base of the Bazel binary at path bazel: keyed by
+    its content, so a changed binary never reuses another's."""
+    h = hashlib.sha256()
+    with open(bazel, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return os.path.join(INSTALL_ROOT, h.hexdigest()[:32])
+
+
+def inner_command(args, out_root, bep, install):
     """The inner Bazel command line."""
     startup = [
         "--batch",
         "--nosystem_rc",
         "--nohome_rc",
         "--output_user_root=" + out_root,
+        "--install_base=" + install,
         "--host_jvm_args=" + JVM_HEAP,
     ] + ["--bazelrc=" + rc for rc in args.rc] + args.startup_flag
     flags = [
         "--credential_helper=*.buildbuddy.io=" + args.credential_helper,
         "--build_event_json_file=" + bep,
         "--build_metadata=PROJECT=" + args.project,
+        # BuildBuddy's tag filter finds every inner run, or one project's.
+        "--build_metadata=TAGS=bazel-matrix," + args.project,
     ]
     if args.mode == "test":
         flags.append("--test_output=errors")
@@ -374,7 +395,7 @@ def main(argv=None):
                 print("note: upstream .bazelversion is %s; using %s" % (upstream, args.bazel_version),
                       file=log, flush=True)
         bep = os.path.join(work, "bep.json")
-        cmd = inner_command(args, os.path.join(work, "out"), bep)
+        cmd = inner_command(args, os.path.join(work, "out"), bep, install_base(args.bazel))
         print("+ " + " ".join(cmd), file=log, flush=True)
         state["proc"] = subprocess.Popen(cmd, cwd=src, env=env, stdout=log,
                                          stderr=subprocess.STDOUT, start_new_session=True)

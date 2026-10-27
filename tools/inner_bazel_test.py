@@ -111,17 +111,30 @@ class CommandTest(unittest.TestCase):
             "--startup_flag=--experimental_remote_repo_contents_cache",
             "--flag=--copt=-w", "--target=//...", "--target=-//x/...",
         ])
-        cmd = inner_bazel.inner_command(args, "/out", "/bep")
+        cmd = inner_bazel.inner_command(args, "/out", "/bep", "/install")
         mode = cmd.index("test")
         self.assertEqual(cmd[:mode], ["/b", "--batch", "--nosystem_rc", "--nohome_rc",
-                                      "--output_user_root=/out", "--host_jvm_args=-Xmx2g",
+                                      "--output_user_root=/out", "--install_base=/install",
+                                      "--host_jvm_args=-Xmx2g",
                                       "--bazelrc=/r1", "--bazelrc=/r2",
                                       "--experimental_remote_repo_contents_cache"])
         self.assertIn("--credential_helper=*.buildbuddy.io=/h", cmd)
         self.assertIn("--test_output=errors", cmd)
+        self.assertIn("--build_metadata=TAGS=bazel-matrix,p", cmd)
         self.assertFalse(any(c.startswith("--repository_cache") for c in cmd))
         self.assertEqual(cmd[-4:], ["--copt=-w", "--", "//...", "-//x/..."])
         self.assertFalse(any("api-key" in c for c in cmd))
+
+    def test_install_base_is_keyed_by_content(self):
+        with tempfile.TemporaryDirectory() as d:
+            a, b = os.path.join(d, "a"), os.path.join(d, "b")
+            for path, data in ((a, b"one"), (b, b"two")):
+                with open(path, "wb") as f:
+                    f.write(data)
+            base = inner_bazel.install_base(a)
+            self.assertTrue(base.startswith(inner_bazel.INSTALL_ROOT + "/"))
+            self.assertEqual(base, inner_bazel.install_base(a))
+            self.assertNotEqual(base, inner_bazel.install_base(b))
 
     def test_env_is_explicit(self):
         env = inner_bazel.inner_env("/w", "/w/bin", "/k")
