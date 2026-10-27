@@ -9,4 +9,21 @@ project(
     ],
     # its registered gcc_12 toolchain fails to load: gcc_toolchain 0.9.0's toolchain/cc_toolchain_config.bzl passes None in rule(provides=...) under Bazel 9, and au pins and patches gcc_toolchain (and toolchains_llvm 1.5.0, whose llvm repos call native cc_import) with its own single_version_override, so neither can be overridden here
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "eigen",
+        "fmt",
+        "gazelle",
+        "gcc_toolchain",
+        "googletest",
+        "platforms",
+        "rules_cc",
+        "rules_cuda",
+        "rules_go",
+        "rules_proto",
+        "rules_python",
+        "rules_shell",
+        "toolchains_llvm",
+    ],
 )

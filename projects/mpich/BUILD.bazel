@@ -13,4 +13,9 @@ project(
     ],
     # its root-package configure_make has lib_source glob(["**"]) of the main repo's root, so rules_foreign_cc copies the execroot into itself ("cannot copy a directory, '/buildbuddy-execroot/.', into itself") and configure is never copied ("configure: not found")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "platforms",
+        "rules_foreign_cc",
+    ],
 )

@@ -5,6 +5,7 @@
     tools/run.py build --shards 8
     tools/run.py test zlib re2         # only these projects
     tools/run.py test --known-failing  # also the known-failing ones
+    tools/run.py test --dep rules_cc   # the projects that bazel_dep rules_cc
     tools/run.py test -- --test_output=all   # extra outer Bazel flags
 
 Each shard is one `tools/bb.sh <command> <targets>` on its own runner
@@ -14,6 +15,10 @@ finishes, then one row per project and the totals; the logs are in
 bb-out/run/<command>-<time>-<pid>/. Exit status 0 when every project passed
 or failed as expected (see below) and every shard's runner Bazel exited 0,
 or the exit its expected failures explain (3 tests, 1 builds).
+
+--dep MODULE (repeatable) picks the projects whose MODULE.bazel bazel_deps
+MODULE directly, dev dependencies included (projects.json's deps and
+dev_deps), and handles known-failing ones as when running all projects.
 
 Without project names it leaves out what `//projects/...` leaves out: a
 `known-failing build` project entirely; for a `known-failing test` project,
@@ -95,6 +100,18 @@ def select_projects(projects, command, names, known_failing):
         elif kf == "test":
             out[p["name"]] = "build"
     return out
+
+
+def depending_on(entries, modules):
+    """The names of projects.json's projects that directly depend on any of
+    modules; ValueError for a module no project depends on."""
+    out = []
+    for m in modules:
+        hits = [e["name"] for e in entries if m in e.get("deps", []) + e.get("dev_deps", [])]
+        if not hits:
+            raise ValueError("no project depends on " + m)
+        out += hits
+    return set(out)
 
 
 def classify(status, target, known_failing):
@@ -264,6 +281,8 @@ def main(argv=None):
     ap.add_argument("--shards", type=int, default=4)
     ap.add_argument("--known-failing", action="store_true",
                     help="also run the projects marked known-failing")
+    ap.add_argument("--dep", action="append", default=[], metavar="MODULE",
+                    help="only the projects that directly depend on MODULE (repeatable)")
     argv = sys.argv[1:] if argv is None else argv
     extra = []
     if "--" in argv:
@@ -272,12 +291,21 @@ def main(argv=None):
     args = ap.parse_intermixed_args(argv)
 
     projects = sync.parse_projects_txt(sync.read("projects.txt"))
-    skipped = {s["name"]: s["reason"] for s in json.loads(sync.read("projects.json"))["skipped"]}
+    data = json.loads(sync.read("projects.json"))
+    skipped = {s["name"]: s["reason"] for s in data["skipped"]}
+    if args.dep and args.projects:
+        sys.exit("give project names or --dep, not both")
     for n in args.projects:
         if n in skipped:
             sys.exit("%s: skipped by sync: %s" % (n, skipped[n]))
     # Only the projects sync wrote a package for.
     projects = [p for p in projects if os.path.exists(os.path.join(ROOT, "projects", p["name"], "BUILD.bazel"))]
+    if args.dep:
+        try:
+            wanted = depending_on(data["projects"], args.dep)
+        except ValueError as e:
+            sys.exit(str(e))
+        projects = [p for p in projects if p["name"] in wanted]
     targets = select_projects(projects, args.command, args.projects, args.known_failing)
     kf = {p["name"]: p["known_failing"][0] for p in projects if p.get("known_failing")}
     if not targets:

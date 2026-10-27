@@ -11,4 +11,11 @@ project(
         # tests/bcr is the BCR presubmit module (its own MODULE.bazel) loading @rules_shell, which the root MODULE.bazel doesn't declare
         "--deleted_packages=tests/bcr",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "libcap",
+        "platforms",
+        "rules_cc",
+    ],
 )

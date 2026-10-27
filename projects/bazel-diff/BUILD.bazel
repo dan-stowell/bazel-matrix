@@ -9,4 +9,16 @@ project(
         # its rust_e2e_tests need //:bazel-diff-example.sh, which the release archive lacks; each also runs a nested bazel on the runner
         "-//tests/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_rules_lint",
+        "buildifier_prebuilt",
+        "llvm",
+        "platforms",
+        "protobuf",
+        "rules_go",
+        "rules_license",
+        "rules_python",
+        "rules_rs",
+    ],
 )

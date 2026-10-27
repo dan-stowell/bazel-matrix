@@ -9,4 +9,14 @@ project(
     ],
     # its MODULE.bazel has local_path_override(rules_license, path = "../rules_license"), which points outside its archive's strip_prefix and applies when it is the root module
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "package_metadata",
+        "platforms",
+        "rules_cc",
+        "rules_license",
+        "rules_python",
+        "supply-chain-go",
+    ],
 )

@@ -9,4 +9,11 @@ project(
     ],
     # rules_swift_package_manager runs `swift package dump-package` while fetching, and the images lack swift (exit 1)
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "apple_support",
+        "rules_proto_grpc",
+        "rules_swift",
+        "rules_swift_package_manager",
+    ],
 )

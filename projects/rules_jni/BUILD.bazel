@@ -9,4 +9,15 @@ project(
         # //docs:rules.extract (stardoc) fails analysis: missing bzl_library targets for @rules_cc's compatibility proxy modules
         "-//docs/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "platforms",
+        "rules_cc",
+        "rules_java",
+        "rules_jvm_external",
+        "rules_license",
+        "rules_shell",
+        "stardoc",
+    ],
 )

@@ -9,4 +9,11 @@ project(
     ],
     # its MODULE.bazel has local_path_override(rules_webtesting, path = ".."): BCR's strip_prefix extracts only this submodule of the rules_webtesting repo, so .. is outside the extracted workspace
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "rules_java",
+        "rules_jvm_external",
+        "rules_webtesting",
+    ],
 )

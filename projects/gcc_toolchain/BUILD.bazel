@@ -9,4 +9,15 @@ project(
         # its stardoc targets and their diff test: its MODULE.bazel pins stardoc 0.5.6, whose extractor rejects Bazel 9's canonical repo names ("invalid repository name '@bazel_lib+'")
         "-//docs/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_lib",
+        "bazel_skylib",
+        "platforms",
+        "protobuf",
+        "rules_cc",
+        "rules_foreign_cc",
+        "rules_shell",
+        "stardoc",
+    ],
 )

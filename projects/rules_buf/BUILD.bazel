@@ -11,4 +11,15 @@ project(
         # //:buildifier_check: its script resolves buildifier with readlink, which yields an empty path because RBE stages runfiles as regular files ("xargs: : No such file or directory"); run tests on the runner, where runfiles are symlinks (--strategy_regexp=buildifier_check=local, scoped to that test, still ran it remotely)
         "--strategy=TestRunner=local",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "gazelle",
+        "platforms",
+        "protobuf",
+        "rules_go",
+        "rules_proto",
+        "rules_shell",
+        "stardoc",
+    ],
 )

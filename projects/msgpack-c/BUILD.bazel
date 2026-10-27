@@ -11,4 +11,8 @@ project(
         # (not an exclusion: //... fails on a broken package even when subtracted) test/BUILD.bazel uses @boost.test and @zlib, which its MODULE.bazel doesn't declare
         "--deleted_packages=test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "rules_cc",
+    ],
 )

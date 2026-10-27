@@ -13,4 +13,9 @@ project(
         # autoload the cc and shell rules Bazel 9 removed from rules_cc and rules_shell
         "--incompatible_autoload_externally=+@rules_cc,+@rules_shell",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "tree-sitter-bazel",
+    ],
 )

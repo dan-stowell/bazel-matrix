@@ -11,4 +11,11 @@ project(
         # the test_suite that includes //test:test_fs (excluded above)
         "-//test:upstream_tests",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "boost",
+        "boost.config",
+        "platforms",
+        "rules_cc",
+    ],
 )

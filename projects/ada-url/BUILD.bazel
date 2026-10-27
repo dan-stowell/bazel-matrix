@@ -15,4 +15,8 @@ project(
     ],
     # ada.h's constexpr url::get_pathname() converts std::string to string_view in a constant expression, which needs constexpr std::string (libstdc++ 12+); the image's gcc uses libstdc++ 11 (3.4.4 fails the same way)
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "rules_cc",
+    ],
 )

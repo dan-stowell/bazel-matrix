@@ -9,4 +9,19 @@ project(
         # uses @boost.interprocess, @boost.test and @boost.thread, which its MODULE.bazel doesn't declare
         "-//test/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "boost",
+        "boost.align",
+        "boost.assert",
+        "boost.atomic",
+        "boost.config",
+        "boost.core",
+        "boost.parameter",
+        "boost.predef",
+        "boost.static_assert",
+        "boost.throw_exception",
+        "boost.type_traits",
+        "rules_cc",
+    ],
 )

@@ -9,4 +9,9 @@ project(
     ],
     # its .bazelrc sets @aspect_rules_ts//ts:skipLibCheck, but its MODULE.bazel doesn't depend on aspect_rules_ts ("No repository visible as '@aspect_rules_ts' from main repository")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_bazel_lib",
+        "aspect_rules_js",
+    ],
 )

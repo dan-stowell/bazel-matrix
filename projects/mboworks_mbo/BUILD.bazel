@@ -9,4 +9,17 @@ project(
     ],
     # gcc 11 (the image's only compiler) rejects mbo/types/stringify.h:311 under its -std=c++23 ("invalid return type 'StringifyOptions' of 'constexpr' function ... does not have 'constexpr' destructor"); its clang config's llvm toolchain include is commented out in its MODULE.bazel
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-cpp",
+        "bazel_skylib",
+        "google_benchmark",
+        "googletest",
+        "mboworks_bashtest",
+        "platforms",
+        "re2",
+        "rules_cc",
+        "rules_fuzzing",
+        "rules_shell",
+    ],
 )

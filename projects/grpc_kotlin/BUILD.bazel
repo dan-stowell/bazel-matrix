@@ -13,4 +13,13 @@ project(
     ],
     # with these, grpc-java's targets reference @maven artifacts (junit_junit, io_netty_netty_transport, io_perfmark_perfmark_api, ...) that the @maven repo resolved for grpc_kotlin doesn't declare ("no such target '@@rules_jvm_external++maven+maven//:junit_junit'")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "format",
+        "grpc-java",
+        "protobuf",
+        "rules_java",
+        "rules_jvm_external",
+        "rules_kotlin",
+    ],
 )

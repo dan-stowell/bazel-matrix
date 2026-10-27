@@ -11,4 +11,14 @@ project(
         # its .bazelrc sets --lockfile_mode=error, and its MODULE.bazel.lock lacks registry checksums for the versions resolved here (apple_support 2.5.2)
         "--lockfile_mode=off",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "buildifier_prebuilt",
+        "llvm",
+        "platforms",
+        "protobuf",
+        "rules_proto",
+        "rules_rs",
+    ],
 )

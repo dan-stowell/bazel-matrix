@@ -13,4 +13,13 @@ project(
         # needs tzdata, which the executor image lacks
         "-//absl/time/internal/cctz:time_zone_lookup_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "gloop",
+        "google_benchmark",
+        "googletest",
+        "platforms",
+        "rules_cc",
+    ],
 )

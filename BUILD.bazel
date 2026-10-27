@@ -5,6 +5,7 @@ load("//tools:versions.bzl", "DEFAULT_INNER_BAZEL")
 
 exports_files(
     [
+        "docs/coverage.md",
         "projects.json",
         "projects.txt",
     ],

@@ -15,4 +15,21 @@ project(
         # depends on //:window (above)
         "-//:sfml",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "apple_support",
+        "flac",
+        "freetype",
+        "harfbuzz",
+        "libssh2",
+        "libx11",
+        "libxcursor",
+        "libxi",
+        "libxrandr",
+        "mbedtls",
+        "platforms",
+        "rules_cc",
+        "sheenbidi",
+        "vorbis",
+    ],
 )

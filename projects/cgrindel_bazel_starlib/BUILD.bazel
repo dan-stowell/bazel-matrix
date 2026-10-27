@@ -9,4 +9,20 @@ project(
     ],
     # its root BUILD.bazel loads //ci:defs.bzl, but the release archive has no ci package
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_bazel_lib",
+        "aspect_rules_lint",
+        "bazel_skylib",
+        "bazel_skylib_gazelle_plugin",
+        "buildifier_prebuilt",
+        "gazelle",
+        "platforms",
+        "rules_bazel_integration_test",
+        "rules_go",
+        "rules_multitool",
+        "rules_python",
+        "rules_shell",
+        "stardoc",
+    ],
 )

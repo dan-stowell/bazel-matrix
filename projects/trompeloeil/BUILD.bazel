@@ -9,4 +9,8 @@ project(
         # a separate workspace (test/MODULE.bazel, the BCR test module) whose catch2 dep the root module doesn't declare
         "-//test/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "rules_cc",
+    ],
 )

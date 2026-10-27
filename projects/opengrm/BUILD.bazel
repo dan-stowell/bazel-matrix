@@ -11,4 +11,22 @@ project(
         # gcc 11 rejects string-view-fst.h's static constexpr TokenType() members ("changes meaning of 'TokenType' [-fpermissive]"), which only that test includes
         "--per_file_copt=opengrm/string/string-view-fst_test.cc@-fpermissive",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-cpp",
+        "abseil-py",
+        "bazel_skylib",
+        "cython",
+        "googletest",
+        "openfst",
+        "platforms",
+        "protobuf",
+        "readline",
+        "rules_bison",
+        "rules_cc",
+        "rules_license",
+        "rules_m4",
+        "rules_python",
+        "rules_shell",
+    ],
 )

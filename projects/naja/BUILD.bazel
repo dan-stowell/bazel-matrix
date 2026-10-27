@@ -49,4 +49,25 @@ project(
         # its .bazelrc overrides naja-if and naja-verilog with the thirdparty/ git submodules, which the archive has empty ("No MODULE.bazel ... found in external/naja-verilog+"); its registered config uses the registry modules
         "--config=registered",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "bison",
+        "boost.asio",
+        "boost.dynamic_bitset",
+        "boost.intrusive",
+        "boost.multiprecision",
+        "capnp-cpp",
+        "fmt",
+        "naja-if",
+        "naja-verilog",
+        "onetbb",
+        "platforms",
+        "rules_cc",
+        "rules_python",
+        "rules_shell",
+        "spdlog",
+        "sv-lang",
+        "zlib",
+    ],
 )

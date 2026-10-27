@@ -9,4 +9,20 @@ project(
     ],
     # with these overrides, most of //cel-c and //cel-c/internal (84 targets) depend on protobuf targets the resolved protobuf doesn't have ("no such target '@@protobuf+//upb/message:message_unknowns_testonly'", field_mask_upb_reflection_proto)
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-cpp",
+        "cel-cpp",
+        "cel-spec",
+        "fuzztest",
+        "google_benchmark",
+        "googleapis",
+        "googleapis-upb",
+        "googletest",
+        "platforms",
+        "protobuf",
+        "re2",
+        "rules_cc",
+        "rules_license",
+    ],
 )

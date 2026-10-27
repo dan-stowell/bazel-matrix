@@ -7,4 +7,16 @@ project(
     targets = [
         "//...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_lib",
+        "bazelrc-preset.bzl",
+        "buildifier_prebuilt",
+        "gazelle",
+        "jq.bzl",
+        "package_metadata",
+        "platforms",
+        "rules_go",
+        "rules_shell",
+    ],
 )

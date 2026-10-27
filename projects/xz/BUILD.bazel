@@ -9,4 +9,11 @@ project(
         # needs -fsanitize=fuzzer (clang); the executors' gcc rejects it
         "-//:ossfuzz",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_lib",
+        "bazel_skylib",
+        "platforms",
+        "rules_cc",
+    ],
 )

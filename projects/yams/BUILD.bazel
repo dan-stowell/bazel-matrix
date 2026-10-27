@@ -9,4 +9,12 @@ project(
     ],
     # its rules_apple fails analysis under Bazel 9: transition inputs [//command_line_option:apple_crosstool_top] do not correspond to valid settings
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "apple_support",
+        "platforms",
+        "rules_apple",
+        "rules_cc",
+        "rules_swift",
+    ],
 )

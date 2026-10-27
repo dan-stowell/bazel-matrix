@@ -13,4 +13,15 @@ project(
         # autoload the cc/sh rules Bazel 9 removed from rules_cc and rules_shell: its test packages call native cc_test/sh_test, and the civetweb and google_benchmark it resolves call native cc_library
         "--incompatible_autoload_externally=+@rules_cc,+@rules_shell",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "boringssl",
+        "civetweb",
+        "curl",
+        "google_benchmark",
+        "googletest",
+        "platforms",
+        "rules_cc",
+        "zlib",
+    ],
 )

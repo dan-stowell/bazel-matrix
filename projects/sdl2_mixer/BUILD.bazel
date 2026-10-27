@@ -7,4 +7,12 @@ project(
     targets = [
         "//...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "apple_support",
+        "platforms",
+        "rules_cc",
+        "rules_license",
+        "sdl2",
+    ],
 )

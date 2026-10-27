@@ -9,4 +9,20 @@ project(
         # test/BUILD.bazel refers to package //archetypes, which has no BUILD file in the release archive
         "-//test/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "boost",
+        "boost.align",
+        "boost.assert",
+        "boost.config",
+        "boost.context",
+        "boost.date_time",
+        "boost.system",
+        "boost.throw_exception",
+        "boringssl",
+        "openssl",
+        "platforms",
+        "rules_cc",
+    ],
 )

@@ -7,4 +7,20 @@ project(
     targets = [
         "//...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "buildifier_prebuilt",
+        "googleapis",
+        "googleapis-cc",
+        "googleapis-go",
+        "googleapis-grpc-cc",
+        "googleapis-python",
+        "grpc",
+        "protobuf",
+        "re2",
+        "rules_cc",
+        "rules_go",
+        "rules_license",
+    ],
 )

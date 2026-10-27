@@ -15,4 +15,14 @@ project(
     ],
     # with those flags, the glfw it resolves (behind its rendering backends) includes X11/Xlib.h, and the image has no X11 headers
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "apple_support",
+        "glfw",
+        "glm",
+        "googletest",
+        "happly",
+        "imgui",
+        "nlohmann_json",
+    ],
 )

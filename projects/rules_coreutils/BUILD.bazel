@@ -9,4 +9,15 @@ project(
         # its pre-commit pip hub needs a Python 3.10 toolchain that isn't registered ("Unable to find interpreter for pip hub 'pre-commit-3.10'")
         "-//hooks/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "ape",
+        "download_utils",
+        "hermetic_cc_toolchain",
+        "pre-commit",
+        "pre-commit-hooks",
+        "rules_license",
+        "rules_python",
+        "toolchain_utils",
+    ],
 )

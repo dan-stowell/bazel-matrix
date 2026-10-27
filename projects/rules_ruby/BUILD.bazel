@@ -13,4 +13,21 @@ project(
         # docs/repository_rules.md is out of date for Bazel 9.3.1's stardoc output (the generated docs drop the WORKSPACE-only repo_mapping attribute)
         "-//docs:update_1_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_bazel_lib",
+        "bazel_features",
+        "bazel_skylib",
+        "bazel_skylib_gazelle_plugin",
+        "buildifier_prebuilt",
+        "cgrindel_bazel_starlib",
+        "gazelle",
+        "platforms",
+        "protobuf",
+        "rules_cc",
+        "rules_go",
+        "rules_java",
+        "rules_shell",
+        "stardoc",
+    ],
 )

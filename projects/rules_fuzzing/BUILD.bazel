@@ -9,4 +9,18 @@ project(
     ],
     # needs clang: its .bazelrc sets CC=clang and //fuzzing/private/runtime copies libclang_rt sanitizer runtimes; the images have only gcc
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-cpp",
+        "bazel_features",
+        "bazel_skylib",
+        "googletest",
+        "platforms",
+        "re2",
+        "rules_cc",
+        "rules_java",
+        "rules_python",
+        "rules_shell",
+        "stardoc",
+    ],
 )

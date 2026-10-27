@@ -9,4 +9,9 @@ project(
     ],
     # its .bazelrc (from Skia) sets --extra_toolchains=//toolchain:... and --host_platform=//bazel/platform:host_with_hermetic_toolchain, and toolchain/*_toolchain_config.bzl call rule(provides = [CcToolchainConfigInfo]), which is None in Bazel 9 ("got element of type NoneType, want Provider")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "platforms",
+        "rules_cc",
+    ],
 )

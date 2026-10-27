@@ -9,4 +9,9 @@ project(
         # test/test_edge_manipulation_happy_case.cc:85 pipes a prvalue std::vector<cgrapht::Result<...>> into std::views::transform, and the images' gcc 13 libstdc++ finds no viable operator| for it ("no match for 'operator|'")
         "-//test:cgrapht_unit_tests",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "catch2",
+        "rules_cc",
+    ],
 )

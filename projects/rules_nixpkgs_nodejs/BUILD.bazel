@@ -9,4 +9,11 @@ project(
     ],
     # its .bazelrc does 'import %workspace%/../../.bazelrc.remote-cache', a file in the rules_nixpkgs monorepo that the module's archive (toolchains/nodejs only) doesn't contain
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "platforms",
+        "rules_nixpkgs_core",
+        "rules_nodejs",
+    ],
 )

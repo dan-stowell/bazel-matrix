@@ -15,4 +15,16 @@ project(
         # autoload the cc rules Bazel 9 removed from rules_cc
         "--incompatible_autoload_externally=+@rules_cc",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-cpp",
+        "abseil-py",
+        "apple_support",
+        "google_benchmark",
+        "googletest",
+        "platforms",
+        "pybind11_bazel",
+        "rules_cc",
+        "rules_python",
+    ],
 )

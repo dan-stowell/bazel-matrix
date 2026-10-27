@@ -15,4 +15,11 @@ project(
         # autoload the cc rules Bazel 9 removed from rules_cc
         "--incompatible_autoload_externally=+@rules_cc",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "catch2",
+        "eigen",
+        "osqp",
+        "rules_cc",
+    ],
 )

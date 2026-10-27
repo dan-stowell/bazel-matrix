@@ -9,4 +9,11 @@ project(
     ],
     # a Swift project: rules_swift's repository autoconfiguration, which runs on the runner, finds no Swift installation there (no target linux-toolchain in build_bazel_rules_swift_local_config, "No matching toolchains found for types: @@rules_swift+//toolchains:toolchain_type"), and the images lack swift
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "apple_support",
+        "rules_cc",
+        "rules_swift",
+        "swift_argument_parser",
+    ],
 )

@@ -9,4 +9,8 @@ project(
     ],
     # rules_swift finds no Swift toolchain ("No matching toolchains found" for //:PathKit): the executor image has no Swift
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "rules_swift",
+    ],
 )

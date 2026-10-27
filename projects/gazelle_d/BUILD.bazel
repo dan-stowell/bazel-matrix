@@ -9,4 +9,11 @@ project(
         # the checked-in tools/preset.bazelrc differs from the preset the resolved bazel_lib generates (it adds startup --host_jvm_args=-DBAZEL_TRACK_SOURCE_DIRECTORIES=1 and more)
         "-//tools:preset.update_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazelrc-preset.bzl",
+        "gazelle",
+        "rules_d",
+        "rules_go",
+    ],
 )

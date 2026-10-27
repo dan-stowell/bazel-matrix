@@ -11,4 +11,18 @@ project(
         # macOS-only Cocoa sources without target_compatible_with; gcc here can't compile them ("cannot execute 'cc1objplus'")
         "-//:RenderSystem_GL3Plus_macos",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "egl-registry",
+        "freeimage",
+        "freetype",
+        "libx11",
+        "libxcb",
+        "opengl-registry",
+        "platforms",
+        "rapidjson",
+        "rules_cc",
+        "rules_license",
+    ],
 )

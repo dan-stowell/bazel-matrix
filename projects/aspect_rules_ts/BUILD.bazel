@@ -7,4 +7,20 @@ project(
     targets = [
         "//...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_bazel_lib",
+        "aspect_rules_js",
+        "aspect_rules_lint",
+        "aspect_tools_telemetry",
+        "bazel_skylib",
+        "bazelrc-preset.bzl",
+        "buildifier_prebuilt",
+        "platforms",
+        "protobuf",
+        "rules_go",
+        "rules_nodejs",
+        "rules_proto",
+        "rules_shell",
+    ],
 )

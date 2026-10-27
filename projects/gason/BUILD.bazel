@@ -15,4 +15,10 @@ project(
         # its dep rapidjson calls native cc_library, which Bazel 9 removed; autoload it from rules_cc
         "--incompatible_autoload_externally=+@rules_cc",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "platforms",
+        "rapidjson",
+        "rules_cc",
+    ],
 )

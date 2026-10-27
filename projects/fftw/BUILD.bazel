@@ -11,4 +11,10 @@ project(
         # ARM NEON kernels: on x86-64 gcc has no arm_neon.h
         "-//:simd_support_neon_float",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "platforms",
+        "rules_autoconf",
+        "rules_cc",
+    ],
 )

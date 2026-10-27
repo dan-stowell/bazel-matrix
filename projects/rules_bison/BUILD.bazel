@@ -11,4 +11,14 @@ project(
         # its dev deps (googletest 1.11) call native cc_library/cc_test, which Bazel 9 removed; autoload them from rules_cc
         "--incompatible_autoload_externally=+@rules_cc",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "googletest",
+        "rules_cc",
+        "rules_java",
+        "rules_m4",
+        "rules_shell",
+        "stardoc",
+    ],
 )

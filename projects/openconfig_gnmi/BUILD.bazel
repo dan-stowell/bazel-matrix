@@ -9,4 +9,12 @@ project(
     ],
     # its own bazel/generate_cc.bzl fails to load under Bazel 9 (rule() got unexpected keyword argument 'incompatible_use_toolchain_transition'); its resolved rules_go and rules_foreign_cc use the removed native CcInfo
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "gazelle",
+        "grpc",
+        "protobuf",
+        "rules_go",
+        "rules_proto",
+    ],
 )

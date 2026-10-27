@@ -9,4 +9,12 @@ project(
         # no git toolchain registered here ("No matching toolchains found")
         "-//tf/toolchains/git:is_git_available",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "platforms",
+        "rules_license",
+        "rules_pkg",
+        "rules_python",
+    ],
 )

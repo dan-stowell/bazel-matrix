@@ -9,4 +9,9 @@ project(
     ],
     # needs Erlang/OTP: validating @erlang_config's otp at /usr fails (exit 127), the images have no erl
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "rules_erlang",
+    ],
 )

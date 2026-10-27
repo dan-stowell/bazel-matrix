@@ -9,4 +9,12 @@ project(
         # aborts on the executors: topology.cc:590 "Assert lp <= max_lp" (3 logical CPUs on a 128-core EPYC host)
         "-//:topology_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "googletest",
+        "platforms",
+        "rules_cc",
+        "rules_license",
+    ],
 )

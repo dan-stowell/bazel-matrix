@@ -9,4 +9,14 @@ project(
         # uses @boost.core, @boost.optional, @boost.variant, @boost.variant2, which its MODULE.bazel doesn't declare
         "-//test/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "boost",
+        "boost.assert",
+        "boost.charconv",
+        "boost.hana",
+        "boost.type_index",
+        "platforms",
+        "rules_cc",
+    ],
 )

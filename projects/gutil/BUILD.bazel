@@ -15,4 +15,15 @@ project(
         # its .bazelrc sets --repo_env=CC=/usr/bin/clang, and the images have only gcc
         "--repo_env=CC=gcc",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-cpp",
+        "buildifier_prebuilt",
+        "google_benchmark",
+        "googletest",
+        "protobuf",
+        "re2",
+        "rules_cc",
+        "rules_license",
+    ],
 )

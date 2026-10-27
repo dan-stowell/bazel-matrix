@@ -9,4 +9,9 @@ project(
         # the sample runners include the sample test headers (e.g. simple_test.h), which their cc_tests don't make available ("fatal error: simple_test.h: No such file or directory")
         "-//sample/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "rules_cc",
+        "rules_python",
+    ],
 )

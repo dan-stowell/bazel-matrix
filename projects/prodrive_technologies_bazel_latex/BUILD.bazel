@@ -15,4 +15,10 @@ project(
     ],
     # with those fixes, every latex_document depends on //:ghostscript_dependencies, whose Linux ghostscript build (//third_party:lib_ghost_script_configure_linux, configure_make) runs autoreconf, which the executor image lacks ("autoreconf: command not found")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "platforms",
+        "rules_foreign_cc",
+        "rules_python",
+    ],
 )

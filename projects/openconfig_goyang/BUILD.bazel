@@ -9,4 +9,9 @@ project(
         # TestScanForPathsAndAddModules reads ../../testdata (the root testdata/), but the overlay's data is only pkg/yang/testdata ("lstat ../../testdata: no such file or directory")
         "-//pkg/yang:yang_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "gazelle",
+        "rules_go",
+    ],
 )

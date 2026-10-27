@@ -9,4 +9,11 @@ project(
     ],
     # its own toolchain/config.bzl, loaded by its module extension, calls rule(provides = [CcToolchainConfigInfo]), which is None in Bazel 9 ("got element of type NoneType, want Provider")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_bazel_lib",
+        "bazel_skylib",
+        "platforms",
+        "rules_cc",
+    ],
 )

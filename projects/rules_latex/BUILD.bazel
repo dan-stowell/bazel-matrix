@@ -15,4 +15,12 @@ project(
         # needs node on PATH, which the executor image lacks ("node not found (set $NODE or put node on PATH)")
         "-//tests/js:test_synctex_math",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "platforms",
+        "rules_python",
+        "rules_shell",
+        "stardoc",
+    ],
 )

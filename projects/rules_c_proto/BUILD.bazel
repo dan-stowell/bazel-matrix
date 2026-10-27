@@ -9,4 +9,9 @@ project(
     ],
     # its own src/base.bzl uses the native CcInfo symbol, which Bazel 9 removed ("The CcInfo symbol has been removed")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "googletest",
+        "protobuf",
+    ],
 )

@@ -11,4 +11,14 @@ project(
         # its checked-in MODULE.bazel.lock has a version Bazel 9 doesn't support
         "--lockfile_mode=off",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_lib",
+        "bazel_skylib",
+        "bazel_skylib_gazelle_plugin",
+        "buildifier_prebuilt",
+        "gazelle",
+        "package_metadata",
+        "platforms",
+    ],
 )

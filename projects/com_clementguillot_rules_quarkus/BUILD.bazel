@@ -11,4 +11,21 @@ project(
         # its MODULE.bazel.lock is in a format Bazel 9 doesn't support ("The version of MODULE.bazel.lock is not supported")
         "--lockfile_mode=off",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_rules_lint",
+        "bazel_lib",
+        "bazel_skylib",
+        "bazel_skylib_gazelle_plugin",
+        "buildifier_prebuilt",
+        "gazelle",
+        "package_metadata",
+        "platforms",
+        "rules_android",
+        "rules_cc",
+        "rules_go",
+        "rules_graalvm",
+        "rules_java",
+        "rules_jvm_external",
+    ],
 )

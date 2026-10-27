@@ -9,4 +9,9 @@ project(
     ],
     # its overlay's cc_library adds -I$(package path)/src, which as the main repo is "/src": "The include path '/src' references a path outside of the execution root"
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "rules_cc",
+        "zlib",
+    ],
 )

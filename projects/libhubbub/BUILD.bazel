@@ -13,4 +13,10 @@ project(
         # autoload the cc rules Bazel 9 removed, also for its dep gperf, whose BUILD.bazel calls native cc_binary
         "--incompatible_autoload_externally=+@rules_cc",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "gperf",
+        "libparserutils",
+        "rules_perl",
+    ],
 )

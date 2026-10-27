@@ -7,4 +7,15 @@ project(
     targets = [
         "//...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "curl",
+        "lz4",
+        "openssl",
+        "platforms",
+        "rules_cc",
+        "zlib",
+        "zstd",
+    ],
 )

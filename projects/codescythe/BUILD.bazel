@@ -9,4 +9,8 @@ project(
     ],
     # its .bazelrc sets @rules_go//go/config:gc_linkopts, but no @rules_go is visible from its main repo ("No repository visible as '@rules_go'")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "platforms",
+    ],
 )

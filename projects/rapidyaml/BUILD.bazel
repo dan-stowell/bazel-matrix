@@ -11,4 +11,9 @@ project(
         # (not an exclusion: //... fails on a broken package even when subtracted) a vendored fast_float copy whose BUILD files call native cc rules and use //:fast_float and @doctest, which only resolve in fast_float's own workspace
         "--deleted_packages=ext/c4core/src/c4/ext/fast_float,ext/c4core/src/c4/ext/fast_float/tests",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "c4core",
+        "rules_cc",
+    ],
 )

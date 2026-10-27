@@ -9,4 +9,9 @@ project(
         # uses @emoji_font, which its MODULE.bazel doesn't declare
         "-//bazel_test/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "libpng",
+        "rules_cc",
+    ],
 )

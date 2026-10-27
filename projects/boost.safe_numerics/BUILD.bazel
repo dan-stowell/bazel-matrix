@@ -9,4 +9,15 @@ project(
         # uses @platforms, which its MODULE.bazel doesn't declare
         "-//test/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "boost",
+        "boost.concept_check",
+        "boost.config",
+        "boost.core",
+        "boost.integer",
+        "boost.logic",
+        "boost.mp11",
+        "rules_cc",
+    ],
 )

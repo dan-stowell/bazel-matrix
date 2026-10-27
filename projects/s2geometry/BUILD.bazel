@@ -11,4 +11,13 @@ project(
         # python/BUILD.bazel loads @pybind11_bazel, which its MODULE.bazel doesn't declare
         "--deleted_packages=python",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-cpp",
+        "bazel_skylib",
+        "boringssl",
+        "google_benchmark",
+        "googletest",
+        "rules_cc",
+    ],
 )

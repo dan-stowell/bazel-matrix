@@ -9,4 +9,25 @@ project(
     ],
     # //... has targets that can't build on the host configuration: toolchain/runtimes args (resource_dir, rtlib, ...) select() on the target platform with no default, bzl_library doc_extract targets miss deps (@tar.bzl, @bazel_tools repo .bzl), and after ~18 min the inner Bazel exits 33 (out of memory) with its 2 GB heap
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_features",
+        "bazel_lib",
+        "bazel_skylib",
+        "bazel_skylib_gazelle_plugin",
+        "bazelrc-preset.bzl",
+        "buildifier_prebuilt",
+        "gazelle",
+        "glibc-stubs-generator",
+        "libarchive",
+        "libstdcxx-stubs-generator",
+        "platforms",
+        "rules_cc",
+        "rules_shell",
+        "rules_swift",
+        "rules_zig",
+        "tar.bzl",
+        "with_cfg.bzl",
+        "xpkgutil",
+    ],
 )

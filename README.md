@@ -42,6 +42,7 @@ invocation links and a pass/fail row per project:
 tools/run.py test --shards 8     # every project, 8 runners
 tools/run.py build zlib re2      # some projects
 tools/run.py test --known-failing  # also the known-failing ones
+tools/run.py test --dep rules_cc   # the projects that bazel_dep rules_cc (repeatable)
 ```
 
 Like `//projects/...`, it leaves out `known-failing build` projects. For a
@@ -63,6 +64,19 @@ test logs).
 `tools/bb.sh` asks for a 16-CPU, 32 GB runner
 (`--runner_exec_properties=EstimatedCPU=16,EstimatedMemory=32GB`; the
 default is 6 CPUs, 7 GB), which runs about 8 inner Bazels at once.
+
+### Projects that depend on a module
+
+Both targets are tagged `dep:<module>` for each module the project's
+MODULE.bazel `bazel_dep`s directly, dev dependencies included:
+
+```sh
+tools/run.py test --dep rules_cc
+tools/bb.sh test //projects/... --test_tag_filters=dep:rules_cc
+```
+
+The plain-Bazel form skips known-failing projects entirely (they're
+`manual`) rather than building a `known-failing test` project's `:build`.
 
 Passing projects' logs (summary, inner invocation link) only print with
 `--test_output=all`; that flag isn't in the action key, so it replays cached
@@ -117,15 +131,19 @@ environment variable, so the outer cache is shared across checkouts.
   records (`--update` moves to the BCR's HEAD), picks each project's version
   (pinned, else the newest stable, non-yanked one whose
   `bazel_compatibility` admits `DEFAULT_INNER_BAZEL`), and writes
-  - `projects.json`: the BCR commit and each project's version and source
-    (archive, integrity, overlay, patches and the registry's MODULE.bazel,
-    as `bcr.bazel.build` URLs with integrity), and the projects it skipped
-    (deprecated, no compatible version, unsupported source type) with why;
+  - `projects.json`: the BCR commit; each project's version, direct
+    `deps` and `dev_deps` (dev-only), and source (archive, integrity,
+    overlay, patches and the registry's MODULE.bazel, as `bcr.bazel.build`
+    URLs with integrity); the projects it skipped, with why;
+  - under `bcr` in `projects.json`: the BCR's module count and, per
+    unlisted module, why it's unlisted and how many BCR modules depend on it;
+  - `docs/coverage.md`, rendered from `projects.txt` and `projects.json`;
   - `projects/<module>/BUILD.bazel`, deleting those of projects no longer
     listed.
 
-  `//tools:generated_test` fails when the committed `projects.json` or
-  `projects/<module>/BUILD.bazel` files don't match `projects.txt` (sync
+  `//tools:generated_test` fails when the committed `projects.json`,
+  `docs/coverage.md` or `projects/<module>/BUILD.bazel` files don't match
+  `projects.txt` and `projects.json` (sync
   wasn't re-run). A blank line ends a project's indented lines. Changes that only
   matter through the BCR (unpinning a project, `bazel <v>` lines,
   `DEFAULT_INNER_BAZEL`) aren't checked.
@@ -175,3 +193,14 @@ outside its archive, gets ``rc-drop <file> `<exact line>` <reason>``:
 
 Only `archive` BCR sources are supported so far; sync skips
 `git_repository` ones.
+
+## Finding more projects
+
+- `python3 tools/sync.py --update`, then docs/coverage.md's "Unlisted BCR
+  modules" table.
+- BCR modules with `git_repository` sources (none unlisted today).
+- Outside the BCR: GitHub code search for `filename:MODULE.bazel`, the
+  `bazelbuild` and `bazel-contrib` orgs, open BCR pull requests.
+
+The last two need a new source kind in `tools/sync.py` and
+`tools/sources.bzl`, which doesn't exist yet.

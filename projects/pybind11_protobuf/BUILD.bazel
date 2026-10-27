@@ -17,4 +17,17 @@ project(
     ],
     # with those fixes, its core libraries (//pybind11_protobuf:proto_cast_util and the casters using it) depend on @protobuf//python targets that need @system_python, which isn't visible from the resolved protobuf ("No repository visible as '@system_python' from repository '@@protobuf+'")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-cpp",
+        "abseil-py",
+        "bazel_skylib",
+        "grpc",
+        "platforms",
+        "protobuf",
+        "pybind11_abseil",
+        "pybind11_bazel",
+        "rules_cc",
+        "rules_python",
+    ],
 )

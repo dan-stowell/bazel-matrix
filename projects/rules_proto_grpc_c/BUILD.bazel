@@ -9,4 +9,10 @@ project(
     ],
     # its only target, //:proto_plugin, uses @protobuf//upb_generator:protoc-gen-upb, which the protobuf it resolves (33.4; it asks for 27.1) no longer has ("target 'protoc-gen-upb' not declared in package 'upb_generator'")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "protobuf",
+        "rules_cc",
+        "rules_proto_grpc",
+    ],
 )

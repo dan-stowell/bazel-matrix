@@ -17,4 +17,15 @@ project(
     ],
     # with those flags, src/google/protobuf/util/converter/BUILD.bazel loads cc_proto_library from @rules_cc//cc:defs.bzl, which fails for Bazel 8+ ("cc_proto_library is removed from @rules_cc//cc:defs.bzl in Bazel 8"), and its googletest calls the removed native cc rules
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-cpp",
+        "bazel_skylib",
+        "googletest",
+        "platforms",
+        "protobuf",
+        "rules_cc",
+        "rules_pkg",
+        "rules_proto",
+    ],
 )

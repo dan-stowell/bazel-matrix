@@ -9,4 +9,13 @@ project(
         # uses @boost.core, @boost.iterator and @boost.tuple, which its MODULE.bazel doesn't declare
         "-//test/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "boost",
+        "boost.assert",
+        "boost.config",
+        "boost.intrusive",
+        "boost.move",
+        "rules_cc",
+    ],
 )

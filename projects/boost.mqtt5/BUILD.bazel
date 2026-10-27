@@ -11,4 +11,22 @@ project(
         # its //:ssl string_flag defaults to boringssl, but its MODULE.bazel declares only openssl ("No repository visible as '@boringssl'")
         "--//:ssl=openssl",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "boost",
+        "boost.asio",
+        "boost.assert",
+        "boost.beast",
+        "boost.container",
+        "boost.core",
+        "boost.endian",
+        "boost.random",
+        "boost.range",
+        "boost.smart_ptr",
+        "boost.system",
+        "boost.type_traits",
+        "openssl",
+        "rules_cc",
+    ],
 )

@@ -9,4 +9,19 @@ project(
         # uses @boost.test, which its MODULE.bazel doesn't declare
         "-//test/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "boost",
+        "boost.asio",
+        "boost.assert",
+        "boost.core",
+        "boost.mp11",
+        "boost.system",
+        "boost.throw_exception",
+        "boringssl",
+        "openssl",
+        "platforms",
+        "rules_cc",
+    ],
 )

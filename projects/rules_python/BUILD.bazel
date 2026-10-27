@@ -17,4 +17,28 @@ project(
         # the nested Bazel's //:basic_test fails in 0.3s (exit 1) and the nested Bazel prints none of its output
         "-//tests/integration:runtime_manifests_test_bazel_self",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "another_module",
+        "bazel_ci_rules",
+        "bazel_features",
+        "bazel_skylib",
+        "bazel_skylib_gazelle_plugin",
+        "gazelle",
+        "other",
+        "package_metadata",
+        "platforms",
+        "protobuf",
+        "rules_bazel_integration_test",
+        "rules_cc",
+        "rules_go",
+        "rules_multirun",
+        "rules_pkg",
+        "rules_pyrefly",
+        "rules_rust",
+        "rules_shell",
+        "rules_testing",
+        "sphinxdocs",
+        "toml.bzl",
+    ],
 )

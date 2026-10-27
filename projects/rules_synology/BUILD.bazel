@@ -23,4 +23,18 @@ project(
         # autoload the shell rules Bazel 9 removed
         "--incompatible_autoload_externally=+@rules_shell",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_bazel_lib",
+        "bazel_skylib",
+        "buildifier_prebuilt",
+        "gazelle",
+        "platforms",
+        "rules_bazel_integration_test",
+        "rules_cc",
+        "rules_go",
+        "rules_pkg",
+        "rules_shellcheck",
+        "stardoc",
+    ],
 )

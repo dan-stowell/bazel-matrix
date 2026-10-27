@@ -11,4 +11,9 @@ project(
         # its resolved deps use rules and symbols Bazel 9 removed: grpc calls native.cc_library (cc_grpc_library) and native py_library (src/python/grpcio), protoc-gen-validate uses JavaInfo and envoy_api ProtoInfo without a load(); autoload them
         "--incompatible_autoload_externally=+@rules_cc,+@rules_python,+@rules_java,+@com_google_protobuf",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "grpc",
+        "protobuf",
+    ],
 )

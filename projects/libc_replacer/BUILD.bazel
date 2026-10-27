@@ -7,4 +7,12 @@ project(
     targets = [
         "//...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "buildifier_prebuilt",
+        "clang_tools",
+        "rules_cc",
+        "testing",
+        "toolchains_musl",
+    ],
 )

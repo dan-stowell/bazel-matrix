@@ -7,4 +7,17 @@ project(
     targets = [
         "//...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-cpp",
+        "boost.algorithm",
+        "boost.dynamic_bitset",
+        "boost.graph",
+        "boost.iostreams",
+        "boost.lexical_cast",
+        "boost.optional",
+        "eigen",
+        "rules_cc",
+        "rules_license",
+    ],
 )

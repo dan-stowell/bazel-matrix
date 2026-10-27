@@ -11,4 +11,9 @@ project(
         # (not an exclusion: //... fails on a broken package even when subtracted) it loads @rules_pkg, which its MODULE.bazel doesn't declare
         "--deleted_packages=example_bazel",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "gazelle",
+        "rules_go",
+    ],
 )

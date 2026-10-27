@@ -11,4 +11,12 @@ project(
         # (not an exclusion: //... fails on a broken package even when subtracted) its vendored googletest calls native cc_library without a load() and, with main-repo autoloads, still selects on @platforms, which its MODULE.bazel doesn't declare; its test packages load @rules_python, which it doesn't declare either
         "--deleted_packages=contrib/googletest,contrib/googletest/googlemock/test,contrib/googletest/googletest/test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "pugixml",
+        "rapidjson",
+        "rules_cc",
+        "zlib",
+    ],
 )

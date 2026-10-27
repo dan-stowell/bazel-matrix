@@ -11,4 +11,15 @@ project(
         # its stamp test expects the values its stamp.sh prints, which its .bazelrc passes only under test:ci (as $GITHUB_WORKSPACE/stamp.sh); Bazel runs the command with bash -c in the workspace, so $PWD finds it
         "--workspace_status_command=$PWD/stamp.sh",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_bazel_lib",
+        "bazel_skylib",
+        "platforms",
+        "rules_oci",
+        "rules_pkg",
+        "rules_shell",
+        "stardoc",
+        "zlib",
+    ],
 )

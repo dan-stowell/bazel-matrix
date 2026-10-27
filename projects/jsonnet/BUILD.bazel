@@ -11,4 +11,11 @@ project(
         # its dep googletest calls native cc_library, which Bazel 9 removed; autoload it from rules_cc
         "--incompatible_autoload_externally=+@rules_cc",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "googletest",
+        "rules_cc",
+        "rules_python",
+        "rules_shell",
+    ],
 )

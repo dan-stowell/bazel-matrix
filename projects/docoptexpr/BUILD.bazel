@@ -9,4 +9,10 @@ project(
     ],
     # docoptexpr/docoptexpr.hh includes <expected> (C++23), which the image's libstdc++ 11 lacks
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "hedron_compile_commands",
+        "platforms",
+        "rules_cc",
+    ],
 )

@@ -21,6 +21,16 @@ class SelectTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             run.select_projects(self.PROJECTS, "test", ["z"], False)
 
+    def test_depending_on(self):
+        entries = [{"name": "a", "deps": ["x"], "dev_deps": ["y"]},
+                   {"name": "b", "deps": ["y"], "dev_deps": []},
+                   {"name": "c", "deps": [], "dev_deps": []}]
+        self.assertEqual(run.depending_on(entries, ["x"]), {"a"})
+        self.assertEqual(run.depending_on(entries, ["y"]), {"a", "b"})
+        self.assertEqual(run.depending_on(entries, ["x", "y"]), {"a", "b"})
+        with self.assertRaises(ValueError):
+            run.depending_on(entries, ["z"])
+
     def test_shard(self):
         self.assertEqual(run.shard(["c", "a", "b", "d", "e"], 2), [["a", "c", "e"], ["b", "d"]])
         self.assertEqual(run.shard(["a"], 4), [["a"]])

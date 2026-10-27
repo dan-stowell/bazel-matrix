@@ -9,4 +9,15 @@ project(
     ],
     # its aspect_bazel_lib needs @local_config_platform and calls rule(incompatible_use_toolchain_transition = ...), which Bazel 9 removed; tools/BUILD.bazel calls native sh_binary
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_bazel_lib",
+        "aspect_rules_js",
+        "aspect_rules_lint",
+        "aspect_tools_telemetry",
+        "bazel_skylib",
+        "buildifier_prebuilt",
+        "platforms",
+        "rules_nodejs",
+    ],
 )

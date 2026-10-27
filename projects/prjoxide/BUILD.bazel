@@ -7,4 +7,14 @@ project(
     targets = [
         "//...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "capnp-cpp",
+        "platforms",
+        "prjoxide-db",
+        "rules_python",
+        "rules_rust",
+        "rules_rust_pyo3",
+    ],
 )

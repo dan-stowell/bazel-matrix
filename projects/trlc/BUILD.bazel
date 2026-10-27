@@ -23,4 +23,11 @@ project(
         # //:requirements_dev.test (size small, so 60 s) runs pip-compile against live PyPI, which took 45 s on one run and timed out at 60 s on another
         "--test_timeout=300",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_rules_lint",
+        "buildifier_prebuilt",
+        "rules_python",
+        "rules_shell",
+    ],
 )

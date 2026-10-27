@@ -7,4 +7,19 @@ project(
     targets = [
         "//...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "bazel_worker_api",
+        "bazel_worker_java",
+        "hermetic_android_toolchains",
+        "protobuf",
+        "rules_android",
+        "rules_java",
+        "rules_jvm_external",
+        "rules_kotlin",
+        "rules_pmd",
+        "rules_proto",
+        "stardoc",
+    ],
 )

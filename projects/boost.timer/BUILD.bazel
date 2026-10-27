@@ -9,4 +9,12 @@ project(
         # uses @platforms, @boost.chrono and @boost.core, which its MODULE.bazel doesn't declare
         "-//test/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "boost",
+        "boost.config",
+        "boost.io",
+        "boost.predef",
+        "rules_cc",
+    ],
 )

@@ -11,4 +11,14 @@ project(
         # its .bazelrc sets --lockfile_mode=error, and its MODULE.bazel.lock lacks registry checksums ("Missing checksum for registry file .../apple_support/2.5.2/MODULE.bazel")
         "--lockfile_mode=off",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_lib",
+        "bazel_skylib",
+        "bazel_skylib_gazelle_plugin",
+        "bazelrc-preset.bzl",
+        "gazelle",
+        "package_metadata",
+        "platforms",
+    ],
 )

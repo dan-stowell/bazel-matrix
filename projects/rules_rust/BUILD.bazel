@@ -9,4 +9,17 @@ project(
         # its genrules run cargo, whose rustc panics linking (link.rs: unwrap on None)
         "-//cargo/private/cargo_toml_variable_extractor/testdata/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "apple_support",
+        "bazel_ci_rules",
+        "bazel_features",
+        "bazel_skylib",
+        "platforms",
+        "rules_cc",
+        "rules_license",
+        "rules_python",
+        "rules_shell",
+        "rules_testing",
+    ],
 )

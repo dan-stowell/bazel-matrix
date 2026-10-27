@@ -9,4 +9,10 @@ project(
         # uses @googletest, which its MODULE.bazel doesn't declare
         "-//:naja_verilog_tests",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bison",
+        "flex",
+        "rules_cc",
+    ],
 )

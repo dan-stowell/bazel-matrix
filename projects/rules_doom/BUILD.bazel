@@ -7,4 +7,17 @@ project(
     targets = [
         "//...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "apple_support",
+        "bazel_skylib",
+        "crispy-doom",
+        "hermetic_launcher",
+        "llvm",
+        "platforms",
+        "rules_cc",
+        "rules_java",
+        "rules_license",
+        "zlib",
+    ],
 )

@@ -9,4 +9,15 @@ project(
     ],
     # the rules_rust 0.65.0 it declares fails to load under Bazel 9: rust/private/dummy_cc_toolchain/dummy_cc_toolchain.bzl does rule(provides = [...]) with a native provider that is None ("got element of type NoneType"); with rules_rust and rules_rust_wasm_bindgen overridden to 0.74.0, its test/ package loads @rules_rust_wasm_bindgen//rules_js:defs.bzl, which 0.74.0 no longer has
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_rules_js",
+        "bazel_skylib",
+        "platforms",
+        "rules_rust",
+        "rules_rust_mdbook",
+        "rules_rust_wasm_bindgen",
+        "rules_shell",
+        "stardoc",
+    ],
 )

@@ -11,4 +11,16 @@ project(
         # test_cleanup_handles_errors chmods the runtime dir to 0 so cleanup can't delete it, but the executors run tests as root: cleanup deletes it and g_chmod (runtime_dir, 0755) fails with ENOENT
         "-//glib/tests:utils-isolated",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "apple_support",
+        "bazel_skylib",
+        "libffi",
+        "pcre2",
+        "platforms",
+        "rules_cc",
+        "rules_license",
+        "rules_python",
+        "zlib",
+    ],
 )

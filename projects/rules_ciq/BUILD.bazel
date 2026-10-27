@@ -9,4 +9,12 @@ project(
     ],
     # its local_ciq repository rule (the Garmin Connect IQ SDK) only supports macOS ("The local_ciq repository rule is currently only supported on macOS"), and //:libmtp_unsupported, which a target references, isn't declared
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "platforms",
+        "rules_cc",
+        "rules_rust",
+        "stardoc",
+    ],
 )

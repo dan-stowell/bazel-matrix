@@ -23,4 +23,14 @@ project(
         # depends on //examples:vehicle_requirements_validation (above)
         "-//examples/brake_control:brake_controller_trace",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_rules_lint",
+        "bazel_skylib",
+        "rules_cc",
+        "rules_go",
+        "rules_java",
+        "rules_python",
+        "rules_rust",
+    ],
 )

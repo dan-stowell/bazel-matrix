@@ -9,4 +9,9 @@ project(
     ],
     # its only target, //internal/test/bcr:pylib, needs @openapi_tools_generator_bazel_cli, which its openapi_gen extension creates only for an openapi_gen.client() tag, and no module in the graph has one ("does not generate repository \"openapi_tools_generator_bazel_cli\"")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "rules_java",
+        "rules_pkg",
+    ],
 )

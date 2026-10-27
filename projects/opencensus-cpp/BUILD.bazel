@@ -11,4 +11,26 @@ project(
         # the civetweb, curl, grpc and opencensus-proto it resolves have BUILD files calling native cc and proto rules, which Bazel 9 removed; autoload them
         "--incompatible_autoload_externally=+@rules_cc,+@com_google_protobuf",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-cpp",
+        "bazel_skylib",
+        "boringssl",
+        "civetweb",
+        "curl",
+        "google_benchmark",
+        "googleapis",
+        "googleapis-cc",
+        "googleapis-grpc-cc",
+        "googletest",
+        "grpc",
+        "opencensus-proto",
+        "prometheus-cpp",
+        "protobuf",
+        "rapidjson",
+        "rules_cc",
+        "rules_foreign_cc",
+        "rules_go",
+        "zlib",
+    ],
 )

@@ -11,4 +11,10 @@ project(
         # tests/BUILD.bazel loads @emsdk, which its MODULE.bazel doesn't declare
         "--deleted_packages=tests",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "package_metadata",
+        "platforms",
+        "rules_cc",
+    ],
 )

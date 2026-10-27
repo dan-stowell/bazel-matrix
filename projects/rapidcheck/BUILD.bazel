@@ -11,4 +11,8 @@ project(
         # its root BUILD.bazel globs include/**/*.cpp, which matches nothing
         "--noincompatible_disallow_empty_glob",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "rules_cc",
+    ],
 )

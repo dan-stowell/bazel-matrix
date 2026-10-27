@@ -9,4 +9,8 @@ project(
         # examples/ is a separate workspace (examples/MODULE.bazel): its scenario's csv://clips/aeb_signals.csv is relative to that workspace root, so from the root module the runner doesn't find it ("'clips/aeb_signals.csv' 不存在", i.e. doesn't exist)
         "-//examples:aeb_csv_replay_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "platforms",
+    ],
 )

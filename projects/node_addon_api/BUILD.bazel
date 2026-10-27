@@ -13,4 +13,9 @@ project(
     ],
     # @rules_nodejs//nodejs/headers:current_node_cc_headers fails analysis: the node toolchain's nodeinfo.headers is None (also with rules_nodejs 6.7.7)
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "rules_cc",
+        "rules_nodejs",
+    ],
 )

@@ -9,4 +9,16 @@ project(
         # buildifier wants the registry's MODULE.bazel (used in place of its own) reformatted: compatibility_level after version
         "-//:buildifier.test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "buildifier_prebuilt",
+        "googletest",
+        "gz-math",
+        "gz-utils",
+        "rules_cc",
+        "rules_gazebo",
+        "rules_license",
+        "rules_python",
+        "tinyxml2",
+    ],
 )

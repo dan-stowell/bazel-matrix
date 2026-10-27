@@ -9,4 +9,9 @@ project(
     ],
     # include/vsr/space/vsr_cga3D_op.h defines non-inline namespace-scope variables (auto pointOnLine = [](...){...} and others), so linking its library //:vsr fails with multiple definitions of vsr::cga::pointOnLine etc.
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "rules_cc",
+        "rules_license",
+    ],
 )

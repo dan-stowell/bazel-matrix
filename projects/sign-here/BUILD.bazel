@@ -15,4 +15,11 @@ project(
     ],
     # a Swift project: rules_swift's repository autoconfiguration, which runs on the runner, finds no Swift installation there (no target linux-toolchain in build_bazel_rules_swift_local_config), and its Swift targets need one (the flags below get past the native sh_binary errors before it)
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "apple_support",
+        "rules_apple",
+        "rules_swift",
+        "swift_argument_parser",
+    ],
 )

@@ -11,4 +11,20 @@ project(
         # (not an exclusion: //... fails on a broken package even when subtracted) bazel_test/BUILD loads @rules_python, which its MODULE.bazel doesn't declare
         "--deleted_packages=bazel_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "cairo",
+        "fontconfig",
+        "freetype",
+        "fribidi",
+        "glib",
+        "harfbuzz",
+        "libdatrie",
+        "libpng",
+        "libthai",
+        "platforms",
+        "rules_cc",
+        "zlib",
+    ],
 )

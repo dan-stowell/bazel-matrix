@@ -9,4 +9,20 @@ project(
     ],
     # its MODULE.bazel patches protobuf with //third_party:protobuf_load-cc-rules.patch, but the release archive has no third_party package
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-cpp",
+        "bazel_features",
+        "bazel_skylib",
+        "platforms",
+        "protobuf",
+        "re2",
+        "rules_cc",
+        "rules_license",
+        "rules_pkg",
+        "rules_shell",
+        "rules_testing",
+        "stardoc",
+        "zlib",
+    ],
 )

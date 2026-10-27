@@ -11,4 +11,10 @@ project(
         # a separate workspace (bcr_test/MODULE.bazel, the BCR test module) whose aspect_bazel_lib dep the root module doesn't declare
         "--deleted_packages=bcr_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_features",
+        "platforms",
+        "rules_cc",
+    ],
 )

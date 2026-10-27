@@ -11,4 +11,14 @@ project(
         # the root BUILD.bazel globs *.tgz, which the release archive lacks
         "--noincompatible_disallow_empty_glob",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_features",
+        "bazel_lib",
+        "bazel_skylib",
+        "platforms",
+        "rules_android",
+        "rules_java",
+        "rules_license",
+    ],
 )

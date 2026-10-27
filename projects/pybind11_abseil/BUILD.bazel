@@ -13,4 +13,13 @@ project(
         # autoload the cc and py rules Bazel 9 removed from rules_cc and rules_python
         "--incompatible_autoload_externally=+@rules_cc,+@rules_python",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-cpp",
+        "bazel_skylib",
+        "platforms",
+        "pybind11_bazel",
+        "rules_cc",
+        "rules_python",
+    ],
 )

@@ -25,4 +25,15 @@ project(
         # same: checked-in .pb.go header names protoc v6.32.1, the resolved protoc is v6.33.4
         "-//scalapb:scalapb_go_compiled_sources_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "build_stack_rules_proto",
+        "gazelle",
+        "protobuf",
+        "rules_go",
+        "rules_java",
+        "rules_jvm_external",
+        "rules_proto",
+        "rules_scala",
+    ],
 )

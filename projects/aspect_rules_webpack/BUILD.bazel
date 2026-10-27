@@ -13,4 +13,17 @@ project(
         # the checked-in docs are out of date for the stardoc resolved here (it renders **kwargs where they have kwargs)
         "-//docs:update_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_bazel_lib",
+        "aspect_gazelle_prebuilt",
+        "aspect_rules_js",
+        "aspect_tools_telemetry",
+        "bazel_lib",
+        "bazel_skylib",
+        "bazelrc-preset.bzl",
+        "buildifier_prebuilt",
+        "platforms",
+        "rules_shell",
+    ],
 )

@@ -9,4 +9,17 @@ project(
         # a separate workspace (verify_generated_code/MODULE.bazel) whose rules_foreign_cc dep the root module doesn't declare
         "-//verify_generated_code/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "boringssl",
+        "bzip2",
+        "platforms",
+        "rules_cc",
+        "rules_cc_autoconf",
+        "rules_license",
+        "xz",
+        "zlib",
+        "zstd",
+    ],
 )

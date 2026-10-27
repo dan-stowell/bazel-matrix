@@ -13,4 +13,22 @@ project(
         # its script runs third_party/mujoco/sample/testspeed, a path that isn't in its runfiles ("No such file or directory")
         "-//test/sample:testspeed_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-cpp",
+        "apple_support",
+        "bazel_skylib",
+        "ccd",
+        "glfw",
+        "googletest",
+        "lodepng",
+        "marchingcubecpp",
+        "miniz",
+        "platforms",
+        "qhull",
+        "rules_cc",
+        "rules_shell",
+        "tinyobjloader",
+        "tinyxml2",
+    ],
 )

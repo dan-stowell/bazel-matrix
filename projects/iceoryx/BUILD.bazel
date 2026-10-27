@@ -9,4 +9,14 @@ project(
     ],
     # iceoryx_platform/generic/include/iceoryx_platform/generic/acl.hpp includes sys/acl.h, which no declared dep provides and the executor image lacks (no libacl headers)
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "buildifier_prebuilt",
+        "cpptoml",
+        "googletest",
+        "ncurses",
+        "platforms",
+        "rules_cc",
+    ],
 )

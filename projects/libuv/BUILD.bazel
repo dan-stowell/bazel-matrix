@@ -9,4 +9,9 @@ project(
     ],
     # //:tests: "The libuv test suite cannot be run as root" (the executors run tests as root); //:benchmarks times out (300s)
     known_failing = "test",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "platforms",
+        "rules_cc",
+    ],
 )

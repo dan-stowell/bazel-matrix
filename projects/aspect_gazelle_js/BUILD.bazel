@@ -9,4 +9,16 @@ project(
     ],
     # its MODULE.bazel has local_path_override(aspect_gazelle, path = "../.."), which applies as the root module: the module is a subdirectory of the aspect-build/aspect-gazelle repo, and its archive has nothing at ../.. ("No MODULE.bazel ... found in external/aspect_gazelle+")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_gazelle",
+        "aspect_rules_js",
+        "aspect_tools_telemetry",
+        "bazel_lib",
+        "gazelle",
+        "llvm",
+        "rules_go",
+        "rules_rs",
+        "with_cfg.bzl",
+    ],
 )

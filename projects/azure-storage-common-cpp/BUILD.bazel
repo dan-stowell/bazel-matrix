@@ -13,4 +13,12 @@ project(
         # azure-core-cpp's curl transport fails analysis ("must be built with --@curl//:ssl_lib=openssl") under curl's default TLS backend
         "--@@curl+//:ssl_lib=openssl",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "azure-core-cpp",
+        "libxml2",
+        "openssl",
+        "platforms",
+        "rules_cc",
+    ],
 )

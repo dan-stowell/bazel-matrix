@@ -9,4 +9,15 @@ project(
     ],
     # rules_foreign_cc's make tool fails to build with its registered toolchains_llvm clang and sysroot_linux_amd64: make's configure reports "C compiler cannot create executables"
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_bazel_lib",
+        "bazel_skylib",
+        "platforms",
+        "rules_foreign_cc",
+        "rules_pkg",
+        "rules_python",
+        "rules_shell",
+        "toolchains_llvm",
+    ],
 )

@@ -9,4 +9,9 @@ project(
         # tests/BUILD.bazel uses @googletest, which its MODULE.bazel doesn't declare
         "-//tests/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "platforms",
+        "rules_cc",
+    ],
 )

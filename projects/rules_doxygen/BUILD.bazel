@@ -13,4 +13,10 @@ project(
         # (not an exclusion: //... fails on a broken package even when subtracted) examples/ is a separate workspace (examples/MODULE.bazel): its BUILD files load @doxygen, which only that MODULE.bazel's doxygen_extension defines
         "--deleted_packages=examples,examples/awesome,examples/base,examples/custom,examples/dependencies,examples/doxyfile,examples/doxylink,examples/executable,examples/graphviz,examples/kwargs,examples/latex,examples/nested,examples/plantuml,examples/submodules/root,examples/submodules/submodule1,examples/submodules/submodule2,examples/substitutions,examples/third_party/greet_gen",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "platforms",
+        "stardoc",
+    ],
 )

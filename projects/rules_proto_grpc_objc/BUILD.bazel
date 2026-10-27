@@ -11,4 +11,12 @@ project(
         # the grpc it resolves has BUILD files calling native cc and proto rules, which Bazel 9 removed; autoload them
         "--incompatible_autoload_externally=+@rules_cc,+@com_google_protobuf",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "apple_support",
+        "grpc",
+        "protobuf",
+        "rules_cc",
+        "rules_proto_grpc",
+    ],
 )

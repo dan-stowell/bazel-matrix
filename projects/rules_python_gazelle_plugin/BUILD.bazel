@@ -9,4 +9,12 @@ project(
     ],
     # its MODULE.bazel has local_path_override(rules_python, path = ".."): the module is the gazelle/ directory of the rules_python repo, and its archive has no rules_python at .. ("No MODULE.bazel ... found in external/rules_python+")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "gazelle",
+        "rules_cc",
+        "rules_go",
+        "rules_python",
+    ],
 )

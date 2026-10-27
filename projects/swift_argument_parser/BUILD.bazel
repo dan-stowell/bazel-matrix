@@ -9,4 +9,9 @@ project(
     ],
     # needs a Swift toolchain: rules_swift's local config has no //:linux-toolchain on the executors
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "apple_support",
+        "rules_swift",
+    ],
 )

@@ -13,4 +13,15 @@ project(
         # with --spawn_strategy=local: don't reuse outputs that remote execution produced for the same action keys
         "--noremote_accept_cached",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_features",
+        "bazel_lib",
+        "bazel_skylib",
+        "bazelrc-preset.bzl",
+        "buildifier_prebuilt",
+        "gawk",
+        "platforms",
+        "rules_shell",
+    ],
 )

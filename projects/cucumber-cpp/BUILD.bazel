@@ -7,4 +7,13 @@ project(
     targets = [
         "//...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "asio",
+        "googletest",
+        "nlohmann_json",
+        "platforms",
+        "rules_cc",
+        "tclap",
+    ],
 )

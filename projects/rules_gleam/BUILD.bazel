@@ -9,4 +9,13 @@ project(
     ],
     # with that override, gazelle's go_deps resolves golang.org/x/mod v0.41.0, which requires go >= 1.26.0, but its MODULE.bazel pins go_sdk.download(version = "1.25.1") ("requires go >= 1.26.0 (running go 1.25.1; GOTOOLCHAIN=local)"), and its gleam toolchain repos need those Go tools
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_features",
+        "bazel_skylib",
+        "gazelle",
+        "platforms",
+        "rules_erlang",
+        "rules_go",
+    ],
 )

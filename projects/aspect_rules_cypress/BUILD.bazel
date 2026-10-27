@@ -9,4 +9,19 @@ project(
         # tools/preset.bazelrc is out of date for Bazel 9.3.1 (missing lines the preset generates for it, e.g. its copy_directory and host_jvm_args notes)
         "-//tools:preset.update_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_rules_js",
+        "aspect_rules_lint",
+        "aspect_tools_telemetry",
+        "bazel_lib",
+        "bazel_skylib",
+        "bazelrc-preset.bzl",
+        "buildifier_prebuilt",
+        "gazelle",
+        "platforms",
+        "rules_go",
+        "rules_nodejs",
+        "rules_shell",
+    ],
 )

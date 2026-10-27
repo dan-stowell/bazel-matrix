@@ -9,4 +9,13 @@ project(
     ],
     # an Apple linker ruleset: gcc rejects the --ld-path=...ld64.lld it adds ("unrecognized command-line option"), and its Swift targets need a Swift toolchain, which rules_swift's local config lacks on Linux (no //:linux-toolchain)
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "apple_support",
+        "bazel_features",
+        "bazel_skylib",
+        "rules_apple",
+        "rules_cc",
+        "rules_swift",
+    ],
 )

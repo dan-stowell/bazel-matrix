@@ -17,4 +17,17 @@ project(
     ],
     # even with its other fixes here, protobuf fails to load: babylon pins protobuf 32.1 with its own single_version_override (so it can't be overridden here), and 32.1's bazel/upb_*.bzl use the native CcInfo, which Bazel 9 removed
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-cpp",
+        "bazel_skylib",
+        "boost.preprocessor",
+        "boost.spirit",
+        "fmt",
+        "googletest",
+        "platforms",
+        "protobuf",
+        "rules_cc",
+        "rules_cuda",
+    ],
 )

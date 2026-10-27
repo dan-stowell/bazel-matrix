@@ -9,4 +9,18 @@ project(
         # builds @zstd//:zstd_cli in a configuration with no C++ toolchain ("No matching toolchains found for types: @@bazel_tools//tools/cpp:toolchain_type")
         "-//zstd/toolchain/zstd:zstd",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "ape",
+        "bazel_lib",
+        "bazel_skylib",
+        "ci-component-bazelisk",
+        "download_utils",
+        "pre-commit",
+        "pre-commit-hooks",
+        "rules_license",
+        "rules_python",
+        "toolchain_utils",
+        "zstd",
+    ],
 )

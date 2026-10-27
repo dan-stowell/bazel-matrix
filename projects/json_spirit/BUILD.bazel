@@ -7,4 +7,15 @@ project(
     targets = [
         "//...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "boost.bind",
+        "boost.config",
+        "boost.function",
+        "boost.smart_ptr",
+        "boost.spirit",
+        "boost.static_assert",
+        "boost.variant",
+        "rules_cc",
+    ],
 )

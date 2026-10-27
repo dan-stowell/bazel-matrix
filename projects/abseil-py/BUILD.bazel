@@ -9,4 +9,9 @@ project(
         # test_method_flagfiles_no_permissions: CantOpenFlagFileError not raised (the executors run tests as root)
         "-//absl/flags:tests/flags_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "rules_cc",
+        "rules_python",
+    ],
 )

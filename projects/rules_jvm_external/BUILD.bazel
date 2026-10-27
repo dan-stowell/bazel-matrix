@@ -9,4 +9,24 @@ project(
     ],
     # needs an Android SDK: @androidsdk//:aapt2 and friends are undeclared without one
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_bazel_lib",
+        "bazel_features",
+        "bazel_skylib",
+        "bzlmod_lock_files",
+        "coursier_higher_layer",
+        "package_metadata",
+        "platforms",
+        "protobuf",
+        "root_wins_layer",
+        "rules_android",
+        "rules_java",
+        "rules_kotlin",
+        "rules_license",
+        "rules_shell",
+        "stardoc",
+        "toml.bzl",
+        "transitive_module_can_override",
+    ],
 )

@@ -11,4 +11,20 @@ project(
         # the bzip2 it resolves (via boost.iostreams) has a BUILD file calling native cc_binary, which Bazel 9 removed; autoload it from rules_cc
         "--incompatible_autoload_externally=+@rules_cc",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "boost.filesystem",
+        "boost.iostreams",
+        "boost.program_options",
+        "boost.system",
+        "boost.thread",
+        "eigen",
+        "platforms",
+        "prjtrellis",
+        "pybind11_bazel",
+        "rules_cc",
+        "rules_python",
+        "rules_rust",
+    ],
 )

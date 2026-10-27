@@ -9,4 +9,16 @@ project(
     ],
     # as the root module its MODULE.bazel registers only a Python 3.13 toolchain (python.toolchain is a dev dependency) but pip.parse()s hubs for 3.10-3.13 ("Unable to find interpreter for pip hub 'clang-format-3.10'"), and its dev dep hermetic_cc_toolchain 3.1.0 fails to load under Bazel 9 (toolchain/zig_toolchain.bzl uses the native CcToolchainConfigInfo without a load(), which is None in Bazel 9: "at index 0 of provides, got element of type NoneType")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "buildifier_prebuilt",
+        "download_utils",
+        "hermetic_cc_toolchain",
+        "pre-commit",
+        "rules_license",
+        "rules_python",
+        "rules_shellcheck",
+        "rules_uv",
+        "toolchain_utils",
+    ],
 )

@@ -11,4 +11,10 @@ project(
         # NodeList's getFirst/addFirst/... clash with the SequencedCollection methods JDK 21 added to List; remote-minimal compiles against JDK 21
         "--java_runtime_version=remotejdk_17",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "javacc",
+        "rules_java",
+    ],
 )

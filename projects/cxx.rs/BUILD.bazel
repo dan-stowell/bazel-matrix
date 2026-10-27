@@ -11,4 +11,13 @@ project(
         # its .bazelrc's build:linux passes -Clink-arg=-fuse-ld=lld to rustc, and the executor image has no lld (gcc: "cannot find 'ld'"); its other build:linux flag, --cxxopt=-std=c++17, is the default anyway
         "--noenable_platform_specific_config",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "apple_support",
+        "bazel_features",
+        "bazel_skylib",
+        "platforms",
+        "rules_cc",
+        "rules_rust",
+    ],
 )

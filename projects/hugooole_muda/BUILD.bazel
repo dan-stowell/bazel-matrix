@@ -11,4 +11,11 @@ project(
         # (not an exclusion: //... fails on a broken package even when subtracted) example and test load @rules_cuda//cuda:defs.bzl, which its MODULE.bazel doesn't declare
         "--deleted_packages=example,test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "eigen",
+        "rules_cc",
+        "rules_license",
+    ],
 )

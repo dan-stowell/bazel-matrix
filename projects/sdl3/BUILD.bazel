@@ -7,4 +7,20 @@ project(
     targets = [
         "//...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "alsa_lib",
+        "libffi",
+        "libx11",
+        "libxcursor",
+        "libxext",
+        "libxfixes",
+        "libxi",
+        "libxrandr",
+        "platforms",
+        "rules_cc",
+        "rules_cc_autoconf",
+        "wayland",
+        "xkbcommon",
+    ],
 )

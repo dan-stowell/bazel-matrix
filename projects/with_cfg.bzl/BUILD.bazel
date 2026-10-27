@@ -11,4 +11,23 @@ project(
         # its genrule sets exec_properties pool=all: "No registered executors in pool \"all\"" on RBE
         "-//with_cfg/tests:default_frontend_exec_properties_test_subject_/default_frontend_exec_properties_test_subject",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_bazel_lib",
+        "bazel_features",
+        "bazel_skylib",
+        "bazel_skylib_gazelle_plugin",
+        "buildifier_prebuilt",
+        "gazelle",
+        "platforms",
+        "protobuf",
+        "rules_android",
+        "rules_cc",
+        "rules_go",
+        "rules_java",
+        "rules_python",
+        "rules_shell",
+        "rules_testing",
+        "stardoc",
+    ],
 )

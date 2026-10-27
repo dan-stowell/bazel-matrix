@@ -9,4 +9,11 @@ project(
     ],
     # rules_rs's process wrapper rejects the Rust outputs (librav1e.a, the rlib) because they embed the absolute execroot /buildbuddy-execroot ("embeds the absolute working directory"); what embeds it (likely the gcc-built C/asm parts, as with zenoh-cpp's ring under gcc) is not confirmed
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "platforms",
+        "rules_cc",
+        "rules_rs",
+    ],
 )

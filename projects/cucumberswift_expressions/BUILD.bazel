@@ -9,4 +9,9 @@ project(
     ],
     # rules_swift's autoconfiguration, which runs on the runner while fetching repos, finds no Swift there, so its local config has no linux-toolchain ("no such target '...rules_swift_local_config//:linux-toolchain'")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "apple_support",
+        "rules_swift",
+    ],
 )

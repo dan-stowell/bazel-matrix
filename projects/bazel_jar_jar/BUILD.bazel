@@ -7,4 +7,11 @@ project(
     targets = [
         "//...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "platforms",
+        "rules_java",
+        "rules_jvm_external",
+        "rules_shell",
+    ],
 )

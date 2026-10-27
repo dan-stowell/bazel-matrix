@@ -9,4 +9,20 @@ project(
     ],
     # its rules_go dependency uses the native CcInfo symbol, which Bazel 9 removed
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_bazel_lib",
+        "bazel_env.bzl",
+        "bazel_features",
+        "bazel_skylib",
+        "bazel_skylib_gazelle_plugin",
+        "gazelle",
+        "package_metadata",
+        "platforms",
+        "rules_go",
+        "rules_multirun",
+        "rules_multitool",
+        "stardoc",
+        "tar.bzl",
+    ],
 )

@@ -13,4 +13,9 @@ project(
     ],
     # needs Erlang/OTP: validating @erlang_config's otp at /usr fails (exit 127, "/usr/bin/erl: No such file or directory"), the images have no erl; its BUILD.bazel also uses @tls_gen, which its MODULE.bazel doesn't declare
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "rabbitmq_seshat",
+        "rules_erlang",
+    ],
 )

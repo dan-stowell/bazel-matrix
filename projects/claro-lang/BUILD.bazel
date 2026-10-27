@@ -9,4 +9,11 @@ project(
     ],
     # with that override, its @maven repo (rules_jvm_external) loads @rules_license//rules:package_info.bzl, which isn't visible from it
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_bazel_lib",
+        "bazel_skylib",
+        "rules_jvm_external",
+        "rules_proto",
+    ],
 )

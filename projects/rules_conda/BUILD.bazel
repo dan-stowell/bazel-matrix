@@ -11,4 +11,14 @@ project(
         # documents conda/cc/import.bzl, which uses the native CcInfo symbol that Bazel 9 removed ("The CcInfo symbol has been removed")
         "-//conda/cc:import.docs-as-proto",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_rules_lint",
+        "bazel_lib",
+        "bazel_skylib",
+        "buildifier_prebuilt",
+        "platforms",
+        "rules_cc",
+        "rules_python",
+    ],
 )

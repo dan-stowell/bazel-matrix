@@ -9,4 +9,10 @@ project(
     ],
     # its MODULE.bazel has local_path_override(package_metadata, path = "../../metadata"), which points outside its archive's strip_prefix (lib/supplychain-go of bazel-contrib/supply-chain) and applies when it is the root module
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "gazelle",
+        "package_metadata",
+        "rules_go",
+    ],
 )

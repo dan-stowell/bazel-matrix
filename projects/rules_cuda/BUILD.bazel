@@ -13,4 +13,11 @@ project(
         # @rules_cuda_examples//basic:kernel finds no C++ toolchain in the test's configuration
         "-//tests/flag:cuda_library_sysroot_flag_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "platforms",
+        "rules_cc",
+        "rules_cuda_examples",
+    ],
 )

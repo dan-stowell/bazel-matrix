@@ -19,4 +19,10 @@ project(
         # an Xtensa port, which needs the Xtensa cross-toolchain (its xtensa/config/core.h); the host x86-64 gcc lacks it
         "-//:xtensa_port",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "pico-sdk",
+        "platforms",
+        "rules_cc",
+    ],
 )

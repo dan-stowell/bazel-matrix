@@ -11,4 +11,17 @@ project(
         # it starts the lambda image through the Docker daemon (docker-sdk-python over /var/run/docker.sock), which the executors don't have
         "-//examples/python_lambda/test:integration_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_bazel_lib",
+        "aspect_rules_py",
+        "aspect_tools_telemetry",
+        "bazel_skylib",
+        "buildifier_prebuilt",
+        "container_structure_test",
+        "package_metadata",
+        "platforms",
+        "rules_oci",
+        "rules_python",
+    ],
 )

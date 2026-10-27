@@ -9,4 +9,11 @@ project(
     ],
     # its root package loads protobuf_javascript_release.bzl, which loads @rules_pkg//:providers.bzl; it declares rules_pkg 0.7.0 but resolves 1.0.1, which no longer has that file ("cannot load '@@rules_pkg+//:providers.bzl': no such file")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-cpp",
+        "hedron_compile_commands",
+        "protobuf",
+        "rules_pkg",
+    ],
 )

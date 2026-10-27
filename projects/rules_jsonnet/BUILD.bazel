@@ -9,4 +9,12 @@ project(
     ],
     # with rules_go 0.65.0, gazelle's go_repository_tools fails: "go.work requires go >= 1.24.12 (running go 1.23.7; GOTOOLCHAIN=local)" (its Go SDK is too old)
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "jsonnet",
+        "jsonnet_go",
+        "rules_python",
+        "rules_rust",
+    ],
 )

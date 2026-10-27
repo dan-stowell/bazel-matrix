@@ -11,4 +11,9 @@ project(
         # a vendored cpu_features copy whose BUILD.bazel loads @bazel_skylib, which suitesparse's MODULE.bazel doesn't declare; its own BUILD.bazel doesn't use it
         "--deleted_packages=GraphBLAS/cpu_features",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "platforms",
+        "rules_cc",
+    ],
 )

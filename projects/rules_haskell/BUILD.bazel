@@ -9,4 +9,27 @@ project(
     ],
     # its resolved rules_nixpkgs_core's util.bzl loads get_cpu_value from @bazel_tools//tools/cpp:lib_cc_configure.bzl, which Bazel 9 no longer has; its own haskell/*.bzl also use the removed native CcInfo/CcSharedLibraryInfo
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_rules_js",
+        "bazel_skylib",
+        "gazelle",
+        "platforms",
+        "protobuf",
+        "rules_cc",
+        "rules_go",
+        "rules_java",
+        "rules_license",
+        "rules_nixpkgs_cc",
+        "rules_nixpkgs_core",
+        "rules_nixpkgs_go",
+        "rules_nixpkgs_nodejs",
+        "rules_nixpkgs_posix",
+        "rules_nixpkgs_python",
+        "rules_nodejs",
+        "rules_proto",
+        "rules_python",
+        "rules_sh",
+        "stardoc",
+    ],
 )

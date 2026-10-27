@@ -9,4 +9,9 @@ project(
     ],
     # its only target is a swift_library, and rules_swift finds no Swift toolchain on the Linux executors
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "apple_support",
+        "rules_swift",
+    ],
 )

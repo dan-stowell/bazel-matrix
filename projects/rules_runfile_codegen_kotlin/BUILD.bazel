@@ -9,4 +9,15 @@ project(
     ],
     # its MODULE.bazel has a local_path_override for rules_runfile_codegen_core at ../core: BCR's strip_prefix extracts only this module's directory of the monorepo archive, so the sibling core/ is outside the extracted workspace ("The repository's path is \"../core\" ... does not exist")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_features",
+        "bazel_skylib",
+        "protobuf",
+        "rules_java",
+        "rules_jvm_external",
+        "rules_kotlin",
+        "rules_runfile_codegen_core",
+        "stardoc",
+    ],
 )

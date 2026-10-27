@@ -9,4 +9,8 @@ project(
     ],
     # the overlay's //:generate_headers runs `ln -sf $pkg_dir/Makefile.common Makefile.common`, which fails as the main repo (pkg_dir is .: "are the same file")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "rules_cc",
+    ],
 )

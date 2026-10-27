@@ -13,4 +13,16 @@ project(
         # the patchelf module's BUILD.bazel calls native cc_binary, which Bazel 9 removed; autoload it
         "--incompatible_autoload_externally=+@rules_cc",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "hermetic_cc_toolchain",
+        "patchelf",
+        "platforms",
+        "pre-commit",
+        "pre-commit-hooks",
+        "rules_license",
+        "rules_python",
+        "toolchain_utils",
+    ],
 )

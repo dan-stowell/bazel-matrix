@@ -9,4 +9,19 @@ project(
         # its bats runner execs runfiles/libexec/bats-core/bats, which isn't in its runfiles ("No such file or directory", exit 127)
         "-//cmd/gotopt2:gotopt2_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_bats",
+        "bazel_lib",
+        "bazel_skylib",
+        "bazel_skylib_gazelle_plugin",
+        "buildifier_prebuilt",
+        "gazelle",
+        "protobuf",
+        "rules_go",
+        "rules_multitool",
+        "rules_pkg",
+        "rules_shell",
+        "stardoc",
+    ],
 )

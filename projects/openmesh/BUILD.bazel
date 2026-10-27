@@ -9,4 +9,10 @@ project(
     ],
     # its BCR source URL (www.graphics.rwth-aachen.de) refuses connections from the runners and this VM ("Connection refused"), and the BCR lists no mirror
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "platforms",
+        "rules_cc",
+        "rules_license",
+    ],
 )

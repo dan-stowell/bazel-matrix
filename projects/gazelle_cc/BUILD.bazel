@@ -11,4 +11,17 @@ project(
         # same: its compilation-test repo loads grpc 1.70.1's bazel/generate_cc.bzl, which Bazel 9 rejects
         "-//language/cc/testdata:cc_grpc_library_index_only_compilation",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "gazelle",
+        "grpc",
+        "package_metadata",
+        "platforms",
+        "protobuf",
+        "rules_cc",
+        "rules_go",
+        "rules_proto",
+        "rules_python",
+    ],
 )

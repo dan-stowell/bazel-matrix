@@ -9,4 +9,11 @@ project(
     ],
     # its MODULE.bazel has local_path_override(engflowapis, path = ".."), which applies as the root module: the module is the java/ directory of the EngFlow/engflowapis repo, and its archive has nothing at .. ("No MODULE.bazel ... found in external/engflowapis+")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "engflowapis",
+        "grpc-java",
+        "protobuf",
+        "rules_java",
+    ],
 )

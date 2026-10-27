@@ -9,4 +9,18 @@ project(
     ],
     # its protoc-gen-validate and grpc deps use the native JavaInfo and PyInfo symbols, which Bazel 9 removed
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "cel-spec",
+        "gazelle",
+        "googleapis",
+        "grpc",
+        "protobuf",
+        "protoc-gen-validate",
+        "re2",
+        "rules_cc",
+        "rules_go",
+        "rules_python",
+    ],
 )

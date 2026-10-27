@@ -9,4 +9,18 @@ project(
     ],
     # its pkl module extension reads //.github:PklProject.deps.json, and the release archive has no .github/ package ("Unable to load package for //.github:PklProject.deps.json")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_bazel_lib",
+        "bazel_skylib",
+        "buildifier_prebuilt",
+        "gazelle",
+        "platforms",
+        "rules_bazel_integration_test",
+        "rules_java",
+        "rules_jvm_external",
+        "rules_python",
+        "rules_shell",
+        "stardoc",
+    ],
 )

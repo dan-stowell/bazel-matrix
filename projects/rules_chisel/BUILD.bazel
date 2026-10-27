@@ -15,4 +15,16 @@ project(
         # needs @chisel_firtool, whose repo rule needs Java 11+ on PATH, which the runner image lacks ("Preparing firtool requires Java 11 or newer on PATH")
         "-//tests/smoke:fir_verilog_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "rules_java",
+        "rules_jvm_external",
+        "rules_license",
+        "rules_python",
+        "rules_scala",
+        "rules_shell",
+        "rules_verilog",
+        "verilator",
+    ],
 )

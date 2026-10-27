@@ -41,4 +41,11 @@ project(
         # same: starlark_pytest, pytest can't import its plugin bazel.python.starlark_finder
         "-//private/utf8:test_utf8",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_rules_py",
+        "bazel_skylib",
+        "buildifier_prebuilt",
+        "rules_python",
+    ],
 )
