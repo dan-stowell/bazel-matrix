@@ -1,6 +1,6 @@
 """Rules that run one project's inner Bazel; see README.md.
 
-`project()` (used by the generated //<module>:BUILD.bazel) declares
+`project()` (used by the generated //projects/<module>:BUILD.bazel) declares
   - `build`: an action running inner `bazel build`, writing a summary and
     the inner log. It runs on the machine running the outer Bazel
     (no-remote-exec), but is not `local`, so the outer remote cache keeps

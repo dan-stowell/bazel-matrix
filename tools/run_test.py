@@ -36,10 +36,10 @@ class ParseLogTest(unittest.TestCase):
             OUTER,
             "INFO: Elapsed time: 9s",
             "INFO: Build completed, 1 test FAILED, 3 total actions",
-            "//zlib:test                                  (cached) PASSED in 30.1s",
-            "\x1b[32m//re2:test\x1b[0m    FAILED in 10s",
+            "//projects/zlib:test                                  (cached) PASSED in 30.1s",
+            "\x1b[32m//projects/re2:test\x1b[0m    FAILED in 10s",
             "  /path/to/re2/test.log",
-            "//other:test PASSED in 1s",
+            "//projects/other:test PASSED in 1s",
             "",
             "Executed 1 out of 3 tests: 2 tests pass and 1 fails remotely.",
             OUTER,
@@ -52,16 +52,16 @@ class ParseLogTest(unittest.TestCase):
 
     def test_inner_output_is_not_a_result(self):
         inner_block = [
-            "==================== Test output for //zlib:test:",
+            "==================== Test output for //projects/zlib:test:",
             INNER,
-            "//zlib:test   PASSED in 1s",
+            "//projects/zlib:test   PASSED in 1s",
             "",
             "Executed 1 out of 1 test: 1 test passes.",
             INNER,
             "wall time: 20s",
             "================================================================================",
         ]
-        summary = ["//zlib:test  FAILED in 25s", "  /path/test.log", "",
+        summary = ["//projects/zlib:test  FAILED in 25s", "  /path/test.log", "",
                    "Executed 1 out of 1 test: 1 fails locally.", OUTER,
                    "(command exited with code 3)"]
         log = "\n".join([OUTER] + inner_block + summary)
@@ -74,11 +74,11 @@ class ParseLogTest(unittest.TestCase):
         log = "\n".join([
             OUTER,
             "INFO: From Building zlib with inner Bazel 9.3.1:",
-            "Target //zlib:build up-to-date:",  # inner-looking noise outside the summary
+            "Target //projects/zlib:build up-to-date:",  # inner-looking noise outside the summary
             "INFO: Found 3 targets...",
-            "Target //zlib:build up-to-date:",
-            "  bazel-bin/zlib/build.txt",
-            "\x1b[31mTarget //re2:build failed to build\x1b[0m",
+            "Target //projects/zlib:build up-to-date:",
+            "  bazel-bin/projects/zlib/build.txt",
+            "\x1b[31mTarget //projects/re2:build failed to build\x1b[0m",
             "INFO: Elapsed time: 11.1s, Critical Path: 0.3s",
             "INFO: 19 processes: 7 remote cache hit, 12 internal.",
             "ERROR: Build did NOT complete successfully",
@@ -94,7 +94,7 @@ class ParseLogTest(unittest.TestCase):
         log = "\n".join([
             OUTER,
             "INFO: Found 1 target...",
-            "Target //apple_support:build failed to build",
+            "Target //projects/apple_support:build failed to build",
             "Use --verbose_failures to see the command lines of failed build steps.",
             "INFO: Elapsed time: 41.7s, Critical Path: 41.0s",
             "INFO: 2 processes: 11 action cache hit, 2 internal.",
@@ -108,10 +108,10 @@ class ParseLogTest(unittest.TestCase):
     def test_build_of_known_failing_test_project(self):
         log = "\n".join([
             OUTER,
-            "Target //c:build up-to-date:",
-            "  bazel-bin/c/build.txt",
+            "Target //projects/c:build up-to-date:",
+            "  bazel-bin/projects/c/build.txt",
             "INFO: Elapsed time: 5s",
-            "//a:test   PASSED in 3s",
+            "//projects/a:test   PASSED in 3s",
             "",
             "Executed 1 out of 1 test: 1 test passes.",
             OUTER,

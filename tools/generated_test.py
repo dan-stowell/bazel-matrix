@@ -1,6 +1,6 @@
-"""Checks the committed projects.json and <module>/BUILD.bazel files against
-projects.txt: they drift when projects.txt changes without a re-run of
-`python3 tools/sync.py`. Needs no BCR clone: what it checks depends only on
+"""Checks the committed projects.json and projects/<module>/BUILD.bazel files
+against projects.txt: they drift when projects.txt changes without a re-run
+of `python3 tools/sync.py`. Needs no BCR clone: what it checks depends only on
 projects.txt and projects.json."""
 
 import json

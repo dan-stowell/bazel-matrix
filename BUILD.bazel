@@ -1,4 +1,4 @@
-# Root package. Projects live in //<module>/; see README.md.
+# Root package. Projects live in //projects/<module>/; see README.md.
 
 load("//tools:project.bzl", "string_list_setting", "string_setting")
 load("//tools:versions.bzl", "DEFAULT_INNER_BAZEL")

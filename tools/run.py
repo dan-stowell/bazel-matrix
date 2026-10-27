@@ -15,7 +15,7 @@ bb-out/run/<command>-<time>-<pid>/. Exit status 0 when every project passed
 or failed as expected (see below) and every shard's runner Bazel exited 0,
 or the exit its expected failures explain (3 tests, 1 builds).
 
-Without project names it leaves out what `//...` leaves out: a
+Without project names it leaves out what `//projects/...` leaves out: a
 `known-failing build` project entirely; for a `known-failing test` project,
 `test` runs its :build instead of its :test (row BUILT), so a regression of
 its inner build still shows.
@@ -59,11 +59,11 @@ _EXCUSABLE = {"build": {"FAILED", "FAILED TO BUILD", "TIMEOUT"}, "test": {"FAILE
 _ANSI = re.compile(r"\x1b\[[0-9;]*[A-Za-z]|\[\d+(?:;\d+)*m")
 _EXIT = re.compile(r"\(command exited with code (\d+)\)")
 _STREAM = re.compile(r"Streaming build results to: (\S+/invocation/[0-9a-f-]+)")
-_TEST = re.compile(r"^//([^:\s/]+):test\s+(?:\(cached\)\s+)?"
+_TEST = re.compile(r"^//projects/([^:\s/]+):test\s+(?:\(cached\)\s+)?"
                    r"(PASSED|FAILED TO BUILD|FAILED|TIMEOUT|FLAKY|NO STATUS|INCOMPLETE|"
                    r"REMOTE FAILURE|SKIPPED)\b")
 # With --show_result (see run_shard), Bazel reports every top-level target.
-_BUILD = re.compile(r"^Target //([^:\s/]+):build (up-to-date|failed to build)")
+_BUILD = re.compile(r"^Target //projects/([^:\s/]+):build (up-to-date|failed to build)")
 # The line ending the outer summary, a few lines before the outer Bazel's
 # last "Streaming build results to" line.
 _END = {"build": re.compile(r"^INFO: Elapsed time: "),
@@ -145,7 +145,7 @@ def summary_lines(lines, command):
     """The outer Bazel's final summary lines, [] if it never printed one.
 
     Only those: a project's inner output (in a failing outer test's log)
-    has result lines of its own, maybe even `//<project>:test PASSED`.
+    has result lines of its own, maybe even `//projects/<project>:test PASSED`.
     """
     links = [i for i, l in enumerate(lines) if _STREAM.search(l)]
     if not links:
@@ -185,7 +185,7 @@ def parse_log(text, command, targets):
 
 
 def run_shard(i, command, targets, extra, out_dir):
-    labels = ["//%s:%s" % kv for kv in sorted(targets.items())]
+    labels = ["//projects/%s:%s" % kv for kv in sorted(targets.items())]
     if not labels:
         raise ValueError("shard %d is empty" % i)
     log_path = os.path.join(out_dir, "%d.log" % i)
@@ -277,7 +277,7 @@ def main(argv=None):
         if n in skipped:
             sys.exit("%s: skipped by sync: %s" % (n, skipped[n]))
     # Only the projects sync wrote a package for.
-    projects = [p for p in projects if os.path.exists(os.path.join(ROOT, p["name"], "BUILD.bazel"))]
+    projects = [p for p in projects if os.path.exists(os.path.join(ROOT, sync.PROJECTS, p["name"], "BUILD.bazel"))]
     targets = select_projects(projects, args.command, args.projects, args.known_failing)
     kf = {p["name"]: p["known_failing"][0] for p in projects if p.get("known_failing")}
     if not targets:

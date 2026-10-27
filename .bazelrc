@@ -11,7 +11,7 @@ common --keep_going
 # The outer graph is a handful of rules_python repos and generated repos.
 common --lockfile_mode=off
 
-# `test //...` runs each project's inner test, which builds everything the
+# `test //projects/...` runs each project's inner test, which builds everything the
 # inner build would; don't also run the inner builds.
 test --build_tests_only
 test --test_output=errors

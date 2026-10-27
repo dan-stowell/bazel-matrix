@@ -1,6 +1,6 @@
 #!/bin/bash
 # Runs a Bazel command on a BuildBuddy remote runner, e.g.
-#   tools/bb.sh test //zlib/...
+#   tools/bb.sh test //projects/zlib/...
 # The runner uses the executor image tools/remote.bazelrc pins, so the C++
 # toolchain the inner Bazels autodetect on it works on the executors.
 set -euo pipefail

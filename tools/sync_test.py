@@ -212,7 +212,7 @@ class GeneratedTest(unittest.TestCase):
 
     def test_build_files(self):
         files = sync.build_files(self.PROJECTS, ["a", "c"])
-        self.assertEqual(sorted(files), ["a/BUILD.bazel", "c/BUILD.bazel"])
+        self.assertEqual(sorted(files), ["projects/a/BUILD.bazel", "projects/c/BUILD.bazel"])
         self.assertIn('known_failing = "build"', files["a/BUILD.bazel"])
 
     def test_module_mismatch(self):
