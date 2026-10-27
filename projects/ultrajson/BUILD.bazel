@@ -9,4 +9,9 @@ project(
         # the vendored double-conversion's test includes double-conversion/bignum.h, a path no dep of that target provides
         "-//deps/double-conversion:cctest",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "platforms",
+        "rules_cc",
+    ],
 )

@@ -47,4 +47,27 @@ project(
         # the sdformat it resolves has a BUILD.bazel calling native cc rules, which Bazel 9 removed; autoload them from rules_cc
         "--incompatible_autoload_externally=+@rules_cc",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "boost.algorithm",
+        "boost.asio",
+        "boost.bind",
+        "boost.filesystem",
+        "boost.foreach",
+        "boost.format",
+        "boost.fusion",
+        "boost.integer",
+        "boost.iostreams",
+        "boost.math",
+        "boost.property_tree",
+        "boost.serialization",
+        "boost.test",
+        "boost.type_traits",
+        "boost.variant",
+        "cmake_configure_file",
+        "eigen",
+        "rules_cc",
+        "sdformat",
+    ],
 )

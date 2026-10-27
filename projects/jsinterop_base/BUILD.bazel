@@ -9,4 +9,13 @@ project(
     ],
     # as the root, its archive_override of j2cl to the j2cl master branch applies, and j2cl master's j2cl_maven_import_external no longer takes the `testonly` its MODULE.bazel passes
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "google_bazel_common",
+        "j2cl",
+        "rules_java",
+        "rules_jvm_external",
+        "rules_license",
+    ],
 )

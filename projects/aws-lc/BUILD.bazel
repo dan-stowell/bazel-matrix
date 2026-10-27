@@ -11,4 +11,12 @@ project(
         # the vendored googletest's own test package loads @rules_python, which aws-lc's MODULE.bazel doesn't declare
         "--deleted_packages=third_party/googletest/test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "googletest",
+        "platforms",
+        "rules_autoconf",
+        "rules_cc",
+    ],
 )

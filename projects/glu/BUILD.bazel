@@ -9,4 +9,9 @@ project(
     ],
     # its sources include GL/gl.h, which no declared dep provides and the executor image lacks (no OpenGL/Mesa headers)
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "platforms",
+        "rules_cc",
+    ],
 )

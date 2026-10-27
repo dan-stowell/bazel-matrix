@@ -9,4 +9,15 @@ project(
     ],
     # its .bazelrc imports .aspect/bazelrc/performance.bazelrc, which sets --incompatible_remote_results_ignore_disk, which Bazel 9 no longer recognizes ("Unrecognized option")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_bazel_lib",
+        "aspect_rules_js",
+        "bazel_skylib",
+        "bazel_skylib_gazelle_plugin",
+        "buildifier_prebuilt",
+        "gazelle",
+        "rules_nodejs",
+        "stardoc",
+    ],
 )

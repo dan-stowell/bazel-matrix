@@ -15,4 +15,28 @@ project(
     ],
     # the rules_rust 0.51.0 it declares uses the native CcInfo, which Bazel 9 removed; overriding it to 0.54.1 (the last with @rules_rust//wasm_bindgen, which its MODULE.bazel uses; later releases moved it to rules_rust_wasm_bindgen) still fails (rust/private/rust.bzl: "at index 0 of providers, got element of type ...BaseRuleClasses$5, want Provider"); the aspect_bazel_lib it resolves also loads @local_config_platform, which Bazel 9 no longer provides
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_bazel_lib",
+        "aspect_rules_js",
+        "aspect_rules_lint",
+        "aspect_rules_py",
+        "aspect_rules_ts",
+        "bazel_skylib",
+        "buildifier_prebuilt",
+        "cppzmq",
+        "googletest",
+        "hedron_compile_commands",
+        "libzmq",
+        "pico-sdk",
+        "picotool",
+        "platforms",
+        "pybind11_bazel",
+        "rules_cc",
+        "rules_foreign_cc",
+        "rules_nodejs",
+        "rules_platform",
+        "rules_python",
+        "rules_rust",
+    ],
 )

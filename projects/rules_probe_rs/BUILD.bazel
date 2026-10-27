@@ -9,4 +9,13 @@ project(
         # the stardoc-generated docs/rules-docgen.md differs from the checked-in docs/rules.md ("files ... differ"); the cause of the drift is unconfirmed
         "-//docs:update_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_bazel_lib",
+        "bazel_skylib",
+        "bazel_skylib_gazelle_plugin",
+        "buildifier_prebuilt",
+        "gazelle",
+        "platforms",
+    ],
 )

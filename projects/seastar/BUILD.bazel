@@ -17,4 +17,27 @@ project(
     ],
     # its core library //:seastar includes system headers the executor image lacks (valgrind/valgrind.h, hwloc.h, netinet/sctp.h) and uses std::hardware_destructive_interference_size, which the image's gcc 11 libstdc++ lacks (the flags below get it to compile)
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "boost.algorithm",
+        "boost.asio",
+        "boost.endian",
+        "boost.filesystem",
+        "boost.intrusive",
+        "boost.lockfree",
+        "boost.program_options",
+        "boost.range",
+        "boost.test",
+        "c-ares",
+        "fmt",
+        "liburing",
+        "lz4",
+        "openssl",
+        "protobuf",
+        "ragel",
+        "rules_cc",
+        "rules_python",
+        "yaml-cpp",
+    ],
 )

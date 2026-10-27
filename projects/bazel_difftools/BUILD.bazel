@@ -9,4 +9,11 @@ project(
     ],
     # with these overrides, gazelle's go_repository_tools fails to build: "go: go.work requires go >= 1.24" (the Go SDK it resolves is older)
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "build_stack_rules_proto",
+        "gazelle",
+        "rules_go",
+        "rules_proto",
+    ],
 )

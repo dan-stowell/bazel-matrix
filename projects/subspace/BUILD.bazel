@@ -7,4 +7,26 @@ project(
     targets = [
         "//...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-cpp",
+        "bazel_skylib",
+        "boost.asio",
+        "boost.coroutine",
+        "coroutines",
+        "cpp_toolbelt",
+        "googletest",
+        "platforms",
+        "protobuf",
+        "pybind11_bazel",
+        "rules_android_ndk",
+        "rules_cc",
+        "rules_java",
+        "rules_pkg",
+        "rules_proto",
+        "rules_python",
+        "rules_rust",
+        "rules_shell",
+        "zlib",
+    ],
 )

@@ -13,4 +13,12 @@ project(
         # needs //:snappy-test (above)
         "-//:snappy_unittest",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "google_benchmark",
+        "googletest",
+        "platforms",
+        "rules_cc",
+    ],
 )

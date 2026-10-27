@@ -15,4 +15,12 @@ project(
         # zenoh-c registers its llvm cc toolchain only as a dev dependency too; with gcc, the ring crate's rlib embeds the absolute execroot, which rules_rs's process wrapper rejects
         "--extra_toolchains=@@llvm+//toolchain:all",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "rules_cc",
+        "rules_shell",
+        "zenoh-c",
+        "zenoh-pico",
+    ],
 )

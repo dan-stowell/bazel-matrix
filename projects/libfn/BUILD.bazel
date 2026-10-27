@@ -9,4 +9,8 @@ project(
         # a separate consumer workspace (test_package/MODULE.bazel); built from the root, its main.cpp gets no -std flag, and gcc's default C++17 lacks std::remove_cvref_t
         "-//test_package/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "rules_cc",
+    ],
 )

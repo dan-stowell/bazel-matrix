@@ -9,4 +9,22 @@ project(
         # uses @boost.url.extra, which its MODULE.bazel doesn't declare
         "-//test:boost.url_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "boost",
+        "boost.align",
+        "boost.assert",
+        "boost.config",
+        "boost.container",
+        "boost.core",
+        "boost.filesystem",
+        "boost.mp11",
+        "boost.optional",
+        "boost.system",
+        "boost.throw_exception",
+        "boost.type_traits",
+        "boost.variant2",
+        "platforms",
+        "rules_cc",
+    ],
 )

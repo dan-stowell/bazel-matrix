@@ -9,4 +9,12 @@ project(
         # its shellcheck wrapper execs a binary that the ocx repo rule installed under the inner Bazel's $HOME on the runner (/var/tmp/.../home/.ocx/...), which doesn't exist on the remote executor ("No such file or directory")
         "-//ocx/tests:dev_tools_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "buildifier_prebuilt",
+        "platforms",
+        "rules_shell",
+        "stardoc",
+    ],
 )

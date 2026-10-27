@@ -9,4 +9,10 @@ project(
         # the stardoc-generated docs.md differs from the checked-in README.md ("files ... differ"); the cause of the drift (Bazel 9, stardoc version) is unconfirmed
         "-//:docs_diff_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "platforms",
+        "stardoc",
+    ],
 )

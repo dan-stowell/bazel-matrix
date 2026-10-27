@@ -15,4 +15,15 @@ project(
         # asserts hello.txt in the artifact isn't executable, but on the executors it has the execute bits set ("filemode(...) & 0x49 == 0", evaluated 0x49 == 0); that RBE input staging sets them is not confirmed
         "-//julia/private/tests/artifact:artifact_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "platforms",
+        "rules_batch",
+        "rules_cc",
+        "rules_rust_mdbook",
+        "rules_shell",
+        "stardoc",
+        "toml.bzl",
+    ],
 )

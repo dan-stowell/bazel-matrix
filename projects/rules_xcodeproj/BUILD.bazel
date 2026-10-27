@@ -11,4 +11,15 @@ project(
         # depends on //:py_init_shim, but the release archive has no root BUILD file ("no such package ''")
         "-//tools/params_processors:cc_compiler_params_processor_tests",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "apple_support",
+        "bazel_features",
+        "bazel_skylib",
+        "rsync",
+        "rules_apple",
+        "rules_cc",
+        "rules_python",
+        "rules_swift",
+    ],
 )

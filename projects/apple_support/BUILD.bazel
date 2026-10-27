@@ -9,4 +9,17 @@ project(
     ],
     # needs macOS: //toolchain:xcode_env fails analysis without Xcode
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_features",
+        "bazel_skylib",
+        "bazel_skylib_gazelle_plugin",
+        "gazelle",
+        "platforms",
+        "protobuf",
+        "rules_cc",
+        "rules_go",
+        "rules_shell",
+        "stardoc",
+    ],
 )

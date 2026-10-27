@@ -13,4 +13,12 @@ project(
         # a separate workspace (examples/blinkie/MODULE.bazel) using @avr and hedron_compile_commands, which the root module doesn't declare
         "--deleted_packages=examples/blinkie,examples/blinkie/src/hello,examples/blinkie/src/pulse",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "platforms",
+        "rules_cc",
+        "rules_rust",
+        "rules_shell",
+    ],
 )

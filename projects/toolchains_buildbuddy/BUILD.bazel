@@ -13,4 +13,12 @@ project(
         # as rbe_bzlmod_test: needs BUILDBUDDY_API_KEY in the test environment
         "-//examples:rbe_workspace_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "buildifier_prebuilt",
+        "platforms",
+        "rules_bazel_integration_test",
+        "rules_cc",
+        "rules_java",
+    ],
 )

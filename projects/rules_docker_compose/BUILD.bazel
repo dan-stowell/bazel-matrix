@@ -13,4 +13,16 @@ project(
         # needs a Docker daemon, which the executors don't have ("Cannot connect to the Docker daemon at unix:///var/run/docker.sock")
         "-//docker_compose/private/tests/verification:verification_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "gazelle",
+        "platforms",
+        "rules_go",
+        "rules_img",
+        "rules_oci",
+        "rules_rust_mdbook",
+        "rules_shell",
+        "stardoc",
+    ],
 )

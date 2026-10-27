@@ -7,4 +7,13 @@ project(
     targets = [
         "//...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "platforms",
+        "rules_bison",
+        "rules_cc",
+        "rules_cc_autoconf",
+        "rules_license",
+        "rules_m4",
+    ],
 )

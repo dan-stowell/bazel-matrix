@@ -13,4 +13,13 @@ project(
         # its deps (curl, googletest) call native cc_library, which Bazel 9 removed; autoload them from rules_cc
         "--incompatible_autoload_externally=+@rules_cc",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "curl",
+        "googletest",
+        "openssl",
+        "platforms",
+        "rules_cc",
+    ],
 )

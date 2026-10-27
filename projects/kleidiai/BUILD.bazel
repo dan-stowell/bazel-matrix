@@ -9,4 +9,12 @@ project(
     ],
     # its kernels are Arm-only: the x86-64 executors' gcc rejects their -march=armv8-a/armv8.2-a+... flags ("bad value ('armv8.2-a+sve+sve2') for '-march=' switch")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "google_benchmark",
+        "googletest",
+        "platforms",
+        "rules_cc",
+    ],
 )

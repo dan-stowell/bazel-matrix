@@ -7,4 +7,16 @@ project(
     targets = [
         "//...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "assimp",
+        "boost.filesystem",
+        "boost.math",
+        "boost.serialization",
+        "eigen",
+        "octomap",
+        "qhull",
+        "rules_cc",
+        "rules_license",
+    ],
 )

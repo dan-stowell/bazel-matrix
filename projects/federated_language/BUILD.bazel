@@ -9,4 +9,11 @@ project(
         # examples/ uses @examples_pypi, which its MODULE.bazel doesn't declare, and an `executor` package the archive lacks
         "-//examples/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "protobuf",
+        "rules_license",
+        "rules_python",
+        "rules_shell",
+    ],
 )

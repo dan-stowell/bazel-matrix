@@ -13,4 +13,11 @@ project(
         # same, for ReturnValueIgnored in java/tests/.../CopyPolicyTest.java ("Return value of 'getDeclaredMethod' must be used")
         "--javacopt=-Xep:ReturnValueIgnored:WARN",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "protobuf",
+        "rules_java",
+        "rules_jvm_external",
+        "rules_proto",
+    ],
 )

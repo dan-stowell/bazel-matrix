@@ -47,4 +47,12 @@ project(
         # web_test runner: "cannot find @bazel_tools//tools/bash/runfiles:runfiles.bash" (Bazel 9 dropped it)
         "-//go/wtl/proxy/driverhub/scripttimeout:go_default_test_firefox-local",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "gazelle",
+        "platforms",
+        "rules_go",
+        "rules_shell",
+    ],
 )

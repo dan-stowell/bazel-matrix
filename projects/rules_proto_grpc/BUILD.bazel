@@ -9,4 +9,13 @@ project(
         # clippy (enabled by its .bazelrc) fails on //tools/fixer:fixer
         "-//tools/fixer/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_bazel_lib",
+        "bazel_skylib",
+        "platforms",
+        "protobuf",
+        "rules_rust",
+        "toolchains_protoc",
+    ],
 )

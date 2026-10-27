@@ -13,4 +13,15 @@ project(
     ],
     # its MODULE.bazel archive_overrides j2cl, jsinterop_generator and jsinterop_base to their unpinned GitHub master.zip archives (no integrity), so it builds against whatever master is now; with rules_go and bazel_worker_api fixed, those deps reference @maven artifacts (args4j_args4j, org_jspecify_jspecify, com_google_escapevelocity_escapevelocity) that the resolved maven repo doesn't define
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "google_bazel_common",
+        "j2cl",
+        "jsinterop_base",
+        "jsinterop_generator",
+        "rules_java",
+        "rules_jvm_external",
+        "rules_license",
+    ],
 )

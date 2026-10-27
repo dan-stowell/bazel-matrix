@@ -11,4 +11,12 @@ project(
         # its deps rules_autoconf and libxml2 call native cc_binary/cc_library, which Bazel 9 removed; autoload them from rules_cc
         "--incompatible_autoload_externally=+@rules_cc",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_bazel_lib",
+        "libxml2",
+        "platforms",
+        "rules_autoconf",
+        "rules_cc",
+    ],
 )

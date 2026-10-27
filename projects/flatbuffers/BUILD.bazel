@@ -23,4 +23,19 @@ project(
         # its dev deps (an old re2, via grpc) call native cc_library/cc_test, which Bazel 9 removed; autoload them from rules_cc
         "--incompatible_autoload_externally=+@rules_cc",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_bazel_lib",
+        "aspect_rules_esbuild",
+        "aspect_rules_js",
+        "aspect_rules_ts",
+        "bazel_skylib",
+        "grpc",
+        "platforms",
+        "rules_cc",
+        "rules_go",
+        "rules_nodejs",
+        "rules_shell",
+        "rules_swift",
+    ],
 )

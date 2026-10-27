@@ -9,4 +9,19 @@ project(
     ],
     # bazel/BUILD loads //Tests:generated_tests.bzl, but the release archive has no Tests package; it is also a Swift project, and the images lack swift
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "apple_support",
+        "bazel_skylib",
+        "platforms",
+        "rules_apple",
+        "rules_cc",
+        "rules_shell",
+        "rules_swift",
+        "rules_xcodeproj",
+        "sourcekitten",
+        "swift-filename-matcher",
+        "swift_argument_parser",
+        "yams",
+    ],
 )

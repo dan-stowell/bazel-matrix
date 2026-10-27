@@ -9,4 +9,21 @@ project(
     ],
     # its dev dep local_repository ./lib/tests/external_test_repo isn't in the release archive; without dev deps, tools/* can't load @io_bazel_rules_go
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_features",
+        "bazel_lib",
+        "bazel_skylib",
+        "bazel_skylib_gazelle_plugin",
+        "buildifier_prebuilt",
+        "external_test_repo",
+        "gazelle",
+        "jq.bzl",
+        "platforms",
+        "rules_go",
+        "rules_shell",
+        "stardoc",
+        "tar.bzl",
+        "yq.bzl",
+    ],
 )

@@ -21,4 +21,13 @@ project(
         # (not an exclusion: //... fails on a broken package even when subtracted) its genrule uses exec_tools, which Bazel 9 removed
         "--deleted_packages=clang-tools-extra/clang-tidy",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "apple_support",
+        "bazel_skylib",
+        "platforms",
+        "rules_cc",
+        "rules_python",
+        "rules_shell",
+    ],
 )

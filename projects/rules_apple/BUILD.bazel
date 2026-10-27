@@ -9,4 +9,16 @@ project(
     ],
     # needs macOS: its tests compile with /usr/bin/xcrun and need a macOS execution platform
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "apple_support",
+        "bazel_skylib",
+        "platforms",
+        "rules_cc",
+        "rules_python",
+        "rules_shell",
+        "rules_swift",
+        "stardoc",
+        "xctestrunner",
+    ],
 )

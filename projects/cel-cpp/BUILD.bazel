@@ -13,4 +13,25 @@ project(
         # these gtest cases need tzdata, which the executor image lacks: the 5 cel-spec timestamp_selectors_tz conformance cases with named zones (Australia/Sydney, US/Central, America/St_Johns, Asia/Kathmandu fail with "Invalid timezone"), the builtin TestTimestampFunctionsWithTimeZone, and ExtensionTest's America/Los_Angeles cases, which abort (exit 134) on the error result via TimestampOrDie()/MessageOrDie()
         "--test_filter=-timestamps.timestamp_selectors_tz/getDate:timestamps.timestamp_selectors_tz/getDayOfMonth_name_pos:timestamps.timestamp_selectors_tz/getDayOfMonth_name_neg:timestamps.timestamp_selectors_tz/getDayOfYear:timestamps.timestamp_selectors_tz/getMinutes:BuiltinsTest.TestTimestampFunctionsWithTimeZone:ExtensionTest.TestGetDate:ExtensionTest.TestGetTimeOfDay",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-cpp",
+        "antlr4-cpp-runtime",
+        "bazel_skylib",
+        "cel-spec",
+        "flatbuffers",
+        "google_benchmark",
+        "googleapis",
+        "googleapis-cc",
+        "googletest",
+        "platforms",
+        "protobuf",
+        "re2",
+        "rules_cc",
+        "rules_java",
+        "rules_license",
+        "rules_proto",
+        "rules_python",
+        "yaml-cpp",
+    ],
 )

@@ -9,4 +9,17 @@ project(
         # uses @boost.atomic, @boost.bind, @boost.chrono, @boost.function, @boost.test, @boost.thread, which its MODULE.bazel doesn't declare
         "-//test/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "boost",
+        "boost.assert",
+        "boost.config",
+        "boost.context",
+        "boost.core",
+        "boost.intrusive",
+        "boost.predef",
+        "boost.smart_ptr",
+        "platforms",
+        "rules_cc",
+    ],
 )

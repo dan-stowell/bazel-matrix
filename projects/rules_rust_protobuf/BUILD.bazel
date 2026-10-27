@@ -9,4 +9,15 @@ project(
     ],
     # //:default_proto_toolchain_impl (rust_proto_toolchain) asks for the @rules_proto//proto:toolchain_type toolchain, which its rule doesn't declare ("toolchain type ... was requested but only types [] are configured"); it is the module's default toolchain
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_ci_rules",
+        "bazel_features",
+        "bazel_skylib",
+        "platforms",
+        "protobuf",
+        "rules_cc",
+        "rules_proto",
+        "rules_rust",
+    ],
 )

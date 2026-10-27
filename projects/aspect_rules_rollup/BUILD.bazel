@@ -25,4 +25,14 @@ project(
         # the checked-in docs are out of date for the stardoc resolved here, whose output adds a load() line to each usage block
         "-//docs:update_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_bazel_lib",
+        "aspect_rules_js",
+        "bazel_skylib",
+        "buildifier_prebuilt",
+        "platforms",
+        "rules_nodejs",
+        "stardoc",
+    ],
 )

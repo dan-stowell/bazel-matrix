@@ -13,4 +13,15 @@ project(
         # the googleapis it resolves calls native py_test (google/devtools/build/v1/BUILD.bazel), which Bazel 9 removed, so its build_proto target is missing; autoload it from rules_python, and the proto rules from protobuf
         "--incompatible_autoload_externally=+@com_google_protobuf,+@rules_python",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_lib",
+        "bazel_skylib",
+        "gazelle",
+        "googleapis",
+        "platforms",
+        "protobuf",
+        "rules_go",
+        "rules_img",
+    ],
 )

@@ -7,4 +7,23 @@ project(
     targets = [
         "//...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aws_sdk",
+        "azure-core-cpp",
+        "azure-identity-cpp",
+        "azure-storage-blobs-cpp",
+        "azure-storage-files-datalake-cpp",
+        "bazel_skylib",
+        "bzip2",
+        "lz4",
+        "platforms",
+        "rapidjson",
+        "rules_cc",
+        "snappy",
+        "thrift",
+        "xsimd",
+        "zlib",
+        "zstd",
+    ],
 )

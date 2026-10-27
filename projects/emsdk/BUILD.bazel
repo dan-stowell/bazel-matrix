@@ -15,4 +15,12 @@ project(
         # a plain cc_binary meant only as the cc_target of the wasm_cc_binary targets (still built): natively, gcc finds no wasm_simd128.h
         "-//hello-world:hello-world-simd",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "platforms",
+        "rules_cc",
+        "rules_nodejs",
+        "rules_python",
+    ],
 )

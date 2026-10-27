@@ -7,4 +7,18 @@ project(
     targets = [
         "//...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "boost",
+        "boost.assert",
+        "boost.config",
+        "boost.core",
+        "boost.mp11",
+        "boost.pool",
+        "boost.predef",
+        "boost.smart_ptr",
+        "platforms",
+        "rules_cc",
+    ],
 )

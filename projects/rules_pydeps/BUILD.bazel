@@ -11,4 +11,12 @@ project(
         # //:buildifier.test (buildifier_prebuilt's runner) does `$(readlink <buildifier runfile>)` under set -e, and RBE stages runfiles as regular files, so readlink exits 1 silently (the test fails in 0.1 s with no output); run tests on the runner, where runfiles are symlinks
         "--strategy=TestRunner=local",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "buildifier_prebuilt",
+        "platforms",
+        "rules_python",
+        "rules_uv",
+    ],
 )

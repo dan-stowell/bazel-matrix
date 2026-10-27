@@ -9,4 +9,10 @@ project(
         # SelfTest assertions fail on the executors (first: TextFlow.tests.cpp:156; also Generators.tests.cpp:321 "failure to init")
         "-//tests:catch2_self_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "rules_cc",
+        "rules_license",
+    ],
 )

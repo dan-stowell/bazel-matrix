@@ -9,4 +9,15 @@ project(
         # every diff3 action fails: the prebuilt diffutils diff3 runs a subsidiary `diff`, which exits 2 on "unrecognized option '---no-directory'" (diff3 and that diff disagree on options)
         "-//diff/tests/diff3/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_lib",
+        "bazel_skylib",
+        "bazelrc-preset.bzl",
+        "buildifier_prebuilt",
+        "package_metadata",
+        "platforms",
+        "protobuf",
+        "stardoc",
+    ],
 )

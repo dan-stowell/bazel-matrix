@@ -15,4 +15,25 @@ project(
         # skips its go_bazel_test integration tests (tagged local): each runs a third-level Bazel on the runner; all 71 took 25 min and 12 GB of runner disk, and 40 still failed
         "--test_tag_filters=-local",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "apple_support",
+        "bazel_ci_rules",
+        "bazel_features",
+        "bazel_skylib",
+        "buildifier_prebuilt",
+        "gazelle",
+        "googleapis",
+        "hermetic_cc_toolchain",
+        "package_metadata",
+        "platforms",
+        "protobuf",
+        "rules_cc",
+        "rules_proto",
+        "rules_shell",
+        "runfiles_remote_test",
+        "stardoc",
+        "toolchains_llvm",
+        "with_cfg.bzl",
+    ],
 )

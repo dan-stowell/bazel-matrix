@@ -9,4 +9,12 @@ project(
     ],
     # its own ytt/private/resolved_toolchains.bzl calls rule(incompatible_use_toolchain_transition=...), which Bazel 9 removed, and every package loads it
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_bazel_lib",
+        "bazel_features",
+        "bazel_skylib",
+        "platforms",
+        "stardoc",
+    ],
 )

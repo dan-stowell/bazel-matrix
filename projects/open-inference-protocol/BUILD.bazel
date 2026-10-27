@@ -11,4 +11,11 @@ project(
         # the grpc it resolves calls native cc and py rules, and its protoc-gen-validate uses the native JavaInfo (bazel/protobuf.bzl), all removed in Bazel 9; autoload them
         "--incompatible_autoload_externally=+@rules_cc,+@rules_python,+@rules_java,+@com_google_protobuf",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "grpc",
+        "protobuf",
+        "rules_cc",
+        "rules_go",
+    ],
 )

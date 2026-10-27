@@ -13,4 +13,19 @@ project(
         # every TestRoundTrip subtest: "go: cannot find GOROOT directory: 'go' binary is trimmed and GOROOT is not set"
         "-//tools/convert-go-deps-test-case:convert-go-deps-test-case_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_features",
+        "bazel_skylib",
+        "bazel_skylib_gazelle_plugin",
+        "package_metadata",
+        "platforms",
+        "protobuf",
+        "rules_cc",
+        "rules_go",
+        "rules_license",
+        "rules_shell",
+        "rules_testing",
+        "stardoc",
+    ],
 )

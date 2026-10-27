@@ -9,4 +9,15 @@ project(
     ],
     # its dev toolchains_protoc registers a prebuilt protoc v27.0, which rejects the --option_dependencies flag that the resolved protobuf's proto_library passes ("Unknown flag: --option_dependencies")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "rules_bazel_integration_test",
+        "rules_java",
+        "rules_proto",
+        "rules_testing",
+        "stardoc",
+        "toolchains_protoc",
+        "tweag-credential-helper",
+    ],
 )

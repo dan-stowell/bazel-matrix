@@ -9,4 +9,15 @@ project(
         # utils/extra_distributions.sh needs jq, which the executor image lacks
         "-//utils:extra_distributions_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_bazel_lib",
+        "bazel_features",
+        "bazel_skylib",
+        "mboworks_bzl",
+        "platforms",
+        "rules_cc",
+        "rules_python",
+        "tar.bzl",
+    ],
 )

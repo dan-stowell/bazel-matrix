@@ -9,4 +9,15 @@ project(
         # tools/preset.bazelrc is out of date for Bazel 9.3.1: the regenerated preset adds flags it lacks (coverage --build_runfile_links, --experimental_remote_cache_eviction_retries=5)
         "-//tools:preset.update_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_bazel_lib",
+        "aspect_rules_js",
+        "aspect_rules_lint",
+        "bazel_env.bzl",
+        "bazel_skylib",
+        "bazelrc-preset.bzl",
+        "buildifier_prebuilt",
+        "rules_nodejs",
+    ],
 )

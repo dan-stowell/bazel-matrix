@@ -7,4 +7,19 @@ project(
     targets = [
         "//...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "freetype",
+        "libavif",
+        "libheif",
+        "libjpeg_turbo",
+        "libpng",
+        "libtiff",
+        "libwebp",
+        "platforms",
+        "rules_cc",
+        "rules_cc_autoconf",
+        "zlib",
+    ],
 )

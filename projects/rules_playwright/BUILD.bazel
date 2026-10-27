@@ -13,4 +13,14 @@ project(
     ],
     # with those fixes, its own tools/config_setting/BUILD.bazel has a syntax error under Bazel 9 ("syntax error at 'for': expected expression"), and //tools:stardoc_renderer sets java_binary's main_class, which the java_binary it gets doesn't have ("no such attribute 'main_class'")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_bazel_lib",
+        "bazel_skylib",
+        "buildifier_prebuilt",
+        "platforms",
+        "rules_rust",
+        "toolchains_llvm",
+        "toolchains_musl",
+    ],
 )

@@ -9,4 +9,16 @@ project(
     ],
     # its .bazelrc sets common:linux --repo_env=CC=clang, and the image has no clang ("Cannot find gcc or CC (clang)"); with CC=gcc it still needs a Swift toolchain (rules_swift's local config defines no linux-toolchain without swiftc, which the image lacks), and its dev dep app-store-connect-openapi-specification.zip from developer.apple.com no longer matches its pinned checksum
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "apple_support",
+        "bazel_lib",
+        "jq.bzl",
+        "platforms",
+        "rules_apple",
+        "rules_cc",
+        "rules_multirun",
+        "rules_shell",
+        "rules_swift",
+    ],
 )

@@ -11,4 +11,10 @@ project(
         # a vendored googletest copy that wabt's BUILD files don't use: its test packages load @rules_python, which wabt doesn't declare, and //third_party/gtest refers to @bazel_tools//platforms, which Bazel 9 removed
         "--deleted_packages=third_party/gtest,third_party/gtest/googletest/test,third_party/gtest/googlemock/test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "platforms",
+        "rules_cc",
+    ],
 )

@@ -11,4 +11,9 @@ project(
         # (not an exclusion: //... fails on a broken package even when subtracted) the overlay's test/bcr/BUILD.bazel loads @rules_shell, which its MODULE.bazel doesn't declare
         "--deleted_packages=test/bcr",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "platforms",
+        "rules_cc",
+    ],
 )

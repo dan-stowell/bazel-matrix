@@ -13,4 +13,15 @@ project(
         # autoload the proto rules Bazel 9 removed from protobuf
         "--incompatible_autoload_externally=+@com_google_protobuf",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "gazelle",
+        "protobuf",
+        "rules_cc",
+        "rules_go",
+        "rules_java",
+        "rules_proto",
+        "rules_python",
+    ],
 )

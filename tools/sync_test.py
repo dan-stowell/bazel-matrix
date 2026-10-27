@@ -211,9 +211,13 @@ class GeneratedTest(unittest.TestCase):
     PROJECTS = sync.parse_projects_txt("a\n  known-failing build  why\nb\nc\n")
 
     def test_build_files(self):
-        files = sync.build_files(self.PROJECTS, ["a", "c"])
+        files = sync.build_files(self.PROJECTS, [
+            {"name": "a"}, {"name": "c", "deps": ["z", "x"], "dev_deps": ["y"]}])
         self.assertEqual(sorted(files), ["projects/a/BUILD.bazel", "projects/c/BUILD.bazel"])
         self.assertIn('known_failing = "build"', files["projects/a/BUILD.bazel"])
+        self.assertNotIn("deps", files["projects/a/BUILD.bazel"])
+        self.assertIn('    deps = [\n        "x",\n        "y",\n        "z",\n    ],\n',
+                      files["projects/c/BUILD.bazel"])
 
     def test_module_mismatch(self):
         def check(fetched, skipped):
@@ -274,6 +278,72 @@ class GeneratedTest(unittest.TestCase):
         self.assertEqual(sync.module_mismatch(projects, data), [
             "a: projects.json's rc file removals don't match its rc-drop lines",
             "b: projects.json's rc file removals don't match its rc-drop lines"])
+
+
+class ModuleDepsTest(unittest.TestCase):
+    def test_forms(self):
+        text = '''module(name = "m", version = "1")
+bazel_dep(name = "rules_cc", version = "0.2")  # bazel_dep(name = "in_comment")
+# bazel_dep(name = "commented")
+bazel_dep(
+    name = 'platforms',
+    version = "1.0#not-a-comment",
+    dev_dependency = True,
+)
+bazel_dep(version = "1", name = "b", repo_name = "x(")
+bazel_dep(name="googletest",dev_dependency=True)
+bazel_dep(name = "googletest", version = "1")  # also a non-dev dep
+bazel_dep(name = "d", dev_dependency = False)
+bazel_dep(name = NAME)
+x.bazel_dep(name = "attr")
+my_bazel_dep(name = "other")
+'''
+        self.assertEqual(sync.module_deps(text), (["b", "d", "googletest", "rules_cc"], ["platforms"]))
+
+    def test_none(self):
+        self.assertEqual(sync.module_deps('module(name = "m")\n'), ([], []))
+        self.assertEqual(sync.module_deps('bazel_dep(name = "a"'), ([], []))
+
+
+class CoverageTest(unittest.TestCase):
+    def test_latest_version(self):
+        self.assertEqual(sync.latest_version({"versions": ["1.0", "2.0-rc1", "1.10", "1.9"]}), "1.10")
+        self.assertEqual(sync.latest_version({"versions": ["1.0", "1.1"],
+                                              "yanked_versions": {"1.1": "bad"}}), "1.0")
+        self.assertIsNone(sync.latest_version({"versions": []}))
+
+    def test_unlisted_reason(self):
+        self.assertEqual(sync.unlisted_reason({"deprecated": "x"}, "1", None), "deprecated")
+        self.assertEqual(sync.unlisted_reason({}, None, None), "no compatible version")
+        self.assertEqual(sync.unlisted_reason({}, "1", "git_repository"), "git_repository source")
+        self.assertEqual(sync.unlisted_reason({}, "1", "archive"), "unlisted")
+
+    def test_bcr_summary(self):
+        modules = {"a": ["b", "c"], "b": ["c", "c"], "c": [], "d": ["a"]}
+        self.assertEqual(sync.bcr_summary({"a", "b"}, modules, {"c": "unlisted", "d": "deprecated"}), {
+            "modules": 4, "unlisted": [{"name": "c", "reason": "unlisted", "dependents": 2},
+                                       {"name": "d", "reason": "deprecated", "dependents": 0}]})
+
+    def test_render(self):
+        projects = sync.parse_projects_txt("a\n  known-failing build  why\nb\nc\n")
+        data = {"bcr_commit": "0123456789abcdef", "skipped": [{"name": "c", "reason": "r"}],
+                "projects": [{"name": "a", "deps": ["x"], "dev_deps": ["y"]},
+                             {"name": "b", "deps": ["x", "y"], "dev_deps": []}],
+                "bcr": {"modules": 6, "unlisted": [
+                    {"name": "p", "reason": "unlisted", "dependents": 0},
+                    {"name": "q", "reason": "deprecated", "dependents": 3}]}}
+        text = sync.render_coverage(projects, data)
+        self.assertEqual(text, sync.render_coverage(projects, data))
+        for row in ["| BCR modules | 6 |", "| listed in projects.txt | 3 |",
+                    "| &nbsp;&nbsp;run (a generated package) | 2 |",
+                    "| &nbsp;&nbsp;&nbsp;&nbsp;known-failing build | 1 |",
+                    "| &nbsp;&nbsp;skipped by sync (see projects.json) | 1 |",
+                    "| not listed | 2 |", "| &nbsp;&nbsp;deprecated | 1 |",
+                    "| &nbsp;&nbsp;unlisted | 1 |",
+                    "| x | 2 | 0 | 1 |\n| y | 2 | 1 | 1 |\n",
+                    "| q | 3 | deprecated |\n| p | 0 | unlisted |\n"]:
+            self.assertIn(row, text)
+        self.assertIn("| x | 2 | 0 | 1 |\n\n", sync.render_coverage(projects, data, top=1))
 
 
 class RenderBuildTest(unittest.TestCase):

@@ -11,4 +11,23 @@ project(
         # the grpc it resolves has BUILD files calling native cc_library, which Bazel 9 removed; autoload them from rules_cc
         "--incompatible_autoload_externally=+@rules_cc",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-cpp",
+        "bazel_skylib",
+        "boost.bimap",
+        "boost.graph",
+        "buildifier_prebuilt",
+        "google_benchmark",
+        "googleapis",
+        "googleapis-cc",
+        "googletest",
+        "grpc",
+        "gutil",
+        "p4c",
+        "p4runtime",
+        "protobuf",
+        "rules_cc",
+        "rules_license",
+    ],
 )

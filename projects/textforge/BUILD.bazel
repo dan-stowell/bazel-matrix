@@ -13,4 +13,9 @@ project(
         # autoload the python rules Bazel 9 removed from rules_python
         "--incompatible_autoload_externally=+@rules_python",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "rules_python",
+    ],
 )

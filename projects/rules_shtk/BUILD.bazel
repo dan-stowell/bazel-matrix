@@ -13,4 +13,8 @@ project(
         # example workspaces (examples/bzlmod/test has its own MODULE.bazel) whose BUILD.bazel calls native cc_binary without a load(), which Bazel 9 removed; the packages fail to load
         "--deleted_packages=examples/bzlmod/test,examples/workspace/test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+    ],
 )

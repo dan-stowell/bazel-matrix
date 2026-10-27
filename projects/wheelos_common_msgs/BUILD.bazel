@@ -9,4 +9,12 @@ project(
     ],
     # its BUILD files load cc_proto_library from @rules_cc//cc:defs.bzl, which fails in Bazel 9 ("cc_proto_library is removed from @rules_cc//cc:defs.bzl in Bazel 8")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "protobuf",
+        "rules_cc",
+        "rules_pkg",
+        "rules_proto",
+    ],
 )

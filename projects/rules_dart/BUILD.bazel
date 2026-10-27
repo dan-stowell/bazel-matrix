@@ -11,4 +11,22 @@ project(
         # "MODULE.bazel.lock is no longer up-to-date" (usages of @//dart/pub:extensions.bzl%pub changed) fails analysis of 140 targets under its .bazelrc's --lockfile_mode=error
         "--lockfile_mode=off",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "apple_support",
+        "bazel_lib",
+        "bazel_skylib",
+        "bazel_skylib_gazelle_plugin",
+        "bazelrc-preset.bzl",
+        "buildifier_prebuilt",
+        "gazelle",
+        "package_metadata",
+        "platforms",
+        "rules_cc",
+        "rules_go",
+        "rules_multitool",
+        "rules_shell",
+        "sqlite3",
+        "yaml.bzl",
+    ],
 )

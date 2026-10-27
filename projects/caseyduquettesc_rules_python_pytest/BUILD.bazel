@@ -9,4 +9,14 @@ project(
         # //docs:rules.extract needs bzl_library targets for @rules_python's py_binary.bzl etc., which nothing provides ("missing bzl_library targets for Starlark module(s)")
         "-//docs/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_bazel_lib",
+        "bazel_skylib",
+        "bazel_skylib_gazelle_plugin",
+        "buildifier_prebuilt",
+        "gazelle",
+        "platforms",
+        "rules_python",
+    ],
 )

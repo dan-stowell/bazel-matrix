@@ -9,4 +9,12 @@ project(
     ],
     # its root package loads @grpc//bazel:cc_grpc_library.bzl, and the resolved grpc's bzl files use the native PyInfo symbol and pass strings as label providers, which Bazel 9 rejects
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "grpc",
+        "protobuf",
+        "rules_go",
+        "rules_proto",
+        "rules_python",
+    ],
 )

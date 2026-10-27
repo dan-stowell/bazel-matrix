@@ -11,4 +11,9 @@ project(
         # the vendored fast_float's own tests use //:fast_float and @doctest, which c4core doesn't define or declare
         "--deleted_packages=src/c4/ext/fast_float/tests",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "fast_float",
+        "rules_cc",
+    ],
 )

@@ -11,4 +11,16 @@ project(
         # its .bazelrc sets --lockfile_mode=error, and its MODULE.bazel.lock is out of date ("usages of the extension '@@rules_dart+//dart/pub:extensions.bzl%pub' have changed"), which fails analysis of 3 targets
         "--lockfile_mode=off",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_lib",
+        "bazel_skylib",
+        "bazelrc-preset.bzl",
+        "buildifier_prebuilt",
+        "package_metadata",
+        "protobuf",
+        "rules_dart",
+        "rules_multitool",
+        "rules_proto",
+    ],
 )

@@ -9,4 +9,24 @@ project(
     ],
     # its deps opentracing-cpp and prometheus-cpp call native cc_library, which Bazel 9 removed; --incompatible_autoload_externally=+@rules_cc does not fix them
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-cpp",
+        "bazel_skylib",
+        "curl",
+        "google_benchmark",
+        "googletest",
+        "grpc",
+        "nlohmann_json",
+        "opentelemetry-proto",
+        "opentracing-cpp",
+        "platforms",
+        "prometheus-cpp",
+        "protobuf",
+        "rapidyaml",
+        "rules_cc",
+        "rules_foreign_cc",
+        "rules_proto",
+        "zlib",
+    ],
 )

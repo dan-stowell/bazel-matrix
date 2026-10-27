@@ -17,4 +17,12 @@ project(
         # autoload the cc and python rules Bazel 9 removed
         "--incompatible_autoload_externally=+@rules_cc,+@rules_python",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "gazelle",
+        "googletest",
+        "rules_python",
+        "rules_python_gazelle_plugin",
+        "trlc",
+    ],
 )

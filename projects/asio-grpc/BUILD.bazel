@@ -13,4 +13,20 @@ project(
         # skips "agrpc::run Traits can specify zero max latency" (doctest wildcards, no spaces): it assumes a handler posted to the grpc_context (delivered asynchronously via a gRPC alarm) runs within the first 14 zero-wait polls of agrpc::run, a timing assumption that failed here (CHECK(invoked) false). Both its tests are doctest binaries, so the flag only skips this case
         "--test_arg=--test-case-exclude=*Traits?can?specify?zero?max?latency",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "asio",
+        "bazel_skylib",
+        "boost.asio",
+        "boost.coroutine",
+        "boost.filesystem",
+        "boost.interprocess",
+        "boost.thread",
+        "doctest",
+        "googletest",
+        "grpc",
+        "protobuf",
+        "rules_cc",
+        "rules_license",
+    ],
 )

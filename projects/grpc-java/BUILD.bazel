@@ -11,4 +11,18 @@ project(
         # needs an Android SDK, which the images lack
         "-//binder/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-cpp",
+        "bazel_jar_jar",
+        "bazel_skylib",
+        "googleapis",
+        "grpc-proto",
+        "protobuf",
+        "rules_android",
+        "rules_cc",
+        "rules_java",
+        "rules_jvm_external",
+        "rules_proto",
+    ],
 )

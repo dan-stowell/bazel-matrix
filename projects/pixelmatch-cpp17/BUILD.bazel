@@ -13,4 +13,12 @@ project(
         # autoload the cc rules Bazel 9 removed
         "--incompatible_autoload_externally=+@rules_cc",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "googletest",
+        "pixelmatch-cpp17",
+        "platforms",
+        "rules_cc",
+        "rules_fuzzing",
+    ],
 )

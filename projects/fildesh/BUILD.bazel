@@ -13,4 +13,11 @@ project(
         # autoload sh_test from rules_shell, and the cc rules that the google_benchmark it resolves calls natively from rules_cc
         "--incompatible_autoload_externally=+@rules_cc,+@rules_shell",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "google_benchmark",
+        "platforms",
+        "rules_cc",
+        "rules_license",
+    ],
 )

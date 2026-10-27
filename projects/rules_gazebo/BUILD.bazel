@@ -9,4 +9,12 @@ project(
         # buildifier's lint wants the single_version_override() bazel-matrix appends to its MODULE.bazel reformatted
         "-//:buildifier.test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "buildifier_prebuilt",
+        "rules_cc",
+        "rules_license",
+        "rules_python",
+    ],
 )

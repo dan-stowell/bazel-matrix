@@ -9,4 +9,20 @@ project(
     ],
     # BuildEventProtocol/BUILD loads swift_module_alias from @build_bazel_rules_swift//swift:swift.bzl, which the resolved rules_swift no longer exports; it is also a Swift project, and the images lack swift
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "apple_support",
+        "buildifier_prebuilt",
+        "protobuf",
+        "rules_apple",
+        "rules_cc",
+        "rules_java",
+        "rules_license",
+        "rules_pkg",
+        "rules_proto",
+        "rules_python",
+        "rules_swift",
+        "rules_xcodeproj",
+        "swiftlint",
+    ],
 )

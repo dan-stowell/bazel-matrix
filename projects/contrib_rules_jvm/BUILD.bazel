@@ -9,4 +9,21 @@ project(
     ],
     # rules_go 0.52.0 and rules_android, which it depends on, use CcInfo, which Bazel 9 removed; with rules_go overridden to 0.59.0, rules_android and its junit5/sample package (java_library without srcs) still fail
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "apple_rules_lint",
+        "bazel_lib",
+        "bazel_skylib",
+        "bazel_skylib_gazelle_plugin",
+        "gazelle",
+        "platforms",
+        "protobuf",
+        "rules_cc",
+        "rules_go",
+        "rules_java",
+        "rules_jvm_external",
+        "rules_python",
+        "rules_shell",
+        "stardoc",
+    ],
 )

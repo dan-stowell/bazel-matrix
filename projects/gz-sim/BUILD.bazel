@@ -9,4 +9,28 @@ project(
         # buildifier -mode=diff flags MODULE.bazel: the registry's copy (which replaces the archive's) puts compatibility_level before version
         "-//:buildifier.test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "buildifier_prebuilt",
+        "eigen",
+        "googletest",
+        "gz-common",
+        "gz-fuel-tools",
+        "gz-math",
+        "gz-msgs",
+        "gz-physics",
+        "gz-plugin",
+        "gz-rendering",
+        "gz-sensors",
+        "gz-transport",
+        "gz-utils",
+        "protobuf",
+        "rules_cc",
+        "rules_gazebo",
+        "rules_license",
+        "rules_proto",
+        "sdformat",
+        "tinyxml2",
+    ],
 )

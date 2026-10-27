@@ -9,4 +9,13 @@ project(
     ],
     # its pex actions fail on the executors: FileNotFoundError for the runfiles path of the entry point (/tmp/bzl-pex-*/runfiles/_main/tests/basic/basic.py)
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "platforms",
+        "rules_python",
+        "rules_rust_mdbook",
+        "rules_shell",
+        "stardoc",
+    ],
 )

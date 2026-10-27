@@ -7,4 +7,22 @@ project(
     targets = [
         "//...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "boost.config",
+        "boost.container_hash",
+        "boost.dll",
+        "boost.filesystem",
+        "boost.interprocess",
+        "boost.optional",
+        "boost.program_options",
+        "boost.property_tree",
+        "boost.range",
+        "boost.system",
+        "boost.thread",
+        "platforms",
+        "prjtrellis-db",
+        "rules_cc",
+    ],
 )

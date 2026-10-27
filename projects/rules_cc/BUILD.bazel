@@ -13,4 +13,18 @@ project(
         # needs clang: prints "clang/clang++ not installed. Skipping test." and exits nonzero
         "-//tests/integration:ftime_trace_tests",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "apple_support",
+        "bazel_features",
+        "bazel_skylib",
+        "googletest",
+        "platforms",
+        "protobuf",
+        "rules_python",
+        "rules_shell",
+        "rules_testing",
+        "stardoc",
+        "test_repo",
+    ],
 )

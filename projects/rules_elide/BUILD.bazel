@@ -9,4 +9,16 @@ project(
     ],
     # its MODULE.bazel registers //tests:_test_elide_toolchain, and the release archive has no tests/ package ("no such package 'tests'"), which breaks toolchain resolution for every target
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_features",
+        "bazel_skylib",
+        "platforms",
+        "protobuf",
+        "rules_java",
+        "rules_jvm_external",
+        "rules_kotlin",
+        "rules_proto",
+        "stardoc",
+    ],
 )

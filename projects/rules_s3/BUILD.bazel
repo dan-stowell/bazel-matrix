@@ -11,4 +11,15 @@ project(
         # same protoc v27.0 failure as //docs:extensions
         "-//docs:repo_rules",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "rules_bazel_integration_test",
+        "rules_java",
+        "rules_proto",
+        "rules_testing",
+        "stardoc",
+        "toolchains_protoc",
+        "tweag-credential-helper",
+    ],
 )

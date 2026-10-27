@@ -15,4 +15,20 @@ project(
     ],
     # its own bazel/flex.bzl and bazel/bison.bzl pass a select() as genrule toolchains ("attribute toolchains is not configurable" in Bazel 9) so verible/verilog/parser and verible/common/analysis fail to load (the flags below get past the native-rule errors before it)
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-cpp",
+        "bant",
+        "bazel_skylib",
+        "googletest",
+        "nlohmann_json",
+        "platforms",
+        "protobuf",
+        "re2",
+        "rules_bison",
+        "rules_flex",
+        "rules_license",
+        "rules_m4",
+        "zlib",
+    ],
 )

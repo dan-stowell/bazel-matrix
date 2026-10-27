@@ -13,4 +13,16 @@ project(
         # its MODULE.bazel.lock has a version Bazel 9.3.1 doesn't support ("The version of MODULE.bazel.lock is not supported")
         "--lockfile_mode=off",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_lib",
+        "bazel_skylib",
+        "bazelrc-preset.bzl",
+        "buildifier_prebuilt",
+        "package_metadata",
+        "platforms",
+        "rules_dotnet",
+        "rules_python",
+        "xml.bzl",
+    ],
 )

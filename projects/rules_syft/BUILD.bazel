@@ -9,4 +9,12 @@ project(
     ],
     # with that override, its own syft/private/resolved_toolchain.bzl calls rule(incompatible_use_toolchain_transition=...), which Bazel 9 removed
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_bazel_lib",
+        "bazel_skylib",
+        "buildifier_prebuilt",
+        "platforms",
+        "stardoc",
+    ],
 )

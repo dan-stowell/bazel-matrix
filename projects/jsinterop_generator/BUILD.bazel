@@ -9,4 +9,16 @@ project(
     ],
     # fetching @maven fails: rules_jvm_external's coursier needs a host java ("exec: java: not found"); (its resolved rules_go also uses the native CcInfo, which Bazel 9 removed: override rules_go 0.65.0 fixes that)
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "google_bazel_common",
+        "j2cl",
+        "jsinterop_base",
+        "rules_closure",
+        "rules_java",
+        "rules_jvm_external",
+        "rules_license",
+        "rules_shell",
+    ],
 )

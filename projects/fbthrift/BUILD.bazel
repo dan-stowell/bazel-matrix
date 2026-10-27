@@ -9,4 +9,16 @@ project(
     ],
     # it resolves libaio 0.3.113.bcr.0, which the BCR yanked ("The tarball link for 0.3.113.bcr.0 is broken"), and 0.3.113.bcr.1's archive returns 404 too
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "boost.algorithm",
+        "boost.container",
+        "boost.core",
+        "fmt",
+        "folly",
+        "gflags",
+        "glog",
+        "openssl",
+        "rules_cc",
+    ],
 )

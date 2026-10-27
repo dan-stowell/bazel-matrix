@@ -17,4 +17,14 @@ project(
         # its hermetic Firefox (@firefox_linux_x86_64) fails to start under webdriver: libmozgtk.so needs libgtk-3.so.0, which the executor image lacks
         "-//test:hello_world_web_wasm_bindgen_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "apple_support",
+        "bazel_ci_rules",
+        "bazel_features",
+        "bazel_skylib",
+        "platforms",
+        "rules_cc",
+        "rules_rust",
+    ],
 )

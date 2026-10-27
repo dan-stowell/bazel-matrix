@@ -13,4 +13,16 @@ project(
         # its dep folly needs C++20 (std::type_identity), and the default is C++17
         "--host_cxxopt=-std=c++20",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "boost.thread",
+        "fizz",
+        "fmt",
+        "folly",
+        "glog",
+        "openssl",
+        "rules_cc",
+        "rules_license",
+    ],
 )

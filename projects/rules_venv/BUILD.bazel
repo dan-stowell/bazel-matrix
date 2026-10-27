@@ -17,4 +17,17 @@ project(
         # ruff EXE002 "The file is executable but no shebang is present": the sources are 0644 in the release archive and in source.tar, but executable in the remote actions on the executors
         "-//python/ruff/private/tests/printer:py_binary_lint.check",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "buildifier_prebuilt",
+        "platforms",
+        "rules_batch",
+        "rules_cc",
+        "rules_python",
+        "rules_req_compile",
+        "rules_rust_mdbook",
+        "rules_shell",
+        "stardoc",
+    ],
 )

@@ -11,4 +11,14 @@ project(
         # (not an exclusion: //... fails on a broken package even when subtracted) test/BUILD.bazel uses @googletest, which its MODULE.bazel doesn't declare
         "--deleted_packages=test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "cmake_configure_file",
+        "curl",
+        "libtiff",
+        "platforms",
+        "rules_cc",
+        "sqlite3",
+    ],
 )

@@ -9,4 +9,10 @@ project(
         # tests/basic_tests.c: 'g_bytesScanned' undeclared; tests/runtests.c: assignment of read-only variable 'g_reparseDeferralEnabledDefault'
         "-//:expat_tests",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "platforms",
+        "rules_cc",
+    ],
 )

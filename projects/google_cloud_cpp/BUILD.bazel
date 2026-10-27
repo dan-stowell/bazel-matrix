@@ -13,4 +13,28 @@ project(
         # skips the tests tagged integration-test (generated *_samples, examples and *_integration_test): they call live Google Cloud APIs and need GOOGLE_CLOUD_PROJECT and credentials, so on RBE they fail (samples with "Missing command")
         "--test_tag_filters=-integration-test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-cpp",
+        "bazel_skylib",
+        "boringssl",
+        "curl",
+        "google_benchmark",
+        "googleapis",
+        "googleapis-cc",
+        "googleapis-grpc-cc",
+        "googletest",
+        "grpc",
+        "nlohmann_json",
+        "opentelemetry-cpp",
+        "platforms",
+        "protobuf",
+        "protoc-gen-validate",
+        "pugixml",
+        "rules_apple",
+        "rules_cc",
+        "rules_proto",
+        "rules_python",
+        "yaml-cpp",
+    ],
 )

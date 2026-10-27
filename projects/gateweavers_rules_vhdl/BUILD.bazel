@@ -17,4 +17,13 @@ project(
         # same: their testbenches run ghdl, which needs GLIBC_2.38
         "-//examples/gazelle_vhdl/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_rules_py",
+        "bazel_skylib",
+        "gazelle",
+        "platforms",
+        "rules_go",
+        "rules_python",
+    ],
 )

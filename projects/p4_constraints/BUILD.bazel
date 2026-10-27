@@ -15,4 +15,21 @@ project(
         # its .bazelrc sets --repo_env=CC=clang (build:linux), and the images have only gcc ("Cannot find gcc or CC (clang)")
         "--repo_env=CC=gcc",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-cpp",
+        "bazel_skylib",
+        "boost.multiprecision",
+        "buildifier_prebuilt",
+        "googletest",
+        "gutil",
+        "p4c",
+        "p4runtime",
+        "protobuf",
+        "re2",
+        "rules_cc",
+        "rules_license",
+        "rules_proto",
+        "z3",
+    ],
 )

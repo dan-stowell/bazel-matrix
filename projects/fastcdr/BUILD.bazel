@@ -9,4 +9,11 @@ project(
         # uses @googletest, which its MODULE.bazel doesn't declare
         "-//test/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "cmake_configure_file",
+        "package_metadata",
+        "platforms",
+        "rules_cc",
+    ],
 )

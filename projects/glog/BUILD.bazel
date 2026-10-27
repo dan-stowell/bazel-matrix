@@ -19,4 +19,9 @@ project(
         # uses @com_github_google_googletest, which its MODULE.bazel doesn't declare
         "-//:utilities_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "gflags",
+        "rules_cc",
+    ],
 )

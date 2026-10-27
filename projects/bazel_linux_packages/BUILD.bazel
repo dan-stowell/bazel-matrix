@@ -9,4 +9,15 @@ project(
         # the e2e packages use @systemd, @busybox_amd64 and @busybox_arm64, which its MODULE.bazel doesn't declare
         "-//e2e/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_lib",
+        "bazel_skylib",
+        "bazel_skylib_gazelle_plugin",
+        "buildifier_prebuilt",
+        "gazelle",
+        "jq.bzl",
+        "platforms",
+        "rules_shell",
+    ],
 )

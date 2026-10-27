@@ -11,4 +11,11 @@ project(
         # a separate workspace (tests/MODULE.bazel, the BCR test module) whose rules_shell dep the root module doesn't declare
         "--deleted_packages=tests",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "cmake_configure_file",
+        "mbedtls",
+        "platforms",
+        "rules_cc",
+    ],
 )

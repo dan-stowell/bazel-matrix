@@ -15,4 +15,15 @@ project(
     ],
     # with those autoloads, 70 targets still fail: its CUDA, SYCL, darwin and aarch64 toolchain packages need repos that are empty or undeclared here ("glob pattern 'bin/**' didn't match anything" in @cuda_nvcc, "unknown repo 'oneapi'"), and //cc/config:empty fails analysis ("type 'NoneType' has no operator [](Provider)" on ctx.attr.toolchain_import)
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-cpp",
+        "bazel_skylib",
+        "googletest",
+        "platforms",
+        "protobuf",
+        "pybind11_bazel",
+        "rules_cc",
+        "rules_proto",
+    ],
 )

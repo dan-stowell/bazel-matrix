@@ -9,4 +9,8 @@ project(
         # c/common/dictionary.bin isn't in the release archive
         "-//:dictionary",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "rules_cc",
+    ],
 )

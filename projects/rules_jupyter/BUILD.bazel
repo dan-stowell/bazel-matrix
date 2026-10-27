@@ -51,4 +51,17 @@ project(
         # launches playwright's hermetic chromium, which needs libnspr4.so, missing from the executor image ("error while loading shared libraries: libnspr4.so")
         "-//tests/with_env:test_with_env_py",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "platforms",
+        "rules_multirun",
+        "rules_req_compile",
+        "rules_rust_mdbook",
+        "rules_shell",
+        "rules_venv",
+        "stardoc",
+        "texlive",
+        "texlive-texmf",
+    ],
 )

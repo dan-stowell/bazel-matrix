@@ -27,4 +27,10 @@ project(
         # autoload the java rules and providers Bazel 9 removed
         "--incompatible_autoload_externally=+@rules_java",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "rules_jvm_external",
+        "rules_license",
+        "rules_python",
+    ],
 )

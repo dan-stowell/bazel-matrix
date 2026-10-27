@@ -9,4 +9,20 @@ project(
         # 31 nested-Bazel tests (8-29 min each, 33 min per run); a different 7-8 fail each run: each nested Bazel extracts rules_python's cpython 3.14 archives into its own output base on the runner, and the runner disk fills ("Error extracting ...: No space left on device")
         "-//tests/e2e/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_features",
+        "bazel_lib",
+        "bazel_skylib",
+        "bazel_skylib_gazelle_plugin",
+        "buildifier_prebuilt",
+        "gazelle",
+        "platforms",
+        "pypackaging.bzl",
+        "rules_cc",
+        "rules_python",
+        "rules_shell",
+        "rules_testing",
+        "toml.bzl",
+    ],
 )

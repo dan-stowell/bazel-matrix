@@ -9,4 +9,22 @@ project(
     ],
     # its test suites read OpenCV's separate opencv_extra test data, which the module doesn't provide: dnn, stereo, stitching, video, core, features, geometry, imgproc and objdetect tests fail with "Can't find required data file" (e.g. shared/lena.png), and imgcodecs_test and photo_test are killed by SIGSEGV on the executors, aborting the inner run
     known_failing = "test",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "apple_support",
+        "bazel_skylib",
+        "cpu_features",
+        "eigen",
+        "libjpeg_turbo",
+        "libpng",
+        "libtiff",
+        "libwebp",
+        "platforms",
+        "protobuf",
+        "rules_cc",
+        "rules_license",
+        "rules_python",
+        "rules_qt",
+        "zlib",
+    ],
 )

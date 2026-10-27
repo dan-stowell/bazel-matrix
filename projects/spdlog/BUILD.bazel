@@ -9,4 +9,12 @@ project(
         # tests/test_systemd.cpp needs systemd/sd-journal.h, which the executor image lacks
         "-//:spdlog_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "catch2",
+        "fmt",
+        "rules_cc",
+        "rules_license",
+    ],
 )

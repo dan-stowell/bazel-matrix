@@ -39,4 +39,18 @@ project(
         # reads testdata/ (the libjxl/testdata git submodule), which the release archive lacks
         "-//lib:jxl/splines_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "brotli",
+        "giflib",
+        "googletest",
+        "highway",
+        "libjpeg_turbo",
+        "libpng",
+        "libwebp",
+        "openexr",
+        "rules_cc",
+        "skcms",
+    ],
 )

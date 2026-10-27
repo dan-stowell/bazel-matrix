@@ -9,4 +9,13 @@ project(
     ],
     # its resolved rules_go and rules_foreign_cc use the native CcInfo symbol, which Bazel 9 removed; with both overridden, gazelle's go_repository_tools fails: "invalid go version '1.24.12': must match format 1.23" (its Go SDK is too old)
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "gazelle",
+        "googleapis",
+        "protobuf",
+        "rules_buf",
+        "rules_go",
+        "rules_proto",
+    ],
 )

@@ -9,4 +9,10 @@ project(
     ],
     # its root BUILD.bazel loads @buildifier_prebuilt//:rules.bzl, which its MODULE.bazel doesn't declare ("No repository visible as '@buildifier_prebuilt'")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_bazel_lib",
+        "aspect_rules_js",
+        "bazel_skylib",
+    ],
 )

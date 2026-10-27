@@ -13,4 +13,13 @@ project(
         # (not an exclusion: //... fails on a broken package even when subtracted) it loads @rules_python, which its MODULE.bazel doesn't declare
         "--deleted_packages=third_party/googletest/test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "cpuinfo",
+        "nasm",
+        "platforms",
+        "rules_cc",
+        "rules_license",
+        "rules_nasm",
+    ],
 )

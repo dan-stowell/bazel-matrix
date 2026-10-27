@@ -9,4 +9,15 @@ project(
     ],
     # the openconfig_gnsi it resolves (via openconfig_bootz) has a bazel/generate_cc.bzl that fails to load under Bazel 9 (attr.label(providers = ...) at line 195: "at index 0 of providers, got element of type string, want sequence")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "gazelle",
+        "googleapis",
+        "grpc",
+        "openconfig_bootz",
+        "openconfig_gnsi",
+        "protobuf",
+        "rules_go",
+        "rules_proto",
+    ],
 )

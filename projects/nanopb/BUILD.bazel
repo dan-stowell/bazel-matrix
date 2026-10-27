@@ -25,4 +25,13 @@ project(
         # depends on //:all_types_nanopb (above)
         "-//:bazel_options_support",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "protobuf",
+        "rules_cc",
+        "rules_proto",
+        "rules_proto_grpc",
+        "rules_python",
+    ],
 )

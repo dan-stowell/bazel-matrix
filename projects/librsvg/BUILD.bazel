@@ -9,4 +9,19 @@ project(
         # a separate workspace (bazel_test/MODULE.bazel) using librsvg as a dependency; run from the root, //bazel_test:svg exits 1 (gdk_pixbuf_loader_new_with_type("svg") finds no svg loader)
         "-//bazel_test/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "cairo",
+        "fontconfig",
+        "freetype",
+        "gdk-pixbuf",
+        "glib",
+        "harfbuzz",
+        "libxml2",
+        "pango",
+        "platforms",
+        "rules_cc",
+        "rules_rs",
+    ],
 )

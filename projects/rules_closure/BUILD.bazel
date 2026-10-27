@@ -9,4 +9,17 @@ project(
     ],
     # closure/compiler/test and third_party/phantomjs call native sh_test/sh_binary without a load() (main-repo autoloads fix those), but @maven fails: rules_jvm_external's coursier needs a host java ("exec: java: not found"); its resolved rules_go uses the removed native CcInfo
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "google_bazel_common",
+        "platforms",
+        "protobuf",
+        "rules_java",
+        "rules_jvm_external",
+        "rules_proto",
+        "rules_python",
+        "rules_web_testing_java",
+        "rules_webtesting",
+    ],
 )

@@ -51,4 +51,16 @@ project(
         # mope_cc uses OptionalDataOrRef (as above), and its mope rules default to //:clang-format, which its root BUILD.bazel doesn't define
         "-//mbo/mope/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-cpp",
+        "bazel_skylib",
+        "google_benchmark",
+        "googletest",
+        "helly25_bashtest",
+        "platforms",
+        "re2",
+        "rules_cc",
+        "rules_shell",
+    ],
 )

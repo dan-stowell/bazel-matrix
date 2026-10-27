@@ -19,4 +19,26 @@ project(
     ],
     # with those flags, its core (rdma, engine, control, api) links -libverbs and includes infiniband/verbs.h, and test/integration includes ncurses.h; the image has neither rdma-core nor ncurses headers ("cannot find -libverbs")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-cpp",
+        "abseil-py",
+        "bazel_features",
+        "envoy_api",
+        "flatbuffers",
+        "fuzztest",
+        "google_benchmark",
+        "googletest",
+        "grpc",
+        "nanobind",
+        "nanobind_bazel",
+        "ncurses",
+        "platforms",
+        "protobuf",
+        "rules_cc",
+        "rules_proto",
+        "rules_python",
+        "rules_shell",
+        "xxhash",
+    ],
 )

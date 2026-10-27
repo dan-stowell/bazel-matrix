@@ -9,4 +9,12 @@ project(
     ],
     # its CUE actions' runner script joins $PWD with input paths that are already absolute ("stat <execroot>/var/tmp/.../src/test/testdata/injection/injection.cue: no such file", and /buildbuddy-execroot twice on RBE), so every cue_export/cue_def action fails
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "gazelle",
+        "platforms",
+        "rules_go",
+        "rules_shell",
+    ],
 )

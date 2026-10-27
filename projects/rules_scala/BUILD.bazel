@@ -17,4 +17,18 @@ project(
         # its MODULE.bazel.lock has a version Bazel 9 can't read
         "--lockfile_mode=off",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_ci_rules",
+        "bazel_skylib",
+        "bazel_worker_api",
+        "buildifier_prebuilt",
+        "platforms",
+        "protobuf",
+        "rules_java",
+        "rules_jvm_external",
+        "rules_proto",
+        "rules_python",
+        "rules_shell",
+    ],
 )

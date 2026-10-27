@@ -13,4 +13,10 @@ project(
         # autoload the proto rules Bazel 9 removed from protobuf, and py_test, which the googleapis it resolves calls natively, from rules_python
         "--incompatible_autoload_externally=+@com_google_protobuf,+@rules_python",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "googleapis",
+        "protobuf",
+        "rules_proto",
+    ],
 )

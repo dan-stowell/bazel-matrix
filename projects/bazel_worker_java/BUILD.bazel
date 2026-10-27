@@ -9,4 +9,11 @@ project(
     ],
     # its MODULE.bazel has local_path_override(module_name = "bazel_worker_api", path = "../proto"), which applies as the root module, and the archive has no ../proto
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_worker_api",
+        "protobuf",
+        "rules_java",
+        "rules_jvm_external",
+    ],
 )

@@ -13,4 +13,9 @@ project(
     ],
     # the resolved rules_erlang's gazelle/BUILD.bazel calls native sh_binary, which Bazel 9 removed ("name 'sh_binary' is not defined"); past that it builds with rules_erlang, which needs Erlang/OTP the images lack (as for rabbitmq_osiris; not confirmed here)
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "gazelle",
+        "rules_erlang",
+    ],
 )

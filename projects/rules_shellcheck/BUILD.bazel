@@ -9,4 +9,13 @@ project(
     ],
     # its root BUILD.bazel loads from //examples and refers to //internal/pkg, which the release archive lacks
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "platforms",
+        "rules_batch",
+        "rules_bazel_integration_test",
+        "rules_pkg",
+        "rules_shell",
+    ],
 )

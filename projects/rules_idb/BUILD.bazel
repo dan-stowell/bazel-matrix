@@ -9,4 +9,14 @@ project(
     ],
     # an iOS-simulator test ruleset (needs idb and Xcode on macOS): its 32 example targets find no execution platform ("Unable to find an execution platform for target platform @@platforms//host:host from available execution platforms []"); why none is available here is not confirmed
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "apple_support",
+        "bazel_skylib",
+        "platforms",
+        "rules_apple",
+        "rules_python",
+        "rules_shell",
+        "rules_swift",
+    ],
 )

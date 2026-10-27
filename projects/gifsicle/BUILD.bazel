@@ -11,4 +11,10 @@ project(
         # on RBE, make finds Makefile.in out of date and runs automake-1.17, which the image lacks; run the configure_make action on the runner
         "--strategy=CcConfigureMakeRule=local",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "platforms",
+        "rules_foreign_cc",
+        "rules_license",
+    ],
 )

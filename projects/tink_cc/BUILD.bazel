@@ -7,4 +7,18 @@ project(
     targets = [
         "//...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-cpp",
+        "bazel_skylib",
+        "boringssl",
+        "google_benchmark",
+        "googletest",
+        "platforms",
+        "protobuf",
+        "rules_cc",
+        "rules_license",
+        "rules_proto",
+        "rules_shell",
+    ],
 )

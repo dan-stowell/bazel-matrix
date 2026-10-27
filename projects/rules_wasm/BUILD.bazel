@@ -11,4 +11,19 @@ project(
         # diffs //tests:command-output-actual (above)
         "-//tests:verify-command-runs",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "buildifier_prebuilt",
+        "example",
+        "gazelle",
+        "jq.bzl",
+        "package_metadata",
+        "platforms",
+        "rules_cc",
+        "rules_go",
+        "rules_license",
+        "rules_rust",
+        "rules_shell",
+    ],
 )

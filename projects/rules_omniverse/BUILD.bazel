@@ -13,4 +13,9 @@ project(
         # its .bazelrc registers this fake GPU execution platform for `test` only, so `build` finds no execution platform for the gpu targets ("Unable to find an execution platform ... from available execution platforms []")
         "--extra_execution_platforms=//tests:fake_gpu_platform",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "platforms",
+        "rules_shell",
+    ],
 )

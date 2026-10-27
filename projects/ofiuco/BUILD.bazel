@@ -13,4 +13,14 @@ project(
         # (not an exclusion: //... fails on a broken package even when subtracted) examples/transitions and examples/wheel are separate workspaces (own MODULE.bazel; they use @poetry, @gcc-linux-x86_64, @linux_sysroot), and examples/BUILD.bazel's integration tests glob example dirs (airflow, ...) that the release archive lacks ("glob pattern 'airflow/**/*' didn't match anything")
         "--deleted_packages=examples,examples/transitions,examples/transitions/constraint,examples/transitions/toolchains,examples/transitions/toolchains/args,examples/transitions/toolchains/clang,examples/transitions/toolchains/clang/args,examples/transitions/toolchains/clang/tools,examples/transitions/toolchains/gcc,examples/transitions/toolchains/gcc/args,examples/transitions/toolchains/gcc/tools,examples/wheel",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "platforms",
+        "rules_cc",
+        "rules_multitool",
+        "rules_python",
+        "rules_rust",
+        "rules_shell",
+    ],
 )

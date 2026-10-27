@@ -7,4 +7,15 @@ project(
     targets = [
         "//...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "ccd",
+        "cmake_configure_file",
+        "eigen",
+        "octomap",
+        "platforms",
+        "rules_cc",
+        "rules_license",
+    ],
 )

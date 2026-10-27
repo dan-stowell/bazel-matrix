@@ -13,4 +13,8 @@ project(
         # autoload the java rules Bazel 9 removed
         "--incompatible_autoload_externally=+@rules_java",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "javaparser",
+    ],
 )

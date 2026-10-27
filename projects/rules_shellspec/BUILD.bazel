@@ -13,4 +13,19 @@ project(
     ],
     # its resolved gazelle and aspect_rules_lint load toolchain code calling rule(incompatible_use_toolchain_transition=...), which Bazel 9 removed, and its rules_go uses the removed native CcInfo
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_rules_lint",
+        "bazel_lib",
+        "bazel_skylib",
+        "bazel_skylib_gazelle_plugin",
+        "bazelrc-preset.bzl",
+        "buildifier_prebuilt",
+        "gazelle",
+        "package_metadata",
+        "platforms",
+        "rules_multitool",
+        "rules_shell",
+        "rules_testing",
+    ],
 )

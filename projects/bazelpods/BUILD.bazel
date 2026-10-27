@@ -9,4 +9,13 @@ project(
     ],
     # its targets go through rules_apple's transition, whose inputs include //command_line_option:apple_crosstool_top, which Bazel 9 removed ("do not correspond to valid settings")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "apple_support",
+        "rules_apple",
+        "rules_cc",
+        "rules_ios",
+        "rules_swift",
+        "rules_xcodeproj",
+    ],
 )

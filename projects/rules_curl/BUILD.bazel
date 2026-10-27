@@ -13,4 +13,11 @@ project(
         # autoload the sh rules Bazel 9 removed from rules_shell
         "--incompatible_autoload_externally=+@rules_shell",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "ape",
+        "bazel_skylib",
+        "rules_go",
+        "toolchain_utils",
+    ],
 )

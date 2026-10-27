@@ -9,4 +9,10 @@ project(
         # examples/BUILD.bazel (the BCR example module, with its own examples/MODULE.bazel) lists srcs = ["examples/in_memory.cpp"], which resolves to examples/examples/in_memory.cpp, but the file is examples/in_memory.cpp ("missing input file")
         "-//examples/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "platforms",
+        "rules_cc",
+        "sqlite3",
+    ],
 )

@@ -9,4 +9,14 @@ project(
         # tests/test-images/fail/bug793470-crasher.png declares 935820x854554 pixels (~2.4 TB as RGB), and the PNG loader allocates for it instead of rejecting it until the executor OOM-kills the test (observed 55-67 GB); bisected on RBE, the other 40 images pass, but a --test_arg=-s=... skip would reach every test in the project, and pixbuf-lowmem reads its args as image files
         "-//tests:pixbuf-fail",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "glib",
+        "libjpeg_turbo",
+        "libpng",
+        "platforms",
+        "rules_autoconf",
+        "rules_cc",
+    ],
 )

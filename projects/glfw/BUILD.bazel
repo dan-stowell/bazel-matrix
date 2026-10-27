@@ -7,4 +7,21 @@ project(
     targets = [
         "//...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "apple_support",
+        "egl-registry",
+        "libffi",
+        "libx11",
+        "libxcursor",
+        "libxi",
+        "libxinerama",
+        "libxrandr",
+        "opengl-registry",
+        "package_metadata",
+        "platforms",
+        "rules_cc",
+        "wayland",
+        "xkbcommon",
+    ],
 )

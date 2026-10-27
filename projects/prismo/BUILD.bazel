@@ -13,4 +13,18 @@ project(
         # autoload the sh rules Bazel 9 removed
         "--incompatible_autoload_externally=+@rules_shell",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_rules_js",
+        "aspect_rules_lint",
+        "bazel_skylib",
+        "buildifier_prebuilt",
+        "llvm",
+        "platforms",
+        "rules_cc",
+        "rules_nodejs",
+        "rules_python",
+        "rules_rs",
+        "rules_rust",
+    ],
 )

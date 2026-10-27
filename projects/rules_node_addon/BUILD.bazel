@@ -11,4 +11,13 @@ project(
         # separate workspaces (each has its own MODULE.bazel); examples/full loads @aspect_rules_ts, which the root MODULE.bazel doesn't declare
         "--deleted_packages=examples/full,examples/node_version_pin",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_rules_js",
+        "bazel_skylib",
+        "node_addon_api",
+        "platforms",
+        "rules_cc",
+        "rules_nodejs",
+    ],
 )

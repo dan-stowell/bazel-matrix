@@ -11,4 +11,10 @@ project(
         # the gmp it resolves globs mpn/arm64/add.asm, which its archive lacks, and Bazel 9 rejects empty globs
         "--noincompatible_disallow_empty_glob",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "gmp",
+        "rules_cc",
+    ],
 )

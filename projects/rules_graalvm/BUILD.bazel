@@ -9,4 +9,28 @@ project(
     ],
     # its .bazelrc sets --incompatible_remote_results_ignore_disk, which Bazel 9 no longer recognizes ("Unrecognized option")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "apple_rules_lint",
+        "apple_support",
+        "aspect_bazel_lib",
+        "aspect_rules_js",
+        "bazel_features",
+        "bazel_skylib",
+        "bazel_skylib_gazelle_plugin",
+        "buildifier_prebuilt",
+        "contrib_rules_jvm",
+        "gazelle",
+        "platforms",
+        "protobuf",
+        "rules_cc",
+        "rules_go",
+        "rules_java",
+        "rules_jvm_external",
+        "rules_license",
+        "rules_nodejs",
+        "rules_python",
+        "rules_testing",
+        "stardoc",
+    ],
 )

@@ -13,4 +13,14 @@ project(
         # autoload the cc rules Bazel 9 removed, for those and for the yaml-cpp and googletest it resolves
         "--incompatible_autoload_externally=+@rules_cc",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "eigen",
+        "gflags",
+        "googletest",
+        "maliput",
+        "rules_cc",
+        "tinyxml2",
+        "yaml-cpp",
+    ],
 )

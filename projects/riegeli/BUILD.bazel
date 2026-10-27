@@ -9,4 +9,24 @@ project(
     ],
     # open-ended under Bazel 9: python/BUILD calls native sh_binary without a load() (main-repo autoloads fix that); its resolved rules_foreign_cc calls rule() with incompatible_use_toolchain_transition, and rules_go and highwayhash use removed natives; with those fixed, its TensorFlow ops need @local_config_tf and its xz dep's glob src/liblzma/*.h matches nothing
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-cpp",
+        "abseil-py",
+        "bazel_skylib",
+        "boringssl",
+        "brotli",
+        "bzip2",
+        "google_cloud_cpp",
+        "highwayhash",
+        "lz4",
+        "platforms",
+        "protobuf",
+        "rules_cc",
+        "rules_python",
+        "snappy",
+        "xz",
+        "zlib",
+        "zstd",
+    ],
 )

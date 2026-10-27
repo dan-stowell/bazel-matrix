@@ -13,4 +13,15 @@ project(
         # needs @squashfs-tools (same checksum mismatch as //squashfs/toolchain/mksquashfs)
         "-//squashfs/toolchain/unsquashfs/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "hermetic_cc_toolchain",
+        "rules_bzip2",
+        "rules_coreutils",
+        "rules_gzip",
+        "rules_xz",
+        "rules_zstd",
+        "squashfs-tools",
+        "toolchain_utils",
+    ],
 )

@@ -9,4 +9,12 @@ project(
     ],
     # its own toolchains/toolchains.bzl:7 calls rule() with incompatible_use_toolchain_transition, which Bazel 9 removed
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_bazel_lib",
+        "bazel_skylib",
+        "buildifier_prebuilt",
+        "platforms",
+        "rules_license",
+    ],
 )

@@ -9,4 +9,14 @@ project(
         # test_ordered_overwrites_and_whiteouts finds only {'value'} in the result, not the expected dir/new ("AssertionError: {'value': b'new\n'}"); cause not confirmed
         "-//layers/tests:order_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_bazel_lib",
+        "aspect_rules_py",
+        "bazel_skylib",
+        "gawk",
+        "rules_distroless",
+        "rules_python",
+        "toml.bzl",
+    ],
 )

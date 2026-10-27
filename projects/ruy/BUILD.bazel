@@ -15,4 +15,8 @@ project(
     ],
     # with those autoloads, ruy/block_map.cc (which nearly every target depends on) fails to compile: "'numeric_limits' is not a member of 'std'" (it doesn't include <limits>)
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "googletest",
+    ],
 )

@@ -23,4 +23,9 @@ project(
         # its vendored Catch2 (3rd_party/include/opentracing/catch2/catch.hpp) sizes a static array with MINSIGSTKSZ, which glibc 2.34+ no longer defines as a constant ("size of array 'altStackMem' is not an integral constant-expression")
         "-//test:value_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "rules_cc",
+    ],
 )

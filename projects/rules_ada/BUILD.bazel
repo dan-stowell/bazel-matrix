@@ -15,4 +15,16 @@ project(
         # diffs :main_dynamic_libgcc_output (above)
         "-//tests/shared_library:main_dynamic_libgcc_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "apple_support",
+        "bazel_skylib",
+        "platforms",
+        "rules_cc",
+        "rules_rust",
+        "rules_rust_mdbook",
+        "rules_shell",
+        "rules_venv",
+        "stardoc",
+    ],
 )

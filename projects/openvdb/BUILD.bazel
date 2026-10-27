@@ -11,4 +11,12 @@ project(
         # the onetbb it resolves has a BUILD.bazel calling native cc rules, which Bazel 9 removed; autoload them from rules_cc
         "--incompatible_autoload_externally=+@rules_cc",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "boost.numeric_conversion",
+        "onetbb",
+        "platforms",
+        "rules_cc",
+    ],
 )

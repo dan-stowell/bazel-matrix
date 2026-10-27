@@ -9,4 +9,12 @@ project(
         # the repo.md.generated that stardoc renders here differs from the checked-in docs/repo.md ("files ... differ"); the test prints no diff, and the cause is unconfirmed (likely a different stardoc or Bazel 9.3.1 rendering, as with rules_codeowners's stardoc_up_to_date)
         "-//:docs_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_lib",
+        "bazel_skylib_gazelle_plugin",
+        "gazelle",
+        "rules_multitool",
+        "stardoc",
+    ],
 )

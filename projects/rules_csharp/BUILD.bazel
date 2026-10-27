@@ -13,4 +13,12 @@ project(
         # its CSharpAppHostPatch action runs the dotnet muxer but doesn't declare the SDK's host/fxr as an input, so remotely dotnet quits ("[.../host/fxr] does not exist"); run that action on the runner, where the whole SDK repo is present
         "--strategy=CSharpAppHostPatch=local",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "apple_support",
+        "bazel_skylib",
+        "platforms",
+        "protobuf",
+        "stardoc",
+    ],
 )

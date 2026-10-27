@@ -9,4 +9,25 @@ project(
         # uses @boost.format, @boost.multiprecision, @boost.phoenix, @boost.test, which its MODULE.bazel doesn't declare
         "-//test/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "boost",
+        "boost.assert",
+        "boost.config",
+        "boost.core",
+        "boost.fusion",
+        "boost.iterator",
+        "boost.math",
+        "boost.mpl",
+        "boost.multi_array",
+        "boost.numeric_ublas",
+        "boost.preprocessor",
+        "boost.range",
+        "boost.static_assert",
+        "boost.throw_exception",
+        "boost.type_traits",
+        "boost.units",
+        "boost.utility",
+        "rules_cc",
+    ],
 )

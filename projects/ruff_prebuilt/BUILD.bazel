@@ -9,4 +9,11 @@ project(
         # its README.md isn't in the release archive ("missing input file '//:README.md'")
         "-//:readme",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "buildifier_prebuilt",
+        "platforms",
+        "rules_pkg",
+        "rules_python",
+    ],
 )

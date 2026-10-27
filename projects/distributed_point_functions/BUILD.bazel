@@ -15,4 +15,23 @@ project(
     ],
     # the abseil-cpp resolved here is too new for its deps: it makes absl/base:endian private, which its farmhash http_archive and tink_cc depend on ("Visibility error"), and with --nocheck_visibility tink_cc's tink/internal/proto_parser_state.h fails to compile (expected ',' or '...' before '<', at an absl CRC type)
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-cpp",
+        "boringssl",
+        "cppitertools",
+        "gflags",
+        "glog",
+        "google_benchmark",
+        "googletest",
+        "highway",
+        "protobuf",
+        "rapidjson",
+        "riegeli",
+        "rules_cc",
+        "rules_go",
+        "rules_license",
+        "rules_proto",
+        "tink_cc",
+    ],
 )

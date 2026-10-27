@@ -9,4 +9,27 @@ project(
         # uses @boost.lexical_cast and @boost.thread, which its MODULE.bazel doesn't declare, and a //baseline-outputs package the archive lacks
         "-//test/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "boost",
+        "boost.algorithm",
+        "boost.assert",
+        "boost.bind",
+        "boost.config",
+        "boost.core",
+        "boost.detail",
+        "boost.exception",
+        "boost.function",
+        "boost.io",
+        "boost.iterator",
+        "boost.mpl",
+        "boost.numeric_conversion",
+        "boost.optional",
+        "boost.preprocessor",
+        "boost.smart_ptr",
+        "boost.static_assert",
+        "boost.type_traits",
+        "boost.utility",
+        "rules_cc",
+    ],
 )

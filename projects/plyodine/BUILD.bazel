@@ -9,4 +9,9 @@ project(
     ],
     # it includes the C++23 headers <generator> and <expected> (plyodine/ply_writer.h, ply_header_reader.h), which gcc 11's libstdc++, the image's only one, lacks ("fatal error: generator: No such file or directory")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "googletest",
+        "rules_cc",
+    ],
 )

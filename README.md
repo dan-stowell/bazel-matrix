@@ -42,6 +42,7 @@ invocation links and a pass/fail row per project:
 tools/run.py test --shards 8     # every project, 8 runners
 tools/run.py build zlib re2      # some projects
 tools/run.py test --known-failing  # also the known-failing ones
+tools/run.py test --dep rules_cc   # the projects that bazel_dep rules_cc (repeatable)
 ```
 
 Like `//projects/...`, it leaves out `known-failing build` projects. For a
@@ -63,6 +64,28 @@ test logs).
 `tools/bb.sh` asks for a 16-CPU, 32 GB runner
 (`--runner_exec_properties=EstimatedCPU=16,EstimatedMemory=32GB`; the
 default is 6 CPUs, 7 GB), which runs about 8 inner Bazels at once.
+
+### Projects that depend on a module
+
+Each project's targets are tagged `dep:<module>` for every module its
+registry MODULE.bazel `bazel_dep`s directly, `dev_dependency = True` ones
+included (a project runs as the root module, so its dev dependencies are
+active). So "does RBE work for projects using rules_cc?" is
+
+```sh
+tools/run.py test --dep rules_cc
+tools/bb.sh test //projects/... --test_tag_filters=dep:rules_cc   # plain Bazel
+tools/bb.sh build //projects/... --build_tag_filters=dep:rules_cc
+```
+
+and "does it work for everything?" is `tools/run.py test`. `--dep` keeps
+run.py's known-failing handling above. The plain-Bazel form only skips
+known-failing projects (their targets are `manual`): it doesn't run a
+`known-failing test` project's `:build` instead, as run.py does. The tags
+aren't execution requirements, so they don't change the outer action keys.
+[docs/coverage.md](docs/coverage.md) ranks the modules by how many projects
+depend on them. Modules a MODULE.bazel `include()`s, or names
+non-literally (boost.pin_version's list comprehension), aren't seen.
 
 Passing projects' logs (summary, inner invocation link) only print with
 `--test_output=all`; that flag isn't in the action key, so it replays cached
@@ -117,15 +140,23 @@ environment variable, so the outer cache is shared across checkouts.
   records (`--update` moves to the BCR's HEAD), picks each project's version
   (pinned, else the newest stable, non-yanked one whose
   `bazel_compatibility` admits `DEFAULT_INNER_BAZEL`), and writes
-  - `projects.json`: the BCR commit and each project's version and source
-    (archive, integrity, overlay, patches and the registry's MODULE.bazel,
-    as `bcr.bazel.build` URLs with integrity), and the projects it skipped
-    (deprecated, no compatible version, unsupported source type) with why;
+  - `projects.json`: the BCR commit and each project's version, direct
+    `deps` and `dev_deps` (dev-only) from its registry MODULE.bazel, and
+    source (archive, integrity, overlay, patches and the registry's
+    MODULE.bazel, as `bcr.bazel.build` URLs with integrity), the projects it
+    skipped (deprecated, no compatible version, unsupported source type)
+    with why, and under `bcr` the number of BCR modules and, for each one
+    `projects.txt` doesn't list, why not and how many BCR modules' latest
+    versions depend on it;
+  - `docs/coverage.md`, from `projects.txt` and `projects.json`: how much of
+    the BCR the matrix covers, the modules most projects depend on, and the
+    unlisted modules most depended on;
   - `projects/<module>/BUILD.bazel`, deleting those of projects no longer
     listed.
 
-  `//tools:generated_test` fails when the committed `projects.json` or
-  `projects/<module>/BUILD.bazel` files don't match `projects.txt` (sync
+  `//tools:generated_test` fails when the committed `projects.json`,
+  `docs/coverage.md` or `projects/<module>/BUILD.bazel` files don't match
+  `projects.txt` and `projects.json` (sync
   wasn't re-run). A blank line ends a project's indented lines. Changes that only
   matter through the BCR (unpinning a project, `bazel <v>` lines,
   `DEFAULT_INNER_BAZEL`) aren't checked.
@@ -175,3 +206,19 @@ outside its archive, gets ``rc-drop <file> `<exact line>` <reason>``:
 
 Only `archive` BCR sources are supported so far; sync skips
 `git_repository` ones.
+
+## Finding more projects
+
+The matrix lists nearly every BCR module, so growth comes from elsewhere:
+
+- `python3 tools/sync.py --update`, then the "Unlisted BCR modules" table
+  in [docs/coverage.md](docs/coverage.md): new BCR modules, ranked by how
+  many BCR modules depend on them, and why each isn't listed.
+- BCR modules whose source is a `git_repository` (e.g. pico-sdk's
+  development versions): they need a new source kind in `tools/sync.py`
+  and `tools/sources.bzl`.
+- Bazel projects outside the BCR: GitHub code search for
+  `filename:MODULE.bazel`, the `bazelbuild` and `bazel-contrib`
+  organizations' repos, and modules in open BCR pull requests. These need a
+  new source kind too (a repo and commit instead of a BCR module), which
+  doesn't exist yet.

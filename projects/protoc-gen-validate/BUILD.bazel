@@ -9,4 +9,16 @@ project(
     ],
     # its re2 dependency calls native cc_library (removed in Bazel 9), and java targets need WORKSPACE repos (@com_google_guava)
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "gazelle",
+        "protobuf",
+        "re2",
+        "rules_cc",
+        "rules_go",
+        "rules_java",
+        "rules_proto",
+        "rules_python",
+    ],
 )

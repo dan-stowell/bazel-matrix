@@ -9,4 +9,25 @@ project(
     ],
     # its local_config repository rule needs makeinfo (texinfo) on the runner, which the image lacks ("program \"makeinfo\" not found"), and most packages depend on it
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-cpp",
+        "bazel_skylib",
+        "bazel_skylib_gazelle_plugin",
+        "buildifier_prebuilt",
+        "gazelle",
+        "gazelle_cc",
+        "googletest",
+        "platforms",
+        "protobuf",
+        "re2",
+        "rules_cc",
+        "rules_elisp_example",
+        "rules_go",
+        "rules_license",
+        "rules_pkg",
+        "rules_shell",
+        "stardoc",
+        "wolfd_bazel_compile_commands",
+    ],
 )

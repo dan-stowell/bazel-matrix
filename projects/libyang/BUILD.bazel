@@ -9,4 +9,10 @@ project(
         # its hdrs include the compat_h genrule output compat/compat.h, which lies outside its strip_include_prefix = "src" ("header 'compat/compat.h' is not under the specified strip prefix 'src'")
         "-//:config_headers",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "pcre2",
+        "platforms",
+        "rules_cc",
+    ],
 )

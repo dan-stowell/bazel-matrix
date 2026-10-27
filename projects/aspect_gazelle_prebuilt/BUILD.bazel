@@ -9,4 +9,12 @@ project(
     ],
     # its MODULE.bazel has local_path_override(aspect_go_treesitter_grammars, path = "../treesitter"), which applies as the root module, and its archive has no ../treesitter ("does not exist or is not a directory")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_go_treesitter_grammars",
+        "aspect_tools_telemetry",
+        "bazel_skylib",
+        "gazelle",
+        "platforms",
+    ],
 )

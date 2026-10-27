@@ -9,4 +9,20 @@ project(
     ],
     # its MODULE.bazel overrides xz with patch //patches:xz-s390x-support.patch, but the release archive has no patches package
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_lib",
+        "bazel_skylib",
+        "bzip2",
+        "llvm",
+        "platforms",
+        "rules_cc",
+        "rules_go",
+        "rules_platform",
+        "rules_python",
+        "rules_rs",
+        "rules_shell",
+        "rules_testing",
+        "xz",
+    ],
 )

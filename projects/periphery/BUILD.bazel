@@ -9,4 +9,22 @@ project(
     ],
     # rules_swift finds no Swift toolchain (no such target '@build_bazel_rules_swift_local_config//:linux-toolchain'): the executor image has no Swift
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aexml",
+        "apple_support",
+        "bazel_skylib",
+        "buildifier_prebuilt",
+        "pathkit",
+        "platforms",
+        "rules_apple",
+        "rules_swift",
+        "swift-filename-matcher",
+        "swift-index-store",
+        "swift-syntax",
+        "swift-system",
+        "swift_argument_parser",
+        "xcodeproj",
+        "yams",
+    ],
 )

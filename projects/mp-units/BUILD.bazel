@@ -13,4 +13,12 @@ project(
     ],
     # with -std=c++20, its overlay hardcodes MP_UNITS_API_STD_FORMAT=1, and the executor GCC's libstdc++ has no std::format (compat_macros.h: #error "std::formatting facility not supported")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "catch2",
+        "gsl",
+        "rules_cc",
+        "rules_license",
+    ],
 )

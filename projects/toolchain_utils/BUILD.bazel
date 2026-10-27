@@ -9,4 +9,16 @@ project(
     ],
     # fetching https://cosmo.zip/pub/cosmos/v/4.0.2/bin/ape-x86_64.elf times out (Connect timed out) from RBE
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_features",
+        "bazel_skylib",
+        "ci-component-bazelisk",
+        "llvm",
+        "package_metadata",
+        "platforms",
+        "pre-commit",
+        "pre-commit-hooks",
+        "rules_python",
+    ],
 )

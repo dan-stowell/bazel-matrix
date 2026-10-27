@@ -23,4 +23,17 @@ project(
         # same: a write-error case relies on a 0555 directory, which root can write
         "-//lint/lang/typescript/archtest/wrapper:wrapper_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "aspect_bazel_lib",
+        "aspect_rules_esbuild",
+        "aspect_rules_js",
+        "aspect_rules_ts",
+        "gazelle",
+        "rules_go",
+        "rules_java",
+        "rules_nodejs",
+        "rules_python",
+        "rules_rust",
+    ],
 )

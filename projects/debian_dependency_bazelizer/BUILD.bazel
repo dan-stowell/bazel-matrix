@@ -15,4 +15,9 @@ project(
     ],
     # the poetry repo its ofiuco extension generates loads @ofiuco+//python:poetry_deps.bzl, a canonical repo name used as an apparent one, which doesn't resolve ("unknown repo 'ofiuco+'")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "ofiuco",
+        "rules_python",
+    ],
 )

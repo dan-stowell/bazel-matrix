@@ -9,4 +9,23 @@ project(
     ],
     # the openconfig_gnmi 0.14.1 it declares (the BCR's newest) has bazel/generate_cc.bzl calling attr.label(providers = ["..."]) with strings, which Bazel 9 rejects ("got element of type string, want sequence")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-cpp",
+        "bazel_skylib",
+        "boringssl",
+        "buildifier_prebuilt",
+        "google_benchmark",
+        "googleapis",
+        "googletest",
+        "grpc",
+        "gutil",
+        "openconfig_gnmi",
+        "openconfig_gnoi",
+        "p4runtime",
+        "protobuf",
+        "rules_cc",
+        "rules_go",
+        "rules_proto",
+    ],
 )

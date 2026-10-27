@@ -15,4 +15,14 @@ project(
         # autoload the cc and proto rules Bazel 9 removed, plus JavaInfo and sh_binary, which its dep rules_fuzzing (fuzzing/private/engine.bzl, fuzzing/tools/BUILD) uses natively
         "--incompatible_autoload_externally=+@rules_cc,+@com_google_protobuf,+@rules_java,+@rules_shell",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-cpp",
+        "boringssl",
+        "googletest",
+        "libprotobuf-mutator",
+        "protobuf",
+        "rules_fuzzing",
+        "rules_proto",
+    ],
 )

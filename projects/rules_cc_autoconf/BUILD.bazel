@@ -63,4 +63,22 @@ project(
         # its .bazelrc adds a ruff aspect on every py target and EXE002 (executable without a shebang) fails on dozens (//autoconf/tests:diff_tester, //tools/convert:*_test, ...); excluding them would drop their tests, this drops only ruff
         "--output_groups=-py_ruff_checks",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_features",
+        "bazel_skylib",
+        "buildifier_prebuilt",
+        "m4",
+        "nlohmann_json",
+        "platforms",
+        "rules_cc",
+        "rules_multirun",
+        "rules_perl",
+        "rules_python",
+        "rules_req_compile",
+        "rules_rust_mdbook",
+        "rules_shell",
+        "rules_venv",
+        "stardoc",
+    ],
 )

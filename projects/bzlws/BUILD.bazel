@@ -9,4 +9,13 @@ project(
     ],
     # its .bazelrc passes --noincompatible_remove_rule_name_parameter, which Bazel 9 doesn't recognize ("Unrecognized option")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "hedron_compile_commands",
+        "rules_cc",
+        "stardoc",
+        "toolchains_llvm",
+        "yaml-cpp",
+    ],
 )

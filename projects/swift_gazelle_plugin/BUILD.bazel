@@ -13,4 +13,15 @@ project(
     ],
     # its root BUILD.bazel's ci_workflow (line 189) refers to //release, //examples and //tools/generate_ci_workflow, which the release archive lacks; excluding it and every root target that reaches it (update_ci_workflow, update_all, tidy, update_files, smoke_integration_tests, all_integration_tests) still leaves those errors in the inner build (the flags below get past earlier ones)
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "bazel_skylib_gazelle_plugin",
+        "cgrindel_bazel_starlib",
+        "gazelle",
+        "platforms",
+        "rules_bazel_integration_test",
+        "rules_go",
+        "rules_shell",
+    ],
 )

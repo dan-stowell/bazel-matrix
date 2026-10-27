@@ -7,4 +7,16 @@ project(
     targets = [
         "//...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-cpp",
+        "cel-cpp",
+        "googletest",
+        "protobuf",
+        "protovalidate",
+        "re2",
+        "rules_buf",
+        "rules_cc",
+        "rules_proto",
+    ],
 )

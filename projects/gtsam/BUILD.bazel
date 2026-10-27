@@ -7,4 +7,26 @@ project(
     targets = [
         "//...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "boost.assign",
+        "boost.bimap",
+        "boost.chrono",
+        "boost.date_time",
+        "boost.filesystem",
+        "boost.format",
+        "boost.graph",
+        "boost.lexical_cast",
+        "boost.math",
+        "boost.regex",
+        "boost.serialization",
+        "boost.system",
+        "boost.thread",
+        "boost.timer",
+        "cmake_configure_file",
+        "eigen",
+        "geographiclib",
+        "rules_cc",
+    ],
 )

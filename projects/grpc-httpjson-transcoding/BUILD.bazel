@@ -41,4 +41,17 @@ project(
         # same for the exec configuration: its .bazelrc sets --host_cxxopt=-std=c++14
         "--host_cxxopt=-std=c++17",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-cpp",
+        "google_benchmark",
+        "googletest",
+        "nlohmann_json",
+        "proto-converter",
+        "protobuf",
+        "rules_cc",
+        "rules_fuzzing",
+        "rules_proto",
+        "zlib",
+    ],
 )

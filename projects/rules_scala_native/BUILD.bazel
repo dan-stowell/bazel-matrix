@@ -11,4 +11,15 @@ project(
         # its .bazelrc deletes each examples/* workspace's root package but not this one's core/ and services/ subpackages, so the outer build loads services (whose //core label then misses: "no such package 'core'") and the e2e test's glob of the example skips both ("no such package 'services'" in the nested build)
         "--deleted_packages=examples/01-basics/02-transitive-dependencies/core,examples/01-basics/02-transitive-dependencies/services",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "llvm",
+        "platforms",
+        "protobuf",
+        "rules_bazel_integration_test",
+        "rules_cc",
+        "rules_java",
+        "rules_scala",
+    ],
 )

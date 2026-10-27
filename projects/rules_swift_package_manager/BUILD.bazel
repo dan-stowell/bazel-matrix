@@ -9,4 +9,20 @@ project(
     ],
     # //:BUILD.bazel:201's _ci_workflow needs //examples, //release and //tools/generate_ci_workflow, which the release archive lacks; its Swift rules need a Swift toolchain anyway
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "apple_support",
+        "bazel_skylib",
+        "bazel_skylib_gazelle_plugin",
+        "cgrindel_bazel_starlib",
+        "gazelle",
+        "platforms",
+        "rules_apple",
+        "rules_bazel_integration_test",
+        "rules_cc",
+        "rules_go",
+        "rules_license",
+        "rules_shell",
+        "rules_swift",
+    ],
 )

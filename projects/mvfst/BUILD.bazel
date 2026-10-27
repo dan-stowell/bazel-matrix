@@ -11,4 +11,17 @@ project(
         # the folly it resolves uses consteval, and the toolchain default is -std=c++17 ("'consteval' does not name a type")
         "--cxxopt=-std=c++20",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "boost.iterator",
+        "fizz",
+        "fmt",
+        "folly",
+        "glog",
+        "libsodium",
+        "mbedtls",
+        "rules_cc",
+        "rules_license",
+    ],
 )

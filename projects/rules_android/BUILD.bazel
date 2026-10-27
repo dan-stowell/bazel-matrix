@@ -9,4 +9,28 @@ project(
     ],
     # needs an Android SDK: @androidsdk//:core-for-system-modules-jar is undeclared without one
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "abseil-py",
+        "bazel_features",
+        "bazel_skylib",
+        "bazel_worker_api",
+        "bazel_worker_java",
+        "cgrindel_bazel_starlib",
+        "gazelle",
+        "libxml2",
+        "platforms",
+        "protobuf",
+        "rules_bazel_integration_test",
+        "rules_cc",
+        "rules_go",
+        "rules_java",
+        "rules_jvm_external",
+        "rules_license",
+        "rules_proto",
+        "rules_python",
+        "rules_robolectric",
+        "rules_shell",
+        "stardoc",
+    ],
 )

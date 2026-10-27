@@ -15,4 +15,22 @@ project(
     ],
     # with these, fetching @maven and @copybara_maven fails: rules_jvm_external's coursier needs a host java ("exec: java: not found")
     known_failing = "build",
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "blake3",
+        "buildifier_prebuilt",
+        "grpc",
+        "grpc-java",
+        "platforms",
+        "protobuf",
+        "rules_cc",
+        "rules_java",
+        "rules_jvm_external",
+        "rules_license",
+        "rules_pkg",
+        "rules_python",
+        "rules_shell",
+        "zstd-jni",
+    ],
 )

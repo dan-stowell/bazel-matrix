@@ -9,4 +9,25 @@ project(
         # uses @boost.bind, @boost.detail, @boost.iostreams, @boost.lexical_cast, which its MODULE.bazel doesn't declare
         "-//test/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "boost",
+        "boost.any",
+        "boost.assert",
+        "boost.config",
+        "boost.core",
+        "boost.exception",
+        "boost.function",
+        "boost.function_types",
+        "boost.mpl",
+        "boost.optional",
+        "boost.preprocessor",
+        "boost.smart_ptr",
+        "boost.static_assert",
+        "boost.thread",
+        "boost.type_traits",
+        "boost.typeof",
+        "boost.utility",
+        "rules_cc",
+    ],
 )

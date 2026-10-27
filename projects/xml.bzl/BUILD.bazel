@@ -9,4 +9,14 @@ project(
         # tools/preset.bazelrc is out of date for Bazel 9.3.1 (new --incompatible_enforce_starlark_utf8)
         "-//tools:preset.update_test",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_lib",
+        "bazel_skylib",
+        "bazel_skylib_gazelle_plugin",
+        "bazelrc-preset.bzl",
+        "buildifier_prebuilt",
+        "gazelle",
+        "package_metadata",
+    ],
 )

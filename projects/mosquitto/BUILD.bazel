@@ -149,4 +149,20 @@ project(
         # links against //:mosquitto, which in the overlay is the broker cc_binary, not the client library //:lib/mosquitto, so every mosquitto_* call is undefined
         "-//test:fuzzish",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "bazel_skylib",
+        "c-ares",
+        "cjson",
+        "cunit",
+        "googletest",
+        "libmicrohttpd",
+        "openssl",
+        "platforms",
+        "readline",
+        "rules_cc",
+        "rules_cc_autoconf",
+        "rules_shell",
+        "sqlite3",
+    ],
 )

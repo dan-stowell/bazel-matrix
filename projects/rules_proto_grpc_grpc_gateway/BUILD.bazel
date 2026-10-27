@@ -7,4 +7,12 @@ project(
     targets = [
         "//...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "gazelle",
+        "grpc_ecosystem_grpc_gateway",
+        "rules_go",
+        "rules_proto_grpc",
+        "rules_proto_grpc_go",
+    ],
 )

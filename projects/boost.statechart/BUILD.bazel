@@ -9,4 +9,21 @@ project(
         # uses @boost.test, which its MODULE.bazel doesn't declare
         "-//test/...",
     ],
+    # Its MODULE.bazel's bazel_deps, dev ones included; tags dep:<module>.
+    deps = [
+        "boost",
+        "boost.assert",
+        "boost.bind",
+        "boost.config",
+        "boost.conversion",
+        "boost.core",
+        "boost.detail",
+        "boost.function",
+        "boost.mpl",
+        "boost.smart_ptr",
+        "boost.static_assert",
+        "boost.thread",
+        "boost.type_traits",
+        "rules_cc",
+    ],
 )
