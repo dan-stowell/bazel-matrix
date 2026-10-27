@@ -4,11 +4,12 @@ Builds and tests popular public Bazel projects from the
 [Bazel Central Registry](https://registry.bazel.build/) (BCR). Each project
 is built as the root module of its own workspace, from its own source at its
 BCR release, by an inner Bazel; an outer Bazel (this repo) drives the inner
-ones. Every project gets a generated package `//<module>/` with two targets:
+ones. Every project gets a generated package `//projects/<module>/` with two
+targets:
 
-- `//<module>:build` runs inner `bazel build -- //... <exclusions>` and
+- `//projects/<module>:build` runs inner `bazel build -- //... <exclusions>` and
   writes a summary (inner invocation link, counts) and the inner log;
-- `//<module>:test` runs inner `bazel test -- //... <exclusions>` and writes
+- `//projects/<module>:test` runs inner `bazel test -- //... <exclusions>` and writes
   one test.xml testcase per inner test target (plus one per non-test target
   that failed to build), so per-target results show in the outer invocation.
   The test log has the inner output and the inner invocation link.
@@ -22,14 +23,16 @@ Everything runs on BuildBuddy RBE through `bb remote`; `tools/bb.sh` adds
 the runner image and `--config=remote-minimal`:
 
 ```sh
-tools/bb.sh build //...          # every project's inner build
-tools/bb.sh test //...           # every project's inner test
-tools/bb.sh test //zlib/...      # one project
-tools/bb.sh test //tools/...     # this repo's unit tests
-tools/bb.sh test //re2:test --//:inner_flags=--test_tag_filters=-slow  # extra inner flags (repeatable)
-tools/bb.sh test //zlib:test --//:inner_bazel_version=8.4.2            # another pinned inner Bazel
-tools/bb.sh test //... --test_output=all  # print every project's summary and inner link
+tools/bb.sh build //projects/...       # every project's inner build
+tools/bb.sh test //projects/...        # every project's inner test (the matrix)
+tools/bb.sh test //projects/zlib/...   # one project
+tools/bb.sh test //tools/...           # this repo's unit tests
+tools/bb.sh test //projects/re2:test --//:inner_flags=--test_tag_filters=-slow  # extra inner flags (repeatable)
+tools/bb.sh test //projects/zlib:test --//:inner_bazel_version=8.4.2            # another pinned inner Bazel
+tools/bb.sh test //projects/... --test_output=all  # print every project's summary and inner link
 ```
+
+`//...` is both: the matrix and this repo's unit tests.
 
 For the whole matrix, `tools/run.py` splits the projects over concurrent
 `bb remote` runs (each gets its own runner) and prints each shard's
@@ -41,9 +44,10 @@ tools/run.py build zlib re2      # some projects
 tools/run.py test --known-failing  # also the known-failing ones
 ```
 
-Like `//...`, it leaves out `known-failing build` projects, and for a
-`known-failing test` project `test` runs its `:build` (row `BUILT`), so
-regressions of its inner build still show. A known-failing project that
+Like `//projects/...`, it leaves out `known-failing build` projects. For a
+`known-failing test` project, `test` runs its `:build` (row `BUILT`), so
+regressions of its inner build still show; plain `test //projects/...`
+(with `--build_tests_only`) doesn't, so only run.py catches those. A known-failing project that
 does run (named, or with `--known-failing`) shows its result with its mark:
 `FAILED (known-failing build)` is expected and doesn't fail the run, while
 `PASSED (known-failing build: candidate to un-mark)` is listed as a
@@ -117,13 +121,16 @@ environment variable, so the outer cache is shared across checkouts.
     (archive, integrity, overlay, patches and the registry's MODULE.bazel,
     as `bcr.bazel.build` URLs with integrity), and the projects it skipped
     (deprecated, no compatible version, unsupported source type) with why;
-  - `<module>/BUILD.bazel`, deleting those of projects no longer listed.
+  - `projects/<module>/BUILD.bazel`, deleting those of projects no longer
+    listed.
 
   `//tools:generated_test` fails when the committed `projects.json` or
-  `<module>/BUILD.bazel` files don't match `projects.txt` (sync wasn't
-  re-run). A blank line ends a project's indented lines. Changes that only
+  `projects/<module>/BUILD.bazel` files don't match `projects.txt` (sync
+  wasn't re-run). A blank line ends a project's indented lines. Changes that only
   matter through the BCR (unpinning a project, `bazel <v>` lines,
   `DEFAULT_INNER_BAZEL`) aren't checked.
+- `projects/<module>/BUILD.bazel`: one generated package per project
+  (`//projects/<module>:build` and `:test`); never hand-edited.
 - `tools/sources.bzl`: the module extension reading `projects.json`; one
   lazily fetched repo per project (`@projects//:<module>` is its
   `source.tar`: the archive with the overlay, then the patches, then the
@@ -142,15 +149,15 @@ environment variable, so the outer cache is shared across checkouts.
 ## Adding or fixing a project
 
 Add its module name to `projects.txt`, run `python3 tools/sync.py`, then
-build and test `//<module>/...`. Fix failures with an exclusion
+build and test `//projects/<module>/...`. Fix failures with an exclusion
 (`-//pattern`) or a flag (`--flag`), each with the reason, then sync again.
-A package that fails to load breaks `//...` even when excluded; delete it
-with `--deleted_packages=<pkg>` instead. A project that is fundamentally broken here
+A package of the project that fails to load breaks its inner `//...` even
+when excluded; delete it with `--deleted_packages=<pkg>` instead. A project that is fundamentally broken here
 (doesn't load under Bazel 9, needs macOS or a tool the images lack) gets
 `known-failing build` (both targets) or `known-failing test` (`:test` only)
 with the first error as the reason: those targets are tagged `manual`, so
-`//...` skips them, but `tools/bb.sh test //<module>:test` still runs them. Prefer exclusions when
-only a few targets fail. A project that needs a different
+`//projects/...` skips them, but `tools/bb.sh test //projects/<module>:test`
+still runs them. Prefer exclusions when only a few targets fail. A project that needs a different
 inner Bazel gets `bazel <version>` (add the version to
 `tools/versions.bzl` first). A project whose resolved dependency is too
 old for it as the root module gets `override <module> <version>`: sync

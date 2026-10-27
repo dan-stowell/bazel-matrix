@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regenerates projects.json and //<module>:BUILD.bazel from projects.txt.
+"""Regenerates projects.json and //projects/<module>:BUILD.bazel from projects.txt.
 
     python3 tools/sync.py           # at the BCR commit projects.json records
     python3 tools/sync.py --update  # at the BCR's current HEAD
@@ -12,7 +12,7 @@ version, or else the newest stable, non-yanked version whose
 bazel_compatibility admits its inner Bazel (DEFAULT_INNER_BAZEL in
 tools/versions.bzl unless pinned); records its source (archive, integrity,
 strip_prefix, patches, overlay and MODULE.bazel, as bcr.bazel.build URLs with
-their integrity) in projects.json; and writes //<module>:BUILD.bazel.
+their integrity) in projects.json; and writes //projects/<module>:BUILD.bazel.
 Projects that can't be used (deprecated, no compatible version, an
 unsupported source type) are skipped with the reason, recorded in
 projects.json. Generated packages of projects not written are deleted.
@@ -334,13 +334,13 @@ def render_build(project):
 
 
 def build_files(projects, names):
-    """{<module>/BUILD.bazel: its text} for the projects named (those
+    """{projects/<module>/BUILD.bazel: its text} for the projects named (those
     projects.json fetches).
 
     Depends only on projects.txt (parsed) and projects.json, so
     tools/generated_test.py can check the committed files without the BCR.
     """
-    return {p["name"] + "/BUILD.bazel": render_build(p) for p in projects if p["name"] in names}
+    return {"projects/" + p["name"] + "/BUILD.bazel": render_build(p) for p in projects if p["name"] in names}
 
 
 def module_mismatch(projects, data):
@@ -529,12 +529,14 @@ def main():
     names = {e["name"] for e in entries}
     for path, text in build_files(projects, names).items():
         write(path, text)
-    for d in sorted(os.listdir(ROOT)):
-        build = os.path.join(ROOT, d, "BUILD.bazel")
+    projects_dir = os.path.join(ROOT, "projects")
+    for d in sorted(os.listdir(projects_dir)) if os.path.isdir(projects_dir) else []:
+        pkg = os.path.join(projects_dir, d)
+        build = os.path.join(pkg, "BUILD.bazel")
         if d not in names and is_generated(build):
             os.remove(build)
-            if not os.listdir(os.path.join(ROOT, d)):
-                shutil.rmtree(os.path.join(ROOT, d))
+            if not os.listdir(pkg):
+                shutil.rmtree(pkg)
     used = [p for p in projects if p["name"] in names]
     print("%s; BCR %s" % (status_line(counts(used, skipped)), commit[:12]), file=sys.stderr)
 
