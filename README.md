@@ -81,13 +81,11 @@ The plain-Bazel form skips known-failing projects entirely (they're
 
 Passing projects' logs (summary, inner invocation link) only print with
 `--test_output=all`; that flag isn't in the action key, so it replays cached
-results. Read inner logs with `bb view <inner invocation>`.
-
-`tools/run.py` prints each project's inner invocation link in its row
-(for `test` it adds `--test_output=all`; a cached result links the earlier
-inner run that produced it). Every inner run is also tagged `bazel-matrix`
-and `<project>`, so BuildBuddy's invocation history filtered by tag finds
-them.
+results. Read inner logs with `bb view <inner invocation>`. `tools/run.py`
+prints each project's inner link in its row, from the test logs (it adds
+`--test_output=all`) or the downloaded `build.txt` summaries, where a cached
+result links the earlier run that produced it; inner runs are also tagged
+`bazel-matrix` and `<project>` for BuildBuddy's tag filter.
 
 Caveats: `bb remote` runs your local diff against the default branch on the
 runner (commits need not be pushed). Afterwards it downloads the top-level
@@ -112,12 +110,10 @@ cached):
 3. deletes the work dir, also on SIGTERM (it kills the inner Bazel first)
    and when a killed run left one behind, so a runner's disk doesn't grow
    per run. Nothing is cached on the runner between runs but one install
-   base per pinned inner Bazel version (`/var/tmp/bazel-matrix/install/<version>`,
-   120-190 MB each), shared by concurrent runs: Bazel extracts it into a temp
-   dir and renames that into place, so concurrent first runs are safe, and
-   temp dirs left by killed extractions are deleted after an hour. Fetches
-   go through BuildBuddy's remote downloader, and reproducible repos come
-   from the remote repo contents cache.
+   base per pinned inner Bazel version (`/var/tmp/bazel-matrix/install/<version>`),
+   shared by concurrent runs. Fetches go through BuildBuddy's remote
+   downloader, and reproducible repos come from the remote repo contents
+   cache.
 
 Each inner run is tagged `resources:cpu:2`/`resources:memory:2500`, so a
 6-CPU, 7 GB runner runs two at a time and the 16-CPU, 32 GB one

@@ -82,10 +82,10 @@ def parse_args(argv):
     return p.parse_args(argv)
 
 
-def remove_stale_extractions(root, now=None):
+def remove_stale_extractions(root):
     """Removes <install base>.tmp.* dirs in root older than STALE_EXTRACTION:
     left by an inner Bazel killed while extracting its install base."""
-    now = time.time() if now is None else now
+    now = time.time()
     try:
         entries = os.listdir(root)
     except FileNotFoundError:

@@ -17,7 +17,5 @@ common:remote-minimal --rewind_lost_inputs
 # The executor image has no JDK; use a downloaded one.
 common:remote-minimal --java_runtime_version=remotejdk_21
 common:remote-minimal --tool_java_runtime_version=remotejdk_21
-# zstd-compress cache uploads and downloads (blobs of at least
-# --experimental_remote_cache_compression_threshold, 100 bytes by default in
-# every pinned Bazel).
+# zstd-compress cache transfers.
 common:remote-minimal --remote_cache_compression
