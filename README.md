@@ -44,9 +44,10 @@ tools/run.py build zlib re2      # some projects
 tools/run.py test --known-failing  # also the known-failing ones
 ```
 
-Like `//projects/...`, it leaves out `known-failing build` projects, and for a
-`known-failing test` project `test` runs its `:build` (row `BUILT`), so
-regressions of its inner build still show. A known-failing project that
+Like `//projects/...`, it leaves out `known-failing build` projects. For a
+`known-failing test` project, `test` runs its `:build` (row `BUILT`), so
+regressions of its inner build still show; plain `test //projects/...`
+(with `--build_tests_only`) doesn't, so only run.py catches those. A known-failing project that
 does run (named, or with `--known-failing`) shows its result with its mark:
 `FAILED (known-failing build)` is expected and doesn't fail the run, while
 `PASSED (known-failing build: candidate to un-mark)` is listed as a

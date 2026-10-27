@@ -277,7 +277,7 @@ def main(argv=None):
         if n in skipped:
             sys.exit("%s: skipped by sync: %s" % (n, skipped[n]))
     # Only the projects sync wrote a package for.
-    projects = [p for p in projects if os.path.exists(os.path.join(ROOT, sync.PROJECTS, p["name"], "BUILD.bazel"))]
+    projects = [p for p in projects if os.path.exists(os.path.join(ROOT, "projects", p["name"], "BUILD.bazel"))]
     targets = select_projects(projects, args.command, args.projects, args.known_failing)
     kf = {p["name"]: p["known_failing"][0] for p in projects if p.get("known_failing")}
     if not targets:
